@@ -1,109 +1,133 @@
-@push('styles')
+@pushOnce('styles')
     <style>
-        .global-toast {
+        #global-toast-container {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            top: 24px;
+            right: 24px;
             z-index: 99999;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
-        
-        .toast-message {
-            padding: 12px 24px;
-            margin-bottom: 10px;
-            border-radius: 4px;
-            color: white;
+
+        .toast-wrapper {
             display: flex;
             align-items: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            animation: slideIn 0.3s ease-out;
-            min-width: 250px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            box-shadow: 0 15px 30px rgba(15, 23, 42, 0.15);
+            min-width: 260px;
+            position: relative;
+            animation: toast-slide-down 0.35s ease-out;
         }
-        
-        .toast-success {
-            background-color: #10B981;
+
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 4px;
         }
-        
-        .toast-error {
-            background-color: #EF4444;
+
+        .toast-message {
+            color: #64748b;
+            font-size: 0.875rem;
         }
-        
-        .toast-icon {
-            margin-right: 12px;
-            font-size: 20px;
+
+        .toast-icon-success {
+            color: #22c55e;
         }
-        
-        .toast-close {
-            margin-left: 20px;
+
+        .toast-icon-error {
+            color: #ef4444;
+        }
+
+        .toast-close-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 9999px;
+            background-color: rgba(148, 163, 184, 0.2);
+            color: #334155;
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
-            font-weight: bold;
-            opacity: 0.8;
+            transition: background-color 0.2s ease;
         }
-        
-        .toast-close:hover {
-            opacity: 1;
+
+        .toast-close-btn:hover {
+            background-color: rgba(148, 163, 184, 0.35);
         }
-        
-        @keyframes slideIn {
+
+        @keyframes toast-slide-down {
             from {
-                transform: translateX(100%);
+                transform: translateY(-24px);
                 opacity: 0;
             }
             to {
-                transform: translateX(0);
+                transform: translateY(0);
                 opacity: 1;
             }
         }
     </style>
-@endpush
+@endPushOnce
 
-<div id="global-toast-container" class="global-toast"></div>
+<div id="global-toast-container"></div>
 
-@push('scripts')
+<!-- Hidden templates -->
+<div class="hidden">
+    <div id="toast-template-success" class="toast-wrapper">
+        <x-base.lucide icon="CheckCircle" class="toast-icon-success stroke-1.5 w-5 h-5"></x-base.lucide>
+        <div class="ml-4 mr-4">
+            <div class="toast-title">Success!</div>
+            <div class="toast-message"></div>
+        </div>
+        <button type="button" class="toast-close-btn">×</button>
+    </div>
+
+    <div id="toast-template-error" class="toast-wrapper">
+        <x-base.lucide icon="XCircle" class="toast-icon-error stroke-1.5 w-5 h-5"></x-base.lucide>
+        <div class="ml-4 mr-4">
+            <div class="toast-title">Error!</div>
+            <div class="toast-message"></div>
+        </div>
+        <button type="button" class="toast-close-btn">×</button>
+    </div>
+</div>
+
+@pushOnce('scripts')
 <script>
-    // Global toast notification function
-    window.showToast = function(message, type = 'success') {
+    function cloneToastTemplate(type, message) {
         const container = document.getElementById('global-toast-container');
         if (!container) return;
-        
-        // Create toast element
-        const toast = document.createElement('div');
-        toast.className = `toast-message toast-${type}`;
-        
-        // Set icon based on type
-        const icon = type === 'success' ? '✓' : '✗';
-        
-        // Create toast content
-        toast.innerHTML = `
-            <span class="toast-icon">${icon}</span>
-            <span class="toast-message-text">${message}</span>
-            <span class="toast-close" onclick="this.parentElement.remove()">&times;</span>
-        `;
-        
-        // Add to container
-        container.appendChild(toast);
-        
-        // Auto remove after 5 seconds
-        setTimeout(() => {
-            toast.style.animation = 'slideOut 0.5s forwards';
-            toast.addEventListener('animationend', () => toast.remove());
-        }, 5000);
-    };
-    
-    // Add slide out animation
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes slideOut {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(100%);
-                opacity: 0;
-            }
+
+        const templateId = type === 'success' ? 'toast-template-success' : 'toast-template-error';
+        const template = document.getElementById(templateId);
+        if (!template) return;
+
+        const node = template.cloneNode(true);
+        node.id = '';
+        node.classList.remove('hidden');
+        node.querySelector('.toast-title').textContent = type === 'success' ? 'Success!' : 'Error!';
+        node.querySelector('.toast-message').textContent = message;
+
+        const closeBtn = node.querySelector('.toast-close-btn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function () {
+                node.remove();
+            });
         }
-    `;
-    document.head.appendChild(style);
+
+        container.appendChild(node);
+        setTimeout(() => node.remove(), 5000);
+    }
+
+    window.showToast = function (message, type = 'success') {
+        cloneToastTemplate(type, message || (type === 'success' ? 'Operation completed successfully.' : 'Something went wrong.'));
+    };
 </script>
-@endpush
+@endPushOnce

@@ -1,57 +1,5 @@
-@push('styles')
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-@endpush
-
-@push('vendors')
-    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-@endpush
-
-<!-- Hidden Notification Templates -->
-<x-base.notification class="flex hidden" id="success-notification-content">
-    <x-base.lucide class="text-success" icon="CheckCircle" />
-    <div class="ml-4 mr-4">
-        <div class="font-medium">Success!</div>
-        <div class="mt-1 text-slate-500" id="success-message-text"></div>
-    </div>
-</x-base.notification>
-
-<x-base.notification class="flex hidden" id="error-notification-content">
-    <x-base.lucide class="text-danger" icon="XCircle" />
-    <div class="ml-4 mr-4">
-        <div class="font-medium">Error!</div>
-        <div class="mt-1 text-slate-500" id="error-message-text"></div>
-    </div>
-</x-base.notification>
-
 @push('scripts')
 <script>
-    // Toast notification function (exactly like theme notification.blade.php)
-    window.showToast = function(message, type = 'success') {
-        const contentId = type === 'success' ? 'success-notification-content' : 'error-notification-content';
-        const messageId = type === 'success' ? 'success-message-text' : 'error-message-text';
-        
-        // Update message text
-        document.getElementById(messageId).textContent = message;
-        
-        // Clone the element
-        const element = document.getElementById(contentId);
-        const clonedElement = element.cloneNode(true);
-        
-        // Remove hidden class
-        clonedElement.classList.remove('hidden');
-        
-        // Show notification using Toastify (same as theme)
-        Toastify({
-            node: clonedElement,
-            duration: 5000,
-            newWindow: true,
-            close: true,
-            gravity: "top",
-            position: "right",
-            stopOnFocus: true,
-        }).showToast();
-    };
-
     // Tab switching functionality
     document.addEventListener('DOMContentLoaded', function() {
         const tabs = document.querySelectorAll('.settings-tab');

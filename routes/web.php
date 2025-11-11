@@ -46,13 +46,33 @@ Route::middleware('auth')->group(function () {
         // DataTable route for departments
         Route::get('departments/datatable', [App\Http\Controllers\HR\DepartmentController::class, 'datatable'])
             ->name('departments.datatable');
+
+        // Preview generated department code
+        Route::get('departments/preview-code', [App\Http\Controllers\HR\DepartmentController::class, 'previewCode'])
+            ->name('departments.preview-code');
+            
+        // API for departments by company
+        Route::get('departments/api/company/{company}', [App\Http\Controllers\HR\DepartmentController::class, 'getByCompany'])
+            ->name('departments.api.by-company');
             
         // Positions
-        Route::resource('positions', 'App\Http\Controllers\HR\PositionController');
+        Route::get('positions/datatable', [App\Http\Controllers\HR\PositionController::class, 'datatable'])
+            ->name('positions.datatable');
+        Route::get('positions/preview-code', [App\Http\Controllers\HR\PositionController::class, 'previewCode'])
+            ->name('positions.preview-code');
+        Route::resource('positions', 'App\Http\Controllers\HR\PositionController')
+            ->only(['index', 'store', 'update', 'destroy']);
+            
+        // API for positions by department
+        Route::get('positions/api/department/{department}', [App\Http\Controllers\HR\PositionController::class, 'getPositionsByDepartment'])
+            ->name('positions.api.by-department');
             
         // Employees
+        Route::get('employees/datatable', [App\Http\Controllers\HR\EmployeeController::class, 'datatable'])
+            ->name('employees.datatable');
+        Route::get('employees/preview-code', [App\Http\Controllers\HR\EmployeeController::class, 'previewCode'])
+            ->name('employees.preview-code');
         Route::resource('employees', 'App\Http\Controllers\HR\EmployeeController');
-        Route::get('employees/export', [App\Http\Controllers\HR\EmployeeController::class, 'export'])->name('employees.export');
         
         // Attendance
         Route::get('attendance', [App\Http\Controllers\HR\AttendanceController::class, 'index'])->name('attendance.index');

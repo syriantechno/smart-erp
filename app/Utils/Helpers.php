@@ -1,5 +1,7 @@
 <?php
 
+use App\Services\DocumentCodeGenerator;
+
 if (!function_exists('merge')) {
     function merge($arrays)
     {
@@ -35,25 +37,17 @@ if (!function_exists('uncamelize')) {
     }
 }
 
-if (!function_exists('formatCurrency')) {
-    function formatCurrency($number)
+if (!function_exists('format_currency')) {
+    function format_currency($value, $currency = 'USD')
     {
-        if ($number) {
-            $formattedNumber = preg_replace('/\D/', '', strval($number));
-            $rest = strlen($formattedNumber) % 3;
-            $currency = substr($formattedNumber, 0, $rest);
-            $thousand = str_split(substr($formattedNumber, $rest), 3);
-            $separator = '';
+        return number_format((float) $value, 2) . ' ' . $currency;
+    }
+}
 
-            if ($thousand) {
-                $separator = $rest ? "." : "";
-                $currency .= $separator . implode(".", $thousand);
-            }
-
-            return $currency;
-        } else {
-            return "";
-        }
+if (!function_exists('generate_document_code')) {
+    function generate_document_code(string $documentType): string
+    {
+        return app(DocumentCodeGenerator::class)->generate($documentType);
     }
 }
 
@@ -65,11 +59,13 @@ if (!function_exists('getFileList')) {
         if (is_dir($directory)) {
             $scannedFiles = scandir($directory);
             foreach ($scannedFiles as $file) {
-                if ($file === '.' || $file === '..') continue;
+                if ($file === '.' || $file === '..') {
+                    continue;
+                }
 
-                $fileExtension = explode(".", $file);
-                if (in_array(end($fileExtension), explode(",", $extensions))) {
-                    array_push($files, str_replace(base_path() . "/", "", "/" . implode("/", array_filter(explode("/", $directory), "strlen")) . "/" . $file));
+                $fileExtension = explode('.', $file);
+                if (in_array(end($fileExtension), explode(',', $extensions))) {
+                    $files[] = str_replace(base_path() . '/', '', '/' . implode('/', array_filter(explode('/', $directory), 'strlen')) . '/' . $file);
                 }
             }
         }

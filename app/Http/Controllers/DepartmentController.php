@@ -16,11 +16,11 @@ class DepartmentController extends Controller
      */
     public function index()
     {
-        $departments = Department::with(['company', 'manager', 'parent'])
-            ->latest()
-            ->paginate(10);
+        $companies = Company::active()->get();
+        $managers = Employee::active()->get();
+        $departments = Department::active()->get();
 
-        return view('hr.departments.index', compact('departments'));
+        return view('hr.departments.index', compact('companies', 'managers', 'departments'));
     }
 
     /**

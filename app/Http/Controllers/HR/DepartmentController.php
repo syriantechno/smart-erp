@@ -4,13 +4,19 @@ namespace App\Http\Controllers\HR;
 
 use App\Http\Controllers\Controller;
 use App\Models\Department;
+use App\Services\DocumentCodeGenerator;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
+use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Validation\Rule;
 
 class DepartmentController extends Controller
 {
+    public function __construct(private DocumentCodeGenerator $codeGenerator)
+    {
+    }
+
     public function index()
     {
         $departments = Department::with(['manager', 'parent', 'employees'])->get();
@@ -32,7 +38,7 @@ class DepartmentController extends Controller
             'parent_id' => [
                 'nullable',
                 Rule::exists('departments', 'id')
-                    ->where('company_id', $request->company_id)
+                    ->where('company_id', request('company_id'))
             ],
             'description' => 'nullable|string',
             'is_active' => 'boolean',
@@ -40,6 +46,8 @@ class DepartmentController extends Controller
 
         try {
             DB::beginTransaction();
+
+            $validated['code'] = $this->codeGenerator->generate('department');
 
             $department = Department::create($validated);
             DB::commit();
@@ -83,37 +91,100 @@ class DepartmentController extends Controller
      */
     public function datatable(Request $request)
     {
-        $query = Department::with(['company', 'manager'])
-            ->withCount('employees')
-            ->select('departments.*');
-            
-        return DataTables::of($query)
-            ->addIndexColumn()
-            ->addColumn('DT_RowIndex', function($row) {
-                return '';
-            })
-            ->addColumn('actions', function($department) {
-                return view('hr.departments.partials.actions', ['department' => $department])->render();
-            })
-            ->addColumn('edit_url', function($department) {
-                return route('hr.departments.edit', $department);
-            })
-            ->editColumn('created_at', function($department) {
-                return $department->created_at->format('Y-m-d H:i:s');
-            })
-            ->editColumn('updated_at', function($department) {
-                return $department->updated_at->format('Y-m-d H:i:s');
-            })
-            ->rawColumns(['actions', 'is_active'])
-            ->make(true);
+        $draw = intval($request->input('draw'));
+        $length = intval($request->input('length', 10));
+        $start = intval($request->input('start', 0));
+        $searchValue = $request->input('search.value');
+
+        $baseQuery = Department::query()
+            ->with(['company', 'manager'])
+            ->withCount('employees');
+
+        $recordsTotal = (clone $baseQuery)->count();
+
+        if (!empty($searchValue)) {
+            $baseQuery->where(function ($query) use ($searchValue) {
+                $query->where('name', 'like', "%{$searchValue}%")
+                    ->orWhereHas('company', function ($companyQuery) use ($searchValue) {
+                        $companyQuery->where('name', 'like', "%{$searchValue}%");
+                    })
+                    ->orWhereHas('manager', function ($managerQuery) use ($searchValue) {
+                        $managerQuery->where('full_name', 'like', "%{$searchValue}%");
+                    });
+            });
+        }
+
+        $recordsFiltered = (clone $baseQuery)->count();
+
+        $orderColumnIndex = $request->input('order.0.column', 1);
+        $orderDirection = $request->input('order.0.dir', 'asc');
+        $orderableColumns = [
+            0 => 'id',
+            1 => 'name',
+            2 => 'company_name',
+            3 => 'manager_name',
+            4 => 'employees_count',
+            5 => 'is_active',
+        ];
+
+        $orderColumn = $orderableColumns[$orderColumnIndex] ?? 'name';
+
+        if ($orderColumn === 'company_name') {
+            $baseQuery->leftJoin('companies', 'departments.company_id', '=', 'companies.id')
+                ->orderBy('companies.name', $orderDirection)
+                ->select('departments.*');
+        } elseif ($orderColumn === 'manager_name') {
+            $baseQuery->leftJoin('employees', 'departments.manager_id', '=', 'employees.id')
+                ->orderBy('employees.full_name', $orderDirection)
+                ->select('departments.*');
+        } else {
+            $baseQuery->orderBy($orderColumn, $orderDirection);
+        }
+
+        $departments = $baseQuery
+            ->skip($start)
+            ->take($length)
+            ->get();
+
+        $data = $departments->map(function (Department $department, $index) use ($start) {
+            return [
+                'DT_RowIndex' => $start + $index + 1,
+                'code' => $department->code,
+                'name' => $department->name,
+                'company' => [
+                    'name' => optional($department->company)->name,
+                ],
+                'manager' => [
+                    'full_name' => optional($department->manager)->full_name,
+                ],
+                'employees_count' => $department->employees_count,
+                'is_active' => (bool) $department->is_active,
+                'actions' => view('hr.departments.partials.actions', ['department' => $department])->render(),
+            ];
+        })->values();
+
+        return response()->json([
+            'draw' => $draw,
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $data,
+        ]);
     }
-    
+
+    public function previewCode(): JsonResponse
+    {
+        $code = $this->codeGenerator->preview('department');
+
+        return response()->json([
+            'code' => $code,
+        ]);
+    }
+
     public function update(Request $request, Department $department)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'manager_id' => 'nullable|exists:employees,id',
             'parent_id' => 'nullable|exists:departments,id|not_in:' . $department->id,
             'is_active' => 'boolean'
         ]);

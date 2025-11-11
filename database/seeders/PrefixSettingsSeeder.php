@@ -14,6 +14,8 @@ class PrefixSettingsSeeder extends Seeder
     public function run(): void
     {
         $documentTypes = [
+            ['document_type' => 'department', 'prefix' => 'DEPT'],
+            ['document_type' => 'position', 'prefix' => 'POS'],
             ['document_type' => 'employees', 'prefix' => 'EMP'],
             ['document_type' => 'invoices', 'prefix' => 'INV'],
             ['document_type' => 'sales_orders', 'prefix' => 'SO'],

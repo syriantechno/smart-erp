@@ -123,4 +123,20 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Autoloaded Package Aliases
+    |--------------------------------------------------------------------------
+    |
+    | The aliases listed below are automatically loaded by Laravel's package
+    | auto-discovery mechanism. However, if you need to override any of these
+    | aliases, you may do so here.
+    |
+    */
+
+    'aliases' => [
+        'DataTables' => Yajra\DataTables\Facades\DataTables::class,
+        'Vite' => Illuminate\Support\Facades\Vite::class,
+    ],
+
 ];

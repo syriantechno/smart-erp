@@ -40,23 +40,22 @@ License: You must have a valid license purchased only from themeforest(the above
 
     <!-- BEGIN: CSS Assets-->
     @stack('styles')
-    <!-- END: CSS Assets-->
-
     @vite('resources/css/app.css')
 </head>
 <!-- END: Head -->
 
 <body>
-    @yield('content')
 
-    <!-- BEGIN: Vendor JS Assets-->
+
+@yield('content')
+
+ <!-- BEGIN: Vendor JS Assets-->
     @vite('resources/js/vendors/dom.js')
     @vite('resources/js/vendors/tailwind-merge.js')
     @stack('vendors')
-    <!-- END: Vendor JS Assets-->
 
     <!-- BEGIN: Pages, layouts, components JS Assets-->
-    @vite('resources/js/components/base/theme-color.js')
+
     @include('components.global-notifications')
     @stack('scripts')
     <!-- END: Pages, layouts, components JS Assets-->

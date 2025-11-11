@@ -5,6 +5,7 @@
 @endsection
 
 @section('subcontent')
+    @include('components.global-notifications')
     <div class="grid grid-cols-12 gap-6">
         <!-- Sidebar -->
         <div class="col-span-12 lg:col-span-3">

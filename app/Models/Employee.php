@@ -20,6 +20,7 @@ class Employee extends Model
      * @var array
      */
     protected $fillable = [
+        'code',
         'employee_id',
         'first_name',
         'middle_name',
@@ -38,7 +39,8 @@ class Employee extends Model
         'department_id',
         'company_id',
         'user_id',
-        'is_active'
+        'is_active',
+        'profile_picture'
     ];
 
     protected $casts = [
@@ -86,5 +88,17 @@ class Employee extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the profile picture URL.
+     */
+    public function getProfilePictureUrlAttribute()
+    {
+        if ($this->profile_picture) {
+            return asset('storage/' . $this->profile_picture);
+        }
+
+        return asset('images/default-avatar.png'); // Fallback to default avatar
     }
 }

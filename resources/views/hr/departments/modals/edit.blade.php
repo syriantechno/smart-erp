@@ -11,11 +11,19 @@ $departments = \App\Models\Department::where('id', '!=', $department->id)
     ->get();
 @endphp
 
-<x-base.modal id="edit-department-modal-{{ $department->id }}" size="modal-lg">
-    <x-base.modal-header>
-        <h2 class="font-medium text-lg">Edit Department: {{ $department->name }}</h2>
-    </x-base.modal-header>
-    <x-base.modal-body>
+<x-base.dialog id="edit-department-modal-{{ $department->id }}" size="lg">
+    <x-base.dialog.panel>
+        <x-base.dialog.title>
+            <h2 class="font-medium text-lg text-gray-900 dark:text-white">Edit Department: {{ $department->name }}</h2>
+            <button
+                type="button"
+                class="text-slate-500 hover:text-slate-400"
+                data-tw-dismiss="modal"
+            >
+                <x-base.lucide icon="X" class="w-5 h-5" />
+            </button>
+        </x-base.dialog.title>
+        <x-base.dialog.description class="p-5">
         <form id="edit-department-form-{{ $department->id }}" 
               action="{{ route('hr.departments.update', $department) }}" 
               method="POST">
@@ -100,80 +108,25 @@ $departments = \App\Models\Department::where('id', '!=', $department->id)
                 </div>
             </div>
         </form>
-    </x-base.modal-body>
-    <x-base.modal-footer>
-        <x-base.button
-            type="button"
-            data-tw-dismiss="modal"
-            variant="outline-secondary"
-            class="mr-1"
-        >
-            Cancel
-        </x-base.button>
-        <x-base.button
-            type="submit"
-            form="edit-department-form-{{ $department->id }}"
-            variant="primary"
-        >
-            Update Department
-        </x-base.button>
-    </x-base.modal-footer>
-</x-base.modal>
-
-@push('scripts')
-<script>
-    // Handle edit form submission
-    document.getElementById('edit-department-form-{{ $department->id }}').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const form = this;
-        const submitButton = form.querySelector('button[type="submit"]');
-        const originalButtonText = submitButton.innerHTML;
-        
-        // Show loading state
-        submitButton.disabled = true;
-        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Updating...';
-        
-        // Submit form via AJAX
-        fetch(form.action, {
-            method: 'POST',
-            body: new FormData(form),
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.redirect) {
-                window.location.href = data.redirect;
-            } else if (data.error) {
-                showToast('error', data.message || 'An error occurred');
-            } else {
-                // Reload the DataTable
-                if (window.LaravelDataTables && window.LaravelDataTables['departments-table']) {
-                    window.LaravelDataTables['departments-table'].draw(false);
-                }
-                
-                // Close the modal
-                const modal = document.getElementById('edit-department-modal-{{ $department->id }}');
-                const modalInstance = bootstrap.Modal.getInstance(modal);
-                if (modalInstance) {
-                    modalInstance.hide();
-                }
-                
-                showToast('success', 'Department updated successfully');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showToast('error', 'An error occurred while updating the department');
-        })
-        .finally(() => {
-            // Reset button state
-            submitButton.disabled = false;
-            submitButton.innerHTML = originalButtonText;
-        });
-    });
-</script>
-@endpush
+        </x-base.dialog.description>
+        <x-base.dialog.footer class="border-t border-gray-200 dark:border-dark-5 pt-4 mt-4">
+            <div class="flex justify-end gap-2 w-full">
+                <x-base.button
+                    type="button"
+                    data-tw-dismiss="modal"
+                    variant="outline-secondary"
+                >
+                    Cancel
+                </x-base.button>
+                <x-base.button
+                    type="submit"
+                    form="edit-department-form-{{ $department->id }}"
+                    variant="primary"
+                >
+                    <x-base.lucide icon="Save" class="w-4 h-4 mr-2" />
+                    Update Department
+                </x-base.button>
+            </div>
+        </x-base.dialog.footer>
+    </x-base.dialog.panel>
+</x-base.dialog>
