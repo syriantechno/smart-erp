@@ -41,6 +41,9 @@ License: You must have a valid license purchased only from themeforest(the above
     <!-- BEGIN: CSS Assets-->
     @stack('styles')
     @vite('resources/css/app.css')
+
+    <!-- DataTables Local CSS -->
+    <link rel="stylesheet" href="{{ asset('vendor/datatables/datatables.min.css') }}">
 </head>
 <!-- END: Head -->
 
@@ -57,6 +60,29 @@ License: You must have a valid license purchased only from themeforest(the above
     <!-- BEGIN: Pages, layouts, components JS Assets-->
 
     @include('components.global-notifications')
+
+    <!-- DataTables Local JavaScript -->
+    <script src="{{ asset('vendor/datatables/jquery-3.7.1.min.js') }}"></script>
+    <script src="{{ asset('vendor/datatables/datatables.min.js') }}"></script>
+    <script src="{{ asset('vendor/datatables/sweetalert2.min.js') }}"></script>
+
+    <!-- Lucide Icons Local JavaScript -->
+    <script src="{{ asset('vendor/lucide/lucide.umd.min.js') }}"></script>
+    <script>
+        // Initialize Lucide Icons
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                lucide.createIcons({
+                    'stroke-width': 1.5,
+                    nameAttr: 'data-lucide'
+                });
+                console.log('✅ Lucide icons initialized locally');
+            } else {
+                console.error('❌ Lucide library not loaded');
+            }
+        });
+    </script>
+
     @stack('scripts')
     <!-- END: Pages, layouts, components JS Assets-->
 </body>

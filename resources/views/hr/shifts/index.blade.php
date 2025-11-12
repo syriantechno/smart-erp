@@ -97,9 +97,19 @@
                             <x-base.button id="shifts-export" variant="outline-secondary" class="mr-2 w-1/2 sm:w-auto">
                                 <x-base.lucide icon="Download" class="mr-2 h-4 w-4" /> Export
                             </x-base.button>
-                            <x-base.button id="shifts-refresh" variant="outline-secondary" class="w-1/2 sm:w-auto">
+                            <x-base.button id="shifts-refresh" variant="outline-secondary" class="mr-2 w-1/2 sm:w-auto">
                                 <x-base.lucide icon="RefreshCcw" class="mr-2 h-4 w-4" /> Refresh
                             </x-base.button>
+                            <x-base.button id="shifts-clear-cache" variant="outline-warning" class="mr-2 w-1/2 sm:w-auto">
+                                <x-base.lucide icon="Trash2" class="mr-2 h-4 w-4" /> Clear Cache
+                            </x-base.button>
+                            <x-base.button id="shifts-cache-stats" variant="outline-info" class="mr-2 w-1/2 sm:w-auto">
+                                <x-base.lucide icon="BarChart3" class="mr-2 h-4 w-4" /> Cache Stats
+                            </x-base.button>
+                            <div id="connection-status" class="flex items-center px-3 py-2 text-sm">
+                                <div class="w-2 h-2 rounded-full bg-green-500 mr-2" id="connection-dot"></div>
+                                <span id="connection-text">Online</span>
+                            </div>
                         </div>
                     </div>
 
@@ -129,10 +139,8 @@
     @stack('shift-modals')
 @endsection
 
-@include('components.datatable.scripts')
-
 @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
+    <script src="{{ asset('js/data-cache-manager.js') }}"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         try {
@@ -150,7 +158,25 @@
 
             const initialLength = lengthSelect ? parseInt(lengthSelect.value, 10) || 10 : 10;
 
-            const table = window.initDataTable('#shifts-table', {
+            // Preload essential data first
+            Promise.all([
+                preloadCompanies(),
+                // Load departments for first company if available
+                preloadCompanies().then(companies => {
+                    if (companies && companies.length > 0) {
+                        return preloadDepartments(companies[0].id);
+                    }
+                }).catch(() => null)
+            ]).then(() => {
+                console.log('🎯 Essential data loaded, initializing DataTable...');
+                initializeDataTable();
+            }).catch(error => {
+                console.error('Failed to preload data, initializing DataTable anyway:', error);
+                initializeDataTable();
+            });
+
+            function initializeDataTable() {
+                const table = createOfflineDataTable('#shifts-table', {
                 ajax: {
                     url: '{{ route("hr.shifts.datatable") }}',
                     type: 'GET',
@@ -178,6 +204,7 @@
                 pageLength: initialLength,
                 lengthChange: false,
                 searching: false,
+                order: [[2, 'asc']], // Order by name column (index 2)
                 dom:
                     "t<'datatable-footer flex flex-col md:flex-row md:items-center md:justify-between mt-5 gap-4'<'datatable-info text-slate-500'i><'datatable-pagination'p>>",
                 columns: [
@@ -213,17 +240,13 @@
                         searchable: false
                     }
                 ],
+                rawColumns: ['status', 'actions'],
                 drawCallback: function () {
                     if (typeof window.Lucide !== 'undefined') {
                         window.Lucide.createIcons();
                     }
                 }
             });
-
-            if (!table) {
-                console.error('❌ Failed to initialize shifts table');
-                return;
-            }
 
             // Handle filters
             if (lengthSelect) {
@@ -236,6 +259,9 @@
             const reloadTable = function () {
                 table.ajax.reload(null, false);
             };
+
+            // Make it global
+            window.reloadTable = reloadTable;
 
             if (filterGoBtn) {
                 filterGoBtn.addEventListener('click', reloadTable);
@@ -265,6 +291,81 @@
             if (refreshBtn) {
                 refreshBtn.addEventListener('click', reloadTable);
             }
+
+            // Clear cache button
+            if (document.getElementById('shifts-clear-cache')) {
+                document.getElementById('shifts-clear-cache').addEventListener('click', function() {
+                    if (confirm('Are you sure you want to clear all cached data?')) {
+                        // Clear localStorage cache
+                        OfflineManager.clearData();
+
+                        // Clear dataCache
+                        if (typeof window.dataCache !== 'undefined') {
+                            window.dataCache.clear();
+                        }
+
+                        showToast('Cache cleared successfully', 'success');
+                        reloadTable();
+                    }
+                });
+            }
+
+            // Cache stats button
+            if (document.getElementById('shifts-cache-stats')) {
+                document.getElementById('shifts-cache-stats').addEventListener('click', function() {
+                    if (typeof window.dataCache !== 'undefined') {
+                        const stats = window.dataCache.getStats();
+                        let message = `📊 Cache Statistics:\n`;
+                        message += `Total cached items: ${stats.totalItems}\n`;
+                        message += `Items currently loading: ${stats.loadingItems}\n\n`;
+
+                        if (stats.items.length > 0) {
+                            message += `Cached items:\n`;
+                            stats.items.forEach(item => {
+                                const age = Math.round(item.age / 1000 / 60); // minutes
+                                message += `- ${item.key}: ${age}min old, ${item.size} bytes\n`;
+                            });
+                        } else {
+                            message += `No items in cache`;
+                        }
+
+                        alert(message);
+                    } else {
+                        showToast('Cache manager not available', 'warning');
+                    }
+                });
+            }
+
+            // Update connection status
+            function updateConnectionStatus() {
+                const dot = document.getElementById('connection-dot');
+                const text = document.getElementById('connection-text');
+
+                if (OfflineManager.isOnline()) {
+                    dot.className = 'w-2 h-2 rounded-full bg-green-500 mr-2';
+                    text.textContent = 'Online';
+                } else {
+                    dot.className = 'w-2 h-2 rounded-full bg-red-500 mr-2';
+                    text.textContent = 'Offline';
+                }
+            }
+
+            // Initial status
+            updateConnectionStatus();
+
+            // Monitor online/offline status
+            window.addEventListener('online', function() {
+                console.log('🌐 Back online - syncing data...');
+                OfflineManager.syncData();
+                updateConnectionStatus();
+                showToast('Back online - data synced', 'success');
+            });
+
+            window.addEventListener('offline', function() {
+                console.log('📴 Gone offline - using local data');
+                updateConnectionStatus();
+                showToast('You are offline - using cached data', 'warning');
+            });
 
             // Handle export
             if (exportBtn) {
@@ -327,11 +428,16 @@
                 'X-Requested-With': 'XMLHttpRequest',
                 'Accept': 'application/json',
             },
+            credentials: 'same-origin',
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                location.reload();
+                if (window.reloadTable) {
+                    window.reloadTable();
+                } else {
+                    location.reload();
+                }
                 showToast(data.message || 'Shift deleted successfully', 'success');
             } else {
                 showToast(data.message || 'Failed to delete shift', 'error');
@@ -351,11 +457,16 @@
                 'X-Requested-With': 'XMLHttpRequest',
                 'Accept': 'application/json',
             },
+            credentials: 'same-origin',
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                location.reload();
+                if (window.reloadTable) {
+                    window.reloadTable();
+                } else {
+                    location.reload();
+                }
                 showToast(data.message, 'success');
             } else {
                 showToast(data.message || 'Failed to update shift status', 'error');
@@ -366,6 +477,284 @@
             showToast('An error occurred while updating', 'error');
         });
     };
+
+    // Database Service for offline/online data management
+    const DatabaseService = {
+        // API base URL
+        apiUrl: window.location.origin,
+
+        // Cache settings
+        cacheExpiry: 5 * 60 * 1000, // 5 minutes in milliseconds
+
+        // Make API request with offline fallback
+        async request(endpoint, options = {}) {
+            const cacheKey = `cache_${endpoint}_${JSON.stringify(options.body || {})}`;
+
+            // Check if offline
+            if (!OfflineManager.isOnline()) {
+                console.log('📴 Offline mode - using cached data');
+                const cachedData = OfflineManager.getData(cacheKey);
+                if (cachedData && this.isCacheValid(cachedData.timestamp)) {
+                    return cachedData.data;
+                } else {
+                    throw new Error('No cached data available and offline');
+                }
+            }
+
+            try {
+                const response = await fetch(`${this.apiUrl}${endpoint}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                // Cache the response
+                OfflineManager.storeData(cacheKey, {
+                    data: data,
+                    timestamp: Date.now()
+                });
+
+                return data;
+            } catch (error) {
+                console.error('API request failed:', error);
+
+                // Try to use cached data as fallback
+                const cachedData = OfflineManager.getData(cacheKey);
+                if (cachedData && this.isCacheValid(cachedData.timestamp)) {
+                    console.log('📦 Using cached data as fallback');
+                    return cachedData.data;
+                }
+
+                throw error;
+            }
+        },
+
+        // Check if cache is still valid
+        isCacheValid(timestamp) {
+            return (Date.now() - timestamp) < this.cacheExpiry;
+        },
+
+        // CRUD operations
+        async get(endpoint, params = {}) {
+            const queryString = new URLSearchParams(params).toString();
+            const url = queryString ? `${endpoint}?${queryString}` : endpoint;
+            return this.request(url, { method: 'GET' });
+        },
+
+        async post(endpoint, data) {
+            return this.request(endpoint, {
+                method: 'POST',
+                body: JSON.stringify(data)
+            });
+        },
+
+        async put(endpoint, data) {
+            return this.request(endpoint, {
+                method: 'PUT',
+                body: JSON.stringify(data)
+            });
+        },
+
+        async delete(endpoint) {
+            return this.request(endpoint, { method: 'DELETE' });
+        }
+    };
+
+// Data Preloader - تحميل البيانات الأساسية مسبقاً
+const DataPreloader = {
+    // البيانات المحملة
+    data: {
+        companies: null,
+        departments: null,
+        employees: null,
+        shifts: null
+    },
+
+    // حالة التحميل
+    loading: {
+        companies: false,
+        departments: false,
+        employees: false,
+        shifts: false
+    },
+
+    // تحميل البيانات الأساسية
+    async preloadEssentialData() {
+        console.log('🔄 Preloading essential data...');
+
+        // تحميل الشركات
+        if (!this.data.companies) {
+            this.loading.companies = true;
+            try {
+                this.data.companies = await DatabaseService.get('/hr/employees/companies');
+                OfflineManager.storeData('companies', this.data.companies);
+                console.log('✅ Companies loaded:', this.data.companies?.length || 0);
+            } catch (error) {
+                console.error('❌ Failed to load companies:', error);
+                // استخدم البيانات المحلية كبديل
+                this.data.companies = OfflineManager.getData('companies');
+            }
+            this.loading.companies = false;
+        }
+
+        // تحميل الأقسام إذا كانت هناك شركات
+        if (this.data.companies && this.data.companies.length > 0) {
+            await this.preloadDepartmentsForCompany(this.data.companies[0]?.id);
+        }
+
+        console.log('✅ Essential data preloaded');
+    },
+
+    // تحميل الأقسام لشركة معينة
+    async preloadDepartmentsForCompany(companyId) {
+        if (!companyId || this.loading.departments) return;
+
+        this.loading.departments = true;
+        try {
+            const cacheKey = `departments_${companyId}`;
+            this.data.departments = await DatabaseService.get(`/hr/departments/api/company/${companyId}`);
+            OfflineManager.storeData(cacheKey, this.data.departments);
+            console.log('✅ Departments loaded for company:', companyId, this.data.departments?.length || 0);
+        } catch (error) {
+            console.error('❌ Failed to load departments:', error);
+            this.data.departments = OfflineManager.getData(`departments_${companyId}`);
+        }
+        this.loading.departments = false;
+    },
+
+    // تحميل الموظفين لقسم معين
+    async preloadEmployeesForDepartment(departmentId) {
+        if (!departmentId || this.loading.employees) return;
+
+        this.loading.employees = true;
+        try {
+            const cacheKey = `employees_${departmentId}`;
+            this.data.employees = await DatabaseService.get(`/hr/employees/positions/department?department_id=${departmentId}`);
+            OfflineManager.storeData(cacheKey, this.data.employees);
+            console.log('✅ Employees loaded for department:', departmentId, this.data.employees?.length || 0);
+        } catch (error) {
+            console.error('❌ Failed to load employees:', error);
+            this.data.employees = OfflineManager.getData(`employees_${departmentId}`);
+        }
+        this.loading.employees = false;
+    },
+
+    // الحصول على البيانات المحملة
+    getCompanies() {
+        return this.data.companies || [];
+    },
+
+    getDepartments() {
+        return this.data.departments || [];
+    },
+
+    getEmployees() {
+        return this.data.employees || [];
+    },
+
+    // تحديث البيانات
+    async refreshData(type) {
+        switch(type) {
+            case 'companies':
+                this.data.companies = null;
+                await this.preloadEssentialData();
+                break;
+            case 'departments':
+                this.data.departments = null;
+                if (this.data.companies?.length > 0) {
+                    await this.preloadDepartmentsForCompany(this.data.companies[0].id);
+                }
+                break;
+            case 'employees':
+                this.data.employees = null;
+                // سيتم تحميلها عند الحاجة
+                break;
+        }
+    }
+};
+
+// Make DataPreloader globally available
+window.DataPreloader = DataPreloader;
+
+// Enhanced table with offline support
+function createOfflineDataTable(selector, config) {
+        if (typeof $ === 'undefined' || typeof $.fn.DataTable === 'undefined') {
+            console.error('jQuery or DataTables not loaded yet, retrying...');
+            setTimeout(() => createOfflineDataTable(selector, config), 100);
+            return null;
+        }
+
+        const originalAjax = config.ajax;
+
+        config.ajax = function(data, callback, settings) {
+            if (!OfflineManager.isOnline()) {
+                // Offline mode - use cached data
+                console.log('📴 Loading data from cache...');
+                const cacheKey = 'datatable_shifts';
+                const cachedData = OfflineManager.getData(cacheKey);
+
+                if (cachedData && DatabaseService.isCacheValid(cachedData.timestamp)) {
+                    callback({
+                        draw: data.draw,
+                        recordsTotal: cachedData.data.length,
+                        recordsFiltered: cachedData.data.length,
+                        data: cachedData.data
+                    });
+                    showToast('Using cached data (offline)', 'info');
+                } else {
+                    callback({
+                        draw: data.draw,
+                        recordsTotal: 0,
+                        recordsFiltered: 0,
+                        data: [],
+                        error: 'No cached data available'
+                    });
+                    showToast('No data available offline', 'warning');
+                }
+                return;
+            }
+
+            // Online mode - make API call
+            DatabaseService.get(originalAjax.url, data)
+                .then(response => {
+                    // Cache the data
+                    OfflineManager.storeData('datatable_shifts', {
+                        data: response.data || [],
+                        timestamp: Date.now()
+                    });
+
+                    callback({
+                        draw: data.draw,
+                        recordsTotal: response.recordsTotal || 0,
+                        recordsFiltered: response.recordsFiltered || 0,
+                        data: response.data || []
+                    });
+                })
+                .catch(error => {
+                    console.error('DataTable AJAX error:', error);
+                    callback({
+                        draw: data.draw,
+                        recordsTotal: 0,
+                        recordsFiltered: 0,
+                        data: [],
+                        error: error.message
+                    });
+                });
+        };
+
+        return $(selector).DataTable(config);
+    }
 
     window.viewShift = function (id) {
         console.log('Viewing shift details:', id);

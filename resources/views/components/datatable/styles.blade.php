@@ -1,5 +1,5 @@
 @pushOnce('styles')
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.13.8/datatables.min.css" />
+    <!-- DataTables CSS is now loaded globally in base.blade.php -->
     <style>
         .datatable-default {
             border-collapse: separate;

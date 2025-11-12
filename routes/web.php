@@ -88,14 +88,6 @@ Route::middleware('auth')->group(function () {
         Route::post('attendance/bulk-update', [App\Http\Controllers\HR\AttendanceController::class, 'bulkUpdate'])->name('attendance.bulk-update');
         Route::get('attendance/stats', [App\Http\Controllers\HR\AttendanceController::class, 'getMonthlyStats'])->name('attendance.stats');
         
-        // Shifts
-        Route::get('shifts/datatable', [App\Http\Controllers\ShiftController::class, 'datatable'])->name('shifts.datatable');
-        Route::get('shifts/preview-code', [App\Http\Controllers\ShiftController::class, 'previewCode'])->name('shifts.preview-code');
-        Route::post('shifts/{shift}/toggle-status', [App\Http\Controllers\ShiftController::class, 'toggleStatus'])->name('shifts.toggle-status');
-        Route::get('shifts/departments', [App\Http\Controllers\ShiftController::class, 'getDepartments'])->name('shifts.departments');
-        Route::get('shifts/employees', [App\Http\Controllers\ShiftController::class, 'getEmployees'])->name('shifts.employees');
-        Route::resource('shifts', App\Http\Controllers\ShiftController::class);
-        
         // Leave Management
         Route::get('leave', [App\Http\Controllers\HR\LeaveController::class, 'index'])->name('leave.index');
         
@@ -104,6 +96,14 @@ Route::middleware('auth')->group(function () {
         
         // Recruitment
         Route::get('recruitment', [App\Http\Controllers\HR\RecruitmentController::class, 'index'])->name('recruitment.index');
+        
+        // Shifts
+        Route::get('shifts/datatable', [App\Http\Controllers\ShiftController::class, 'datatable'])->name('shifts.datatable');
+        Route::get('shifts/preview-code', [App\Http\Controllers\ShiftController::class, 'previewCode'])->name('shifts.preview-code');
+        Route::post('shifts/{shift}/toggle-status', [App\Http\Controllers\ShiftController::class, 'toggleStatus'])->name('shifts.toggle-status');
+        Route::get('shifts/departments', [App\Http\Controllers\ShiftController::class, 'getDepartments'])->name('shifts.departments');
+        Route::get('shifts/employees', [App\Http\Controllers\ShiftController::class, 'getEmployees'])->name('shifts.employees');
+        Route::resource('shifts', App\Http\Controllers\ShiftController::class);
     });
 
     // Dashboard and other pages

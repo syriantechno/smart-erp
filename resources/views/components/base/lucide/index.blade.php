@@ -6,10 +6,11 @@
     {{ $attributes->class(merge(['stroke-1.5 w-5 h-5', $attributes->whereStartsWith('class')->first()]))->merge($attributes->whereDoesntStartWith('class')->getAttributes()) }}
 ></i>
 
-@pushOnce('vendors')
+{{-- Lucide is now loaded globally in base.blade.php --}}
+{{-- @pushOnce('vendors')
     @vite('resources/js/vendors/lucide.js')
 @endPushOnce
 
 @pushOnce('scripts')
     @vite('resources/js/components/base/lucide.js')
-@endPushOnce
+@endPushOnce --}}

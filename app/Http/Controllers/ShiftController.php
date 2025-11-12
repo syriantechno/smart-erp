@@ -3,22 +3,26 @@
 namespace App\Http\Controllers;
 
 use App\Models\Shift;
-use App\Models\Company;
-use App\Models\Department;
-use App\Models\Employee;
+use App\Repositories\ShiftRepository;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Validator;
-use Yajra\DataTables\DataTables;
+use Illuminate\View\View;
 
 class ShiftController extends Controller
 {
+    protected $shiftRepository;
+
+    public function __construct(ShiftRepository $shiftRepository)
+    {
+        $this->shiftRepository = $shiftRepository;
+    }
+
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): View
     {
-        $companies = Company::active()->get();
+        $companies = \App\Models\Company::active()->get();
         return view('hr.shifts.index', compact('companies'));
     }
 
@@ -28,11 +32,10 @@ class ShiftController extends Controller
     public function datatable(Request $request): JsonResponse
     {
         try {
-            $shifts = Shift::with(['company', 'department', 'employee'])
-                ->select(['id', 'code', 'name', 'start_time', 'end_time', 'working_hours', 'color', 'is_active', 'applicable_to', 'company_id', 'department_id', 'employee_id', 'created_at']);
+            $shifts = $this->shiftRepository->getForDataTable();
 
-            return DataTables::of($shifts)
-                ->addIndexColumn() // Adding index column
+            return \Yajra\DataTables\Facades\DataTables::of($shifts)
+                ->addIndexColumn()
                 ->orderColumn('DT_RowIndex', 'id $1')
                 ->addColumn('formatted_time', function ($shift) {
                     return $shift->formatted_time;
@@ -46,10 +49,18 @@ class ShiftController extends Controller
                         '<span class="badge bg-danger">Inactive</span>';
                 })
                 ->addColumn('actions', function ($shift) {
-                    return view('hr.shifts.partials.actions', compact('shift'))->render();
+                    try {
+                        return view('hr.shifts.partials.actions', compact('shift'))->render();
+                    } catch (\Exception $e) {
+                        \Log::info('Error rendering actions view:', [
+                            'shift_id' => $shift->id,
+                            'error' => $e->getMessage(),
+                        ]);
+                        return 'Error: ' . $e->getMessage();
+                    }
                 })
                 ->rawColumns(['status', 'actions'])
-                ->make(true);
+                ->toJson();
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Database error: ' . $e->getMessage()
@@ -84,8 +95,8 @@ class ShiftController extends Controller
             'is_active' => 'boolean',
             'applicable_to' => 'required|in:company,department,employee',
             'company_id' => 'required_if:applicable_to,company|required_if:applicable_to,department|required_if:applicable_to,employee|exists:companies,id',
-            'department_id' => 'required_if:applicable_to,department|required_if:applicable_to,employee|exists:departments,id',
-            'employee_id' => 'required_if:applicable_to,employee|exists:employees,id',
+            'department_id' => 'nullable|required_if:applicable_to,department|required_if:applicable_to,employee|exists:departments,id',
+            'employee_id' => 'nullable|required_if:applicable_to,employee|exists:employees,id',
             'work_days' => 'nullable|array',
             'work_days.*' => 'in:monday,tuesday,wednesday,thursday,friday,saturday,sunday',
             'break_start' => 'nullable|date_format:H:i',
@@ -174,8 +185,8 @@ class ShiftController extends Controller
             'is_active' => 'boolean',
             'applicable_to' => 'required|in:company,department,employee',
             'company_id' => 'required_if:applicable_to,company|required_if:applicable_to,department|required_if:applicable_to,employee|exists:companies,id',
-            'department_id' => 'required_if:applicable_to,department|required_if:applicable_to,employee|exists:departments,id',
-            'employee_id' => 'required_if:applicable_to,employee|exists:employees,id',
+            'department_id' => 'nullable|required_if:applicable_to,department|required_if:applicable_to,employee|exists:departments,id',
+            'employee_id' => 'nullable|required_if:applicable_to,employee|exists:employees,id',
             'work_days' => 'nullable|array',
             'work_days.*' => 'in:monday,tuesday,wednesday,thursday,friday,saturday,sunday',
             'break_start' => 'nullable|date_format:H:i',
@@ -296,15 +307,23 @@ class ShiftController extends Controller
      */
     public function getEmployees(Request $request): JsonResponse
     {
-        $employees = Employee::where('department_id', $request->department_id)
-            ->active()
-            ->select('id', 'first_name', 'last_name', 'full_name')
-            ->get();
+        try {
+            $employees = Employee::where('department_id', $request->department_id)
+                ->active()
+                ->select('id', 'first_name', 'last_name', 'full_name')
+                ->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => $employees
-        ]);
+            return response()->json([
+                'success' => true,
+                'data' => $employees
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to load employees',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**

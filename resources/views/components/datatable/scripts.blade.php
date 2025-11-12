@@ -1,6 +1,5 @@
 @pushOnce('scripts')
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.datatables.net/v/bs5/dt-1.13.8/datatables.min.js"></script>
+    <!-- DataTables JS is now loaded globally in base.blade.php -->
     <script>
         window.initDataTable = function (selector, options = {}) {
             const jq = window.jQuery || window.$;

@@ -223,89 +223,25 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Generate code preview
-    function generateCodePreview() {
-        fetch('{{ route("hr.shifts.preview-code") }}')
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const codeInput = document.getElementById('shift-code');
-                    if (codeInput) {
-                        codeInput.value = data.code;
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error generating code:', error);
-            });
+// Define globally available function
+function submitShiftForm() {
+    const form = document.getElementById('create-shift-form');
+    if (form) {
+        handleFormSubmit(form);
     }
+}
 
-    // Call it immediately on load
-    generateCodePreview();
-
-    // Handle applicable to changes
-    document.getElementById('applicable-to').addEventListener('change', function() {
-        const applicableTo = this.value;
-        const companySelection = document.getElementById('company-selection');
-        const departmentSelection = document.getElementById('shift-department-selection');
-        const employeeSelection = document.getElementById('shift-employee-selection');
-        const companyField = document.getElementById('company-id');
-        const departmentField = document.getElementById('department-id');
-        const employeeField = document.getElementById('employee-id');
-
-        // Reset all
-        companySelection.style.display = 'block';
-        departmentSelection.style.display = 'none';
-        employeeSelection.style.display = 'none';
-        companyField.required = false;
-        departmentField.required = false;
-        employeeField.required = false;
-
-        if (applicableTo === 'company') {
-            companyField.required = true;
-        } else if (applicableTo === 'department') {
-            companySelection.style.display = 'block';
-            departmentSelection.style.display = 'block';
-            companyField.required = true;
-            departmentField.required = true;
-
-            // Load departments when company changes
-            document.getElementById('company-id').addEventListener('change', function() {
-                loadDepartments(this.value);
-            });
-        } else if (applicableTo === 'employee') {
-            companySelection.style.display = 'block';
-            departmentSelection.style.display = 'block';
-            employeeSelection.style.display = 'block';
-            companyField.required = true;
-            departmentField.required = true;
-            employeeField.required = true;
-
-            // Load departments and employees
-            document.getElementById('company-id').addEventListener('change', function() {
-                loadDepartments(this.value);
-            });
-            document.getElementById('department-id').addEventListener('change', function() {
-                loadEmployees(this.value);
-            });
-        }
-    });
-
-    // Select all days
-    document.getElementById('select-all-days').addEventListener('change', function() {
-        const checkboxes = document.querySelectorAll('input[name="work_days[]"]');
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = this.checked;
-        });
-    });
-
-    // Handle form submission
-    document.getElementById('create-shift-form').addEventListener('submit', function(e) {
+// Form submit handler
+document.addEventListener('submit', function(e) {
+    if (e.target && e.target.id === 'create-shift-form') {
         e.preventDefault();
+        handleFormSubmit(e.target);
+    }
+});
 
-        const formData = new FormData(this);
-        const data = {};
+function handleFormSubmit(form) {
+    const formData = new FormData(form);
+    const data = {};
 
         // Convert FormData to object properly
         for (let [key, value] of formData.entries()) {
@@ -393,10 +329,20 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('📨 بيانات الاستجابة:', data);
             if (data.success) {
                 showToast(data.message || 'Shift created successfully', 'success');
-                // Close modal and reload
-                setTimeout(() => {
-                    location.reload();
-                }, 1000);
+                // Close modal
+                const modal = document.getElementById('create-shift-modal');
+                if (modal) {
+                    modal.__tw_modal.hide();
+                }
+                // Reload the table instead of the whole page
+                if (window.reloadTable) {
+                    window.reloadTable();
+                } else {
+                    // Fallback to reload if table reload function not available
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                }
             } else {
                 console.error('❌ Failed to save data:', data);
                 showToast(data.message || 'Failed to create shift', 'error');
@@ -408,6 +354,103 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => {
             console.error('💥 Network error:', error);
             showToast('An error occurred while saving', 'error');
+        });
+}
+
+// Wait for data to be preloaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if dataCache is available and has data
+    if (typeof window.dataCache !== 'undefined') {
+        // Populate companies if available
+        const companies = window.dataCache.get('companies');
+        if (companies && companies.length > 0) {
+            const companySelect = document.getElementById('company-id');
+            if (companySelect) {
+                companySelect.innerHTML = '<option value="">Select Company</option>';
+                companies.forEach(company => {
+                    const option = document.createElement('option');
+                    option.value = company.id;
+                    option.textContent = company.name;
+                    companySelect.appendChild(option);
+                });
+                console.log('✅ Companies populated from cache');
+            }
+        }
+    }
+
+    // Generate code preview
+    function generateCodePreview() {
+        fetch('{{ route("hr.shifts.preview-code") }}')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const codeInput = document.getElementById('shift-code');
+                    if (codeInput) {
+                        codeInput.value = data.code;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error generating code:', error);
+            });
+    }
+
+    // Call it immediately on load
+    generateCodePreview();
+
+    // Handle applicable to changes
+    document.getElementById('applicable-to').addEventListener('change', function() {
+        const applicableTo = this.value;
+        const companySelection = document.getElementById('company-selection');
+        const departmentSelection = document.getElementById('shift-department-selection');
+        const employeeSelection = document.getElementById('shift-employee-selection');
+        const companyField = document.getElementById('company-id');
+        const departmentField = document.getElementById('department-id');
+        const employeeField = document.getElementById('employee-id');
+
+        // Reset all
+        companySelection.style.display = 'block';
+        departmentSelection.style.display = 'none';
+        employeeSelection.style.display = 'none';
+        companyField.required = false;
+        departmentField.required = false;
+        employeeField.required = false;
+
+        if (applicableTo === 'company') {
+            companyField.required = true;
+        } else if (applicableTo === 'department') {
+            companySelection.style.display = 'block';
+            departmentSelection.style.display = 'block';
+            companyField.required = true;
+            departmentField.required = true;
+
+            // Load departments when company changes
+            document.getElementById('company-id').addEventListener('change', function() {
+                loadDepartments(this.value);
+            });
+        } else if (applicableTo === 'employee') {
+            companySelection.style.display = 'block';
+            departmentSelection.style.display = 'block';
+            employeeSelection.style.display = 'block';
+            companyField.required = true;
+            departmentField.required = true;
+            employeeField.required = true;
+
+            // Load departments and employees
+            document.getElementById('company-id').addEventListener('change', function() {
+                loadDepartments(this.value);
+            });
+            document.getElementById('department-id').addEventListener('change', function() {
+                loadEmployees(this.value);
+            });
+        }
+    });
+
+    // Select all days
+    document.getElementById('select-all-days').addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('input[name="work_days[]"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
         });
     });
 
@@ -423,7 +466,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 const departmentSelect = document.getElementById('department-id');
-                departmentSelect.innerHTML = '<option value="">اختر القسم</option>';
+                departmentSelect.innerHTML = '<option value="">Select Department</option>';
 
                 if (data.success) {
                     data.data.forEach(department => {
@@ -444,7 +487,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 const employeeSelect = document.getElementById('employee-id');
-                employeeSelect.innerHTML = '<option value="">اختر الموظف</option>';
+                employeeSelect.innerHTML = '<option value="">Select Employee</option>';
 
                 if (data.success) {
                     data.data.forEach(employee => {

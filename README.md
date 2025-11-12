@@ -1,66 +1,156 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# ERP System - نظام إدارة الموارد البشرية
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+نظام شامل لإدارة الموارد البشرية مع دعم كامل للعمل offline وإدارة البيانات المحلية.
 
-## About Laravel
+## 🚀 المميزات
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### ✅ **العمل Offline كاملاً**
+- جميع المكتبات مُحمّلة محلياً
+- لا اعتماد على CDN أو إنترنت
+- cache ذكي للبيانات
+- مزامنة تلقائية عند العودة للاتصال
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 📊 **إدارة البيانات المتقدمة**
+- **DataTables** محلي مع Bootstrap 5
+- **Repository Pattern** للتنظيم
+- **Cache Manager** للأداء
+- **Offline Support** كامل
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 🎨 **واجهة مستخدم حديثة**
+- **Lucide Icons** محلياً
+- **SweetAlert2** للتنبيهات
+- **Toast Notifications** مخصصة
+- **Responsive Design**
 
-## Learning Laravel
+## 📦 المكتبات المحلية
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+| المكتبة | الإصدار | الحجم | الموقع |
+|---------|---------|-------|--------|
+| jQuery | 3.7.1 | 87.5 KB | `public/vendor/datatables/` |
+| DataTables | 1.13.8 | 180 KB | `public/vendor/datatables/` |
+| DataTables CSS | 1.13.8 | 12.5 KB | `public/vendor/datatables/` |
+| SweetAlert2 | 11.10.1 | 76.6 KB | `public/vendor/datatables/` |
+| Lucide Icons | Latest | ~571 KB | `public/vendor/lucide/` |
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## 🛠️ التثبيت والإعداد
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 1. تحميل المكتبات
+```bash
+# Windows
+update_datatables.bat
 
-## Laravel Sponsors
+# Linux/Mac
+./update_datatables.sh
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 2. فحص المكتبات
+```bash
+php artisan datatables:check
+php artisan datatables:check --update
+```
 
-### Premium Partners
+### 3. إحصائيات الـ Cache
+```javascript
+// في console المتصفح
+dataCache.getStats()
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+## 📁 هيكل المشروع
 
-## Contributing
+```
+├── app/
+│   ├── Repositories/          # Repository Pattern
+│   ├── Providers/            # Service Providers
+│   └── Console/Commands/     # Artisan Commands
+├── public/
+│   ├── vendor/
+│   │   ├── datatables/       # مكتبات DataTables محلية
+│   │   └── lucide/          # أيقونات Lucide محلية
+│   └── js/
+│       └── data-cache-manager.js  # إدارة الـ cache
+├── resources/views/themes/base.blade.php  # تحميل عالمي
+├── docs/                     # التوثيق الكامل
+└── update_datatables.bat     # تحديث المكتبات
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 🎯 الاستخدام
 
-## Code of Conduct
+### في Controllers
+```php
+use App\Repositories\ShiftRepository;
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+class ShiftController extends Controller
+{
+    public function __construct(ShiftRepository $shiftRepository)
+    {
+        $this->shiftRepository = $shiftRepository;
+    }
 
-## Security Vulnerabilities
+    public function index()
+    {
+        $shifts = $this->shiftRepository->getActive();
+        return view('shifts.index', compact('shifts'));
+    }
+}
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### في JavaScript
+```javascript
+// تحميل البيانات مع cache
+const companies = await preloadCompanies();
 
-## License
+// عرض إحصائيات الـ cache
+const stats = dataCache.getStats();
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 🔧 أدوات الإدارة
+
+### Artisan Commands
+- `php artisan datatables:check` - فحص المكتبات
+- `php artisan datatables:check --update` - تحديث المكتبات
+
+### JavaScript Functions
+- `dataCache.getStats()` - إحصائيات الـ cache
+- `dataCache.clear()` - مسح الـ cache
+- `OfflineManager.clearData()` - مسح البيانات المحلية
+
+## 📚 التوثيق
+
+للمزيد من التفاصيل، راجع مجلد `docs/`:
+- `CACHE_SYSTEM_README.md` - نظام الـ cache
+- `DATATABLES_LOCAL_SETUP.md` - إعداد DataTables
+- `OFFLINE_ICONS_NOTIFICATIONS_README.md` - الأيقونات والإشعارات
+
+## 🐛 استكشاف الأخطاء
+
+### مشكلة: المكتبات غير محملة
+```bash
+# تحقق من وجود الملفات
+ls -la public/vendor/datatables/
+ls -la public/vendor/lucide/
+
+# أعد تحميل المكتبات
+php artisan datatables:check --update
+```
+
+### مشكلة: الـ cache لا يعمل
+```javascript
+// مسح الـ cache
+dataCache.clear();
+localStorage.clear();
+
+// إعادة تحميل الصفحة
+location.reload();
+```
+
+## 🤝 المساهمة
+
+نرحب بالمساهمات! يرجى قراءة إرشادات المساهمة في مجلد `docs/`.
+
+## 📄 الترخيص
+
+هذا المشروع مرخص تحت رخصة MIT.
+
+---
+
+**تم تطوير هذا النظام ليكون مستقلاً تماماً عن الإنترنت مع أداء عالي وموثوقية كاملة.** ✨
