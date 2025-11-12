@@ -24,7 +24,10 @@ class EmployeeController extends Controller
     
     public function index()
     {
-        return view('hr.employees.index');
+        $companies = Company::where('is_active', true)->select('id', 'name')->get();
+        $departments = Department::where('is_active', true)->select('id', 'name')->get();
+        
+        return view('hr.employees.index', compact('companies', 'departments'));
     }
     
     public function previewCode()
@@ -36,7 +39,7 @@ class EmployeeController extends Controller
     public function datatable(Request $request): JsonResponse
     {
         $baseQuery = Employee::query()
-            ->with(['department', 'company']);
+            ->with(['department:id,name', 'company:id,name']);
 
         // Apply filters
         if ($request->filled('filter_field') && $request->filled('filter_value')) {
@@ -59,6 +62,19 @@ class EmployeeController extends Controller
             }
         }
 
+        // Apply advanced filters
+        if ($request->filled('company_id') && $request->company_id !== '') {
+            $baseQuery->where('company_id', $request->company_id);
+        }
+
+        if ($request->filled('department_id') && $request->department_id !== '') {
+            $baseQuery->where('department_id', $request->department_id);
+        }
+
+        if ($request->filled('position_filter') && $request->position_filter !== '') {
+            $baseQuery->where('position', '=', $request->position_filter);
+        }
+
         return DataTables::of($baseQuery)
             ->addIndexColumn()
             ->addColumn('code', function ($employee) {
@@ -72,6 +88,9 @@ class EmployeeController extends Controller
             })
             ->addColumn('company_name', function ($employee) {
                 return $employee->company ? $employee->company->name : '-';
+            })
+            ->addColumn('department_name', function ($employee) {
+                return $employee->department ? $employee->department->name : '-';
             })
             ->addColumn('position', function ($employee) {
                 return $employee->position ?? '-';
@@ -89,8 +108,53 @@ class EmployeeController extends Controller
             ->addColumn('actions', function ($employee) {
                 return view('hr.employees.partials.actions', ['employee' => $employee])->render();
             })
-            ->rawColumns(['status', 'actions'])
+            ->rawColumns(['status', 'actions', 'profile_picture'])
             ->make(true);
+    }
+
+    public function testData(Request $request): JsonResponse
+    {
+        $companies = Company::where('is_active', true)->get();
+        $departments = Department::where('is_active', true)->get();
+        
+        return response()->json([
+            'companies_count' => $companies->count(),
+            'departments_count' => $departments->count(),
+            'companies' => $companies->pluck('name'),
+            'departments' => $departments->pluck('name'),
+        ]);
+    }
+
+    public function getCompanies(Request $request): JsonResponse
+    {
+        $companies = Company::where('is_active', true)
+            ->select('id', 'name')
+            ->get();
+        
+        return response()->json($companies);
+    }
+
+    public function getPositionsByDepartment(Request $request): JsonResponse
+    {
+        $departmentId = $request->query('department_id');
+        
+        $query = Employee::where('is_active', true)
+            ->select('position')
+            ->distinct();
+        
+        if ($departmentId && $departmentId !== '') {
+            $query->where('department_id', $departmentId);
+        }
+        
+        $positions = $query->whereNotNull('position')
+            ->where('position', '!=', '')
+            ->orderBy('position')
+            ->get()
+            ->pluck('position')
+            ->filter()
+            ->values();
+        
+        return response()->json($positions);
     }
 
     public function create()

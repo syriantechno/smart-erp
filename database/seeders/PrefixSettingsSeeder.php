@@ -17,6 +17,7 @@ class PrefixSettingsSeeder extends Seeder
             ['document_type' => 'department', 'prefix' => 'DEPT'],
             ['document_type' => 'position', 'prefix' => 'POS'],
             ['document_type' => 'employees', 'prefix' => 'EMP'],
+            ['document_type' => 'shifts', 'prefix' => 'SHIFT'],
             ['document_type' => 'invoices', 'prefix' => 'INV'],
             ['document_type' => 'sales_orders', 'prefix' => 'SO'],
             ['document_type' => 'purchase_orders', 'prefix' => 'PO'],
@@ -27,15 +28,17 @@ class PrefixSettingsSeeder extends Seeder
         ];
 
         foreach ($documentTypes as $type) {
-            PrefixSetting::create([
-                'document_type' => $type['document_type'],
-                'prefix' => $type['prefix'],
-                'padding' => 4,
-                'start_number' => 1,
-                'current_number' => 1,
-                'include_year' => false,
-                'is_active' => true,
-            ]);
+            PrefixSetting::updateOrCreate(
+                ['document_type' => $type['document_type']],
+                [
+                    'prefix' => $type['prefix'],
+                    'padding' => 4,
+                    'start_number' => 1,
+                    'current_number' => 1,
+                    'include_year' => false,
+                    'is_active' => true,
+                ]
+            );
         }
     }
 }

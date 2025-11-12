@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Countries</title>
+</head>
+<body>
+    <h1>Testing Countries Loading</h1>
+    <select id="country">
+        <option value="">اختر الدولة</option>
+    </select>
+    
+    <script>
+        console.log('Testing countries loading...');
+        
+        const countrySelect = document.getElementById('country');
+        const countriesUrl = window.location.origin + '/countries.json';
+        
+        console.log('Fetching from:', countriesUrl);
+        
+        fetch(countriesUrl, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            }
+        })
+        .then(r => {
+            console.log('Response status:', r.status);
+            return r.json();
+        })
+        .then(data => {
+            console.log('Data received:', data);
+            
+            if (data && data.countries && data.countries.length > 0) {
+                data.countries.forEach(country => {
+                    const option = document.createElement('option');
+                    option.value = country.name;
+                    option.textContent = ${country.flag} ;
+                    countrySelect.appendChild(option);
+                });
+                console.log('Countries loaded successfully!');
+            }
+        })
+        .catch(e => {
+            console.error('Error:', e);
+        });
+    </script>
+</body>
+</html>

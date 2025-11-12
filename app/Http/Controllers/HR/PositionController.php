@@ -291,7 +291,7 @@ class PositionController extends Controller
 
     public function getPositionsByDepartment(Department $department)
     {
-        $positions = $department->positions()->active()->get();
+        $positions = $department->positions()->where('is_active', true)->get();
         return response()->json($positions);
     }
 }

@@ -1,0 +1,77 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+    <meta name="csrf-token" content="test-csrf-token">
+</head>
+<body>
+    <h1>API Testing</h1>
+    <div id="results"></div>
+
+    <script>
+        const resultsDiv = document.getElementById('results');
+        
+        function log(message) {
+            resultsDiv.innerHTML += '<div>' + message + '</div>';
+            console.log(message);
+        }
+
+        async function testAPIs() {
+            log('🚀 Starting API tests...');
+
+            // Test Companies API
+            try {
+                log('🌐 Testing Companies API...');
+                const companiesResponse = await fetch('http://127.0.0.1:8000/hr/employees/companies', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': 'test-csrf-token'
+                    },
+                    credentials: 'include'
+                });
+                
+                log('📡 Companies API Status: ' + companiesResponse.status);
+                
+                if (companiesResponse.ok) {
+                    const companiesData = await companiesResponse.json();
+                    log('✅ Companies Data: ' + JSON.stringify(companiesData));
+                } else {
+                    log('❌ Companies API Failed: ' + companiesResponse.status);
+                }
+            } catch (error) {
+                log('❌ Companies API Error: ' + error.message);
+            }
+
+            // Test Code API
+            try {
+                log('🔢 Testing Code API...');
+                const codeResponse = await fetch('http://127.0.0.1:8000/hr/employees/preview-code', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': 'test-csrf-token'
+                    },
+                    credentials: 'include'
+                });
+                
+                log('📡 Code API Status: ' + codeResponse.status);
+                
+                if (codeResponse.ok) {
+                    const codeData = await codeResponse.json();
+                    log('✅ Code Data: ' + JSON.stringify(codeData));
+                } else {
+                    log('❌ Code API Failed: ' + codeResponse.status);
+                }
+            } catch (error) {
+                log('❌ Code API Error: ' + error.message);
+            }
+        }
+
+        // Run tests when page loads
+        window.onload = testAPIs;
+    </script>
+</body>
+</html>

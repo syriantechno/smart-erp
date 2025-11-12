@@ -29,6 +29,80 @@
 
     <div class="mt-5 grid grid-cols-12 gap-6">
         <div class="intro-y col-span-12">
+            <!-- Advanced Filters Section -->
+            <x-base.preview-component class="intro-y box mb-6">
+                <div class="p-5">
+                    <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                        <x-base.lucide icon="Filter" class="h-5 w-5"></x-base.lucide>
+                        Advanced Filters
+                        <span id="active-filters-indicator" class="hidden ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">Active</span>
+                    </h3>
+
+                    <div class="grid grid-cols-12 gap-4">
+                        <!-- Company Filter -->
+                        <div class="col-span-12 md:col-span-4">
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                Filter by Company
+                            </label>
+                            <x-base.form-select id="company-filter" class="w-full">
+                                <option value="">All Companies</option>
+                                @foreach($companies ?? [] as $company)
+                                    <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                @endforeach
+                            </x-base.form-select>
+                        </div>
+
+                        <!-- Department Filter -->
+                        <div class="col-span-12 md:col-span-4">
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                Filter by Department
+                            </label>
+                            <x-base.form-select id="department-filter" class="w-full">
+                                <option value="">All Departments</option>
+                                @foreach($departments ?? [] as $department)
+                                    <option value="{{ $department->id }}">{{ $department->name }}</option>
+                                @endforeach
+                            </x-base.form-select>
+                        </div>
+
+                        <!-- Position Filter -->
+                        <div class="col-span-12 md:col-span-4">
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                Filter by Position
+                            </label>
+                            <x-base.form-select id="position-filter" class="w-full">
+                                <option value="">All Positions</option>
+                                <!-- Will be populated via JavaScript -->
+                            </x-base.form-select>
+                        </div>
+                    </div>
+
+                    <!-- Filter Results Summary -->
+                    <div class="mt-4 p-4 bg-slate-50 dark:bg-darkmode-600 rounded-lg">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div class="text-sm text-slate-600 dark:text-slate-400">
+                                    <span class="font-medium">Total Employees:</span>
+                                    <span id="total-employees-count" class="font-semibold text-slate-800 dark:text-white">0</span>
+                                </div>
+                                <div class="text-sm text-slate-600 dark:text-slate-400">
+                                    <span class="font-medium">Filtered:</span>
+                                    <span id="filtered-employees-count" class="font-semibold text-blue-600">0</span>
+                                </div>
+                            </div>
+                            <x-base.button id="advanced-filter-apply" variant="primary" size="sm">
+                                <x-base.lucide icon="Search" class="w-4 h-4 mr-1" />
+                                Apply Filters
+                            </x-base.button>
+                        </div>
+                    </div>
+                </div>
+            </x-base.preview-component>
+        </div>
+    </div>
+
+    <div class="mt-5 grid grid-cols-12 gap-6">
+        <div class="intro-y col-span-12">
             <x-base.preview-component class="intro-y box">
                 <div class="p-5">
                     <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
@@ -131,515 +205,679 @@
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const filterField = document.getElementById('employees-filter-field');
-        const filterType = document.getElementById('employees-filter-type');
-        const filterValue = document.getElementById('employees-filter-value');
-        const lengthSelect = document.getElementById('employees-filter-length');
-        const filterGoBtn = document.getElementById('employees-filter-go');
-        const filterResetBtn = document.getElementById('employees-filter-reset');
-        const exportBtn = document.getElementById('employees-export');
-        const refreshBtn = document.getElementById('employees-refresh');
+    try {
+        document.addEventListener('DOMContentLoaded', function () {
+            const filterField = document.getElementById('employees-filter-field');
+            const filterType = document.getElementById('employees-filter-type');
+            const filterValue = document.getElementById('employees-filter-value');
+            const lengthSelect = document.getElementById('employees-filter-length');
+            const filterGoBtn = document.getElementById('employees-filter-go');
+            const filterResetBtn = document.getElementById('employees-filter-reset');
+            const exportBtn = document.getElementById('employees-export');
+            const refreshBtn = document.getElementById('employees-refresh');
 
-        const initialLength = lengthSelect ? parseInt(lengthSelect.value, 10) || 10 : 10;
+            // Advanced filters
+            const companyFilter = document.getElementById('company-filter');
+            const departmentFilter = document.getElementById('department-filter');
+            const positionFilter = document.getElementById('position-filter');
+            const advancedFilterApplyBtn = document.getElementById('advanced-filter-apply');
+            const totalEmployeesCount = document.getElementById('total-employees-count');
+            const filteredEmployeesCount = document.getElementById('filtered-employees-count');
 
-        const table = window.initDataTable('#employees-table', {
-            ajax: {
-                url: @json(route('hr.employees.datatable')),
-                type: 'GET',
-                data: function (d) {
+            const initialLength = lengthSelect ? parseInt(lengthSelect.value, 10) || 10 : 10;
+
+            const table = window.initDataTable('#employees-table', {
+                ajax: {
+                    url: '{{ route("hr.employees.datatable") }}',
+                    type: 'GET',
+                    data: function (d) {
+                        if (filterField) {
+                            d.filter_field = filterField.value || 'all';
+                        }
+                        if (filterType) {
+                            d.filter_type = filterType.value || 'contains';
+                        }
+                        if (filterValue) {
+                            d.filter_value = filterValue.value || '';
+                        }
+                        if (companyFilter) {
+                            d.company_id = companyFilter.value || '';
+                        }
+                        if (departmentFilter) {
+                            d.department_id = departmentFilter.value || '';
+                        }
+                        if (positionFilter) {
+                            d.position_filter = positionFilter.value || '';
+                        }
+                        d.page_length = lengthSelect ? parseInt(lengthSelect.value, 10) || initialLength : initialLength;
+                    },
+                    error: function (xhr, textStatus, error) {
+                        console.error('DataTables AJAX error:', textStatus, error, xhr.responseText);
+                    }
+                },
+                pageLength: initialLength,
+                lengthChange: false,
+                searching: false,
+                order: [[2, 'asc']], // Order by code column (index 2)
+                dom:
+                    "t<'datatable-footer flex flex-col md:flex-row md:items-center md:justify-between mt-5 gap-4'<'datatable-info text-slate-500'i><'datatable-pagination'p>>",
+                columns: [
+                    { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center font-medium', orderable: false },
+                    { data: 'profile_picture', name: 'profile_picture', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center', orderable: false },
+                    { data: 'code', name: 'code', className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700 whitespace-nowrap' },
+                    { data: 'employee_id', name: 'employee_id', className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700 whitespace-nowrap' },
+                    { data: 'full_name', name: 'full_name', className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700 datatable-cell-wrap' },
+                    { data: 'email', name: 'email', className: 'px-5 py-3 border-b dark:border-darkmode-300 datatable-cell-wrap' },
+                    { data: 'position', name: 'position', className: 'px-5 py-3 border-b dark:border-darkmode-300 datatable-cell-wrap' },
+                    { data: 'department_name', name: 'department_name', className: 'px-5 py-3 border-b dark:border-darkmode-300 datatable-cell-wrap' },
+                    { data: 'hire_date_formatted', name: 'hire_date_formatted', className: 'px-5 py-3 border-b dark:border-darkmode-300 whitespace-nowrap' },
+                    {
+                        data: 'is_active',
+                        name: 'is_active',
+                        render: function (value) {
+                            const status = Boolean(value);
+                            const badgeClass = status
+                                ? 'bg-green-100 text-green-700'
+                                : 'bg-red-100 text-red-700';
+                            const label = status ? 'Active' : 'Inactive';
+                            return `<span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${badgeClass}">${label}</span>`;
+                        }
+                    },
+                    {
+                        data: 'actions',
+                        name: 'actions',
+                        className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center',
+                        orderable: false,
+                        searchable: false
+                    }
+                ],
+                rawColumns: ['status', 'profile_picture', 'actions'],
+                drawCallback: function () {
+                    if (typeof window.Lucide !== 'undefined') {
+                        window.Lucide.createIcons();
+                    }
+
+                    // Update employee counts
+                    const info = table.page.info();
+                    if (totalEmployeesCount) {
+                        totalEmployeesCount.textContent = info.recordsTotal;
+                    }
+                    if (filteredEmployeesCount) {
+                        filteredEmployeesCount.textContent = info.recordsDisplay;
+                    }
+
+                    // Show filter summary if filters are active
+                    const hasFilters = (companyFilter && companyFilter.value) ||
+                                     (departmentFilter && departmentFilter.value) ||
+                                     (positionFilter && positionFilter.value);
+
+                    if (hasFilters && info.recordsTotal !== info.recordsDisplay) {
+                        showToast(`Filtered ${info.recordsDisplay} out of ${info.recordsTotal} employees`, 'success');
+                    }
+
+                    // Update active filters indicator
+                    const activeFiltersIndicator = document.getElementById('active-filters-indicator');
+                    if (activeFiltersIndicator) {
+                        if (hasFilters) {
+                            activeFiltersIndicator.classList.remove('hidden');
+                        } else {
+                            activeFiltersIndicator.classList.add('hidden');
+                        }
+                    }
+                }
+            });
+
+            if (!table) {
+                return;
+            }
+
+            if (lengthSelect) {
+                lengthSelect.addEventListener('change', function () {
+                    const newLength = parseInt(this.value, 10) || initialLength;
+                    table.page.len(newLength).draw();
+                });
+            }
+
+            const reloadTable = function () {
+                table.ajax.reload(null, false);
+            };
+
+            if (filterGoBtn) {
+                filterGoBtn.addEventListener('click', reloadTable);
+            }
+
+            if (filterValue) {
+                filterValue.addEventListener('keyup', function (event) {
+                    if (event.key === 'Enter') {
+                        reloadTable();
+                    }
+                });
+            }
+
+            if (filterResetBtn) {
+                filterResetBtn.addEventListener('click', function () {
                     if (filterField) {
-                        d.filter_field = filterField.value || 'all';
+                        filterField.value = 'all';
                     }
                     if (filterType) {
-                        d.filter_type = filterType.value || 'contains';
+                        filterType.value = 'contains';
                     }
                     if (filterValue) {
-                        d.filter_value = filterValue.value || '';
+                        filterValue.value = '';
                     }
-                    d.page_length = lengthSelect ? parseInt(lengthSelect.value, 10) || initialLength : initialLength;
-                },
-                error: function (xhr, textStatus, error) {
-                    console.error('DataTables AJAX error:', textStatus, error, xhr.responseText);
-                }
-            },
-            pageLength: initialLength,
-            lengthChange: false,
-            searching: false,
-            order: [[2, 'asc']], // Order by code column (index 2)
-            dom:
-                "t<'datatable-footer flex flex-col md:flex-row md:items-center md:justify-between mt-5 gap-4'<'datatable-info text-slate-500'i><'datatable-pagination'p>>",
-            columns: [
-                { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center font-medium', orderable: false },
-                { data: 'profile_picture', name: 'profile_picture', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center', orderable: false },
-                { data: 'code', name: 'code', className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700 whitespace-nowrap' },
-                { data: 'employee_id', name: 'employee_id', className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700 whitespace-nowrap' },
-                { data: 'full_name', name: 'full_name', className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700 datatable-cell-wrap' },
-                { data: 'email', name: 'email', className: 'px-5 py-3 border-b dark:border-darkmode-300 datatable-cell-wrap' },
-                { data: 'position', name: 'position', className: 'px-5 py-3 border-b dark:border-darkmode-300 datatable-cell-wrap' },
-                { data: 'department_name', name: 'department_name', className: 'px-5 py-3 border-b dark:border-darkmode-300 datatable-cell-wrap' },
-                { data: 'hire_date_formatted', name: 'hire_date_formatted', className: 'px-5 py-3 border-b dark:border-darkmode-300 whitespace-nowrap' },
-                {
-                    data: 'is_active',
-                    name: 'is_active',
-                    render: function (value) {
-                        const status = Boolean(value);
-                        const badgeClass = status
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-red-100 text-red-700';
-                        const label = status ? 'Active' : 'Inactive';
-                        return `<span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${badgeClass}">${label}</span>`;
+                    if (lengthSelect) {
+                        lengthSelect.value = String(initialLength);
+                        table.page.len(initialLength).draw();
                     }
-                },
-                {
-                    data: 'actions',
-                    name: 'actions',
-                    className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center',
-                    orderable: false,
-                    searchable: false
-                }
-            ],
-            rawColumns: ['status', 'profile_picture', 'actions'],
-            drawCallback: function () {
-                if (typeof window.Lucide !== 'undefined') {
-                    window.Lucide.createIcons();
-                }
-            }
-        });
-
-        if (!table) {
-            return;
-        }
-
-        if (lengthSelect) {
-            lengthSelect.addEventListener('change', function () {
-                const newLength = parseInt(this.value, 10) || initialLength;
-                table.page.len(newLength).draw();
-            });
-        }
-
-        const reloadTable = function () {
-            table.ajax.reload(null, false);
-        };
-
-        if (filterGoBtn) {
-            filterGoBtn.addEventListener('click', reloadTable);
-        }
-
-        if (filterValue) {
-            filterValue.addEventListener('keyup', function (event) {
-                if (event.key === 'Enter') {
+                    // Reset advanced filters
+                    if (companyFilter) {
+                        companyFilter.value = '';
+                    }
+                    if (departmentFilter) {
+                        departmentFilter.value = '';
+                    }
+                    if (positionFilter) {
+                        positionFilter.value = '';
+                        loadPositionsForDepartment(''); // Reset positions
+                    }
                     reloadTable();
-                }
-            });
-        }
+                });
+            }
 
-        if (filterResetBtn) {
-            filterResetBtn.addEventListener('click', function () {
-                if (filterField) {
-                    filterField.value = 'all';
-                }
-                if (filterType) {
-                    filterType.value = 'contains';
-                }
-                if (filterValue) {
-                    filterValue.value = '';
-                }
-                if (lengthSelect) {
-                    lengthSelect.value = String(initialLength);
-                    table.page.len(initialLength).draw();
-                }
-                reloadTable();
-            });
-        }
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', reloadTable);
+            }
 
-        if (refreshBtn) {
-            refreshBtn.addEventListener('click', reloadTable);
-        }
+            // Advanced filters event listeners
+            if (advancedFilterApplyBtn) {
+                advancedFilterApplyBtn.addEventListener('click', reloadTable);
+            }
 
-        // Employee code preview
-        const refreshEmployeeCode = function () {
-            const codePreview = document.getElementById('employee-code-preview');
-            const codeInput = document.getElementById('code');
-            if (!codePreview) return;
-
-            fetch(@json(route('hr.employees.preview-code')))
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Failed to preview employee code');
+            // Auto-apply filters when changed
+            if (companyFilter) {
+                companyFilter.addEventListener('change', function() {
+                    // Reset department filter when company changes
+                    if (departmentFilter) {
+                        departmentFilter.value = '';
+                        // Load departments for selected company
+                        loadDepartmentsForCompany(this.value);
                     }
+                    setTimeout(reloadTable, 300);
+                });
+            }
+
+            if (departmentFilter) {
+                departmentFilter.addEventListener('change', function() {
+                    loadPositionsForDepartment(this.value);
+                    setTimeout(reloadTable, 300);
+                });
+            }
+
+            if (positionFilter) {
+                positionFilter.addEventListener('change', function() {
+                    setTimeout(reloadTable, 300);
+                });
+            }
+
+            // Function to load departments based on company
+            function loadDepartmentsForCompany(companyId) {
+                if (!departmentFilter) return;
+
+                departmentFilter.innerHTML = '<option value="">Loading departments...</option>';
+
+                if (!companyId) {
+                    departmentFilter.innerHTML = '<option value="">All Departments</option>';
+                    // Add all departments back
+                    @foreach($departments ?? [] as $department)
+                        departmentFilter.innerHTML += '<option value="{{ $department->id }}">{{ $department->name }}</option>';
+                    @endforeach
+                    loadPositionsForDepartment(''); // Reset positions
+                    return;
+                }
+
+                fetch(`/hr/departments/api/company/${companyId}`, {
+                    credentials: 'same-origin',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        departmentFilter.innerHTML = '<option value="">All Departments</option>';
+                        if (data && Array.isArray(data)) {
+                            data.forEach(dept => {
+                                const option = document.createElement('option');
+                                option.value = dept.id;
+                                option.textContent = dept.name;
+                                departmentFilter.appendChild(option);
+                            });
+                        }
+                        loadPositionsForDepartment(''); // Reset positions when company changes
+                    })
+                    .catch(error => {
+                        console.error('Error loading departments:', error);
+                        departmentFilter.innerHTML = '<option value="">Error loading departments</option>';
+                    });
+            }
+
+            // Function to load positions based on department
+            function loadPositionsForDepartment(departmentId) {
+                if (!positionFilter) return;
+
+                positionFilter.innerHTML = '<option value="">Loading positions...</option>';
+
+                const url = departmentId 
+                    ? `/hr/employees/positions/department?department_id=${departmentId}`
+                    : '/hr/employees/positions/department';
+
+                fetch(url, {
+                    credentials: 'same-origin',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        positionFilter.innerHTML = '<option value="">All Positions</option>';
+                        if (data && Array.isArray(data)) {
+                            data.forEach(position => {
+                                const option = document.createElement('option');
+                                option.value = position;
+                                option.textContent = position;
+                                positionFilter.appendChild(option);
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading positions:', error);
+                        positionFilter.innerHTML = '<option value="">Error loading positions</option>';
+                    });
+            }
+
+            // Employee code preview
+            const refreshEmployeeCode = function () {
+                const codePreview = document.getElementById('employee-code-preview');
+                const codeInput = document.getElementById('code');
+                if (!codePreview) return;
+
+                fetch('{{ route("hr.employees.preview-code") }}')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to preview employee code');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        const code = data.code || '-';
+                        codePreview.textContent = code;
+                        // Also update the form input if it exists
+                        if (codeInput) {
+                            codeInput.value = code;
+                        }
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        codePreview.textContent = '-';
+                        if (codeInput) {
+                            codeInput.value = '-';
+                        }
+                    });
+            };
+            // Image preview functionality
+            const profilePictureInput = document.getElementById('profile_picture');
+            const imagePreviewContainer = document.getElementById('image-preview-container');
+            const imagePreview = document.getElementById('image-preview');
+            const removeImageBtn = document.getElementById('remove-image');
+
+            if (profilePictureInput) {
+                profilePictureInput.addEventListener('change', function(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            imagePreview.src = e.target.result;
+                            imagePreviewContainer.classList.remove('hidden');
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+
+            if (removeImageBtn) {
+                removeImageBtn.addEventListener('click', function() {
+                    profilePictureInput.value = '';
+                    imagePreview.src = '';
+                    imagePreviewContainer.classList.add('hidden');
+                });
+            }
+
+            // Dynamic department and position loading - handled in modal
+            // Removed to avoid conflicts with modal's own JavaScript
+
+            const createForm = document.getElementById('create-employee-form');
+            const createModal = document.getElementById('create-employee-modal');
+
+            if (createForm) {
+                createForm.addEventListener('submit', function (event) {
+                    event.preventDefault();
+
+                    const formData = new FormData(createForm);
+
+                    fetch(createForm.action, {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        },
+                        body: formData,
+                    })
+                        .then(async (response) => {
+                            if (response.ok) {
+                                return response.json();
+                            }
+
+                            if (response.status === 422) {
+                                const data = await response.json();
+                                const errors = data.errors || {};
+                                const firstError = Object.values(errors)[0];
+                                if (firstError) {
+                                    showToast(Array.isArray(firstError) ? firstError[0] : firstError, 'error');
+                                } else {
+                                    showToast(data.message || 'Validation error', 'error');
+                                }
+                                throw new Error('validation');
+                            }
+
+                            throw new Error('request');
+                        })
+                        .then((data) => {
+                            if (data.success) {
+                                showToast(data.message || 'Employee created successfully', 'success');
+                                createForm.reset();
+                                // Reset selects - handled in modal
+                                createModal.__tippy?.hide?.();
+                                reloadTable();
+                            } else {
+                                showToast(data.message || 'Failed to create employee', 'error');
+                            }
+                        })
+                        .catch((error) => {
+                            if (error.message === 'validation') {
+                                return;
+                            }
+                            console.error('Employee create error:', error);
+                            showToast('An error occurred while saving the employee', 'error');
+                        });
+                });
+            }
+
+            if (exportBtn) {
+                exportBtn.addEventListener('click', function () {
+                    try {
+                        const rows = table.rows({ search: 'applied' }).data().toArray();
+                        if (!rows.length) {
+                            showToast('No data available for export.', 'error');
+                            return;
+                        }
+
+                        const headers = ['#', 'Photo', 'Code', 'Employee ID', 'Full Name', 'Email', 'Position', 'Department', 'Hire Date', 'Status'];
+                        const csvRows = [headers.join(',')];
+
+                        rows.forEach(function (row) {
+                            const csvRow = [
+                                row.DT_RowIndex,
+                                row.profile_picture ? 'Yes' : 'No', // Photo indicator
+                                '"' + (row.code || '').replace(/"/g, '""') + '"',
+                                '"' + (row.employee_id || '').replace(/"/g, '""') + '"',
+                                '"' + (row.full_name || '').replace(/"/g, '""') + '"',
+                                '"' + (row.email || '').replace(/"/g, '""') + '"',
+                                '"' + (row.position || '').replace(/"/g, '""') + '"',
+                                '"' + (row.department_name || '').replace(/"/g, '""') + '"',
+                                '"' + (row.hire_date_formatted || '').replace(/"/g, '""') + '"',
+                                row.is_active ? 'Active' : 'Inactive'
+                            ];
+                            csvRows.push(csvRow.join(','));
+                        });
+
+                        const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = 'employees.csv';
+                        link.click();
+                        URL.revokeObjectURL(url);
+                        showToast('Export completed successfully.', 'success');
+                    } catch (error) {
+                        console.error('Export error:', error);
+                        showToast('Failed to export data.', 'error');
+                    }
+                });
+            }
+
+            document.addEventListener('hidden.tw.modal', function () {
+                if (document.activeElement && typeof document.activeElement.blur === 'function') {
+                    document.activeElement.blur();
+                }
+                table.ajax.reload(null, false);
+            });
+
+            // Initialize positions on page load
+            loadPositionsForDepartment('');
+
+            window.openEditModal = function(id, employeeId, firstName, lastName, email, phone, position, salary, hireDate, birthDate, gender, address, city, country, postalCode, departmentId, companyId, isActive) {
+                console.log('Opening edit modal for employee:', id, employeeId);
+
+                // Populate form fields
+                document.getElementById('edit-employee-id').value = employeeId || '';
+                document.getElementById('edit-first-name').value = firstName || '';
+                document.getElementById('edit-last-name').value = lastName || '';
+                document.getElementById('edit-email').value = email || '';
+                document.getElementById('edit-phone').value = phone || '';
+                document.getElementById('edit-position').value = position || '';
+                document.getElementById('edit-salary').value = salary || '';
+                document.getElementById('edit-hire-date').value = hireDate || '';
+                document.getElementById('edit-birth-date').value = birthDate || '';
+                document.getElementById('edit-gender').value = gender || '';
+                document.getElementById('edit-address').value = address || '';
+                document.getElementById('edit-city').value = city || '';
+                document.getElementById('edit-country').value = country || '';
+                document.getElementById('edit-postal-code').value = postalCode || '';
+                document.getElementById('edit-department_id').value = departmentId || '';
+                document.getElementById('edit-company_id').value = companyId || '';
+                document.getElementById('edit-is_active').checked = isActive;
+
+                // Update form action
+                const form = document.getElementById('edit-employee-form');
+                form.action = `/hr/employees/${id}`;
+
+                // Show modal using the hidden trigger button
+                const modalTrigger = document.getElementById('edit-employee-trigger');
+                if (modalTrigger) {
+                    modalTrigger.click();
+                } else {
+                    console.error('Edit employee modal trigger not found');
+                }
+            };
+
+            const editForm = document.getElementById('edit-employee-form');
+            const editModal = document.getElementById('edit-employee-modal');
+
+            if (editForm) {
+                editForm.addEventListener('submit', function (event) {
+                    event.preventDefault();
+
+                    const formData = new FormData(editForm);
+
+                    fetch(editForm.action, {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        },
+                        body: formData,
+                    })
+                        .then(async (response) => {
+                            if (response.ok) {
+                                return response.json();
+                            }
+
+                            if (response.status === 422) {
+                                const data = await response.json();
+                                const errors = data.errors || {};
+                                const firstError = Object.values(errors)[0];
+                                if (firstError) {
+                                    showToast(Array.isArray(firstError) ? firstError[0] : firstError, 'error');
+                                } else {
+                                    showToast(data.message || 'Validation error', 'error');
+                                }
+                                throw new Error('validation');
+                            }
+
+                            throw new Error('request');
+                        })
+                        .then((data) => {
+                            if (data.success) {
+                                showToast(data.message || 'Employee updated successfully', 'success');
+                                editModal.__tippy?.hide?.();
+                                reloadTable();
+                            } else {
+                                showToast(data.message || 'Failed to update employee', 'error');
+                            }
+                        })
+                        .catch((error) => {
+                            if (error.message === 'validation') {
+                                return;
+                            }
+                            console.error('Employee update error:', error);
+                            showToast('An error occurred while updating the employee', 'error');
+                        });
+                });
+            }
+
+            window.deleteEmployee = function (id, name) {
+                Swal.fire({
+                    title: 'Delete Employee?',
+                    html: `Are you sure you want to delete <strong>"${name}"</strong>?<br>This action cannot be undone.`,
+                    icon: 'warning',
+                    iconColor: '#ef4444',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc2626',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'Cancel',
+                    background: '#ffffff',
+                    customClass: {
+                        popup: 'rounded-xl shadow-2xl',
+                        confirmButton: 'px-6 py-2 rounded-lg font-semibold',
+                        cancelButton: 'px-6 py-2 rounded-lg font-semibold'
+                    },
+                    showClass: {
+                        popup: 'animate__animated animate__fadeInDown animate__faster'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__fadeOutUp animate__faster'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(`{{ route('hr.employees.destroy', '') }}/${id}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json',
+                            },
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    reloadTable();
+                                    showToast(data.message || 'Employee deleted successfully', 'success');
+                                } else {
+                                    showToast(data.message || 'Failed to delete employee', 'error');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                showToast('An error occurred while deleting the employee', 'error');
+                            });
+                    }
+                });
+            };
+
+            // Test function for debugging
+            window.forceLoadEmployeeData = function() {
+                console.log('🧪 Manual test: forcing employee data load...');
+                
+                // Test companies API
+                fetch('{{ route("hr.employees.companies") }}', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    credentials: 'same-origin'
+                })
+                .then(response => {
+                    console.log('🧪 Companies API Status:', response.status);
                     return response.json();
                 })
                 .then(data => {
-                    const code = data.code || '-';
-                    codePreview.textContent = code;
-                    // Also update the form input if it exists
-                    if (codeInput) {
-                        codeInput.value = code;
-                    }
+                    console.log('🧪 Companies Data:', data);
+                    showToast('Companies loaded: ' + (data.length || 0), 'success');
                 })
                 .catch(error => {
-                    console.error(error);
-                    codePreview.textContent = '-';
-                    if (codeInput) {
-                        codeInput.value = '-';
-                    }
+                    console.error('🧪 Companies API Error:', error);
+                    showToast('Failed to load companies', 'error');
                 });
-        };
 
-        // Image preview functionality
-        const profilePictureInput = document.getElementById('profile_picture');
-        const imagePreviewContainer = document.getElementById('image-preview-container');
-        const imagePreview = document.getElementById('image-preview');
-        const removeImageBtn = document.getElementById('remove-image');
-
-        if (profilePictureInput) {
-            profilePictureInput.addEventListener('change', function(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        imagePreview.src = e.target.result;
-                        imagePreviewContainer.classList.remove('hidden');
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-        }
-
-        if (removeImageBtn) {
-            removeImageBtn.addEventListener('click', function() {
-                profilePictureInput.value = '';
-                imagePreview.src = '';
-                imagePreviewContainer.classList.add('hidden');
-            });
-        }
-
-        // Dynamic department and position loading
-        const companySelect = document.getElementById('company_id');
-        const departmentSelect = document.getElementById('department_id');
-        const positionSelect = document.getElementById('position');
-
-        if (companySelect && departmentSelect) {
-            companySelect.addEventListener('change', function() {
-                const companyId = this.value;
-
-                // Reset department and position
-                departmentSelect.innerHTML = '<option value="">Select Department</option>';
-                positionSelect.innerHTML = '<option value="">Select Position</option>';
-                departmentSelect.disabled = true;
-                positionSelect.disabled = true;
-
-                if (companyId) {
-                    // Load departments for selected company
-                    fetch(`/hr/departments/api/company/${companyId}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.length > 0) {
-                                data.forEach(department => {
-                                    const option = document.createElement('option');
-                                    option.value = department.id;
-                                    option.textContent = department.name;
-                                    departmentSelect.appendChild(option);
-                                });
-                                departmentSelect.disabled = false;
-                            }
-                        })
-                        .catch(error => console.error('Error loading departments:', error));
-                }
-            });
-        }
-
-        if (departmentSelect && positionSelect) {
-            departmentSelect.addEventListener('change', function() {
-                const departmentId = this.value;
-
-                // Reset position
-                positionSelect.innerHTML = '<option value="">Select Position</option>';
-                positionSelect.disabled = true;
-
-                if (departmentId) {
-                    // Load positions for selected department
-                    fetch(`/hr/positions/api/department/${departmentId}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.length > 0) {
-                                data.forEach(position => {
-                                    const option = document.createElement('option');
-                                    option.value = position.title;
-                                    option.textContent = position.title;
-                                    positionSelect.appendChild(option);
-                                });
-                                positionSelect.disabled = false;
-                            }
-                        })
-                        .catch(error => console.error('Error loading positions:', error));
-                }
-            });
-        }
-
-        const createForm = document.getElementById('create-employee-form');
-        const createModal = document.getElementById('create-employee-modal');
-
-        if (createForm) {
-            createForm.addEventListener('submit', function (event) {
-                event.preventDefault();
-
-                const formData = new FormData(createForm);
-
-                fetch(createForm.action, {
-                    method: 'POST',
+                // Test code API
+                fetch('{{ route("hr.employees.preview-code") }}', {
+                    method: 'GET',
                     headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
                         'Accept': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    },
-                    body: formData,
-                })
-                    .then(async (response) => {
-                        if (response.ok) {
-                            return response.json();
-                        }
-
-                        if (response.status === 422) {
-                            const data = await response.json();
-                            const errors = data.errors || {};
-                            const firstError = Object.values(errors)[0];
-                            if (firstError) {
-                                showToast(Array.isArray(firstError) ? firstError[0] : firstError, 'error');
-                            } else {
-                                showToast(data.message || 'Validation error', 'error');
-                            }
-                            throw new Error('validation');
-                        }
-
-                        throw new Error('request');
-                    })
-                    .then((data) => {
-                        if (data.success) {
-                            showToast(data.message || 'Employee created successfully', 'success');
-                            createForm.reset();
-                            refreshEmployeeCode();
-                            // Reset image preview
-                            if (imagePreviewContainer) {
-                                imagePreviewContainer.classList.add('hidden');
-                            }
-                            // Reset selects
-                            if (departmentSelect) departmentSelect.disabled = true;
-                            if (positionSelect) positionSelect.disabled = true;
-                            createModal.__tippy?.hide?.();
-                            reloadTable();
-                        } else {
-                            showToast(data.message || 'Failed to create employee', 'error');
-                        }
-                    })
-                    .catch((error) => {
-                        if (error.message === 'validation') {
-                            return;
-                        }
-                        console.error('Employee create error:', error);
-                        showToast('An error occurred while saving the employee', 'error');
-                    });
-            });
-        }
-
-        if (exportBtn) {
-            exportBtn.addEventListener('click', function () {
-                try {
-                    const rows = table.rows({ search: 'applied' }).data().toArray();
-                    if (!rows.length) {
-                        showToast('No data available for export.', 'error');
-                        return;
-                    }
-
-                    const headers = ['#', 'Photo', 'Code', 'Employee ID', 'Full Name', 'Email', 'Position', 'Department', 'Hire Date', 'Status'];
-                    const csvRows = [headers.join(',')];
-
-                    rows.forEach(function (row) {
-                        const csvRow = [
-                            row.DT_RowIndex,
-                            row.profile_picture ? 'Yes' : 'No', // Photo indicator
-                            '"' + (row.code || '').replace(/"/g, '""') + '"',
-                            '"' + (row.employee_id || '').replace(/"/g, '""') + '"',
-                            '"' + (row.full_name || '').replace(/"/g, '""') + '"',
-                            '"' + (row.email || '').replace(/"/g, '""') + '"',
-                            '"' + (row.position || '').replace(/"/g, '""') + '"',
-                            '"' + (row.department_name || '').replace(/"/g, '""') + '"',
-                            '"' + (row.hire_date_formatted || '').replace(/"/g, '""') + '"',
-                            row.is_active ? 'Active' : 'Inactive'
-                        ];
-                        csvRows.push(csvRow.join(','));
-                    });
-
-                    const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
-                    const url = URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.download = 'employees.csv';
-                    link.click();
-                    URL.revokeObjectURL(url);
-                    showToast('Export completed successfully.', 'success');
-                } catch (error) {
-                    console.error('Export error:', error);
-                    showToast('Failed to export data.', 'error');
-                }
-            });
-        }
-
-        document.addEventListener('hidden.tw.modal', function () {
-            if (document.activeElement && typeof document.activeElement.blur === 'function') {
-                document.activeElement.blur();
-            }
-            table.ajax.reload(null, false);
-        });
-
-        // Initialize when modal opens
-        document.addEventListener('show.tw.modal', function (event) {
-            if (event.target && event.target.id === 'create-employee-modal') {
-                refreshEmployeeCode();
-            }
-        });
-
-        window.openEditModal = function(id, employeeId, firstName, lastName, email, phone, position, salary, hireDate, birthDate, gender, address, city, country, postalCode, departmentId, companyId, isActive) {
-            console.log('Opening edit modal for employee:', id, employeeId);
-
-            // Populate form fields
-            document.getElementById('edit-employee-id').value = employeeId || '';
-            document.getElementById('edit-first-name').value = firstName || '';
-            document.getElementById('edit-last-name').value = lastName || '';
-            document.getElementById('edit-email').value = email || '';
-            document.getElementById('edit-phone').value = phone || '';
-            document.getElementById('edit-position').value = position || '';
-            document.getElementById('edit-salary').value = salary || '';
-            document.getElementById('edit-hire-date').value = hireDate || '';
-            document.getElementById('edit-birth-date').value = birthDate || '';
-            document.getElementById('edit-gender').value = gender || '';
-            document.getElementById('edit-address').value = address || '';
-            document.getElementById('edit-city').value = city || '';
-            document.getElementById('edit-country').value = country || '';
-            document.getElementById('edit-postal-code').value = postalCode || '';
-            document.getElementById('edit-department_id').value = departmentId || '';
-            document.getElementById('edit-company_id').value = companyId || '';
-            document.getElementById('edit-is_active').checked = isActive;
-
-            // Update form action
-            const form = document.getElementById('edit-employee-form');
-            form.action = `/hr/employees/${id}`;
-
-            // Show modal using the hidden trigger button
-            const modalTrigger = document.getElementById('edit-employee-trigger');
-            if (modalTrigger) {
-                modalTrigger.click();
-            } else {
-                console.error('Edit employee modal trigger not found');
-            }
-        };
-
-        const editForm = document.getElementById('edit-employee-form');
-        const editModal = document.getElementById('edit-employee-modal');
-
-        if (editForm) {
-            editForm.addEventListener('submit', function (event) {
-                event.preventDefault();
-
-                const formData = new FormData(editForm);
-
-                fetch(editForm.action, {
-                    method: 'POST',
-                    headers: {
                         'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
-                    body: formData,
+                    credentials: 'same-origin'
                 })
-                    .then(async (response) => {
-                        if (response.ok) {
-                            return response.json();
-                        }
-
-                        if (response.status === 422) {
-                            const data = await response.json();
-                            const errors = data.errors || {};
-                            const firstError = Object.values(errors)[0];
-                            if (firstError) {
-                                showToast(Array.isArray(firstError) ? firstError[0] : firstError, 'error');
-                            } else {
-                                showToast(data.message || 'Validation error', 'error');
-                            }
-                            throw new Error('validation');
-                        }
-
-                        throw new Error('request');
-                    })
-                    .then((data) => {
-                        if (data.success) {
-                            showToast(data.message || 'Employee updated successfully', 'success');
-                            editModal.__tippy?.hide?.();
-                            reloadTable();
-                        } else {
-                            showToast(data.message || 'Failed to update employee', 'error');
-                        }
-                    })
-                    .catch((error) => {
-                        if (error.message === 'validation') {
-                            return;
-                        }
-                        console.error('Employee update error:', error);
-                        showToast('An error occurred while updating the employee', 'error');
-                    });
-            });
-        }
-
-        window.deleteEmployee = function (id, name) {
-            Swal.fire({
-                title: 'Delete Employee?',
-                html: `Are you sure you want to delete <strong>"${name}"</strong>?<br>This action cannot be undone.`,
-                icon: 'warning',
-                iconColor: '#ef4444',
-                showCancelButton: true,
-                confirmButtonColor: '#dc2626',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'Cancel',
-                background: '#ffffff',
-                customClass: {
-                    popup: 'rounded-xl shadow-2xl',
-                    confirmButton: 'px-6 py-2 rounded-lg font-semibold',
-                    cancelButton: 'px-6 py-2 rounded-lg font-semibold'
-                },
-                showClass: {
-                    popup: 'animate__animated animate__fadeInDown animate__faster'
-                },
-                hideClass: {
-                    popup: 'animate__animated animate__fadeOutUp animate__faster'
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    fetch(`{{ route('hr.employees.destroy', '') }}/${id}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'application/json',
-                        },
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                reloadTable();
-                                showToast(data.message || 'Employee deleted successfully', 'success');
-                            } else {
-                                showToast(data.message || 'Failed to delete employee', 'error');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            showToast('An error occurred while deleting the employee', 'error');
-                        });
-                }
-            });
-        };
-    });
+                .then(response => {
+                    console.log('🧪 Code API Status:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('🧪 Code Data:', data);
+                    showToast('Code generated: ' + (data.code || 'N/A'), 'success');
+                })
+                .catch(error => {
+                    console.error('🧪 Code API Error:', error);
+                    showToast('Failed to generate code', 'error');
+                });
+            };
+        });
+    } catch (error) {
+        console.error('❌ JavaScript error in employees index:', error);
+        console.error('Error details:', error.message);
+        console.error('Error stack:', error.stack);
+        
+        // Try to continue with basic functionality
+        console.log('🔄 Attempting to continue with limited functionality...');
+    }
     </script>
 @endpush

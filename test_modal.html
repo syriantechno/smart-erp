@@ -1,0 +1,220 @@
+﻿<!DOCTYPE html>
+<html dir='rtl' lang='ar'>
+<head>
+    <title>API Test - Employee Modal</title>
+    <meta charset='utf-8'>
+    <meta name='csrf-token' content='test-token'>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; direction: rtl; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .form-group { margin: 15px 0; }
+        select, button { padding: 8px; margin: 5px; }
+        .result { background: #f5f5f5; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .error { background: #ffebee; border-left: 4px solid #f44336; }
+        .success { background: #e8f5e8; border-left: 4px solid #4caf50; }
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <h1>اختبار Modal الموظف</h1>
+        
+        <div class='form-group'>
+            <label>الشركة:</label>
+            <select id='company_id'>
+                <option value=''>اختر الشركة</option>
+                <option value='1'>شركة التكنولوجيا المتقدمة</option>
+                <option value='2'>مجموعة الأعمال التجارية</option>
+                <option value='3'>شركة الابتكار الرقمي</option>
+                <option value='4'>شركة الحلول المتكاملة</option>
+            </select>
+        </div>
+
+        <div class='form-group'>
+            <label>القسم:</label>
+            <select id='department_id' disabled>
+                <option value=''>اختر القسم</option>
+            </select>
+        </div>
+
+        <div class='form-group'>
+            <label>المنصب:</label>
+            <select id='position' disabled>
+                <option value=''>اختر المنصب</option>
+            </select>
+        </div>
+
+        <div class='form-group'>
+            <label>كود الموظف:</label>
+            <input type='text' id='code' readonly>
+        </div>
+
+        <button onclick='generateCode()'>توليد الكود</button>
+        <button onclick='clearAll()'>مسح الكل</button>
+
+        <div id='results'></div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = 'result ' + type;
+            div.textContent = new Date().toLocaleTimeString() + ': ' + message;
+            results.appendChild(div);
+            console.log(message);
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        function clearAll() {
+            document.getElementById('company_id').value = '';
+            document.getElementById('department_id').innerHTML = '<option value="">اختر القسم</option>';
+            document.getElementById('position').innerHTML = '<option value="">اختر المنصب</option>';
+            document.getElementById('code').value = '';
+            document.getElementById('department_id').disabled = true;
+            document.getElementById('position').disabled = true;
+            clearResults();
+            log('تم مسح جميع البيانات');
+        }
+
+        function generateCode() {
+            log('توليد كود الموظف...');
+            fetch('http://127.0.0.1:8000/hr/employees/preview-code', {
+                headers: {
+                    'X-CSRF-TOKEN': 'test-token',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(r => {
+                log('استجابة API الكود: ' + r.status);
+                return r.json();
+            })
+            .then(d => {
+                log('بيانات الكود: ' + JSON.stringify(d), 'success');
+                if (d.code) {
+                    document.getElementById('code').value = d.code;
+                }
+            })
+            .catch(e => {
+                log('خطأ في توليد الكود: ' + e.message, 'error');
+            });
+        }
+
+        // Company change
+        document.getElementById('company_id').addEventListener('change', function() {
+            const companyId = this.value;
+            log('تم تغيير الشركة إلى: ' + companyId);
+            
+            const dept = document.getElementById('department_id');
+            const pos = document.getElementById('position');
+
+            // Clear options
+            log('مسح خيارات القسم والمنصب');
+            dept.innerHTML = '<option value="">اختر القسم</option>';
+            pos.innerHTML = '<option value="">اختر المنصب</option>';
+            dept.disabled = pos.disabled = true;
+
+            if (companyId) {
+                log('جاري تحميل الأقسام للشركة: ' + companyId);
+                fetch(http://127.0.0.1:8000/hr/departments/api/company/, {
+                    headers: {
+                        'X-CSRF-TOKEN': 'test-token',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(r => {
+                    log('استجابة API الأقسام: ' + r.status);
+                    return r.json();
+                })
+                .then(d => {
+                    log('بيانات الأقسام: ' + JSON.stringify(d), 'success');
+                    
+                    // Clear again
+                    dept.innerHTML = '<option value="">اختر القسم</option>';
+                    
+                    if (d && Array.isArray(d) && d.length > 0) {
+                        log('إضافة ' + d.length + ' قسم');
+                        d.forEach((x, i) => {
+                            log('  ' + (i+1) + '. ' + x.name);
+                            const o = document.createElement('option');
+                            o.value = x.id;
+                            o.textContent = x.name;
+                            dept.appendChild(o);
+                        });
+                        dept.disabled = false;
+                        log('تم تحميل الأقسام بنجاح', 'success');
+                    } else {
+                        log('لا توجد أقسام لهذه الشركة', 'error');
+                        dept.innerHTML = '<option value="">لا توجد أقسام</option>';
+                    }
+                })
+                .catch(e => {
+                    log('خطأ في تحميل الأقسام: ' + e.message, 'error');
+                    dept.innerHTML = '<option value="">خطأ في التحميل</option>';
+                });
+            }
+        });
+
+        // Department change
+        document.getElementById('department_id').addEventListener('change', function() {
+            const deptId = this.value;
+            log('تم تغيير القسم إلى: ' + deptId);
+            
+            const pos = document.getElementById('position');
+
+            // Clear options
+            log('مسح خيارات المنصب');
+            pos.innerHTML = '<option value="">اختر المنصب</option>';
+            pos.disabled = true;
+
+            if (deptId) {
+                log('جاري تحميل المناصب للقسم: ' + deptId);
+                fetch(http://127.0.0.1:8000/hr/positions/api/department/, {
+                    headers: {
+                        'X-CSRF-TOKEN': 'test-token',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(r => {
+                    log('استجابة API المناصب: ' + r.status);
+                    return r.json();
+                })
+                .then(d => {
+                    log('بيانات المناصب: ' + JSON.stringify(d), 'success');
+                    
+                    // Clear again
+                    pos.innerHTML = '<option value="">اختر المنصب</option>';
+                    
+                    if (d && Array.isArray(d) && d.length > 0) {
+                        log('إضافة ' + d.length + ' منصب');
+                        d.forEach((x, i) => {
+                            log('  ' + (i+1) + '. ' + x.title);
+                            const o = document.createElement('option');
+                            o.value = x.title;
+                            o.textContent = x.title;
+                            pos.appendChild(o);
+                        });
+                        pos.disabled = false;
+                        log('تم تحميل المناصب بنجاح', 'success');
+                    } else {
+                        log('لا توجد مناصب لهذا القسم', 'error');
+                        pos.innerHTML = '<option value="">لا توجد مناصب</option>';
+                    }
+                })
+                .catch(e => {
+                    log('خطأ في تحميل المناصب: ' + e.message, 'error');
+                    pos.innerHTML = '<option value="">خطأ في التحميل</option>';
+                });
+            }
+        });
+
+        // Auto generate code on page load
+        window.onload = function() {
+            log('تم تحميل الصفحة، جاري توليد الكود...');
+            generateCode();
+        };
+    </script>
+</body>
+</html>

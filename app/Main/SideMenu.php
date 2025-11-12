@@ -65,6 +65,11 @@ class SideMenu
                         'title' => 'Attendance',
                         'route_name' => 'hr.attendance.index'
                     ],
+                    'shifts' => [
+                        'icon' => 'watch',
+                        'title' => 'Shifts',
+                        'route_name' => 'hr.shifts.index'
+                    ],
                     'leave' => [
                         'icon' => 'calendar',
                         'title' => 'Leave Management',

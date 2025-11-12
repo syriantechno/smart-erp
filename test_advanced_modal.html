@@ -1,0 +1,415 @@
+﻿<!DOCTYPE html>
+<html dir='rtl' lang='ar'>
+<head>
+    <title>Advanced Modal Test</title>
+    <meta charset='utf-8'>
+    <meta name='csrf-token' content='test-token'>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; direction: rtl; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .form-group { margin: 15px 0; }
+        select { padding: 8px; width: 100%; }
+        .result { background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; font-size: 12px; max-height: 300px; overflow-y: auto; }
+        button { padding: 10px; margin: 5px; cursor: pointer; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { background: white; margin: 10% auto; padding: 20px; width: 80%; max-width: 500px; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <h1>اختبار المودال المتقدم</h1>
+        
+        <button onclick='openModal()'>فتح المودال</button>
+        <button onclick='resetAll()'>إعادة تعيين</button>
+        <button onclick='checkOptions()'>فحص الخيارات</button>
+
+        <div id='results' class='result'></div>
+
+        <!-- Modal -->
+        <div id='test-modal' class='modal'>
+            <div class='modal-content'>
+                <h2>إضافة موظف</h2>
+                
+                <div class='form-group'>
+                    <label>الشركة:</label>
+                    <select id='company_id'>
+                        <option value=''>اختر الشركة</option>
+                        <option value='1'>شركة التكنولوجيا المتقدمة</option>
+                        <option value='2'>مجموعة الأعمال التجارية</option>
+                    </select>
+                </div>
+
+                <div class='form-group'>
+                    <label>القسم:</label>
+                    <select id='department_id' disabled>
+                        <option value=''>اختر القسم</option>
+                    </select>
+                </div>
+
+                <div class='form-group'>
+                    <label>المنصب:</label>
+                    <select id='position' disabled>
+                        <option value=''>اختر المنصب</option>
+                    </select>
+                </div>
+
+                <div class='form-group'>
+                    <label>كود الموظف:</label>
+                    <input type='text' id='code' readonly>
+                </div>
+
+                <button onclick='closeModal()'>إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function log(message) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.textContent = new Date().toLocaleTimeString() + ': ' + message;
+            results.appendChild(div);
+            results.scrollTop = results.scrollHeight;
+            console.log(message);
+        }
+
+        function openModal() {
+            log('فتح المودال...');
+            document.getElementById('test-modal').style.display = 'block';
+            
+            // Simulate modal events
+            setTimeout(() => {
+                log('محاكاة show.tw.modal event');
+                document.dispatchEvent(new CustomEvent('show.tw.modal', {
+                    detail: { target: document.getElementById('test-modal') }
+                }));
+            }, 100);
+
+            setTimeout(() => {
+                log('محاكاة shown.tw.modal event');
+                document.dispatchEvent(new CustomEvent('shown.tw.modal', {
+                    detail: { target: document.getElementById('test-modal') }
+                }));
+            }, 300);
+        }
+
+        function closeModal() {
+            document.getElementById('test-modal').style.display = 'none';
+        }
+
+        function resetAll() {
+            document.getElementById('company_id').value = '';
+            document.getElementById('department_id').innerHTML = '<option value="">اختر القسم</option>';
+            document.getElementById('position').innerHTML = '<option value="">اختر المنصب</option>';
+            document.getElementById('code').value = '';
+            document.getElementById('department_id').disabled = true;
+            document.getElementById('position').disabled = true;
+            document.getElementById('results').innerHTML = '';
+            log('تم إعادة التعيين');
+        }
+
+        function checkOptions() {
+            const dept = document.getElementById('department_id');
+            const pos = document.getElementById('position');
+            
+            log('الأقسام: ' + dept.options.length + ' خيار');
+            for(let i = 0; i < dept.options.length; i++) {
+                log('  ' + i + ': \"' + dept.options[i].text + '\" (value: ' + dept.options[i].value + ')');
+            }
+            
+            log('المناصب: ' + pos.options.length + ' خيار');
+            for(let i = 0; i < pos.options.length; i++) {
+                log('  ' + i + ': \"' + pos.options[i].text + '\" (value: ' + pos.options[i].value + ')');
+            }
+        }
+
+        // Initialize the advanced modal system
+        document.addEventListener('DOMContentLoaded', function() {
+            log('🚀 Advanced modal system loaded');
+
+            let modalInitialized = false;
+            let codeGenerated = false;
+
+            // Use MutationObserver to watch for modal being added to DOM
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'childList') {
+                        const modal = document.getElementById('test-modal');
+                        if (modal && modal.style.display !== 'none' && !modalInitialized) {
+                            log('🎯 Modal found in DOM via MutationObserver, initializing...');
+                            initializeModal();
+                        }
+                    }
+                });
+            });
+
+            // Start observing
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+
+            // Fallback: check for modal every second for 10 seconds
+            let checkCount = 0;
+            const checkInterval = setInterval(() => {
+                checkCount++;
+                const modal = document.getElementById('test-modal');
+                if (modal && modal.style.display !== 'none' && !modalInitialized) {
+                    log('🎯 Modal found via interval check #' + checkCount + ', initializing...');
+                    initializeModal();
+                    clearInterval(checkInterval);
+                }
+                if (checkCount >= 10) {
+                    log('⏰ Stopped checking for modal after 10 attempts');
+                    clearInterval(checkInterval);
+                }
+            }, 1000);
+
+            // Also listen for modal events
+            document.addEventListener('show.tw.modal', function(event) {
+                const target = event.detail ? event.detail.target : event.target;
+                if (target && target.id === 'test-modal') {
+                    log('📂 Modal show event detected');
+                    if (!modalInitialized) {
+                        setTimeout(() => initializeModal(), 100);
+                    }
+                }
+            });
+
+            document.addEventListener('shown.tw.modal', function(event) {
+                const target = event.detail ? event.detail.target : event.target;
+                if (target && target.id === 'test-modal') {
+                    log('🎯 Modal shown event detected');
+                    if (!modalInitialized) {
+                        setTimeout(() => initializeModal(), 200);
+                    }
+                }
+            });
+
+            function initializeModal() {
+                if (modalInitialized) return;
+
+                log('🔄 Initializing modal functionality...');
+
+                // Generate code if not already done
+                if (!codeGenerated) {
+                    generateEmployeeCode();
+                }
+
+                // Setup event listeners
+                setupEventListeners();
+
+                modalInitialized = true;
+                log('✅ Modal initialized successfully');
+            }
+
+            function generateEmployeeCode() {
+                if (codeGenerated) return;
+
+                const codeInput = document.getElementById('code');
+                if (!codeInput || codeInput.value) {
+                    codeGenerated = true;
+                    return;
+                }
+
+                log('🔢 Generating employee code...');
+                fetch('http://127.0.0.1:8000/hr/employees/preview-code', {
+                    headers: {
+                        'X-CSRF-TOKEN': 'test-token',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(r => {
+                    log('📡 Code API response:', r.status);
+                    return r.json();
+                })
+                .then(d => {
+                    log('🔢 Code data received:', d);
+                    if (d.code && codeInput) {
+                        codeInput.value = d.code;
+                        log('✅ Code set to:', d.code);
+                        codeGenerated = true;
+                    }
+                })
+                .catch(e => {
+                    log('❌ Code generation error:', e.message);
+                    codeGenerated = true;
+                });
+            }
+
+            function setupEventListeners() {
+                const companySelect = document.getElementById('company_id');
+                const departmentSelect = document.getElementById('department_id');
+
+                if (companySelect) {
+                    log('🎧 Setting up company change listener');
+                    companySelect.addEventListener('change', function() {
+                        handleCompanyChange.call(this);
+                    });
+                }
+
+                if (departmentSelect) {
+                    log('🎧 Setting up department change listener');
+                    departmentSelect.addEventListener('change', function() {
+                        handleDepartmentChange.call(this);
+                    });
+                }
+            }
+
+            function handleCompanyChange() {
+                log('🏢 Company changed to:', this.value);
+                const dept = document.getElementById('department_id');
+                const pos = document.getElementById('position');
+
+                if (!dept || !pos) {
+                    log('❌ Select elements not found');
+                    return;
+                }
+
+                // Complete clearing
+                log('🧹 Clearing department and position options completely');
+                dept.innerHTML = '';
+                pos.innerHTML = '';
+
+                // Add default options
+                const deptDefault = document.createElement('option');
+                deptDefault.value = '';
+                deptDefault.textContent = 'اختر القسم';
+                dept.appendChild(deptDefault);
+
+                const posDefault = document.createElement('option');
+                posDefault.value = '';
+                posDefault.textContent = 'اختر المنصب';
+                pos.appendChild(posDefault);
+
+                dept.disabled = pos.disabled = true;
+
+                log('📊 After clearing - department options: ' + dept.options.length + ', position options: ' + pos.options.length);
+
+                if (this.value == '1') {
+                    // Simulate API response for company 1
+                    setTimeout(() => {
+                        log('🌐 Simulating API call for company 1');
+                        const mockData = [{id: 1, name: 'sep1'}];
+                        
+                        dept.innerHTML = '';
+                        const newDeptDefault = document.createElement('option');
+                        newDeptDefault.value = '';
+                        newDeptDefault.textContent = 'اختر القسم';
+                        dept.appendChild(newDeptDefault);
+
+                        mockData.forEach((x, index) => {
+                            log('✅ Adding department ' + (index + 1) + ': ' + x.name);
+                            const o = document.createElement('option');
+                            o.value = x.id;
+                            o.textContent = x.name;
+                            dept.appendChild(o);
+                        });
+                        
+                        dept.disabled = false;
+                        log('✅ Departments loaded, total options: ' + dept.options.length);
+                    }, 500);
+                } else if (this.value == '2') {
+                    // Simulate API response for company 2
+                    setTimeout(() => {
+                        log('🌐 Simulating API call for company 2');
+                        const mockData = [{id: 2, name: 'قسم المبيعات'}];
+                        
+                        dept.innerHTML = '';
+                        const newDeptDefault = document.createElement('option');
+                        newDeptDefault.value = '';
+                        newDeptDefault.textContent = 'اختر القسم';
+                        dept.appendChild(newDeptDefault);
+
+                        mockData.forEach((x, index) => {
+                            log('✅ Adding department ' + (index + 1) + ': ' + x.name);
+                            const o = document.createElement('option');
+                            o.value = x.id;
+                            o.textContent = x.name;
+                            dept.appendChild(o);
+                        });
+                        
+                        dept.disabled = false;
+                        log('✅ Departments loaded, total options: ' + dept.options.length);
+                    }, 500);
+                }
+            }
+
+            function handleDepartmentChange() {
+                log('🏢 Department changed to:', this.value);
+                const pos = document.getElementById('position');
+
+                if (!pos) {
+                    log('❌ Position select not found');
+                    return;
+                }
+
+                // Complete clearing
+                log('🧹 Clearing position options completely');
+                pos.innerHTML = '';
+
+                // Add default option
+                const posDefault = document.createElement('option');
+                posDefault.value = '';
+                posDefault.textContent = 'اختر المنصب';
+                pos.appendChild(posDefault);
+
+                pos.disabled = true;
+
+                log('📊 After clearing - position options: ' + pos.options.length);
+
+                if (this.value == '1') {
+                    // Simulate API response for department 1
+                    setTimeout(() => {
+                        log('🌐 Simulating API call for department 1');
+                        const mockData = [
+                            {id: 1, title: 'ops1'},
+                            {id: 3, title: 'مطور برمجيات'}
+                        ];
+                        
+                        pos.innerHTML = '';
+                        const newPosDefault = document.createElement('option');
+                        newPosDefault.value = '';
+                        newPosDefault.textContent = 'اختر المنصب';
+                        pos.appendChild(newPosDefault);
+
+                        mockData.forEach((x, index) => {
+                            log('✅ Adding position ' + (index + 1) + ': ' + x.title);
+                            const o = document.createElement('option');
+                            o.value = x.title;
+                            o.textContent = x.title;
+                            pos.appendChild(o);
+                        });
+                        
+                        pos.disabled = false;
+                        log('✅ Positions loaded, total options: ' + pos.options.length);
+                    }, 500);
+                } else if (this.value == '2') {
+                    // Simulate API response for department 2
+                    setTimeout(() => {
+                        log('🌐 Simulating API call for department 2');
+                        const mockData = [{id: 2, title: 'مدير مبيعات'}];
+                        
+                        pos.innerHTML = '';
+                        const newPosDefault = document.createElement('option');
+                        newPosDefault.value = '';
+                        newPosDefault.textContent = 'اختر المنصب';
+                        pos.appendChild(newPosDefault);
+
+                        mockData.forEach((x, index) => {
+                            log('✅ Adding position ' + (index + 1) + ': ' + x.title);
+                            const o = document.createElement('option');
+                            o.value = x.title;
+                            o.textContent = x.title;
+                            pos.appendChild(o);
+                        });
+                        
+                        pos.disabled = false;
+                        log('✅ Positions loaded, total options: ' + pos.options.length);
+                    }, 500);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

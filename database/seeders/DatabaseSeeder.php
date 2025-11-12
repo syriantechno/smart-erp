@@ -14,6 +14,9 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             AdminUserSeeder::class,
+            CompanySeeder::class,
+            PrefixSettingsSeeder::class,
+            HRDataSeeder::class, // Add HR data seeder
             // Add other seeders here
         ]);
     }

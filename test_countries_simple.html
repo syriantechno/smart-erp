@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html>
+<html>
+<head><title>Country Test</title></head>
+<body>
+    <h1>Testing Countries Loading</h1>
+    <select id="country">
+        <option value="">اختر الدولة</option>
+    </select>
+    <div id="debug"></div>
+
+    <script>
+        console.log('Script loaded at:', new Date().toISOString());
+        
+        function log(message) {
+            const debug = document.getElementById('debug');
+            debug.innerHTML += '<div>' + message + '</div>';
+            console.log(message);
+        }
+
+        function loadCountries() {
+            log('🌍 loadCountries() called');
+            const countrySelect = document.getElementById('country');
+
+            if (!countrySelect) {
+                log('❌ Country select not found');
+                return;
+            }
+
+            log('✅ Found country select');
+
+            // Countries data
+            const countries = [
+                {"code": "SA", "name": "Saudi Arabia", "flag": "🇸🇦"},
+                {"code": "US", "name": "United States", "flag": "🇺🇸"},
+                {"code": "GB", "name": "United Kingdom", "flag": "🇬🇧"}
+            ];
+
+            log('Adding ' + countries.length + ' countries');
+
+            countries.forEach(country => {
+                const option = document.createElement('option');
+                option.value = country.name;
+                option.textContent = ${country.flag} ;
+                countrySelect.appendChild(option);
+            });
+
+            log('✅ Countries loaded, total options: ' + countrySelect.options.length);
+        }
+
+        // Test immediately
+        loadCountries();
+    </script>
+</body>
+</html>

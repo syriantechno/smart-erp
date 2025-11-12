@@ -1,0 +1,214 @@
+﻿<!DOCTYPE html>
+<html dir='rtl' lang='ar'>
+<head>
+    <title>Test - No Duplicates</title>
+    <meta charset='utf-8'>
+    <meta name='csrf-token' content='test-token'>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; direction: rtl; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .form-group { margin: 15px 0; }
+        select { padding: 8px; width: 100%; }
+        .result { background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <h1>اختبار عدم التكرار</h1>
+        
+        <div class='form-group'>
+            <label>الشركة:</label>
+            <select id='company_id'>
+                <option value=''>اختر الشركة</option>
+                <option value='1'>شركة التكنولوجيا المتقدمة</option>
+                <option value='2'>مجموعة الأعمال التجارية</option>
+            </select>
+        </div>
+
+        <div class='form-group'>
+            <label>القسم:</label>
+            <select id='department_id' disabled>
+                <option value=''>اختر القسم</option>
+            </select>
+        </div>
+
+        <div class='form-group'>
+            <label>المنصب:</label>
+            <select id='position' disabled>
+                <option value=''>اختر المنصب</option>
+            </select>
+        </div>
+
+        <button onclick='resetAll()'>إعادة تعيين</button>
+        <button onclick='checkOptions()'>فحص الخيارات</button>
+
+        <div id='results'></div>
+    </div>
+
+    <script>
+        function log(message) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = 'result';
+            div.textContent = new Date().toLocaleTimeString() + ': ' + message;
+            results.appendChild(div);
+            console.log(message);
+        }
+
+        function resetAll() {
+            document.getElementById('company_id').value = '';
+            document.getElementById('department_id').innerHTML = '<option value="">اختر القسم</option>';
+            document.getElementById('position').innerHTML = '<option value="">اختر المنصب</option>';
+            document.getElementById('department_id').disabled = true;
+            document.getElementById('position').disabled = true;
+            document.getElementById('results').innerHTML = '';
+            log('تم إعادة التعيين');
+        }
+
+        function checkOptions() {
+            const dept = document.getElementById('department_id');
+            const pos = document.getElementById('position');
+            
+            log('الأقسام: ' + dept.options.length + ' خيار');
+            for(let i = 0; i < dept.options.length; i++) {
+                log('  ' + i + ': ' + dept.options[i].text + ' (value: ' + dept.options[i].value + ')');
+            }
+            
+            log('المناصب: ' + pos.options.length + ' خيار');
+            for(let i = 0; i < pos.options.length; i++) {
+                log('  ' + i + ': ' + pos.options[i].text + ' (value: ' + pos.options[i].value + ')');
+            }
+        }
+
+        // Company change
+        document.getElementById('company_id').addEventListener('change', function() {
+            const dept = document.getElementById('department_id');
+            const pos = document.getElementById('position');
+
+            // Complete clearing
+            dept.innerHTML = '';
+            pos.innerHTML = '';
+
+            const deptDefault = document.createElement('option');
+            deptDefault.value = '';
+            deptDefault.textContent = 'اختر القسم';
+            dept.appendChild(deptDefault);
+
+            const posDefault = document.createElement('option');
+            posDefault.value = '';
+            posDefault.textContent = 'اختر المنصب';
+            pos.appendChild(posDefault);
+
+            dept.disabled = pos.disabled = true;
+
+            if (this.value == '1') {
+                // Simulate API response for company 1
+                setTimeout(() => {
+                    const mockData = [{id: 1, name: 'sep1'}];
+                    
+                    dept.innerHTML = '';
+                    const newDefault = document.createElement('option');
+                    newDefault.value = '';
+                    newDefault.textContent = 'اختر القسم';
+                    dept.appendChild(newDefault);
+
+                    mockData.forEach(x => {
+                        const o = document.createElement('option');
+                        o.value = x.id;
+                        o.textContent = x.name;
+                        dept.appendChild(o);
+                    });
+                    
+                    dept.disabled = false;
+                    log('تم تحميل قسم واحد: sep1');
+                }, 500);
+            } else if (this.value == '2') {
+                // Simulate API response for company 2
+                setTimeout(() => {
+                    const mockData = [{id: 2, name: 'قسم المبيعات'}];
+                    
+                    dept.innerHTML = '';
+                    const newDefault = document.createElement('option');
+                    newDefault.value = '';
+                    newDefault.textContent = 'اختر القسم';
+                    dept.appendChild(newDefault);
+
+                    mockData.forEach(x => {
+                        const o = document.createElement('option');
+                        o.value = x.id;
+                        o.textContent = x.name;
+                        dept.appendChild(o);
+                    });
+                    
+                    dept.disabled = false;
+                    log('تم تحميل قسم واحد: قسم المبيعات');
+                }, 500);
+            }
+        });
+
+        // Department change
+        document.getElementById('department_id').addEventListener('change', function() {
+            const pos = document.getElementById('position');
+
+            pos.innerHTML = '';
+            const posDefault = document.createElement('option');
+            posDefault.value = '';
+            posDefault.textContent = 'اختر المنصب';
+            pos.appendChild(posDefault);
+            pos.disabled = true;
+
+            if (this.value == '1') {
+                // Simulate API response for department 1
+                setTimeout(() => {
+                    const mockData = [
+                        {id: 1, title: 'ops1'},
+                        {id: 3, title: 'مطور برمجيات'}
+                    ];
+                    
+                    pos.innerHTML = '';
+                    const newDefault = document.createElement('option');
+                    newDefault.value = '';
+                    newDefault.textContent = 'اختر المنصب';
+                    pos.appendChild(newDefault);
+
+                    mockData.forEach(x => {
+                        const o = document.createElement('option');
+                        o.value = x.title;
+                        o.textContent = x.title;
+                        pos.appendChild(o);
+                    });
+                    
+                    pos.disabled = false;
+                    log('تم تحميل منصبين: ops1 و مطور برمجيات');
+                }, 500);
+            } else if (this.value == '2') {
+                // Simulate API response for department 2
+                setTimeout(() => {
+                    const mockData = [{id: 2, title: 'مدير مبيعات'}];
+                    
+                    pos.innerHTML = '';
+                    const newDefault = document.createElement('option');
+                    newDefault.value = '';
+                    newDefault.textContent = 'اختر المنصب';
+                    pos.appendChild(newDefault);
+
+                    mockData.forEach(x => {
+                        const o = document.createElement('option');
+                        o.value = x.title;
+                        o.textContent = x.title;
+                        pos.appendChild(o);
+                    });
+                    
+                    pos.disabled = false;
+                    log('تم تحميل منصب واحد: مدير مبيعات');
+                }, 500);
+            }
+        });
+
+        // Initial check
+        setTimeout(() => {
+            checkOptions();
+        }, 1000);
+    </script>
+</body>
+</html>
