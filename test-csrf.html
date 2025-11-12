@@ -1,0 +1,63 @@
+<!-- test-csrf.html -->
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="test-csrf-token-123456789">
+    <title>اختبار CSRF</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>اختبار إرسال نموذج إعدادات المظهر</h1>
+
+    <form id="test-form" action="http://127.0.0.1:8000/settings/appearance" method="POST">
+        <input type="hidden" name="_token" value="test-csrf-token-123456789">
+
+        <label>
+            <input type="checkbox" name="dark_mode" value="1">
+            تفعيل الوضع المظلم
+        </label><br><br>
+
+        <label>
+            اللون الأساسي:
+            <input type="color" name="primary_color" value="#1e40af">
+        </label><br><br>
+
+        <label>
+            اللون الثانوي:
+            <input type="color" name="secondary_color" value="#7c3aed">
+        </label><br><br>
+
+        <label>
+            لون التأكيد:
+            <input type="color" name="accent_color" value="#06b6d4">
+        </label><br><br>
+
+        <button type="submit">اختبر الإرسال</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+        $('#test-form').on('submit', function(e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: $(this).attr('action'),
+                method: 'POST',
+                data: $(this).serialize(),
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    $('#result').html('<div style="color: green;">✅ نجح: ' + JSON.stringify(response) + '</div>');
+                },
+                error: function(xhr, status, error) {
+                    $('#result').html('<div style="color: red;">❌ خطأ ' + xhr.status + ': ' + xhr.responseText + '</div>');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

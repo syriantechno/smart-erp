@@ -46,4 +46,49 @@ class Company extends Model
     {
         return $this->hasMany(Employee::class);
     }
+
+    public function users()
+    {
+        return $this->hasMany(User::class);
+    }
+
+    public function approvalRequests()
+    {
+        return $this->hasMany(ApprovalRequest::class);
+    }
+
+    public function documentCategories()
+    {
+        return $this->hasMany(DocumentCategory::class);
+    }
+
+    public function documents()
+    {
+        return $this->hasMany(Document::class);
+    }
+
+    public function electronicMails()
+    {
+        return $this->hasMany(ElectronicMail::class);
+    }
+
+    public function warehouses()
+    {
+        return $this->hasMany(Warehouse::class);
+    }
+
+    public function purchaseRequests()
+    {
+        return $this->hasMany(PurchaseRequest::class);
+    }
+
+    public function saleOrders()
+    {
+        return $this->hasMany(SaleOrder::class);
+    }
+
+    public function purchaseOrders()
+    {
+        return $this->hasMany(PurchaseOrder::class);
+    }
 }

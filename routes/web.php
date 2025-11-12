@@ -34,6 +34,7 @@ Route::middleware('auth')->group(function () {
     // Settings Routes
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
     Route::post('/settings', [SettingsController::class, 'update'])->name('settings.update');
+    Route::post('/settings/appearance', [SettingsController::class, 'updateAppearance'])->name('settings.appearance.update');
     Route::post('/settings/prefix', [SettingsController::class, 'updatePrefix'])->name('settings.prefix.update');
     Route::post('/settings/company', [SettingsController::class, 'updateCompany'])->name('settings.company.update');
 
@@ -97,13 +98,188 @@ Route::middleware('auth')->group(function () {
         // Recruitment
         Route::get('recruitment', [App\Http\Controllers\HR\RecruitmentController::class, 'index'])->name('recruitment.index');
         
-        // Shifts
         Route::get('shifts/datatable', [App\Http\Controllers\ShiftController::class, 'datatable'])->name('shifts.datatable');
         Route::get('shifts/preview-code', [App\Http\Controllers\ShiftController::class, 'previewCode'])->name('shifts.preview-code');
         Route::post('shifts/{shift}/toggle-status', [App\Http\Controllers\ShiftController::class, 'toggleStatus'])->name('shifts.toggle-status');
         Route::get('shifts/departments', [App\Http\Controllers\ShiftController::class, 'getDepartments'])->name('shifts.departments');
         Route::get('shifts/employees', [App\Http\Controllers\ShiftController::class, 'getEmployees'])->name('shifts.employees');
-        Route::resource('shifts', App\Http\Controllers\ShiftController::class);
+        Route::get('shifts', [App\Http\Controllers\ShiftController::class, 'index'])->name('shifts.index');
+        Route::post('shifts', [App\Http\Controllers\ShiftController::class, 'store'])->name('shifts.store');
+        Route::get('shifts/{shift}', [App\Http\Controllers\ShiftController::class, 'show'])->name('shifts.show');
+        Route::put('shifts/{shift}', [App\Http\Controllers\ShiftController::class, 'update'])->name('shifts.update');
+        Route::delete('shifts/{shift}', [App\Http\Controllers\ShiftController::class, 'destroy'])->name('shifts.destroy');
+    });
+
+    // Tasks Routes
+    Route::prefix('tasks')->name('tasks.')->group(function () {
+        Route::get('/', [App\Http\Controllers\TaskController::class, 'index'])->name('index');
+        Route::get('/datatable', [App\Http\Controllers\TaskController::class, 'datatable'])->name('datatable');
+        Route::get('/preview-code', [App\Http\Controllers\TaskController::class, 'previewCode'])->name('preview-code');
+        Route::get('/create', [App\Http\Controllers\TaskController::class, 'create'])->name('create');
+        Route::post('/', [App\Http\Controllers\TaskController::class, 'store'])->name('store');
+        Route::get('/{task}', [App\Http\Controllers\TaskController::class, 'show'])->name('show');
+        Route::get('/{task}/edit', [App\Http\Controllers\TaskController::class, 'edit'])->name('edit');
+        Route::put('/{task}', [App\Http\Controllers\TaskController::class, 'update'])->name('update');
+        Route::delete('/{task}', [App\Http\Controllers\TaskController::class, 'destroy'])->name('destroy');
+    });
+
+    // Warehouse Routes
+    Route::prefix('warehouse')->name('warehouse.')->group(function () {
+        // Categories
+        Route::prefix('categories')->name('categories.')->group(function () {
+            Route::get('/', [App\Http\Controllers\CategoryController::class, 'index'])->name('index');
+            Route::get('/datatable', [App\Http\Controllers\CategoryController::class, 'datatable'])->name('datatable');
+            Route::get('/preview-code', [App\Http\Controllers\CategoryController::class, 'previewCode'])->name('preview-code');
+            Route::post('/', [App\Http\Controllers\CategoryController::class, 'store'])->name('store');
+            Route::get('/{category}', [App\Http\Controllers\CategoryController::class, 'show'])->name('show');
+            Route::put('/{category}', [App\Http\Controllers\CategoryController::class, 'update'])->name('update');
+            Route::delete('/{category}', [App\Http\Controllers\CategoryController::class, 'destroy'])->name('destroy');
+        });
+
+        // Warehouses
+        Route::prefix('warehouses')->name('warehouses.')->group(function () {
+            Route::get('/', [App\Http\Controllers\WarehouseController::class, 'index'])->name('index');
+            Route::get('/datatable', [App\Http\Controllers\WarehouseController::class, 'datatable'])->name('datatable');
+            Route::get('/preview-code', [App\Http\Controllers\WarehouseController::class, 'previewCode'])->name('preview-code');
+            Route::post('/', [App\Http\Controllers\WarehouseController::class, 'store'])->name('store');
+            Route::get('/{warehouse}', [App\Http\Controllers\WarehouseController::class, 'show'])->name('show');
+            Route::put('/{warehouse}', [App\Http\Controllers\WarehouseController::class, 'update'])->name('update');
+            Route::delete('/{warehouse}', [App\Http\Controllers\WarehouseController::class, 'destroy'])->name('destroy');
+        });
+
+        // Materials
+        Route::prefix('materials')->name('materials.')->group(function () {
+            Route::get('/', [App\Http\Controllers\MaterialController::class, 'index'])->name('index');
+            Route::get('/datatable', [App\Http\Controllers\MaterialController::class, 'datatable'])->name('datatable');
+            Route::get('/preview-code', [App\Http\Controllers\MaterialController::class, 'previewCode'])->name('preview-code');
+            Route::post('/', [App\Http\Controllers\MaterialController::class, 'store'])->name('store');
+            Route::get('/{material}', [App\Http\Controllers\MaterialController::class, 'show'])->name('show');
+            Route::put('/{material}', [App\Http\Controllers\MaterialController::class, 'update'])->name('update');
+            Route::delete('/{material}', [App\Http\Controllers\MaterialController::class, 'destroy'])->name('destroy');
+        });
+
+        // Inventory
+        Route::prefix('inventory')->name('inventory.')->group(function () {
+            Route::get('/', [App\Http\Controllers\InventoryController::class, 'index'])->name('index');
+            Route::get('/datatable', [App\Http\Controllers\InventoryController::class, 'datatable'])->name('datatable');
+            Route::post('/', [App\Http\Controllers\InventoryController::class, 'store'])->name('store');
+            Route::get('/{inventory}', [App\Http\Controllers\InventoryController::class, 'show'])->name('show');
+            Route::put('/{inventory}', [App\Http\Controllers\InventoryController::class, 'update'])->name('update');
+            Route::delete('/{inventory}', [App\Http\Controllers\InventoryController::class, 'destroy'])->name('destroy');
+        });
+
+        // Purchase Requests
+        Route::prefix('purchase-requests')->name('purchase-requests.')->group(function () {
+            Route::get('/', [App\Http\Controllers\PurchaseRequestController::class, 'index'])->name('index');
+            Route::get('/datatable', [App\Http\Controllers\PurchaseRequestController::class, 'datatable'])->name('datatable');
+            Route::get('/preview-code', [App\Http\Controllers\PurchaseRequestController::class, 'previewCode'])->name('preview-code');
+            Route::post('/', [App\Http\Controllers\PurchaseRequestController::class, 'store'])->name('store');
+            Route::get('/{purchaseRequest}', [App\Http\Controllers\PurchaseRequestController::class, 'show'])->name('show');
+            Route::put('/{purchaseRequest}', [App\Http\Controllers\PurchaseRequestController::class, 'update'])->name('update');
+            Route::delete('/{purchaseRequest}', [App\Http\Controllers\PurchaseRequestController::class, 'destroy'])->name('destroy');
+        });
+
+        // Purchase Orders
+        Route::prefix('purchase-orders')->name('purchase-orders.')->group(function () {
+            Route::get('/', [App\Http\Controllers\PurchaseOrderController::class, 'index'])->name('index');
+            Route::get('/datatable', [App\Http\Controllers\PurchaseOrderController::class, 'datatable'])->name('datatable');
+            Route::get('/preview-code', [App\Http\Controllers\PurchaseOrderController::class, 'previewCode'])->name('preview-code');
+            Route::post('/', [App\Http\Controllers\PurchaseOrderController::class, 'store'])->name('store');
+            Route::get('/{purchaseOrder}', [App\Http\Controllers\PurchaseOrderController::class, 'show'])->name('show');
+            Route::put('/{purchaseOrder}', [App\Http\Controllers\PurchaseOrderController::class, 'update'])->name('update');
+            Route::delete('/{purchaseOrder}', [App\Http\Controllers\PurchaseOrderController::class, 'destroy'])->name('destroy');
+        });
+
+        // Sale Orders
+        Route::prefix('sale-orders')->name('sale-orders.')->group(function () {
+            Route::get('/', [App\Http\Controllers\SaleOrderController::class, 'index'])->name('index');
+            Route::get('/datatable', [App\Http\Controllers\SaleOrderController::class, 'datatable'])->name('datatable');
+            Route::get('/preview-code', [App\Http\Controllers\SaleOrderController::class, 'previewCode'])->name('preview-code');
+            Route::post('/', [App\Http\Controllers\SaleOrderController::class, 'store'])->name('store');
+            Route::get('/{saleOrder}', [App\Http\Controllers\SaleOrderController::class, 'show'])->name('show');
+            Route::put('/{saleOrder}', [App\Http\Controllers\SaleOrderController::class, 'update'])->name('update');
+            Route::delete('/{saleOrder}', [App\Http\Controllers\SaleOrderController::class, 'destroy'])->name('destroy');
+        });
+
+        // Delivery Orders
+        Route::prefix('delivery-orders')->name('delivery-orders.')->group(function () {
+            Route::get('/', [App\Http\Controllers\DeliveryOrderController::class, 'index'])->name('index');
+            Route::get('/datatable', [App\Http\Controllers\DeliveryOrderController::class, 'datatable'])->name('datatable');
+            Route::get('/preview-code', [App\Http\Controllers\DeliveryOrderController::class, 'previewCode'])->name('preview-code');
+            Route::post('/', [App\Http\Controllers\DeliveryOrderController::class, 'store'])->name('store');
+            Route::get('/{deliveryOrder}', [App\Http\Controllers\DeliveryOrderController::class, 'show'])->name('show');
+            Route::put('/{deliveryOrder}', [App\Http\Controllers\DeliveryOrderController::class, 'update'])->name('update');
+            Route::delete('/{deliveryOrder}', [App\Http\Controllers\DeliveryOrderController::class, 'destroy'])->name('destroy');
+        });
+    });
+
+    // Electronic Mail Routes
+    Route::prefix('electronic-mail')->name('electronic-mail.')->group(function () {
+        Route::get('/', [App\Http\Controllers\ElectronicMailController::class, 'index'])->name('index');
+        Route::get('/compose', [App\Http\Controllers\ElectronicMailController::class, 'compose'])->name('compose');
+        Route::get('/datatable', [App\Http\Controllers\ElectronicMailController::class, 'datatable'])->name('datatable');
+        Route::post('/', [App\Http\Controllers\ElectronicMailController::class, 'store'])->name('store');
+        Route::get('/{electronicMail}', [App\Http\Controllers\ElectronicMailController::class, 'show'])->name('show');
+        Route::put('/{electronicMail}', [App\Http\Controllers\ElectronicMailController::class, 'update'])->name('update');
+        Route::delete('/{electronicMail}', [App\Http\Controllers\ElectronicMailController::class, 'destroy'])->name('destroy');
+        Route::post('/{electronicMail}/toggle-star', [App\Http\Controllers\ElectronicMailController::class, 'toggleStar'])->name('toggle-star');
+        Route::post('/{electronicMail}/mark-read', [App\Http\Controllers\ElectronicMailController::class, 'markAsRead'])->name('mark-read');
+    });
+
+    // Approval System Routes
+    Route::prefix('approval-system')->name('approval-system.')->group(function () {
+        Route::get('/', [App\Http\Controllers\ApprovalController::class, 'index'])->name('index');
+        Route::get('/create', [App\Http\Controllers\ApprovalController::class, 'create'])->name('create');
+        Route::get('/datatable', [App\Http\Controllers\ApprovalController::class, 'datatable'])->name('datatable');
+        Route::post('/', [App\Http\Controllers\ApprovalController::class, 'store'])->name('store');
+        Route::get('/{approvalRequest}', [App\Http\Controllers\ApprovalController::class, 'show'])->name('show');
+        Route::post('/{approvalRequest}/approve', [App\Http\Controllers\ApprovalController::class, 'approve'])->name('approve');
+        Route::post('/{approvalRequest}/reject', [App\Http\Controllers\ApprovalController::class, 'reject'])->name('reject');
+        Route::get('/stats', [App\Http\Controllers\ApprovalController::class, 'getStats'])->name('stats');
+    });
+
+    // Chat System Routes
+    Route::prefix('chat')->name('chat.')->group(function () {
+        Route::get('/', [App\Http\Controllers\ChatController::class, 'index'])->name('index');
+        Route::get('/conversations', [App\Http\Controllers\ChatController::class, 'getConversations'])->name('conversations');
+        Route::get('/messages/{conversationId}', [App\Http\Controllers\ChatController::class, 'getMessages'])->name('messages');
+        Route::post('/messages', [App\Http\Controllers\ChatController::class, 'sendMessage'])->name('send-message');
+        Route::post('/conversations', [App\Http\Controllers\ChatController::class, 'startConversation'])->name('start-conversation');
+        Route::post('/mark-read/{conversationId}', [App\Http\Controllers\ChatController::class, 'markAsRead'])->name('mark-read');
+        Route::get('/unread-count', [App\Http\Controllers\ChatController::class, 'getUnreadCount'])->name('unread-count');
+    });
+
+    // AI System Routes
+    Route::prefix('ai')->name('ai.')->group(function () {
+        Route::get('/', [App\Http\Controllers\AiController::class, 'index'])->name('index');
+        Route::get('/chat', [App\Http\Controllers\AiController::class, 'chat'])->name('chat');
+        Route::get('/datatable', [App\Http\Controllers\AiController::class, 'datatable'])->name('datatable');
+        Route::post('/interact', [App\Http\Controllers\AiController::class, 'interact'])->name('interact');
+        Route::get('/interactions/{aiInteraction}', [App\Http\Controllers\AiController::class, 'show'])->name('show');
+        Route::post('/interactions/{aiInteraction}/retry', [App\Http\Controllers\AiController::class, 'retry'])->name('retry');
+        Route::get('/automations', [App\Http\Controllers\AiController::class, 'automations'])->name('automations');
+        Route::post('/automations', [App\Http\Controllers\AiController::class, 'createAutomation'])->name('create-automation');
+        Route::get('/generated-content', [App\Http\Controllers\AiController::class, 'generatedContent'])->name('generated-content');
+        Route::post('/generated-content/{content}/rate', [App\Http\Controllers\AiController::class, 'rateContent'])->name('rate-content');
+        Route::get('/analytics', [App\Http\Controllers\AiController::class, 'analytics'])->name('analytics');
+        Route::get('/available', [App\Http\Controllers\AiController::class, 'isAvailable'])->name('available');
+    });
+
+    // Document Management Routes
+    Route::prefix('documents')->name('documents.')->group(function () {
+        Route::get('/', [App\Http\Controllers\DocumentController::class, 'index'])->name('index');
+        Route::get('/categories', [App\Http\Controllers\DocumentController::class, 'categories'])->name('categories');
+        Route::get('/datatable', [App\Http\Controllers\DocumentController::class, 'datatable'])->name('datatable');
+        Route::get('/create', [App\Http\Controllers\DocumentController::class, 'create'])->name('create');
+        Route::post('/', [App\Http\Controllers\DocumentController::class, 'store'])->name('store');
+        Route::get('/{document}', [App\Http\Controllers\DocumentController::class, 'show'])->name('show');
+        Route::put('/{document}', [App\Http\Controllers\DocumentController::class, 'update'])->name('update');
+        Route::delete('/{document}', [App\Http\Controllers\DocumentController::class, 'destroy'])->name('destroy');
+
+        // Category management
+        Route::post('/categories', [App\Http\Controllers\DocumentController::class, 'storeCategory'])->name('store-category');
+        Route::put('/categories/{category}', [App\Http\Controllers\DocumentController::class, 'updateCategory'])->name('update-category');
+        Route::delete('/categories/{category}', [App\Http\Controllers\DocumentController::class, 'destroyCategory'])->name('destroy-category');
     });
 
     // Dashboard and other pages
@@ -181,3 +357,4 @@ Route::middleware('auth')->group(function () {
         Route::get('image-zoom-page', 'imageZoom')->name('image-zoom');
     });
 });
+    // Manufacturing Routes

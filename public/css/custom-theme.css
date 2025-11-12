@@ -1,0 +1,51 @@
+
+/* Custom Theme Colors */
+:root {
+    --primary-color: #c12525;
+    --secondary-color: #7c3aed;
+    --accent-color: #2ea3b8;
+    --primary-rgb: 193, 37, 37;
+    --secondary-rgb: 124, 58, 237;
+    --accent-rgb: 46, 163, 184;
+}
+
+/* Override theme colors */
+.theme-primary { background-color: var(--primary-color) !important; }
+.theme-secondary { background-color: var(--secondary-color) !important; }
+.theme-accent { background-color: var(--accent-color) !important; }
+
+/* Button overrides */
+.btn-primary {
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+}
+
+.btn-primary:hover {
+    background-color: #ad1111 !important;
+    border-color: #ad1111 !important;
+}
+
+/* Link overrides */
+.text-primary { color: var(--primary-color) !important; }
+.text-secondary { color: var(--secondary-color) !important; }
+.text-accent { color: var(--accent-color) !important; }
+
+/* Background overrides */
+.bg-primary { background-color: var(--primary-color) !important; }
+.bg-secondary { background-color: var(--secondary-color) !important; }
+.bg-accent { background-color: var(--accent-color) !important; }
+
+/* Border overrides */
+.border-primary { border-color: var(--primary-color) !important; }
+.border-secondary { border-color: var(--secondary-color) !important; }
+.border-accent { border-color: var(--accent-color) !important; }
+
+/* إزالة Navigation bar overrides - إعادة للألوان الأصلية */
+/* .side-nav { background-color: var(--primary-color) !important; } */
+/* .side-nav__item:hover { background-color: var(--secondary-color) !important; } */
+/* .side-nav__item--active { background-color: var(--accent-color) !important; } */
+
+/* Top navigation overrides - إعادة للأبيض */
+.top-nav { background-color: #ffffff !important; }
+.top-nav__item:hover { background-color: #f8fafc !important; }
+.top-nav__item--active { background-color: var(--primary-color) !important; }

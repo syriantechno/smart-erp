@@ -1,2 +1,23 @@
 // Load static files
 import.meta.glob(["../images/**"]);
+
+// Load theme customizer
+import './theme-customizer';
+
+// Load theme settings for settings page
+import './theme-settings';
+
+// Configure axios for CSRF protection
+import axios from 'axios';
+window.axios = axios;
+
+window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+
+// Set CSRF token for all axios requests
+let token = document.head.querySelector('meta[name="csrf-token"]');
+
+if (token) {
+    window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
+} else {
+    console.error('CSRF token not found');
+}

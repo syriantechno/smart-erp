@@ -87,6 +87,82 @@ class SideMenu
                     ]
                 ]
             ],
+            'warehouse' => [
+                'icon' => 'package',
+                'title' => 'Warehouse',
+                'sub_menu' => [
+                    'categories' => [
+                        'icon' => 'tag',
+                        'route_name' => 'warehouse.categories.index',
+                        'title' => 'Categories'
+                    ],
+                    'warehouses' => [
+                        'icon' => 'home',
+                        'route_name' => 'warehouse.warehouses.index',
+                        'title' => 'Warehouses'
+                    ],
+                    'materials' => [
+                        'icon' => 'box',
+                        'route_name' => 'warehouse.materials.index',
+                        'title' => 'Materials'
+                    ],
+                    'inventory' => [
+                        'icon' => 'clipboard-list',
+                        'route_name' => 'warehouse.inventory.index',
+                        'title' => 'Inventory'
+                    ],
+                    'purchase-requests' => [
+                        'icon' => 'file-text',
+                        'route_name' => 'warehouse.purchase-requests.index',
+                        'title' => 'Purchase Requests'
+                    ],
+                    'purchase-orders' => [
+                        'icon' => 'shopping-cart',
+                        'route_name' => 'warehouse.purchase-orders.index',
+                        'title' => 'Purchase Orders'
+                    ],
+                    'sale-orders' => [
+                        'icon' => 'truck',
+                        'route_name' => 'warehouse.sale-orders.index',
+                        'title' => 'Sale Orders'
+                    ],
+                    'delivery-orders' => [
+                        'icon' => 'send',
+                        'route_name' => 'warehouse.delivery-orders.index',
+                        'title' => 'Delivery Orders'
+                    ]
+                ]
+            ],
+            'tasks' => [
+                'icon' => 'check-square',
+                'route_name' => 'tasks.index',
+                'title' => 'Tasks Management'
+            ],
+            'electronic-mail' => [
+                'icon' => 'mail',
+                'route_name' => 'electronic-mail.index',
+                'title' => 'Electronic Mail'
+            ],
+            'approval-system' => [
+                'icon' => 'check-circle',
+                'route_name' => 'approval-system.index',
+                'title' => 'Approval System'
+            ],
+            'chat' => [
+                'icon' => 'message-square',
+                'route_name' => 'chat.index',
+                'title' => 'Internal Chat'
+            ],
+            'documents' => [
+                'icon' => 'file-text',
+                'route_name' => 'documents.index',
+                'title' => 'Document Management'
+            ],
+            'ai' => [
+                'icon' => 'bot',
+                'route_name' => 'ai.index',
+                'title' => 'AI Assistant'
+            ],
             'e-commerce' => [
                 'icon' => 'shopping-bag',
                 'title' => 'E-Commerce',
@@ -170,11 +246,6 @@ class SideMenu
                 'icon' => 'credit-card',
                 'route_name' => 'point-of-sale',
                 'title' => 'Point of Sale'
-            ],
-            'chat' => [
-                'icon' => 'message-square',
-                'route_name' => 'chat',
-                'title' => 'Chat'
             ],
             'post' => [
                 'icon' => 'file-text',

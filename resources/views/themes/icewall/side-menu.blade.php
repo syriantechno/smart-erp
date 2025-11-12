@@ -132,3 +132,18 @@
 @pushOnce('scripts')
     @vite('resources/js/themes/icewall.js')
 @endPushOnce
+                        < ! - -   M a n u f a c t u r i n g   M e n u   I t e m   - - >  
+                         < a   h r e f = " # "   c l a s s = " s i d e - m e n u _ _ i t e m "   d a t a - p a g e = " m a n u f a c t u r i n g " >  
+                                 < d i v   c l a s s = " s i d e - m e n u _ _ i c o n " >  
+                                         < s v g   x m l n s = " h t t p : / / w w w . w 3 . o r g / 2 0 0 0 / s v g "   f i l l = " n o n e "   v i e w B o x = " 0   0   2 4   2 4 "   s t r o k e = " c u r r e n t C o l o r " >  
+                     </svg>
+                </div>
+                <div class=" side-menu__title\>
+ Manufacturing
+ <div class=\side-menu__sub-icon\>
+ <svg xmlns=\http://www.w3.org/2000/svg\ fill=\none\ viewBox=\0 0 24 24\ stroke=\currentColor\>
+ <path stroke-linecap=\round\ stroke-linejoin=\round\ stroke-width=\2\ d=\M9 5l7 7-7 7\ />
+ </svg>
+ </div>
+ </div>
+ </a>

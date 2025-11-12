@@ -26,6 +26,8 @@ class CompanySeeder extends Seeder
                 'city' => 'الرياض',
                 'postal_code' => '12345',
                 'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'name' => 'مجموعة الأعمال التجارية',
@@ -40,6 +42,8 @@ class CompanySeeder extends Seeder
                 'city' => 'جدة',
                 'postal_code' => '23456',
                 'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'name' => 'شركة الابتكار الرقمي',
@@ -54,6 +58,8 @@ class CompanySeeder extends Seeder
                 'city' => 'الدمام',
                 'postal_code' => '34567',
                 'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'name' => 'مؤسسة التطوير والاستشارات',
@@ -68,6 +74,8 @@ class CompanySeeder extends Seeder
                 'city' => 'المدينة المنورة',
                 'postal_code' => '45678',
                 'is_active' => false,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'name' => 'شركة الحلول المتكاملة',
@@ -82,14 +90,39 @@ class CompanySeeder extends Seeder
                 'city' => 'مكة المكرمة',
                 'postal_code' => '56789',
                 'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
         ];
 
-        foreach ($companies as $company) {
-            \App\Models\Company::firstOrCreate(
-                ['name' => $company['name']], // Check for existing by name
-                $company // Use all data if creating new
+        $createdCount = 0;
+        $updatedCount = 0;
+
+        foreach ($companies as $companyData) {
+            $company = \App\Models\Company::firstOrCreate(
+                ['name' => $companyData['name']], // Check for existing by name
+                $companyData // Use all data if creating new
             );
+
+            if ($company->wasRecentlyCreated) {
+                $createdCount++;
+            } else {
+                $updatedCount++;
+            }
         }
+
+        $this->command->info('================================================');
+        $this->command->info('🏢 Company Seeder Completed!');
+        $this->command->info('================================================');
+        $this->command->info('✅ Companies Created: ' . $createdCount);
+        $this->command->info('🔄 Companies Updated: ' . $updatedCount);
+        $this->command->info('📊 Total Companies: ' . \App\Models\Company::count());
+        $this->command->info('================================================');
+        $this->command->info('🏢 Available Companies:');
+        foreach (\App\Models\Company::all() as $company) {
+            $status = $company->is_active ? '🟢 Active' : '🔴 Inactive';
+            $this->command->info("  • {$company->name} ({$company->city}) - {$status}");
+        }
+        $this->command->info('================================================');
     }
 }

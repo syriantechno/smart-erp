@@ -1,0 +1,244 @@
+/* Dark Mode Styles */
+.dark {
+    color-scheme: dark;
+}
+
+.dark body {
+    background-color: #0f172a;
+    color: #e2e8f0;
+}
+
+/* Dark mode overrides for common elements */
+.dark .bg-white {
+    background-color: #1e293b !important;
+}
+
+.dark .bg-gray-50 {
+    background-color: #0f172a !important;
+}
+
+.dark .bg-gray-100 {
+    background-color: #1e293b !important;
+}
+
+.dark .text-gray-900 {
+    color: #e2e8f0 !important;
+}
+
+.dark .text-gray-700 {
+    color: #cbd5e1 !important;
+}
+
+.dark .text-gray-600 {
+    color: #94a3b8 !important;
+}
+
+.dark .border-gray-200 {
+    border-color: #334155 !important;
+}
+
+.dark .border-gray-300 {
+    border-color: #475569 !important;
+}
+
+/* Shadow adjustments for dark mode */
+.dark .shadow-sm {
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.5) !important;
+}
+
+.dark .shadow {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.5), 0 1px 2px 0 rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Input field dark mode */
+.dark input,
+.dark textarea,
+.dark select {
+    background-color: #1e293b;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+
+.dark input:focus,
+.dark textarea:focus,
+.dark select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Button adjustments */
+.dark .btn-outline-secondary {
+    background-color: #1e293b;
+    border-color: #475569;
+    color: #cbd5e1;
+}
+
+.dark .btn-outline-secondary:hover {
+    background-color: #334155;
+    border-color: #64748b;
+}
+
+/* Card styles for dark mode */
+.dark .intro-y {
+    background-color: #1e293b;
+    border-color: #334155;
+}
+
+/* Table dark mode */
+.dark table {
+    background-color: #1e293b;
+}
+
+.dark table thead th {
+    background-color: #0f172a;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+
+.dark table tbody tr {
+    border-color: #334155;
+}
+
+.dark table tbody tr:hover {
+    background-color: #334155;
+}
+
+.dark table tbody td {
+    color: #cbd5e1;
+    border-color: #334155;
+}
+
+/* Sidebar dark mode adjustments */
+.dark .side-menu {
+    color: #cbd5e1;
+}
+
+.dark .side-menu:hover {
+    background-color: #334155;
+}
+
+.dark .side-menu--active {
+    background-color: #3b82f6;
+    color: white;
+}
+
+/* Font size classes */
+.text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+.text-base { font-size: 1rem; line-height: 1.5rem; }
+.text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+.text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+
+/* Animation control */
+.no-animations * {
+    animation-duration: 0s !important;
+    transition-duration: 0s !important;
+}
+
+/* Custom scrollbar for dark mode */
+.dark ::-webkit-scrollbar {
+    width: 8px;
+}
+
+.dark ::-webkit-scrollbar-track {
+    background: #0f172a;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
+
+/* Notification styles for dark mode */
+.dark .notification {
+    background-color: #1e293b;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+
+.dark .notification--success {
+    border-color: #10b981;
+}
+
+.dark .notification--error {
+    border-color: #ef4444;
+}
+
+.dark .notification--warning {
+    border-color: #f59e0b;
+}
+
+/* Modal dark mode */
+.dark .modal-content {
+    background-color: #1e293b;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+
+.dark .modal-header {
+    border-color: #334155;
+}
+
+/* Dropdown dark mode */
+.dark .dropdown-menu {
+    background-color: #1e293b;
+    border-color: #334155;
+}
+
+.dark .dropdown-item {
+    color: #cbd5e1;
+}
+
+.dark .dropdown-item:hover {
+    background-color: #334155;
+    color: #e2e8f0;
+}
+
+/* Form elements dark mode */
+.dark .form-control {
+    background-color: #1e293b;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+
+.dark .form-control:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.dark .form-select {
+    background-color: #1e293b;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+
+/* Badge styles */
+.dark .badge {
+    background-color: #334155;
+    color: #cbd5e1;
+}
+
+/* Loading states */
+.dark .loading {
+    border-color: #334155;
+    border-top-color: #3b82f6;
+}
+
+/* Print styles - ensure readability when printing */
+@media print {
+    .dark {
+        color-scheme: light !important;
+    }
+
+    .dark body {
+        background-color: white !important;
+        color: black !important;
+    }
+
+    .dark .bg-white {
+        background-color: white !important;
+    }
+}

@@ -75,4 +75,30 @@ class Department extends Model
     {
         return $this->hasMany(Employee::class);
     }
+
+    public function approvalRequests(): HasMany
+    {
+        return $this->hasMany(ApprovalRequest::class);
+    }
+
+    public function documents(): HasMany
+    {
+        return $this->hasMany(Document::class);
+    }
+
+    public function sharedDocuments(): BelongsToMany
+    {
+        return $this->belongsToMany(Document::class, 'document_shares', 'shared_with_department_id', 'document_id')
+                    ->withPivot('permission', 'expires_at');
+    }
+
+    public function electronicMails(): HasMany
+    {
+        return $this->hasMany(ElectronicMail::class);
+    }
+
+    public function users(): HasMany
+    {
+        return $this->hasMany(User::class);
+    }
 }

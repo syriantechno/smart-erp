@@ -202,7 +202,7 @@
     const countriesData = {!! $countriesJson !!};
 
     console.log('🔧 Script starting, countriesData:', typeof countriesData, countriesData ? countriesData.length : 'undefined');
-    
+
     document.addEventListener('DOMContentLoaded', function() {
         console.log('🚀 Employee modal script loaded at:', new Date().toISOString());
 

@@ -19,6 +19,11 @@
                 @include('settings.partials.general')
             </div>
 
+            <!-- Appearance Settings Tab -->
+            <div class="settings-content hidden" id="appearance-content">
+                @include('settings.partials.appearance')
+            </div>
+
             <!-- Company Settings Tab -->
             <div class="settings-content hidden" id="company-content">
                 @include('settings.partials.company')

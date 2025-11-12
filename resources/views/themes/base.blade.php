@@ -42,12 +42,20 @@ License: You must have a valid license purchased only from themeforest(the above
     @stack('styles')
     @vite('resources/css/app.css')
 
+    <!-- Custom Theme CSS -->
+    @if(file_exists(public_path('css/custom-theme.css')))
+        <link rel="stylesheet" href="{{ asset('css/custom-theme.css?v=' . filemtime(public_path('css/custom-theme.css'))) }}">
+    @endif
+
+    <!-- Dark Mode CSS -->
+    @vite('resources/css/dark-mode.css')
+
     <!-- DataTables Local CSS -->
     <link rel="stylesheet" href="{{ asset('vendor/datatables/datatables.min.css') }}">
 </head>
 <!-- END: Head -->
 
-<body>
+<body class="{{ setting('dark_mode', false) ? 'dark' : '' }} {{ setting('font_size', 'medium') }} {{ setting('animations_enabled', true) ? '' : 'no-animations' }}">
 
 
 @yield('content')
