@@ -37,6 +37,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/settings/appearance', [SettingsController::class, 'updateAppearance'])->name('settings.appearance.update');
     Route::post('/settings/prefix', [SettingsController::class, 'updatePrefix'])->name('settings.prefix.update');
     Route::post('/settings/company', [SettingsController::class, 'updateCompany'])->name('settings.company.update');
+    Route::post('/settings/attendance', [SettingsController::class, 'updateAttendance'])->name('settings.attendance.update');
 
     // HR Routes
     Route::prefix('hr')->name('hr.')->group(function () {
@@ -80,6 +81,17 @@ Route::middleware('auth')->group(function () {
         Route::get('employees/test-data', [App\Http\Controllers\HR\EmployeeController::class, 'testData'])
             ->name('employees.test-data');
         Route::resource('employees', 'App\Http\Controllers\HR\EmployeeController');
+        
+        // Employee Documents
+        Route::prefix('employees/{employee}/documents')->name('employees.documents.')->group(function () {
+            Route::get('/', [App\Http\Controllers\HR\EmployeeDocumentController::class, 'index'])->name('index');
+            Route::get('/create', [App\Http\Controllers\HR\EmployeeDocumentController::class, 'create'])->name('create');
+            Route::post('/', [App\Http\Controllers\HR\EmployeeDocumentController::class, 'store'])->name('store');
+            Route::get('/{document}/edit', [App\Http\Controllers\HR\EmployeeDocumentController::class, 'edit'])->name('edit');
+            Route::put('/{document}', [App\Http\Controllers\HR\EmployeeDocumentController::class, 'update'])->name('update');
+            Route::delete('/{document}', [App\Http\Controllers\HR\EmployeeDocumentController::class, 'destroy'])->name('destroy');
+            Route::get('/{document}/download', [App\Http\Controllers\HR\EmployeeDocumentController::class, 'download'])->name('download');
+        });
         
         // Attendance
         Route::get('attendance', [App\Http\Controllers\HR\AttendanceController::class, 'index'])->name('attendance.index');

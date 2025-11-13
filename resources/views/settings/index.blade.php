@@ -43,6 +43,11 @@
             <div class="settings-content hidden" id="email-content">
                 @include('settings.partials.email')
             </div>
+
+            <!-- Attendance Settings Tab -->
+            <div class="settings-content hidden" id="attendance-content">
+                @include('settings.partials.attendance')
+            </div>
         </div>
     </div>
 

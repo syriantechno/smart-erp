@@ -1,10 +1,10 @@
 
 /* Custom Theme Colors */
 :root {
-    --primary-color: #c12525;
+    --primary-color: #258598;
     --secondary-color: #7c3aed;
     --accent-color: #2ea3b8;
-    --primary-rgb: 193, 37, 37;
+    --primary-rgb: 37, 133, 152;
     --secondary-rgb: 124, 58, 237;
     --accent-rgb: 46, 163, 184;
 }
@@ -21,8 +21,8 @@
 }
 
 .btn-primary:hover {
-    background-color: #ad1111 !important;
-    border-color: #ad1111 !important;
+    background-color: #117184 !important;
+    border-color: #117184 !important;
 }
 
 /* Link overrides */

@@ -1,395 +1,400 @@
-@extends('layouts.app')
+@extends('../themes/' . $activeTheme . '/' . $activeLayout)
 
-{{--
-    Employee Show View
-    Displays detailed information about an employee
-    @var \App\Models\Employee $employee
---}}
+@section('subhead')
+    <title>{{ $employee->full_name }} - Employee Profile</title>
+@endsection
 
-@section('title', $employee->full_name)
-
-@section('content')
-<div class="content">
-    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
-        <h2 class="text-lg font-medium ml-3">
-            تفاصيل الموظف: {{ $employee->full_name }}
-        </h2>
-        <div class="flex w-full sm:w-auto flex-col sm:flex-row sm:mr-auto mt-3 sm:mt-0">
-            <a href="{{ route('hr.employees.edit', $employee) }}" class="btn btn-primary shadow-md mr-2">
-                <i data-lucide="edit-3" class="w-4 h-4 ml-2"></i> تعديل البيانات
-            </a>
-            <a href="{{ route('hr.employees.index') }}" class="btn btn-outline-secondary">
-                <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i> رجوع
-            </a>
-        </div>
+@section('subcontent')
+    <div class="intro-y mt-8 flex items-center">
+        <h2 class="mr-auto text-lg font-medium">{{ $employee->full_name }} Profile</h2>
     </div>
-
-    <div class="grid grid-cols-12 gap-6 mt-5">
-        <!-- Left Column -->
-        <div class="col-span-12 lg:col-span-4 2xl:col-span-3">
-            <div class="intro-y box p-5">
-                <div class="flex flex-col items-center">
-                    <div class="w-40 h-40 image-fit rounded-full overflow-hidden">
-                        <img alt="{{ $employee->full_name }}" class="rounded-full" 
-                             src="{{ $employee->photo_url ?? asset('dist/images/profile-1.jpg') }}">
+    <div class="mt-5 grid grid-cols-12 gap-6">
+        <!-- BEGIN: Profile Menu -->
+        <div class="col-span-12 flex flex-col-reverse lg:col-span-4 lg:block 2xl:col-span-3">
+            <div class="intro-y box mt-5 lg:mt-0">
+                <div class="relative flex items-center p-5">
+                    <div class="image-fit h-12 w-12">
+                        <img
+                            class="rounded-full"
+                            src="{{ $employee->profile_picture_url }}"
+                            alt="{{ $employee->full_name }}"
+                        />
                     </div>
-                    <div class="text-center mt-4">
-                        <h3 class="text-lg font-medium">{{ $employee->full_name }}</h3>
-                        <div class="text-slate-500">{{ $employee->position }}</div>
-                        <div class="mt-1">
-                            <span class="px-2 py-1 text-xs rounded-full {{ $employee->is_active ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger' }}">
-                                {{ $employee->is_active ? 'نشط' : 'غير نشط' }}
-                            </span>
+                    <div class="ml-4 mr-auto">
+                        <div class="text-base font-medium">
+                            {{ $employee->full_name }}
                         </div>
+                        <div class="text-slate-500">{{ $employee->position ?? 'Employee' }}</div>
                     </div>
+                    <x-base.menu>
+                        <x-base.menu.button
+                            class="block h-5 w-5"
+                            href="#"
+                            tag="a"
+                        >
+                            <x-base.lucide
+                                class="h-5 w-5 text-slate-500"
+                                icon="MoreHorizontal"
+                            />
+                        </x-base.menu.button>
+                        <x-base.menu.items class="w-56">
+                            <x-base.menu.header>Actions</x-base.menu.header>
+                            <x-base.menu.divider />
+                            <x-base.menu.item>
+                                <a href="{{ route('hr.employees.edit', $employee) }}" class="flex items-center">
+                                    <x-base.lucide class="mr-2 h-4 w-4" icon="Edit" />
+                                    Edit Profile
+                                </a>
+                            </x-base.menu.item>
+                            <x-base.menu.item>
+                                <a href="mailto:{{ $employee->email }}" class="flex items-center">
+                                    <x-base.lucide class="mr-2 h-4 w-4" icon="Mail" />
+                                    Send Email
+                                </a>
+                            </x-base.menu.item>
+                            <x-base.menu.divider />
+                            <x-base.menu.footer>
+                                <x-base.button
+                                    class="px-2 py-1"
+                                    type="button"
+                                    variant="primary"
+                                >
+                                    <x-base.lucide class="mr-2 h-4 w-4" icon="Download" />
+                                    Export
+                                </x-base.button>
+                                <x-base.button
+                                    class="ml-auto px-2 py-1"
+                                    type="button"
+                                    variant="secondary"
+                                >
+                                    <x-base.lucide class="mr-2 h-4 w-4" icon="Share" />
+                                    Share
+                                </x-base.button>
+                            </x-base.menu.footer>
+                        </x-base.menu.items>
+                    </x-base.menu>
                 </div>
-
-                <div class="border-t border-slate-200/60 mt-5 pt-5">
-                    <div class="flex items-center mb-3">
-                        <i data-lucide="mail" class="w-4 h-4 ml-2 text-slate-500"></i>
-                        <a href="mailto:{{ $employee->email }}" class="text-slate-600">
-                            {{ $employee->email }}
-                        </a>
+                <div class="border-t border-slate-200/60 p-5 dark:border-darkmode-400">
+                    <a
+                        class="flex items-center font-medium text-primary"
+                        href="#personal-info"
+                    >
+                        <x-base.lucide
+                            class="mr-2 h-4 w-4"
+                            icon="User"
+                        /> Personal Information
+                    </a>
+                    <a
+                        class="mt-5 flex items-center"
+                        href="#employment-info"
+                    >
+                        <x-base.lucide
+                            class="mr-2 h-4 w-4"
+                            icon="Briefcase"
+                        /> Employment Details
+                    </a>
+                    <a
+                        class="mt-5 flex items-center"
+                        href="#contact-info"
+                    >
+                        <x-base.lucide
+                            class="mr-2 h-4 w-4"
+                            icon="Phone"
+                        /> Contact Information
+                    </a>
+                    <a
+                        class="mt-5 flex items-center"
+                        href="{{ route('hr.employees.documents.index', ['employee' => $employee->id]) }}"
+                    >
+                        <x-base.lucide
+                            class="mr-2 h-4 w-4"
+                            icon="FileText"
+                        /> Documents
+                    </a>
+                </div>
+                <div class="border-t border-slate-200/60 p-5 dark:border-darkmode-400">
+                    <div class="text-sm">
+                        <div class="font-medium mb-2">Employee ID</div>
+                        <div class="text-slate-500">{{ $employee->employee_id }}</div>
                     </div>
-                    @if($employee->phone)
-                    <div class="flex items-center mb-3">
-                        <i data-lucide="phone" class="w-4 h-4 ml-2 text-slate-500"></i>
-                        <a href="tel:{{ $employee->phone }}" class="text-slate-600">
-                            {{ $employee->phone }}
-                        </a>
+                    <div class="text-sm mt-4">
+                        <div class="font-medium mb-2">Department</div>
+                        <div class="text-slate-500">{{ $employee->department->name ?? 'N/A' }}</div>
                     </div>
-                    @endif
-                    @if($employee->department)
-                    <div class="flex items-center mb-3">
-                        <i data-lucide="building-2" class="w-4 h-4 ml-2 text-slate-500"></i>
-                        <span class="text-slate-600">{{ $employee->department->name }}</span>
+                    <div class="text-sm mt-4">
+                        <div class="font-medium mb-2">Hire Date</div>
+                        <div class="text-slate-500">{{ $employee->hire_date ? $employee->hire_date->format('M d, Y') : 'N/A' }}</div>
                     </div>
-                    @endif
-                    @if($employee->hire_date)
-                    <div class="flex items-center mb-3">
-                        <i data-lucide="calendar" class="w-4 h-4 ml-2 text-slate-500"></i>
-                        <span class="text-slate-600">
-                            تاريخ التعيين: {{ $employee->hire_date->format('Y-m-d') }}
-                            <span class="text-xs text-slate-400">({{ $employee->hire_date->diffForHumans() }})</span>
+                    <div class="text-sm mt-4">
+                        <div class="font-medium mb-2">Status</div>
+                        <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold {{ $employee->is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
+                            {{ $employee->is_active ? 'Active' : 'Inactive' }}
                         </span>
                     </div>
-                    @endif
-                    @if($employee->salary)
-                    <div class="flex items-center">
-                        <i data-lucide="dollar-sign" class="w-4 h-4 ml-2 text-slate-500"></i>
-                        <span class="text-slate-600">
-                            الراتب: {{ number_format($employee->salary, 2) }} {{ config('app.currency', 'USD') }}
-                        </span>
-                    </div>
-                    @endif
                 </div>
-
-                @if($employee->address || $employee->city || $employee->country)
-                <div class="border-t border-slate-200/60 mt-5 pt-5">
-                    <h4 class="text-slate-500 text-xs uppercase font-medium mb-3">العنوان</h4>
-                    <div class="text-slate-600">
-                        @if($employee->address)
-                            <div>{{ $employee->address }}</div>
-                        @endif
-                        <div>
-                            @if($employee->city)
-                                <span>{{ $employee->city }}</span>،
-                            @endif
-                            @if($employee->country)
-                                <span>{{ $employee->country }}</span>
-                            @endif
-                            @if($employee->postal_code)
-                                <div>الرمز البريدي: {{ $employee->postal_code }}</div>
-                            @endif
-                        </div>
+                <div class="flex border-t border-slate-200/60 p-5 dark:border-darkmode-400">
+                    <x-base.button
+                        class="px-2 py-1"
+                        type="button"
+                        variant="primary"
+                    >
+                        <x-base.lucide class="mr-2 h-4 w-4" icon="MessageSquare" />
+                        Message
+                    </x-base.button>
+                    <x-base.button
+                        class="ml-auto px-2 py-1"
+                        type="button"
+                        variant="outline-secondary"
+                    >
+                        <x-base.lucide class="mr-2 h-4 w-4" icon="Calendar" />
+                        Schedule
+                    </x-base.button>
+                </div>
+            </div>
+            <div class="intro-y box mt-5 bg-primary p-5 text-white">
+                <div class="flex items-center">
+                    <div class="text-lg font-medium">Employee Stats</div>
+                    <div class="ml-auto rounded-md bg-white px-1 text-xs text-slate-700 dark:bg-primary dark:text-white">
+                        Info
                     </div>
                 </div>
-                @endif
-
-                @if($employee->user)
-                <div class="border-t border-slate-200/60 mt-5 pt-5">
-                    <h4 class="text-slate-500 text-xs uppercase font-medium mb-3">حساب المستخدم</h4>
-                    <div class="flex items-center">
-                        <div class="w-2 h-2 rounded-full bg-success mr-2"></div>
-                        <span class="text-slate-600">
-                            {{ $employee->user->name }}
-                            <span class="text-slate-400 text-xs">({{ $employee->user->email }})</span>
-                        </span>
+                <div class="mt-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span>Years of Service</span>
+                        <span>{{ $employee->hire_date ? $employee->hire_date->diffInYears(now()) : 0 }} years</span>
                     </div>
-                    <div class="mt-2">
-                        @foreach($employee->user->roles as $role)
-                            <span class="px-2 py-1 text-xs rounded-full bg-primary/10 text-primary">
-                                {{ $role->name }}
-                            </span>
-                        @endforeach
+                    <div class="flex justify-between items-center mb-2">
+                        <span>Department</span>
+                        <span>{{ $employee->department->name ?? 'N/A' }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span>Position</span>
+                        <span>{{ $employee->position ?? 'N/A' }}</span>
                     </div>
                 </div>
-                @endif
+                <div class="mt-5 flex font-medium">
+                    <x-base.button
+                        class="border-white px-2 py-1 text-white dark:border-darkmode-400 dark:bg-darkmode-400 dark:text-slate-300"
+                        type="button"
+                    >
+                        View Details
+                    </x-base.button>
+                    <x-base.button
+                        class="ml-auto border-transparent px-2 py-1 text-white dark:border-transparent"
+                        type="button"
+                    >
+                        Back to List
+                    </x-base.button>
+                </div>
             </div>
         </div>
-
-        <!-- Right Column -->
+        <!-- END: Profile Menu -->
         <div class="col-span-12 lg:col-span-8 2xl:col-span-9">
-            <div class="intro-y box p-5">
-                <ul class="nav nav-boxed-tabs" role="tablist">
-                    <li class="nav-item flex-1" role="presentation">
-                        <button class="nav-link w-full py-2 active" data-tw-toggle="tab" data-tw-target="#personal-info" type="button" role="tab" aria-controls="personal-info" aria-selected="true">
-                            <i data-lucide="user" class="w-4 h-4 ml-2"></i> المعلومات الشخصية
-                        </button>
-                    </li>
-                    <li class="nav-item flex-1" role="presentation">
-                        <button class="nav-link w-full py-2" data-tw-toggle="tab" data-tw-target="#employment" type="button" role="tab" aria-controls="employment" aria-selected="false">
-                            <i data-lucide="briefcase" class="w-4 h-4 ml-2"></i> معلومات التوظيف
-                        </button>
-                    </li>
-                    <li class="nav-item flex-1" role="presentation">
-                        <button class="nav-link w-full py-2" data-tw-toggle="tab" data-tw-target="#documents" type="button" role="tab" aria-controls="documents" aria-selected="false">
-                            <i data-lucide="file-text" class="w-4 h-4 ml-2"></i> المستندات
-                        </button>
-                    </li>
-                    <li class="nav-item flex-1" role="presentation">
-                        <button class="nav-link w-full py-2" data-tw-toggle="tab" data-tw-target="#leaves" type="button" role="tab" aria-controls="leaves" aria-selected="false">
-                            <i data-lucide="calendar-off" class="w-4 h-4 ml-2"></i> الإجازات
-                        </button>
-                    </li>
-                </ul>
-
-                <div class="tab-content mt-5">
-                    <!-- Personal Info Tab -->
-                    <div id="personal-info" class="tab-pane active" role="tabpanel" aria-labelledby="personal-info-tab">
-                        <div class="grid grid-cols-12 gap-6">
-                            <div class="col-span-12 sm:col-span-6">
-                                <div class="border-b border-slate-200/60 pb-3 mb-3">
-                                    <h4 class="text-slate-500 text-xs uppercase font-medium">المعلومات الشخصية</h4>
-                                </div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div class="col-span-1">
-                                        <div class="text-slate-500 text-xs">الاسم الأول</div>
-                                        <div class="font-medium">{{ $employee->first_name }}</div>
-                                    </div>
-                                    <div class="col-span-1">
-                                        <div class="text-slate-500 text-xs">اسم الأب</div>
-                                        <div class="font-medium">{{ $employee->middle_name ?? '-' }}</div>
-                                    </div>
-                                    <div class="col-span-1">
-                                        <div class="text-slate-500 text-xs">اسم العائلة</div>
-                                        <div class="font-medium">{{ $employee->last_name }}</div>
-                                    </div>
-                                    <div class="col-span-1">
-                                        <div class="text-slate-500 text-xs">الجنس</div>
-                                        <div class="font-medium">
-                                            @if($employee->gender == 'male')
-                                                ذكر
-                                            @elseif($employee->gender == 'female')
-                                                أنثى
-                                            @elseif($employee->gender == 'other')
-                                                أخرى
-                                            @else
-                                                -
-                                            @endif
-                                        </div>
-                                    </div>
-                                    @if($employee->birth_date)
-                                    <div class="col-span-1">
-                                        <div class="text-slate-500 text-xs">تاريخ الميلاد</div>
-                                        <div class="font-medium">
-                                            {{ $employee->birth_date->format('Y-m-d') }}
-                                            <span class="text-slate-400 text-xs">({{ $employee->age }} سنة)</span>
-                                        </div>
-                                    </div>
+            <div class="grid grid-cols-12 gap-6">
+                <!-- BEGIN: Personal Information -->
+                <div class="intro-y box col-span-12 2xl:col-span-6" id="personal-info">
+                    <div class="flex items-center border-b border-slate-200/60 px-5 py-5 dark:border-darkmode-400 sm:py-3">
+                        <h2 class="mr-auto text-base font-medium">Personal Information</h2>
+                    </div>
+                    <div class="p-5">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <div class="text-slate-500 text-sm">First Name</div>
+                                <div class="font-medium">{{ $employee->first_name }}</div>
+                            </div>
+                            <div>
+                                <div class="text-slate-500 text-sm">Last Name</div>
+                                <div class="font-medium">{{ $employee->last_name }}</div>
+                            </div>
+                            <div>
+                                <div class="text-slate-500 text-sm">Middle Name</div>
+                                <div class="font-medium">{{ $employee->middle_name ?? '-' }}</div>
+                            </div>
+                            <div>
+                                <div class="text-slate-500 text-sm">Gender</div>
+                                <div class="font-medium">
+                                    @if($employee->gender == 'male') Male
+                                    @elseif($employee->gender == 'female') Female
+                                    @elseif($employee->gender == 'other') Other
+                                    @else -
                                     @endif
                                 </div>
                             </div>
+                            @if($employee->birth_date)
+                            <div>
+                                <div class="text-slate-500 text-sm">Date of Birth</div>
+                                <div class="font-medium">{{ $employee->birth_date->format('M d, Y') }}</div>
+                            </div>
+                            <div>
+                                <div class="text-slate-500 text-sm">Age</div>
+                                <div class="font-medium">{{ $employee->age ?? '-' }} years</div>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                <!-- END: Personal Information -->
 
-                            <div class="col-span-12 sm:col-span-6">
-                                <div class="border-b border-slate-200/60 pb-3 mb-3">
-                                    <h4 class="text-slate-500 text-xs uppercase font-medium">معلومات الاتصال</h4>
+                <!-- BEGIN: Employment Information -->
+                <div class="intro-y box col-span-12 2xl:col-span-6" id="employment-info">
+                    <div class="flex items-center border-b border-slate-200/60 px-5 py-5 dark:border-darkmode-400 sm:py-3">
+                        <h2 class="mr-auto text-base font-medium">Employment Information</h2>
+                    </div>
+                    <div class="p-5">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <div class="text-slate-500 text-sm">Employee ID</div>
+                                <div class="font-medium">{{ $employee->employee_id }}</div>
+                            </div>
+                            <div>
+                                <div class="text-slate-500 text-sm">Position</div>
+                                <div class="font-medium">{{ $employee->position ?? '-' }}</div>
+                            </div>
+                            <div>
+                                <div class="text-slate-500 text-sm">Department</div>
+                                <div class="font-medium">{{ $employee->department->name ?? '-' }}</div>
+                            </div>
+                            <div>
+                                <div class="text-slate-500 text-sm">Company</div>
+                                <div class="font-medium">{{ $employee->company->name ?? '-' }}</div>
+                            </div>
+                            <div>
+                                <div class="text-slate-500 text-sm">Hire Date</div>
+                                <div class="font-medium">{{ $employee->hire_date ? $employee->hire_date->format('M d, Y') : '-' }}</div>
+                            </div>
+                            <div>
+                                <div class="text-slate-500 text-sm">Salary</div>
+                                <div class="font-medium">${{ number_format($employee->salary, 2) }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END: Employment Information -->
+
+                <!-- BEGIN: Contact Information -->
+                <div class="intro-y box col-span-12 2xl:col-span-6" id="contact-info">
+                    <div class="flex items-center border-b border-slate-200/60 px-5 py-5 dark:border-darkmode-400 sm:py-3">
+                        <h2 class="mr-auto text-base font-medium">Contact Information</h2>
+                    </div>
+                    <div class="p-5">
+                        <div class="space-y-4">
+                            <div class="flex items-center">
+                                <x-base.lucide class="h-4 w-4 text-slate-500 mr-3" icon="Mail" />
+                                <div>
+                                    <div class="text-slate-500 text-sm">Email</div>
+                                    <a href="mailto:{{ $employee->email }}" class="font-medium text-primary">{{ $employee->email }}</a>
                                 </div>
-                                <div class="space-y-4">
-                                    <div>
-                                        <div class="text-slate-500 text-xs">البريد الإلكتروني</div>
-                                        <div class="font-medium">
-                                            <a href="mailto:{{ $employee->email }}" class="text-primary">
-                                                {{ $employee->email }}
-                                            </a>
+                            </div>
+                            @if($employee->phone)
+                            <div class="flex items-center">
+                                <x-base.lucide class="h-4 w-4 text-slate-500 mr-3" icon="Phone" />
+                                <div>
+                                    <div class="text-slate-500 text-sm">Phone</div>
+                                    <a href="tel:{{ $employee->phone }}" class="font-medium text-primary">{{ $employee->phone }}</a>
+                                </div>
+                            </div>
+                            @endif
+                            @if($employee->address || $employee->city || $employee->country)
+                            <div class="flex items-start">
+                                <x-base.lucide class="h-4 w-4 text-slate-500 mr-3 mt-1" icon="MapPin" />
+                                <div>
+                                    <div class="text-slate-500 text-sm">Address</div>
+                                    <div class="font-medium">
+                                        @if($employee->address)
+                                            <div>{{ $employee->address }}</div>
+                                        @endif
+                                        <div>
+                                            @if($employee->city) {{ $employee->city }}, @endif
+                                            @if($employee->country) {{ $employee->country }} @endif
+                                            @if($employee->postal_code) {{ $employee->postal_code }} @endif
                                         </div>
                                     </div>
-                                    @if($employee->phone)
-                                    <div>
-                                        <div class="text-slate-500 text-xs">رقم الجوال</div>
-                                        <div class="font-medium">
-                                            <a href="tel:{{ $employee->phone }}" class="text-primary">
-                                                {{ $employee->phone }}
-                                            </a>
-                                        </div>
-                                    </div>
-                                    @endif
-                                    @if($employee->address || $employee->city || $employee->country)
-                                    <div>
-                                        <div class="text-slate-500 text-xs">العنوان</div>
-                                        <div class="font-medium">
-                                            @if($employee->address)
-                                                <div>{{ $employee->address }}</div>
-                                            @endif
+                                </div>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                <!-- END: Contact Information -->
+
+                <!-- BEGIN: Documents -->
+                <div class="intro-y box col-span-12 2xl:col-span-6" id="documents">
+                    <div class="flex items-center border-b border-slate-200/60 px-5 py-5 dark:border-darkmode-400 sm:py-3">
+                        <h2 class="mr-auto text-base font-medium">Documents</h2>
+                        <x-base.button as="a" href="{{ route('hr.employees.documents.index', ['employee' => $employee->id]) }}" variant="outline-secondary">
+                            <x-base.lucide class="mr-2 h-4 w-4" icon="ExternalLink" />
+                            Manage
+                        </x-base.button>
+                    </div>
+                    <div class="p-5">
+                        @php
+                            $recentDocuments = $employee->documents()->active()->latest()->take(3)->get();
+                        @endphp
+
+                        @if($recentDocuments->count() > 0)
+                            <div class="space-y-3">
+                                @foreach($recentDocuments as $document)
+                                    <div class="flex items-center justify-between p-3 border border-slate-200/60 rounded-lg dark:border-darkmode-400">
+                                        <div class="flex items-center">
+                                            <x-base.lucide class="h-8 w-8 text-slate-400 mr-3" icon="FileText" />
                                             <div>
-                                                @if($employee->city)
-                                                    <span>{{ $employee->city }}</span>،
-                                                @endif
-                                                @if($employee->country)
-                                                    <span>{{ $employee->country }}</span>
-                                                @endif
-                                                @if($employee->postal_code)
-                                                    <div>الرمز البريدي: {{ $employee->postal_code }}</div>
-                                                @endif
+                                                <div class="font-medium text-sm">{{ $document->document_name }}</div>
+                                                <div class="text-xs text-slate-500">{{ $document->document_type_formatted }}</div>
                                             </div>
                                         </div>
+                                        <div class="flex items-center space-x-2">
+                                            @if($document->file_path)
+                                                <x-base.button as="a" href="{{ route('hr.employees.documents.download', ['employee' => $employee->id, 'document' => $document->id]) }}" variant="outline-secondary" size="xs" title="Download">
+                                                    <x-base.lucide icon="Download" class="w-3 h-3" />
+                                                </x-base.button>
+                                            @endif
+                                            @if($document->expiry_date && $document->is_expired)
+                                                <span class="px-2 py-1 text-xs bg-red-100 text-red-700 rounded">Expired</span>
+                                            @elseif($document->expiry_date && $document->is_expiring_soon)
+                                                <span class="px-2 py-1 text-xs bg-orange-100 text-orange-700 rounded">Expiring Soon</span>
+                                            @endif
+                                        </div>
                                     </div>
-                                    @endif
-                                </div>
+                                @endforeach
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Employment Tab -->
-                    <div id="employment" class="tab-pane" role="tabpanel" aria-labelledby="employment-tab">
-                        <div class="grid grid-cols-12 gap-6">
-                            <div class="col-span-12 sm:col-span-6">
-                                <div class="border-b border-slate-200/60 pb-3 mb-3">
-                                    <h4 class="text-slate-500 text-xs uppercase font-medium">معلومات التوظيف</h4>
+                            @if($employee->documents()->active()->count() > 3)
+                                <div class="mt-4 text-center">
+                                    <a href="{{ route('hr.employees.documents.index', ['employee' => $employee->id]) }}"
+                                       class="text-primary hover:text-primary/80 text-sm">
+                                        View all {{ $employee->documents()->active()->count() }} documents
+                                    </a>
                                 </div>
-                                <div class="space-y-4">
-                                    <div>
-                                        <div class="text-slate-500 text-xs">رقم الموظف</div>
-                                        <div class="font-medium">{{ $employee->employee_id }}</div>
-                                    </div>
-                                    <div>
-                                        <div class="text-slate-500 text-xs">الوظيفة</div>
-                                        <div class="font-medium">{{ $employee->position }}</div>
-                                    </div>
-                                    @if($employee->department)
-                                    <div>
-                                        <div class="text-slate-500 text-xs">القسم</div>
-                                        <div class="font-medium">
-                                            <a href="{{ route('hr.departments.edit', $employee->department) }}" class="text-primary">
-                                                {{ $employee->department->name }}
-                                            </a>
-                                        </div>
-                                    </div>
-                                    @endif
-                                    @if($employee->company)
-                                    <div>
-                                        <div class="text-slate-500 text-xs">الشركة</div>
-                                        <div class="font-medium">{{ $employee->company->name }}</div>
-                                    </div>
-                                    @endif
-                                </div>
+                            @endif
+                        @else
+                            <div class="flex flex-col items-center justify-center py-10">
+                                <x-base.lucide class="h-12 w-12 text-slate-400 mb-4" icon="FileText" />
+                                <div class="text-slate-500 text-center mb-2">No documents uploaded</div>
+                                <a href="{{ route('hr.employees.documents.index', ['employee' => $employee->id]) }}"
+                                   class="text-primary hover:text-primary/80 text-sm">
+                                    Add first document
+                                </a>
                             </div>
+                        @endif
+                    </div>
+                </div>
+                <!-- END: Documents -->
 
-                            <div class="col-span-12 sm:col-span-6">
-                                <div class="border-b border-slate-200/60 pb-3 mb-3">
-                                    <h4 class="text-slate-500 text-xs uppercase font-medium">المعلومات المالية</h4>
-                                </div>
-                                <div class="space-y-4">
-                                    <div>
-                                        <div class="text-slate-500 text-xs">تاريخ التعيين</div>
-                                        <div class="font-medium">
-                                            {{ $employee->hire_date->format('Y-m-d') }}
-                                            <span class="text-slate-400 text-xs">({{ $employee->hire_date->diffForHumans() }})</span>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="text-slate-500 text-xs">الراتب الأساسي</div>
-                                        <div class="font-medium">
-                                            {{ number_format($employee->salary, 2) }} {{ config('app.currency', 'USD') }}
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="text-slate-500 text-xs">حالة التوظيف</div>
-                                        <div class="font-medium">
-                                            <span class="px-2 py-1 text-xs rounded-full {{ $employee->is_active ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger' }}">
-                                                {{ $employee->is_active ? 'نشط' : 'غير نشط' }}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
+                <!-- BEGIN: Recent Activities -->
+                <div class="intro-y box col-span-12">
+                    <div class="flex items-center border-b border-slate-200/60 px-5 py-5 dark:border-darkmode-400 sm:py-3">
+                        <h2 class="mr-auto text-base font-medium">Recent Activities</h2>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex flex-col items-center justify-center py-10">
+                            <x-base.lucide class="h-12 w-12 text-slate-400 mb-4" icon="Activity" />
+                            <div class="text-slate-500 text-center">
+                                No recent activities
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Documents Tab -->
-                    <div id="documents" class="tab-pane" role="tabpanel" aria-labelledby="documents-tab">
-                        <div class="flex flex-col items-center justify-center py-10 text-center">
-                            <i data-lucide="file-text" class="w-16 h-16 text-slate-400 mb-3"></i>
-                            <h3 class="text-lg font-medium">لا توجد مستندات</h3>
-                            <p class="text-slate-500 mt-1">لا توجد مستندات مرفقة لهذا الموظف حتى الآن.</p>
-                            <button class="btn btn-primary mt-4">
-                                <i data-lucide="plus" class="w-4 h-4 ml-2"></i> إضافة مستند
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Leaves Tab -->
-                    <div id="leaves" class="tab-pane" role="tabpanel" aria-labelledby="leaves-tab">
-                        <div class="flex flex-col items-center justify-center py-10 text-center">
-                            <i data-lucide="calendar-off" class="w-16 h-16 text-slate-400 mb-3"></i>
-                            <h3 class="text-lg font-medium">لا توجد طلبات إجازة</h3>
-                            <p class="text-slate-500 mt-1">لا توجد طلبات إجازة مسجلة لهذا الموظف حتى الآن.</p>
-                            <button class="btn btn-primary mt-4">
-                                <i data-lucide="plus" class="w-4 h-4 ml-2"></i> طلب إجازة جديدة
-                            </button>
                         </div>
                     </div>
                 </div>
+                <!-- END: Recent Activities -->
             </div>
         </div>
     </div>
-</div>
-
-@push('scripts')
-<script>
-    /**
-     * Initialize tab functionality for employee details
-     */
-    document.addEventListener('DOMContentLoaded', function() {
-        // Get all tab buttons
-        const tabButtons = document.querySelectorAll('[data-tw-toggle="tab"]');
-        
-        // Add click event listeners to each tab button
-        tabButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const targetId = this.getAttribute('data-tw-target');
-                const targetTab = document.querySelector(targetId);
-                
-                // Hide all tab panes
-                document.querySelectorAll('.tab-pane').forEach(pane => {
-                    pane.classList.remove('active');
-                });
-                
-                // Deactivate all tab buttons
-                tabButtons.forEach(btn => {
-                    btn.classList.remove('active');
-                });
-                
-                // Show target tab pane and activate button
-                if (targetTab) {
-                    targetTab.classList.add('active');
-                    this.classList.add('active');
-                    
-                    // Optional: Save the active tab to localStorage
-                    localStorage.setItem('employeeTab', targetId);
-                }
-            });
-        });
-
-        // Restore active tab from localStorage if available
-        const savedTab = localStorage.getItem('employeeTab');
-        if (savedTab) {
-            const tabToActivate = document.querySelector(`[data-tw-toggle="tab"][data-tw-target="${savedTab}"]`);
-            if (tabToActivate) {
-                tabToActivate.click();
-            }
-        }
-    });
-</script>
-@endpush
 @endsection

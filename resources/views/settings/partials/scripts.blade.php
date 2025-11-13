@@ -1,35 +1,84 @@
-@push('scripts')
+@pushonce('scripts')
 <script>
-    // Tab switching functionality
+    console.log('Settings scripts loaded successfully');
+
+    // Wait for DOM to be fully loaded
     document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM loaded, initializing settings tabs');
+
+        // Use a longer timeout to ensure all content is loaded
+        setTimeout(function() {
+            initializeSettingsTabs();
+        }, 1000); // Increased from 100ms to 1000ms
+    });
+
+    function initializeSettingsTabs() {
         const tabs = document.querySelectorAll('.settings-tab');
         const contents = document.querySelectorAll('.settings-content');
 
+        console.log('Found', tabs.length, 'tabs and', contents.length, 'contents');
+
+        // Log all tab data attributes
+        tabs.forEach((tab, index) => {
+            console.log('Tab', index + 1, ':', tab.getAttribute('data-tab'));
+        });
+
+        // Log all content IDs
+        contents.forEach((content, index) => {
+            console.log('Content', index + 1, ':', content.id);
+        });
+
+        // Function to show specific tab content
+        function showTab(tabName) {
+            console.log('Showing tab:', tabName);
+
+            // Remove active class from all tabs
+            tabs.forEach(t => {
+                t.classList.remove('bg-primary', 'text-white');
+                t.classList.add('text-slate-700', 'hover:bg-slate-100', 'dark:text-slate-300', 'dark:hover:bg-darkmode-400');
+            });
+
+            // Hide all contents
+            contents.forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            // Show target content and activate tab
+            const targetTab = document.querySelector(`[data-tab="${tabName}"]`);
+            const targetContent = document.getElementById(tabName + '-content');
+
+            if (targetTab && targetContent) {
+                targetTab.classList.add('bg-primary', 'text-white');
+                targetTab.classList.remove('text-slate-700', 'hover:bg-slate-100', 'dark:text-slate-300', 'dark:hover:bg-darkmode-400');
+                targetContent.classList.remove('hidden');
+                console.log('Successfully showed tab:', tabName);
+            } else {
+                console.error('Tab or content not found:', tabName, targetTab, targetContent);
+                console.error('Available tabs:', Array.from(tabs).map(t => t.getAttribute('data-tab')));
+                console.error('Available contents:', Array.from(contents).map(c => c.id));
+            }
+        }
+
+        // Add click event to all tabs
         tabs.forEach(tab => {
             tab.addEventListener('click', function(e) {
                 e.preventDefault();
-                
                 const targetTab = this.getAttribute('data-tab');
-                
-                // Remove active class from all tabs
-                tabs.forEach(t => {
-                    t.classList.remove('bg-primary', 'text-white');
-                    t.classList.add('text-slate-700', 'hover:bg-slate-100', 'dark:text-slate-300', 'dark:hover:bg-darkmode-400');
-                });
-                
-                // Add active class to clicked tab
-                this.classList.add('bg-primary', 'text-white');
-                this.classList.remove('text-slate-700', 'hover:bg-slate-100', 'dark:text-slate-300', 'dark:hover:bg-darkmode-400');
-                
-                // Hide all contents
-                contents.forEach(content => {
-                    content.classList.add('hidden');
-                });
-                
-                // Show target content
-                document.getElementById(targetTab + '-content').classList.remove('hidden');
+                showTab(targetTab);
             });
         });
+
+        // Show default tab (general)
+        console.log('Setting default tab to general');
+        showTab('general');
+
+        // Auto-open specific tab if URL contains hash
+        if (window.location.hash) {
+            const tabName = window.location.hash.substring(1); // Remove #
+            if (document.getElementById(tabName + '-content')) {
+                showTab(tabName);
+            }
+        }
 
         // Handle General Settings Form with AJAX
         const generalForm = document.getElementById('generalSettingsForm');
@@ -197,15 +246,55 @@
             }
         }
 
-        // Add event listeners to all inputs
-        document.querySelectorAll('.prefix-input, .padding-input, .start-number-input, .include-year-input').forEach(input => {
-            input.addEventListener('input', function() {
-                updatePreview(this.dataset.id);
+        // Handle Attendance Settings Form with AJAX
+        const attendanceForm = document.getElementById('attendance-settings-form');
+        if (attendanceForm && !attendanceForm.dataset.listenerAdded) {
+            console.log('Attendance form found');
+            attendanceForm.dataset.listenerAdded = 'true';
+
+            attendanceForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Saving...';
+
+                fetch('{{ route("settings.attendance.update") }}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        showToast(data.message || 'Attendance settings updated successfully!', 'success');
+                    } else {
+                        showToast(data.message || 'Error updating attendance settings', 'error');
+                    }
+                })
+                .catch(error => {
+                    showToast('An error occurred while saving', 'error');
+                    console.error('Error:', error);
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                });
             });
-            input.addEventListener('change', function() {
-                updatePreview(this.dataset.id);
-            });
-        });
+        }
+
     });
 </script>
-@endpush
+@endpushonce

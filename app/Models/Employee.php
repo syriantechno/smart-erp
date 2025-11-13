@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Employee extends Model
 {
@@ -12,7 +13,7 @@ class Employee extends Model
      *
      * @var array
      */
-    protected $appends = ['full_name'];
+    protected $appends = ['full_name', 'age'];
 
     /**
      * The attributes that are mass assignable.
@@ -85,6 +86,16 @@ class Employee extends Model
         ]));
     }
 
+    /**
+     * Get the employee's age.
+     *
+     * @return int|null
+     */
+    public function getAgeAttribute()
+    {
+        return $this->birth_date ? $this->birth_date->age : null;
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -96,6 +107,30 @@ class Employee extends Model
     }
 
     /**
+     * Get the employee's documents.
+     */
+    public function documents(): HasMany
+    {
+        return $this->hasMany(EmployeeDocument::class);
+    }
+
+    /**
+     * Get the employee's passport documents.
+     */
+    public function passports()
+    {
+        return $this->documents()->ofType('passport')->active();
+    }
+
+    /**
+     * Get the employee's visa documents.
+     */
+    public function visas()
+    {
+        return $this->documents()->ofType('visa')->active();
+    }
+
+    /**
      * Get the profile picture URL.
      */
     public function getProfilePictureUrlAttribute()
@@ -104,7 +139,7 @@ class Employee extends Model
             return asset('storage/' . $this->profile_picture);
         }
 
-        return asset('images/default-avatar.png'); // Fallback to default avatar
+        return asset('build/assets/profile-1-0441b45e.jpg'); // Use existing profile image as fallback
     }
 
     /**

@@ -84,7 +84,7 @@ class EmployeeController extends Controller
                 return '<img src="' . $employee->profile_picture_url . '" alt="' . $employee->full_name . '" class="w-10 h-10 rounded-full object-cover">';
             })
             ->addColumn('full_name', function ($employee) {
-                return $employee->full_name;
+                return '<a href="' . route('hr.employees.show', $employee->id) . '" class="font-medium text-slate-700 hover:text-primary">' . $employee->full_name . '</a>';
             })
             ->addColumn('company_name', function ($employee) {
                 return $employee->company ? $employee->company->name : '-';
@@ -108,7 +108,7 @@ class EmployeeController extends Controller
             ->addColumn('actions', function ($employee) {
                 return view('hr.employees.partials.actions', ['employee' => $employee])->render();
             })
-            ->rawColumns(['status', 'actions', 'profile_picture'])
+            ->rawColumns(['status', 'actions', 'profile_picture', 'full_name'])
             ->make(true);
     }
 

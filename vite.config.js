@@ -44,6 +44,7 @@ export default defineConfig({
 
                 // CSS General
                 "resources/css/app.css",
+                "resources/css/dark-mode.css",
 
                 // JS Vendor
                 "resources/js/vendors/accordion.js",

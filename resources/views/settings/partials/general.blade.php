@@ -1,3 +1,4 @@
+<!-- General Settings Content Loaded -->
 <div class="intro-y box mt-5">
     <div class="flex items-center border-b border-slate-200/60 p-5 dark:border-darkmode-400">
         <h2 class="mr-auto text-base font-medium">General Settings</h2>

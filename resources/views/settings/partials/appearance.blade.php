@@ -1,3 +1,27 @@
+<!-- Appearance Settings Content Loaded -->
+@pushonce('styles')
+<style>
+/* الوضع المظلم */
+.dark .form-select,
+.dark .form-control {
+    background-color: #374151;
+    border-color: #4b5563;
+    color: white;
+}
+
+.dark .btn-outline-secondary {
+    background-color: #374151;
+    color: #d1d5db;
+    border-color: #4b5563;
+}
+
+.dark .btn-outline-secondary:hover {
+    background-color: #4b5563;
+    border-color: #6b7280;
+}
+</style>
+@endpushonce
+
 <div class="intro-y box mt-5">
     <div class="p-5">
         <div class="flex items-center justify-between mb-6">
@@ -215,6 +239,7 @@
     </div>
 </div>
 
+@pushonce('scripts')
 <script>
 function resetToDefaults() {
     // إعادة تعيين القيم الافتراضية
@@ -224,9 +249,7 @@ function resetToDefaults() {
     document.querySelector('input[name="secondary_color_hex"]').value = '#7c3aed';
     document.querySelector('input[name="accent_color"]').value = '#06b6d4';
     document.querySelector('input[name="accent_color_hex"]').value = '#06b6d4';
-    document.querySelector('input[name="theme"]').value = 'icewall';
-    document.querySelector('input[name="layout"]').value = 'side-menu';
-    document.querySelector('input[name="font_size"]').value = 'medium';
+    document.querySelector('select[name="font_size"]').value = 'medium';
     document.querySelector('input[name="dark_mode"]').checked = false;
     document.querySelector('input[name="sidebar_collapsed"]').checked = false;
     document.querySelector('input[name="animations_enabled"]').checked = true;
@@ -236,29 +259,39 @@ function resetToDefaults() {
 }
 
 function updatePreview() {
-    const primaryColor = document.querySelector('input[name="primary_color"]').value;
-    const secondaryColor = document.querySelector('input[name="secondary_color"]').value;
-    const accentColor = document.querySelector('input[name="accent_color"]').value;
+    const primaryColor = document.querySelector('input[name="primary_color"]')?.value || '#1e40af';
+    const secondaryColor = document.querySelector('input[name="secondary_color"]')?.value || '#7c3aed';
+    const accentColor = document.querySelector('input[name="accent_color"]')?.value || '#06b6d4';
 
-    document.querySelectorAll('.preview-primary').forEach(el => el.style.backgroundColor = primaryColor);
-    document.querySelectorAll('.preview-secondary').forEach(el => el.style.backgroundColor = secondaryColor);
-    document.querySelectorAll('.preview-accent').forEach(el => el.style.backgroundColor = accentColor);
+    const primaryPreviews = document.querySelectorAll('#preview-primary');
+    const secondaryPreviews = document.querySelectorAll('#preview-secondary');
+    const accentPreviews = document.querySelectorAll('#preview-accent');
+
+    primaryPreviews.forEach(el => el.style.backgroundColor = primaryColor);
+    secondaryPreviews.forEach(el => el.style.backgroundColor = secondaryColor);
+    accentPreviews.forEach(el => el.style.backgroundColor = accentColor);
 }
 
 // تحديث المعاينة عند تغيير الألوان
 document.addEventListener('input', function(e) {
     if (e.target.type === 'color') {
         const hexInput = e.target.name + '_hex';
-        document.querySelector(`input[name="${hexInput}"]`).value = e.target.value;
+        const hexElement = document.querySelector(`input[name="${hexInput}"]`);
+        if (hexElement) {
+            hexElement.value = e.target.value;
+        }
         updatePreview();
     }
 });
 
 // تحديث color picker عند كتابة hex
 document.addEventListener('input', function(e) {
-    if (e.target.name.endsWith('_hex')) {
+    if (e.target.name && e.target.name.endsWith('_hex')) {
         const colorInput = e.target.name.replace('_hex', '');
-        document.querySelector(`input[name="${colorInput}"]`).value = e.target.value;
+        const colorElement = document.querySelector(`input[name="${colorInput}"]`);
+        if (colorElement) {
+            colorElement.value = e.target.value;
+        }
         updatePreview();
     }
 });
@@ -285,107 +318,5 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.classList.add('dark');
     }
 });
-
-// تحديث المعاينة عند تغيير الألوان
-document.addEventListener('input', function(e) {
-    if (e.target.type === 'color') {
-        updatePreview();
-    }
-});
-
-// وظيفة إعادة التعيين
-function resetToDefaults() {
-    if (typeof window.resetThemeSettings === 'function') {
-        window.resetThemeSettings();
-    } else {
-        console.warn('Theme customizer not loaded');
-    }
-}
-
-// وظيفة تحديث المعاينة
-function updatePreview() {
-    const primaryColor = document.querySelector('input[name="primary_color"]')?.value || '#1e40af';
-    const secondaryColor = document.querySelector('input[name="secondary_color"]')?.value || '#7c3aed';
-    const accentColor = document.querySelector('input[name="accent_color"]')?.value || '#06b6d4';
-
-    const primaryPreviews = document.querySelectorAll('.preview-primary');
-    const secondaryPreviews = document.querySelectorAll('.preview-secondary');
-    const accentPreviews = document.querySelectorAll('.preview-accent');
-
-    primaryPreviews.forEach(el => el.style.backgroundColor = primaryColor);
-    secondaryPreviews.forEach(el => el.style.backgroundColor = secondaryColor);
-    accentPreviews.forEach(el => el.style.backgroundColor = accentColor);
-}
-
-// إضافة أنماط لعناصر القائمة
-.form-check-input {
-    width: 1rem;
-    height: 1rem;
-}
-
-.form-select {
-    width: 100%;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.375rem;
-    background-color: white;
-}
-
-.form-control {
-    padding: 0.5rem 0.75rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.375rem;
-    background-color: white;
-}
-
-.btn {
-    padding: 0.5rem 1rem;
-    border-radius: 0.375rem;
-    font-weight: 500;
-    text-decoration: none;
-    display: inline-block;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn-primary {
-    background-color: #1e40af;
-    color: white;
-    border: 1px solid #1e40af;
-}
-
-.btn-primary:hover {
-    background-color: #1d4ed8;
-    border-color: #1d4ed8;
-}
-
-.btn-outline-secondary {
-    background-color: white;
-    color: #6b7280;
-    border: 1px solid #d1d5db;
-}
-
-.btn-outline-secondary:hover {
-    background-color: #f9fafb;
-    border-color: #9ca3af;
-}
-
-/* الوضع المظلم */
-.dark .form-select,
-.dark .form-control {
-    background-color: #374151;
-    border-color: #4b5563;
-    color: white;
-}
-
-.dark .btn-outline-secondary {
-    background-color: #374151;
-    color: #d1d5db;
-    border-color: #4b5563;
-}
-
-.dark .btn-outline-secondary:hover {
-    background-color: #4b5563;
-    border-color: #6b7280;
-}
-</style>
+</script>
+@endpushonce

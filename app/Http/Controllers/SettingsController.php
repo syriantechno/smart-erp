@@ -153,6 +153,51 @@ class SettingsController extends Controller
         return redirect()->route('settings.index')->with('success', 'تم حفظ إعدادات المظهر بنجاح!');
     }
 
+    public function updateAttendance(Request $request)
+    {
+        $request->validate([
+            'attendance.working_hours_per_day' => 'required|numeric|min:1|max:24',
+            'attendance.half_day_hours' => 'required|numeric|min:1|max:12',
+            'attendance.grace_period_minutes' => 'required|numeric|min:0|max:120',
+            'attendance.auto_checkout_time' => 'required|date_format:H:i',
+            'attendance.minimum_working_hours' => 'required|numeric|min:1|max:24',
+            'attendance.enable_auto_attendance' => 'nullable|boolean',
+            'attendance.allow_mobile_checkin' => 'nullable|boolean',
+            'attendance.require_location' => 'nullable|boolean',
+            'attendance.notify_late_arrival' => 'nullable|boolean',
+            'attendance.notify_early_departure' => 'nullable|boolean',
+            'attendance.weekend_days' => 'nullable|string|max:255',
+            'attendance.holidays' => 'nullable|string',
+        ]);
+
+        // حفظ إعدادات ساعات العمل
+        Setting::set('attendance.working_hours_per_day', $request->input('attendance.working_hours_per_day'), 'number', 'عدد ساعات العمل اليومية');
+        Setting::set('attendance.half_day_hours', $request->input('attendance.half_day_hours'), 'number', 'ساعات نصف اليوم');
+        Setting::set('attendance.grace_period_minutes', $request->input('attendance.grace_period_minutes'), 'number', 'فترة السماح (دقائق)');
+        Setting::set('attendance.auto_checkout_time', $request->input('attendance.auto_checkout_time'), 'time', 'وقت الخروج التلقائي');
+        Setting::set('attendance.minimum_working_hours', $request->input('attendance.minimum_working_hours'), 'number', 'الحد الأدنى لساعات العمل');
+
+        // حفظ إعدادات المميزات
+        Setting::set('attendance.enable_auto_attendance', $request->boolean('attendance.enable_auto_attendance'), 'boolean', 'تفعيل التسجيل التلقائي');
+        Setting::set('attendance.allow_mobile_checkin', $request->boolean('attendance.allow_mobile_checkin'), 'boolean', 'السماح بالتسجيل عبر الهاتف');
+        Setting::set('attendance.require_location', $request->boolean('attendance.require_location'), 'boolean', 'طلب تحديد الموقع');
+        Setting::set('attendance.notify_late_arrival', $request->boolean('attendance.notify_late_arrival'), 'boolean', 'إشعار التأخير');
+        Setting::set('attendance.notify_early_departure', $request->boolean('attendance.notify_early_departure'), 'boolean', 'إشعار المغادرة المبكرة');
+
+        // حفظ إعدادات الجدول الزمني
+        Setting::set('attendance.weekend_days', $request->input('attendance.weekend_days'), 'text', 'أيام نهاية الأسبوع');
+        Setting::set('attendance.holidays', $request->input('attendance.holidays'), 'textarea', 'العطلات الرسمية');
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'تم حفظ إعدادات الحضور والغياب بنجاح!'
+            ]);
+        }
+
+        return redirect()->route('settings.index')->with('success', 'تم حفظ إعدادات الحضور والغياب بنجاح!');
+    }
+
     /**
      * إنشاء ملف CSS مخصص للألوان المختارة
      */

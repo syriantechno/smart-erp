@@ -1,10 +1,18 @@
-<div class="intro-y box mt-5">
+<!-- Company Settings Content Loaded -->
+<div class="intro-y box">
     <div class="flex items-center border-b border-slate-200/60 p-5 dark:border-darkmode-400">
-        <h2 class="mr-auto text-base font-medium">Company Settings</h2>
+        <h2 class="mr-auto text-base font-medium flex items-center">
+            <x-base.lucide icon="Building" class="w-5 h-5 mr-2 text-green-500" />
+            Company Settings
+        </h2>
+        <x-base.button type="submit" form="companySettingsForm" variant="primary">
+            <x-base.lucide icon="Save" class="w-4 h-4 mr-2" />
+            Save Changes
+        </x-base.button>
     </div>
-    <div class="p-5">
-        <form method="POST" action="{{ route('settings.company.update') }}" id="companySettingsForm" enctype="multipart/form-data">
-            @csrf
+
+    <form id="companySettingsForm" action="{{ route('settings.company.update') }}" method="POST" enctype="multipart/form-data" class="p-5">
+        @csrf
             
             <div class="grid grid-cols-12 gap-6">
                 <!-- Company Name -->

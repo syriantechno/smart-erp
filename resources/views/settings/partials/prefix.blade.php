@@ -1,10 +1,18 @@
-<div class="intro-y box mt-5">
+<!-- Prefix Settings Content Loaded -->
+<div class="intro-y box">
     <div class="flex items-center border-b border-slate-200/60 p-5 dark:border-darkmode-400">
-        <h2 class="mr-auto text-base font-medium">Document Prefix Settings</h2>
+        <h2 class="mr-auto text-base font-medium flex items-center">
+            <x-base.lucide icon="Hash" class="w-5 h-5 mr-2 text-purple-500" />
+            Prefix Settings
+        </h2>
+        <x-base.button type="submit" form="prefixForm" variant="primary">
+            <x-base.lucide icon="Save" class="w-4 h-4 mr-2" />
+            Save Changes
+        </x-base.button>
     </div>
-    <div class="p-5">
-        <form method="POST" action="{{ route('settings.prefix.update') }}" id="prefixForm">
-            @csrf
+
+    <form id="prefixForm" action="{{ route('settings.prefix.update') }}" method="POST" class="p-5">
+        @csrf
             
             <div class="overflow-x-auto">
                 <table class="w-full text-left">

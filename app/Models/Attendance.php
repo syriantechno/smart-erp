@@ -113,4 +113,141 @@ class Attendance extends Model
             'holiday_days' => (clone $query)->where('status', 'holiday')->count(),
         ];
     }
+
+    /**
+     * حساب حالة الحضور تلقائياً
+     */
+    public function calculateAttendanceStatus()
+    {
+        if (!$this->check_in || !$this->check_out) {
+            return 'absent';
+        }
+
+        $workingHours = $this->working_hours ?? 0;
+        $halfDayHours = setting('attendance.half_day_hours', 4);
+        $minimumHours = setting('attendance.minimum_working_hours', 6);
+
+        // إذا كان العمل أقل من الحد الأدنى
+        if ($workingHours < $minimumHours) {
+            return 'absent';
+        }
+
+        // إذا كان العمل أقل من ساعات نصف اليوم
+        if ($workingHours < $halfDayHours) {
+            return 'half_day';
+        }
+
+        return 'present';
+    }
+
+    /**
+     * التحقق من التأخير
+     */
+    public function isLate()
+    {
+        if (!$this->shift || !$this->check_in) {
+            return false;
+        }
+
+        $shiftStartTime = \Carbon\Carbon::createFromFormat('H:i:s', $this->shift->start_time);
+        $checkInTime = \Carbon\Carbon::createFromFormat('H:i:s', $this->check_in->format('H:i:s'));
+
+        $gracePeriodMinutes = setting('attendance.grace_period_minutes', 15);
+        $allowedTime = $shiftStartTime->copy()->addMinutes($gracePeriodMinutes);
+
+        return $checkInTime->greaterThan($allowedTime);
+    }
+
+    /**
+     * التحقق من المغادرة المبكرة
+     */
+    public function isEarlyDeparture()
+    {
+        if (!$this->shift || !$this->check_out) {
+            return false;
+        }
+
+        $shiftEndTime = \Carbon\Carbon::createFromFormat('H:i:s', $this->shift->end_time);
+        $checkOutTime = \Carbon\Carbon::createFromFormat('H:i:s', $this->check_out->format('H:i:s'));
+
+        return $checkOutTime->lessThan($shiftEndTime);
+    }
+
+    /**
+     * حساب ساعات العمل
+     */
+    public function calculateWorkingHours()
+    {
+        if (!$this->check_in || !$this->check_out) {
+            return 0;
+        }
+
+        $checkIn = \Carbon\Carbon::createFromFormat('H:i:s', $this->check_in->format('H:i:s'));
+        $checkOut = \Carbon\Carbon::createFromFormat('H:i:s', $this->check_out->format('H:i:s'));
+
+        // التأكد من أن وقت الخروج بعد وقت الدخول
+        if ($checkOut->lessThanOrEqualTo($checkIn)) {
+            return 0;
+        }
+
+        return $checkIn->diffInMinutes($checkOut) / 60; // تحويل إلى ساعات
+    }
+
+    /**
+     * التحقق من أن التاريخ يوم عطلة
+     */
+    public static function isHoliday($date)
+    {
+        $holidays = setting('attendance.holidays', '');
+        if (empty($holidays)) {
+            return false;
+        }
+
+        $holidaysArray = array_map('trim', explode("\n", $holidays));
+        return in_array($date->format('Y-m-d'), $holidaysArray);
+    }
+
+    /**
+     * التحقق من أن التاريخ يوم عطلة نهاية أسبوع
+     */
+    public static function isWeekend($date)
+    {
+        $weekendDays = setting('attendance.weekend_days', '5,6');
+        $weekendDaysArray = array_map('intval', explode(',', $weekendDays));
+
+        return in_array($date->dayOfWeek, $weekendDaysArray);
+    }
+
+    /**
+     * إنشاء سجل حضور تلقائي
+     */
+    public static function createAutoAttendance($employeeId, $date, $shiftId = null)
+    {
+        $existingAttendance = self::where('employee_id', $employeeId)
+            ->where('attendance_date', $date)
+            ->first();
+
+        if ($existingAttendance) {
+            return $existingAttendance;
+        }
+
+        // التحقق من العطل
+        $carbonDate = \Carbon\Carbon::parse($date);
+        if (self::isHoliday($carbonDate) || self::isWeekend($carbonDate)) {
+            return self::create([
+                'employee_id' => $employeeId,
+                'shift_id' => $shiftId,
+                'attendance_date' => $date,
+                'status' => self::isHoliday($carbonDate) ? 'holiday' : 'weekend',
+            ]);
+        }
+
+        // إنشاء سجل غياب للأيام العادية
+        return self::create([
+            'employee_id' => $employeeId,
+            'shift_id' => $shiftId,
+            'attendance_date' => $date,
+            'status' => 'absent',
+        ]);
+    }
 }
