@@ -41,7 +41,7 @@ class PrefixSetting extends Model
 
     public function previewCode()
     {
-        $number = str_pad($this->current_number, $this->padding, '0', STR_PAD_LEFT);
+        $number = str_pad($this->start_number, $this->padding, '0', STR_PAD_LEFT);
         
         if ($this->include_year) {
             $year = date('Y');

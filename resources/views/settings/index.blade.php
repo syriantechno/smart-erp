@@ -14,39 +14,36 @@
 
         <!-- Content Area -->
         <div class="col-span-12 lg:col-span-9">
-            <!-- General Settings Tab -->
-            <div class="settings-content" id="general-content">
-                @include('settings.partials.general')
-            </div>
+            <div class="container mx-auto px-4 lg:px-0">
+                <!-- General Settings Tab -->
+                <div class="settings-content" id="general-content">
+                    @include('settings.partials.general')
+                </div>
 
-            <!-- Appearance Settings Tab -->
-            <div class="settings-content hidden" id="appearance-content">
-                @include('settings.partials.appearance')
-            </div>
+                <!-- Company Settings Tab -->
+                <div class="settings-content hidden" id="company-content">
+                    @include('settings.partials.company')
+                </div>
 
-            <!-- Company Settings Tab -->
-            <div class="settings-content hidden" id="company-content">
-                @include('settings.partials.company')
-            </div>
+                <!-- Prefix Settings Tab -->
+                <div class="settings-content hidden" id="prefix-content">
+                    @include('settings.partials.prefix')
+                </div>
 
-            <!-- Prefix Settings Tab -->
-            <div class="settings-content hidden" id="prefix-content">
-                @include('settings.partials.prefix')
-            </div>
+                <!-- Notifications Settings Tab -->
+                <div class="settings-content hidden" id="notifications-content">
+                    @include('settings.partials.notifications')
+                </div>
 
-            <!-- Notifications Settings Tab -->
-            <div class="settings-content hidden" id="notifications-content">
-                @include('settings.partials.notifications')
-            </div>
+                <!-- Email Settings Tab -->
+                <div class="settings-content hidden" id="email-content">
+                    @include('settings.partials.email')
+                </div>
 
-            <!-- Email Settings Tab -->
-            <div class="settings-content hidden" id="email-content">
-                @include('settings.partials.email')
-            </div>
-
-            <!-- Attendance Settings Tab -->
-            <div class="settings-content hidden" id="attendance-content">
-                @include('settings.partials.attendance')
+                <!-- Attendance Settings Tab -->
+                <div class="settings-content hidden" id="attendance-content">
+                    @include('settings.partials.attendance')
+                </div>
             </div>
         </div>
     </div>

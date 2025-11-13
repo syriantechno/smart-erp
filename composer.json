@@ -31,7 +31,8 @@
         },
         "files": [
             "app/Utils/Helpers.php",
-            "app/Helpers/settings.php"
+            "app/Helpers/settings.php",
+            "app/Helpers/NotificationHelper.php"
         ]
     },
     "autoload-dev": {

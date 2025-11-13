@@ -9,7 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
-use Illuminate\Validation\Rule;
+use App\Helpers\NotificationHelper;
 
 class DepartmentController extends Controller
 {
@@ -53,26 +53,29 @@ class DepartmentController extends Controller
             DB::commit();
 
             if ($request->ajax()) {
+                notify_created('Department');
                 return response()->json([
                     'success' => true,
-                    'message' => 'Department has been created successfully',
+                    'message' => 'Department created successfully',
                     'redirect' => route('hr.departments.index')
                 ]);
             }
 
-            // This will be used for non-AJAX requests
+            notify_created('Department');
             return redirect()->route('hr.departments.index');
 
         } catch (\Exception $e) {
             DB::rollBack();
             
             if ($request->ajax()) {
+                notify_error_code(1002, 'Failed to create department');
                 return response()->json([
                     'success' => false,
                     'message' => 'Failed to create department: ' . $e->getMessage()
                 ], 500);
             }
             
+            notify_error_code(1002, 'Failed to create department');
             return back()->with('error', 'Failed to create department: ' . $e->getMessage());
         }
     }
@@ -186,18 +189,20 @@ class DepartmentController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'parent_id' => 'nullable|exists:departments,id|not_in:' . $department->id,
-            'is_active' => 'boolean'
+            'manager_id' => 'nullable|exists:employees,id'
         ]);
 
         $department->update($validated);
 
         if ($request->ajax()) {
+            notify_updated('Department');
             return response()->json([
                 'success' => true,
                 'message' => 'Department updated successfully'
             ]);
         }
 
+        notify_updated('Department');
         return redirect()->route('hr.departments.index')
             ->with('success', 'Department updated successfully');
     }
@@ -210,36 +215,43 @@ class DepartmentController extends Controller
             if ($department->children()->exists()) {
                 $message = 'Cannot delete department because it has sub-departments.';
                 if (request()->ajax()) {
+                    notify_error_code(6001, 'Cannot delete department with sub-departments');
                     return response()->json([
                         'success' => false,
                         'message' => $message
                     ], 400);
                 }
+                notify_error_code(6001, 'Cannot delete department with sub-departments');
                 return back();
             }
             
             if ($department->employees()->exists()) {
                 $message = 'Cannot delete department because it has employees.';
                 if (request()->ajax()) {
+                    notify_error_code(6001, 'Cannot delete department with employees');
                     return response()->json([
                         'success' => false,
                         'message' => $message
                     ], 400);
                 }
+                notify_error_code(6001, 'Cannot delete department with employees');
                 return back();
             }
 
+            $departmentName = $department->name;
             $department->delete();
 
             DB::commit();
 
             if (request()->ajax()) {
+                notify_deleted('Department');
                 return response()->json([
                     'success' => true,
                     'message' => 'Department deleted successfully'
                 ]);
             }
 
+            notify_deleted('Department');
             return redirect()->route('hr.departments.index')
                 ->with('success', 'Department deleted successfully');
 
@@ -247,12 +259,14 @@ class DepartmentController extends Controller
             DB::rollBack();
             
             if (request()->ajax()) {
+                notify_error_code(1004, 'Failed to delete department');
                 return response()->json([
                     'success' => false,
                     'message' => 'Error deleting department: ' . $e->getMessage()
                 ], 500);
             }
             
+            notify_error_code(1004, 'Failed to delete department');
             return back()->with('error', 'Error deleting department: ' . $e->getMessage());
         }
     }

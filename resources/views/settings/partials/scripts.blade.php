@@ -87,14 +87,14 @@
             generalForm.addEventListener('submit', function(e) {
                 e.preventDefault();
                 console.log('Form submitted');
-                
+
                 const formData = new FormData(this);
                 const submitBtn = this.querySelector('button[type="submit"]');
                 const originalText = submitBtn.textContent;
-                
+
                 submitBtn.disabled = true;
                 submitBtn.textContent = 'Saving...';
-                
+
                 fetch('{{ route("settings.update") }}', {
                     method: 'POST',
                     body: formData,
@@ -112,13 +112,13 @@
                 })
                 .then(data => {
                     if (data.success) {
-                        showToast(data.message || 'Settings updated successfully!', 'success');
+                        window.showToast(data.message || 'Settings updated successfully!', 'success');
                     } else {
-                        showToast(data.message || 'Error updating settings', 'error');
+                        window.showToast(data.message || 'Error updating settings', 'error');
                     }
                 })
                 .catch(error => {
-                    showToast('An error occurred while saving', 'error');
+                    window.showToast('An error occurred while saving', 'error');
                     console.error('Error:', error);
                 })
                 .finally(() => {
@@ -133,17 +133,17 @@
         if (prefixForm && !prefixForm.dataset.listenerAdded) {
             console.log('Prefix form found');
             prefixForm.dataset.listenerAdded = 'true';
-            
+
             prefixForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-                
+
                 const formData = new FormData(this);
                 const submitBtn = this.querySelector('button[type="submit"]');
                 const originalText = submitBtn.textContent;
-                
+
                 submitBtn.disabled = true;
                 submitBtn.textContent = 'Saving...';
-                
+
                 fetch('{{ route("settings.prefix.update") }}', {
                     method: 'POST',
                     body: formData,
@@ -161,13 +161,13 @@
                 })
                 .then(data => {
                     if (data.success) {
-                        showToast(data.message || 'Prefix settings updated successfully!', 'success');
+                        window.showToast(data.message || 'Prefix settings updated successfully!', 'success');
                     } else {
-                        showToast(data.message || 'Error updating prefix settings', 'error');
+                        window.showToast(data.message || 'Error updating prefix settings', 'error');
                     }
                 })
                 .catch(error => {
-                    showToast('An error occurred while saving', 'error');
+                    window.showToast('An error occurred while saving', 'error');
                     console.error('Error:', error);
                 })
                 .finally(() => {
@@ -182,17 +182,17 @@
         if (companyForm && !companyForm.dataset.listenerAdded) {
             console.log('Company form found');
             companyForm.dataset.listenerAdded = 'true';
-            
+
             companyForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-                
+
                 const formData = new FormData(this);
                 const submitBtn = this.querySelector('button[type="submit"]');
                 const originalText = submitBtn.textContent;
-                
+
                 submitBtn.disabled = true;
                 submitBtn.textContent = 'Saving...';
-                
+
                 fetch('{{ route("settings.company.update") }}', {
                     method: 'POST',
                     body: formData,
@@ -210,13 +210,13 @@
                 })
                 .then(data => {
                     if (data.success) {
-                        showToast(data.message || 'Company settings updated successfully!', 'success');
+                        window.showToast(data.message || 'Company settings updated successfully!', 'success');
                     } else {
-                        showToast(data.message || 'Error updating company settings', 'error');
+                        window.showToast(data.message || 'Error updating company settings', 'error');
                     }
                 })
                 .catch(error => {
-                    showToast('An error occurred while saving', 'error');
+                    window.showToast('An error occurred while saving', 'error');
                     console.error('Error:', error);
                 })
                 .finally(() => {
@@ -232,19 +232,42 @@
             const padding = parseInt(document.querySelector(`.padding-input[data-id="${id}"]`)?.value);
             const startNumber = parseInt(document.querySelector(`.start-number-input[data-id="${id}"]`)?.value);
             const includeYear = document.querySelector(`.include-year-input[data-id="${id}"]`)?.checked;
-            
+
             if (!prefix || !padding || !startNumber) return;
-            
+
             const number = String(startNumber).padStart(padding, '0');
             const year = new Date().getFullYear();
-            
+
             let preview = includeYear ? `${prefix}-${year}-${number}` : `${prefix}-${number}`;
-            
+
             const previewElement = document.getElementById(`preview-${id}`);
             if (previewElement) {
                 previewElement.textContent = preview;
             }
         }
+
+        // Initialize prefix preview functionality
+        function initializePrefixPreview() {
+            // Add event listeners to all prefix input fields
+            document.querySelectorAll('.prefix-input, .padding-input, .start-number-input, .include-year-input').forEach(input => {
+                const id = input.getAttribute('data-id');
+                if (id) {
+                    input.addEventListener('input', () => updatePreview(id));
+                    input.addEventListener('change', () => updatePreview(id));
+                }
+            });
+
+            // Update all previews on page load
+            document.querySelectorAll('.prefix-input').forEach(input => {
+                const id = input.getAttribute('data-id');
+                if (id) {
+                    updatePreview(id);
+                }
+            });
+        }
+
+        // Initialize prefix preview when DOM is ready
+        initializePrefixPreview();
 
         // Handle Attendance Settings Form with AJAX
         const attendanceForm = document.getElementById('attendance-settings-form');
@@ -279,13 +302,13 @@
                 })
                 .then(data => {
                     if (data.success) {
-                        showToast(data.message || 'Attendance settings updated successfully!', 'success');
+                        window.showToast(data.message || 'Attendance settings updated successfully!', 'success');
                     } else {
-                        showToast(data.message || 'Error updating attendance settings', 'error');
+                        window.showToast(data.message || 'Error updating attendance settings', 'error');
                     }
                 })
                 .catch(error => {
-                    showToast('An error occurred while saving', 'error');
+                    window.showToast('An error occurred while saving', 'error');
                     console.error('Error:', error);
                 })
                 .finally(() => {
@@ -293,8 +316,7 @@
                     submitBtn.textContent = originalText;
                 });
             });
-        }
-
-    });
+    } // Close initializeSettingsTabs function
+} // Close DOMContentLoaded event listener
 </script>
 @endpushonce

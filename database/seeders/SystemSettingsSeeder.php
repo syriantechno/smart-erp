@@ -35,61 +35,7 @@ class SystemSettingsSeeder extends Seeder
                 'description' => 'Unified code for the ERP system'
             ],
 
-            // Theme & Appearance Settings
-            [
-                'key' => 'theme',
-                'value' => 'icewall',
-                'type' => 'string',
-                'description' => 'Selected theme (icewall, enigma, rubick, tinker)'
-            ],
-            [
-                'key' => 'layout',
-                'value' => 'side-menu',
-                'type' => 'string',
-                'description' => 'Layout type (side-menu, top-menu, simple-menu)'
-            ],
-            [
-                'key' => 'dark_mode',
-                'value' => false,
-                'type' => 'boolean',
-                'description' => 'Enable dark mode'
-            ],
-            [
-                'key' => 'primary_color',
-                'value' => '#1e40af',
-                'type' => 'string',
-                'description' => 'Primary theme color'
-            ],
-            [
-                'key' => 'secondary_color',
-                'value' => '#7c3aed',
-                'type' => 'string',
-                'description' => 'Secondary theme color'
-            ],
-            [
-                'key' => 'accent_color',
-                'value' => '#06b6d4',
-                'type' => 'string',
-                'description' => 'Accent theme color'
-            ],
-            [
-                'key' => 'font_size',
-                'value' => 'medium',
-                'type' => 'string',
-                'description' => 'Font size preference (small, medium, large, extra-large)'
-            ],
-            [
-                'key' => 'sidebar_collapsed',
-                'value' => false,
-                'type' => 'boolean',
-                'description' => 'Sidebar collapsed state'
-            ],
-            [
-                'key' => 'animations_enabled',
-                'value' => true,
-                'type' => 'boolean',
-                'description' => 'Enable animations and transitions'
-            ],
+            // Theme & Appearance Settings - Removed as per user request
 
             // Email Settings
             [
@@ -221,6 +167,10 @@ class SystemSettingsSeeder extends Seeder
                 'description' => 'Enable debug mode'
             ],
         ];
+
+        // Delete theme settings to reset to defaults
+        $themeKeys = ['theme', 'layout', 'dark_mode', 'primary_color', 'secondary_color', 'accent_color', 'font_size', 'sidebar_collapsed', 'animations_enabled'];
+        Setting::whereIn('key', $themeKeys)->delete();
 
         foreach ($settings as $setting) {
             Setting::firstOrCreate(

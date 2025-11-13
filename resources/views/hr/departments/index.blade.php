@@ -8,6 +8,7 @@
 @include('components.datatable.theme')
 
 @section('subcontent')
+    @include('components.global-notifications')
     <div class="intro-y mt-8 flex items-center">
         <h2 class="mr-auto text-lg font-medium">Departments Management</h2>
         <x-base.button
@@ -308,7 +309,7 @@
                 try {
                     const rows = table.rows({ search: 'applied' }).data().toArray();
                     if (!rows.length) {
-                        showToast('No data available for export.', 'error');
+                        showError('No data available for export');
                         return;
                     }
 
@@ -327,17 +328,17 @@
                         csvRows.push(csvRow.join(','));
                     });
 
-                    const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+                    const blob = new Blob(['\ufeff' + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
                     const url = URL.createObjectURL(blob);
                     const link = document.createElement('a');
                     link.href = url;
-                    link.download = 'departments.csv';
+                    link.download = 'departments_' + new Date().toISOString().split('T')[0] + '.csv';
                     link.click();
                     URL.revokeObjectURL(url);
-                    showToast('Export completed successfully.', 'success');
+                    showSuccess('Data exported successfully');
                 } catch (error) {
                     console.error('Export error:', error);
-                    showToast('Failed to export data.', 'error');
+                    showError('Failed to export data');
                 }
             });
         }
@@ -350,31 +351,29 @@
         });
 
         window.deleteDepartment = function (id, name) {
-            if (!confirm(`Are you sure you want to delete the department "${name}"?`)) {
-                return;
-            }
-
-            fetch(`{{ route('hr.departments.destroy', '') }}/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json',
-                },
-            })
+            confirmDelete(name, function() {
+                fetch(`{{ route('hr.departments.destroy', '') }}/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                    },
+                })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
                         reloadTable();
-                        showToast(data.message || 'Department deleted successfully', 'success');
+                        showSuccess(data.message || 'Department deleted successfully');
                     } else {
-                        showToast(data.message || 'Failed to delete department', 'error');
+                        showError(data.message || 'Failed to delete department');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    showToast('An error occurred while deleting the department', 'error');
+                    showError('An error occurred while deleting the department');
                 });
+            });
         };
     });
     </script>

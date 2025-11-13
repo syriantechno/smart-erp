@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             SystemSettingsSeeder::class,
             PrefixSettingsSeeder::class,
             HRDataSeeder::class, // Add HR data seeder
+            DemoDataSeeder::class, // Add demo data seeder
             // Add other seeders here
         ]);
 

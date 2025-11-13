@@ -248,7 +248,7 @@
 
             const table = window.initDataTable('#project-table', {
                 ajax: {
-                    url: '{{ route("project-management.projects.datatable") }}',
+                    url: '{{ route("project.projects.datatable") }}',
                     type: 'GET',
                     data: function (d) {
                         console.log('DataTable sending data:', d);
@@ -460,7 +460,7 @@
 
             // Load project statistics
             function loadProjectStats() {
-                fetch('{{ route("project-management.projects.stats") }}', {
+                fetch('{{ route("project.projects.stats") }}', {
                     method: 'GET',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',

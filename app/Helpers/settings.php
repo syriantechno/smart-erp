@@ -15,7 +15,12 @@ if (!function_exists('setting')) {
         static $settings = null;
 
         if ($settings === null) {
-            $settings = Setting::all()->pluck('value', 'key')->toArray();
+            try {
+                $settings = Setting::all()->pluck('value', 'key')->toArray();
+            } catch (\Exception $e) {
+                // If settings table doesn't exist, return default
+                return $default;
+            }
         }
 
         return $settings[$key] ?? $default;

@@ -16,9 +16,9 @@ class SettingsController extends Controller
         $settings = Setting::all()->pluck('value', 'key');
         $prefixSettings = PrefixSetting::all();
         $company = Company::first();
-        
+
         return view('settings.index', [
-            'unified_code' => $settings['unified_code'] ?? '',
+            'settings' => $settings,
             'prefixSettings' => $prefixSettings,
             'company' => $company,
         ]);
@@ -27,10 +27,21 @@ class SettingsController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'unified_code' => 'required|string|max:255',
+            'app_name' => 'required|string|max:255',
+            'default_language' => 'nullable|string|in:en,ar',
+            'timezone' => 'nullable|string',
+            'date_format' => 'nullable|string|in:Y-m-d,d/m/Y,m/d/Y',
+            'maintenance_mode' => 'nullable|boolean',
+            'debug_mode' => 'nullable|boolean',
         ]);
 
-        Setting::set('unified_code', $request->unified_code, 'text', 'Unified Code for the system');
+        // حفظ الإعدادات في قاعدة البيانات
+        Setting::set('app_name', $request->app_name, 'string', 'Application name');
+        Setting::set('app.locale', $request->default_language ?? 'en', 'string', 'Default application locale');
+        Setting::set('app.timezone', $request->timezone ?? 'UTC', 'string', 'Application timezone');
+        Setting::set('date_format', $request->date_format ?? 'Y-m-d', 'string', 'Date format');
+        Setting::set('maintenance_mode', $request->boolean('maintenance_mode'), 'boolean', 'Maintenance mode');
+        Setting::set('app.debug', $request->boolean('debug_mode'), 'boolean', 'Debug mode');
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([

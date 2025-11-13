@@ -89,6 +89,7 @@
                                         id="remember-me"
                                         name="remember"
                                         type="checkbox"
+                                        value="1"
                                     />
                                     <label
                                         class="cursor-pointer select-none"

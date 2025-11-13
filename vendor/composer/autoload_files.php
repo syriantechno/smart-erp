@@ -42,4 +42,5 @@ return array(
     '0b47d6d4a00ca9112ba3953b49e7c9a4' => $vendorDir . '/yajra/laravel-datatables-oracle/src/helper.php',
     '39ddf697ba65bd755a1110a24989d66e' => $baseDir . '/app/Utils/Helpers.php',
     'ec020eae7f42c24af9776d89f8a687b4' => $baseDir . '/app/Helpers/settings.php',
+    'e5390d22ab5f268cc3fd002a7081464c' => $baseDir . '/app/Helpers/NotificationHelper.php',
 );

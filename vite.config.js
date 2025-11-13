@@ -105,7 +105,6 @@ export default defineConfig({
                 "resources/js/themes/enigma.js",
 
                 // JS Base Components
-                "resources/js/components/base/theme-color.js",
                 "resources/js/components/base/calendar/calendar.js",
                 "resources/js/components/base/calendar/draggable.js",
                 "resources/js/components/base/balloon-block-editor.js",

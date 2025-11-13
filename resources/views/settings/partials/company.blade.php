@@ -1,5 +1,5 @@
 <!-- Company Settings Content Loaded -->
-<div class="intro-y box">
+<div class="bg-white dark:bg-darkmode-600 rounded-lg shadow-sm border border-slate-200/60 dark:border-darkmode-400 mt-5">
     <div class="flex items-center border-b border-slate-200/60 p-5 dark:border-darkmode-400">
         <h2 class="mr-auto text-base font-medium flex items-center">
             <x-base.lucide icon="Building" class="w-5 h-5 mr-2 text-green-500" />

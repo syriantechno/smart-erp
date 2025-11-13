@@ -1,9 +1,6 @@
 // Load static files
 import.meta.glob(["../images/**"]);
 
-// Load theme customizer
-import './theme-customizer';
-
 // Load theme settings for settings page
 import './theme-settings';
 
