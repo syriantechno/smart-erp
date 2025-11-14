@@ -153,29 +153,6 @@
 <!-- Toast Container -->
 <div id="global-toast-container"></div>
 
-<!-- Confirm Modal -->
-<div id="global-confirm-modal">
-    <div class="confirm-modal-content">
-        <div class="confirm-modal-header">
-            <div id="confirm-icon-container"></div>
-            <div class="ml-4">
-                <h3 id="confirm-title" class="text-lg font-semibold text-slate-800"></h3>
-            </div>
-        </div>
-        <div class="confirm-modal-body">
-            <p id="confirm-message" class="text-slate-600"></p>
-        </div>
-        <div class="confirm-modal-actions">
-            <button id="confirm-cancel-btn" class="px-4 py-2 text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">
-                Cancel
-            </button>
-            <button id="confirm-ok-btn" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-                Confirm
-            </button>
-        </div>
-    </div>
-</div>
-
 <!-- Session Notifications -->
 @if(session()->has('notification'))
     @php
@@ -370,63 +347,15 @@
 
         const config = { ...defaults, ...options };
 
-        const modal = document.getElementById('global-confirm-modal');
-        const iconContainer = document.getElementById('confirm-icon-container');
-        const titleElement = document.getElementById('confirm-title');
-        const messageElement = document.getElementById('confirm-message');
-        const cancelBtn = document.getElementById('confirm-cancel-btn');
-        const confirmBtn = document.getElementById('confirm-ok-btn');
-
-        // تحديث المحتوى
-        const templateId = `confirm-template-${config.type}`;
-        const template = document.getElementById(templateId);
-
-        if (template) {
-            const iconNode = template.cloneNode(true);
-            iconContainer.innerHTML = '';
-            iconContainer.appendChild(iconNode);
-        }
-
-        titleElement.textContent = config.title;
-        messageElement.textContent = config.message;
-        cancelBtn.textContent = config.cancelText;
-        confirmBtn.textContent = config.confirmText;
-        confirmBtn.className = `px-4 py-2 text-white rounded-lg transition-colors ${config.confirmButtonClass}`;
-
-        // إظهار النافذة
-        modal.style.display = 'flex';
-
         return new Promise((resolve) => {
-            const handleConfirm = () => {
-                modal.style.display = 'none';
-                config.onConfirm();
+            const confirmed = window.confirm(config.message);
+            if (confirmed) {
+                try { config.onConfirm(); } catch (e) {}
                 resolve(true);
-            };
-
-            const handleCancel = () => {
-                modal.style.display = 'none';
-                config.onCancel();
+            } else {
+                try { config.onCancel(); } catch (e) {}
                 resolve(false);
-            };
-
-            confirmBtn.onclick = handleConfirm;
-            cancelBtn.onclick = handleCancel;
-
-            // إغلاق عند النقر خارج النافذة
-            modal.onclick = (e) => {
-                if (e.target === modal) {
-                    handleCancel();
-                }
-            };
-
-            // إغلاق عند الضغط على Escape
-            const handleEscape = (e) => {
-                if (e.key === 'Escape') {
-                    handleCancel();
-                    document.removeEventListener('keydown', handleEscape);
-                }
-            };
-            document.addEventListener('keydown', handleEscape);
+            }
         });
     };
 

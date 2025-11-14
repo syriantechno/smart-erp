@@ -22,8 +22,10 @@
                 </x-base.button>
                 <div class="mt-6 border-t border-white/10 pt-6 text-white dark:border-darkmode-400">
                     <a
-                        href="{{ route('electronic-mail.index', ['folder' => 'inbox']) }}"
-                        class="flex items-center rounded-md px-3 py-2 font-medium {{ $currentFolder === 'inbox' ? 'bg-white/10 dark:bg-darkmode-700' : '' }}"
+                        href="javascript:void(0)"
+                        class="js-mail-folder-link flex items-center rounded-md px-3 py-2 font-medium {{ $currentFolder === 'inbox' ? 'bg-white/10 dark:bg-darkmode-700' : '' }}"
+                        data-folder="inbox"
+                        onclick="return changeMailFolder(event, 'inbox')"
                     >
                         <x-base.lucide
                             class="mr-2 h-4 w-4"
@@ -34,8 +36,10 @@
                         @endif
                     </a>
                     <a
-                        href="{{ route('electronic-mail.index', ['folder' => 'starred']) }}"
-                        class="mt-2 flex items-center rounded-md px-3 py-2 {{ $currentFolder === 'starred' ? 'bg-white/10 dark:bg-darkmode-700' : '' }}"
+                        href="javascript:void(0)"
+                        class="js-mail-folder-link mt-2 flex items-center rounded-md px-3 py-2 {{ $currentFolder === 'starred' ? 'bg-white/10 dark:bg-darkmode-700' : '' }}"
+                        data-folder="starred"
+                        onclick="return changeMailFolder(event, 'starred')"
                     >
                         <x-base.lucide
                             class="mr-2 h-4 w-4"
@@ -46,8 +50,10 @@
                         @endif
                     </a>
                     <a
-                        href="{{ route('electronic-mail.index', ['folder' => 'sent']) }}"
-                        class="mt-2 flex items-center rounded-md px-3 py-2 {{ $currentFolder === 'sent' ? 'bg-white/10 dark:bg-darkmode-700' : '' }}"
+                        href="javascript:void(0)"
+                        class="js-mail-folder-link mt-2 flex items-center rounded-md px-3 py-2 {{ $currentFolder === 'sent' ? 'bg-white/10 dark:bg-darkmode-700' : '' }}"
+                        data-folder="sent"
+                        onclick="return changeMailFolder(event, 'sent')"
                     >
                         <x-base.lucide
                             class="mr-2 h-4 w-4"
@@ -58,8 +64,10 @@
                         @endif
                     </a>
                     <a
-                        href="{{ route('electronic-mail.index', ['folder' => 'draft']) }}"
-                        class="mt-2 flex items-center rounded-md px-3 py-2 {{ $currentFolder === 'draft' ? 'bg-white/10 dark:bg-darkmode-700' : '' }}"
+                        href="javascript:void(0)"
+                        class="js-mail-folder-link mt-2 flex items-center rounded-md px-3 py-2 {{ $currentFolder === 'draft' ? 'bg-white/10 dark:bg-darkmode-700' : '' }}"
+                        data-folder="draft"
+                        onclick="return changeMailFolder(event, 'draft')"
                     >
                         <x-base.lucide
                             class="mr-2 h-4 w-4"
@@ -243,30 +251,15 @@
         </div>
     </div>
 
-    <!-- View Mail Modal -->
-    <div id="view-mail-modal" class="modal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="font-medium text-base mr-auto" id="mail-subject"></h2>
-                    <button type="button" class="text-slate-400 hover:text-slate-600" data-tw-dismiss="modal">
-                        <x-base.lucide icon="X" class="w-6 h-6" />
-                    </button>
-                </div>
-                <div class="modal-body p-6">
-                    <div id="mail-content">
-                        <!-- Mail content will be loaded here -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+ 
+    
 @endsection
 
 @push('scripts')
     <script>
         let currentPage = 1;
         let totalRecords = 0;
+        let currentFolder = '{{ $currentFolder }}';
 
         $(document).ready(function() {
             loadMails();
@@ -287,9 +280,39 @@
             });
         }
 
+        // Global handler for folder changes (used by inline onclick on sidebar links)
+        window.changeMailFolder = function(event, folder) {
+            if (event) {
+                event.preventDefault();
+            }
+
+            if (!folder || folder === currentFolder) {
+                return false;
+            }
+
+            currentFolder = folder;
+            currentPage = 1;
+
+       
+            // Update active state visually
+            $('.js-mail-folder-link').removeClass('bg-white/10 dark:bg-darkmode-700');
+            $(`.js-mail-folder-link[data-folder="${folder}"]`).addClass('bg-white/10 dark:bg-darkmode-700');
+
+            // Update URL query string without reloading the page
+            const url = new URL(window.location.href);
+            url.searchParams.set('folder', currentFolder);
+            window.history.replaceState({}, '', url.toString());
+
+            // Reload mails for the selected folder
+            loadMails();
+
+            // Prevent navigation
+            return false;
+        };
+
         function loadMails() {
             const search = $('#mail-search').val();
-            const folder = '{{ $currentFolder }}';
+            const folder = currentFolder;
 
             $('#mails-container').html('<div class="text-center py-8 text-slate-500">Loading mails...</div>');
 
