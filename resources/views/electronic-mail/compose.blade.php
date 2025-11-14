@@ -31,7 +31,7 @@
 
                         <!-- Mail Type & Priority -->
                         <div class="grid grid-cols-12 gap-4 mb-6">
-                            <div class="col-span-12 md:col-span-6">
+                            <div class="col-span-12 md:col-span-3">
                                 <label class="form-label">Mail Type <span class="text-danger">*</span></label>
                                 <x-base.form-select id="mail-type" name="type" class="w-full" required>
                                     <option value="outgoing">Outgoing (Send)</option>
@@ -39,7 +39,7 @@
                                 </x-base.form-select>
                             </div>
 
-                            <div class="col-span-12 md:col-span-6">
+                            <div class="col-span-12 md:col-span-3">
                                 <label class="form-label">Priority <span class="text-danger">*</span></label>
                                 <x-base.form-select id="mail-priority" name="priority" class="w-full" required>
                                     <option value="normal">Normal</option>
@@ -55,7 +55,7 @@
                             <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">Recipients</h4>
 
                             <div class="grid grid-cols-12 gap-4">
-                                <div class="col-span-12 md:col-span-6">
+                                <div class="col-span-12 md:col-span-3">
                                     <label class="form-label">Recipient Name</label>
                                     <x-base.form-input
                                         id="recipient-name"
@@ -66,7 +66,7 @@
                                     />
                                 </div>
 
-                                <div class="col-span-12 md:col-span-6">
+                                <div class="col-span-12 md:col-span-3">
                                     <label class="form-label">Recipient Email</label>
                                     <x-base.form-input
                                         id="recipient-email"
@@ -77,7 +77,7 @@
                                     />
                                 </div>
 
-                                <div class="col-span-12 md:col-span-6">
+                                <div class="col-span-12 md:col-span-3">
                                     <label class="form-label">Internal User (Optional)</label>
                                     <x-base.form-select id="recipient-user-id" name="recipient_user_id" class="w-full">
                                         <option value="">Select internal user</option>
@@ -87,7 +87,7 @@
                                     </x-base.form-select>
                                 </div>
 
-                                <div class="col-span-12 md:col-span-6">
+                                <div class="col-span-12 md:col-span-3">
                                     <label class="form-label">CC (Optional)</label>
                                     <x-base.form-input
                                         id="cc"
@@ -106,7 +106,7 @@
                             <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">Sender Information</h4>
 
                             <div class="grid grid-cols-12 gap-4">
-                                <div class="col-span-12 md:col-span-6">
+                                <div class="col-span-12 md:col-span-3">
                                     <label class="form-label">Sender Name</label>
                                     <x-base.form-input
                                         id="sender-name"
@@ -166,7 +166,7 @@
                             <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">Organization</h4>
 
                             <div class="grid grid-cols-12 gap-4">
-                                <div class="col-span-12 md:col-span-6">
+                                <div class="col-span-12 md:col-span-3">
                                     <label class="form-label">Company</label>
                                     <x-base.form-select id="company-id" name="company_id" class="w-full">
                                         <option value="">Select Company</option>
@@ -365,16 +365,13 @@
             const companySelect = document.getElementById('company-id');
             const departmentSelect = document.getElementById('department-id');
 
+            if (!companySelect || !departmentSelect) {
+                return;
+            }
+
+            // Simple safe handler: when company changes, reset department selection
             companySelect.addEventListener('change', function() {
-                departmentSelect.innerHTML = '<option value="">Select Department</option>';
-                @foreach($departments as $department)
-                    if ({{ $department->company_id }} == this.value || this.value === '') {
-                        const option = document.createElement('option');
-                        option.value = '{{ $department->id }}';
-                        option.textContent = '{{ $department->name }}';
-                        departmentSelect.appendChild(option);
-                    }
-                @endforeach
+                departmentSelect.selectedIndex = 0;
             });
         }
 

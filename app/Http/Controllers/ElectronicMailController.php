@@ -7,6 +7,7 @@ use App\Models\Department;
 use App\Models\Company;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use App\Services\DocumentCodeGenerator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -217,6 +218,11 @@ class ElectronicMailController extends Controller
                 $data['recipient_user_id'] = auth()->id();
             }
 
+            // If this is an outgoing mail that should be sent now, use the user's personal SMTP settings
+            if ($request->type === 'outgoing' && $request->status === 'sent') {
+                $this->sendOutgoingMailUsingUserAccount($data);
+            }
+
             ElectronicMail::create($data);
 
             DB::commit();
@@ -323,5 +329,70 @@ class ElectronicMailController extends Controller
         $users = User::select('id', 'name', 'email')->get();
 
         return view('electronic-mail.compose', compact('companies', 'departments', 'users'));
+    }
+
+    /**
+     * Configure a temporary mailer using the current user's personal mail account
+     * and send the outgoing email.
+     *
+     * @throws \RuntimeException on missing account or SMTP failure
+     */
+    private function sendOutgoingMailUsingUserAccount(array $data): void
+    {
+        $user = Auth::user();
+        if (! $user) {
+            throw new \RuntimeException('User not authenticated while sending mail.');
+        }
+
+        $account = $user->defaultMailAccount;
+        if (! $account) {
+            throw new \RuntimeException('No personal mail account configured for the current user.');
+        }
+
+        if (empty($data['recipient_email'])) {
+            throw new \RuntimeException('Recipient email is required to send mail.');
+        }
+
+        // Configure a runtime mailer named "user_smtp" using the account settings
+        config([
+            'mail.mailers.user_smtp' => [
+                'transport' => 'smtp',
+                'host' => $account->smtp_host,
+                'port' => $account->smtp_port,
+                'encryption' => $account->smtp_encryption ?: null,
+                'username' => $account->smtp_username,
+                'password' => $account->smtp_password,
+                'timeout' => null,
+                'auth_mode' => null,
+            ],
+            'mail.from.address' => $account->from_email ?: $account->smtp_username,
+            'mail.from.name' => $account->from_name ?: $user->name,
+        ]);
+
+        $subject = $data['subject'] ?? '(No Subject)';
+        $body = $data['content'] ?? '';
+
+        try {
+            Mail::mailer('user_smtp')->raw($body, function ($message) use ($data, $subject) {
+                $message->to($data['recipient_email']);
+
+                if (!empty($data['recipient_name'])) {
+                    $message->to($data['recipient_email'], $data['recipient_name']);
+                }
+
+                $message->subject($subject);
+
+                // Handle CC if provided as array
+                if (!empty($data['cc']) && is_array($data['cc'])) {
+                    foreach ($data['cc'] as $ccEmail) {
+                        if ($ccEmail) {
+                            $message->cc($ccEmail);
+                        }
+                    }
+                }
+            });
+        } catch (\Throwable $e) {
+            throw new \RuntimeException('SMTP send failed: ' . $e->getMessage());
+        }
     }
 }
