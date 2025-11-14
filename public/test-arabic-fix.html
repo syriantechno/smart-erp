@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arabic Encoding Fix Test</title>
+    <script src="js/pdf-export-helper.js"></script>
+    <script src="js/arabic-fix-direct.js"></script>
+</head>
+<body>
+    <h1>Arabic Encoding Fix Test</h1>
+    
+    <div>
+        <h3>Test Corrupted Text:</h3>
+        <p id="corrupted-text">•þŽþãþîþàþÌþäþßþ• þ"þôþèþØþ— þâþ´þ× þ"þãþªþØþ˜þäþßþ• þŽþôþŸþîþßþîþèþÜþ˜þßþ• þ"þÛþ®þ· 3</p>
+        
+        <h3>Fixed Text:</h3>
+        <p id="fixed-text"></p>
+        
+        <button onclick="testFix()">Test Arabic Fix</button>
+        <button onclick="testPDF()">Test PDF Export</button>
+    </div>
+    
+    <script>
+        function testFix() {
+            const corrupted = document.getElementById('corrupted-text').innerText;
+            const fixed = window.PDFExporter.fixArabicEncoding(corrupted);
+            document.getElementById('fixed-text').innerText = fixed;
+            console.log('Original:', corrupted);
+            console.log('Fixed:', fixed);
+        }
+        
+        function testPDF() {
+            const headers = ['#', 'Department', 'Status', 'Employees'];
+            const data = [
+                ['1', 'قسم', 'نشط', 'لديه ثلاثة موظفين'],
+                ['2', 'قسم المبيعات', 'نشط', 'لديه خمسة موظفين']
+            ];
+            
+            window.PDFExporter.exportToPDF(data, headers, 'Departments Report', 'test-departments');
+        }
+        
+        // Auto-test on load
+        document.addEventListener('DOMContentLoaded', testFix);
+    </script>
+</body>
+</html>

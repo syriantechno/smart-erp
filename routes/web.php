@@ -368,5 +368,23 @@ Route::middleware('auth')->group(function () {
         Route::get('slider-page', 'slider')->name('slider');
         Route::get('image-zoom-page', 'imageZoom')->name('image-zoom');
     });
+
+    // Notification Routes
+    Route::prefix('notifications')->name('notifications.')->middleware('auth')->group(function () {
+        Route::get('/', [App\Http\Controllers\NotificationController::class, 'index'])->name('index');
+        Route::get('/unread-count', [App\Http\Controllers\NotificationController::class, 'unreadCount'])->name('unread-count');
+        Route::get('/recent', [App\Http\Controllers\NotificationController::class, 'recent'])->name('recent');
+        Route::patch('/{notification}/read', [App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('mark-read');
+        Route::patch('/mark-all-read', [App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('mark-all-read');
+        Route::delete('/{notification}', [App\Http\Controllers\NotificationController::class, 'destroy'])->name('destroy');
+        Route::delete('/delete-all', [App\Http\Controllers\NotificationController::class, 'destroyAll'])->name('delete-all');
+        Route::post('/create', [App\Http\Controllers\NotificationController::class, 'createNotification'])->name('create');
+        Route::post('/send-to-users', [App\Http\Controllers\NotificationController::class, 'sendToUsers'])->name('send-to-users');
+    });
+
+    // Notification Page Route
+    Route::get('/notifications-page', function () {
+        return view('notifications.index');
+    })->name('notifications.page');
 });
     // Manufacturing Routes

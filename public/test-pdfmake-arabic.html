@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDFMake Arabic Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .corrupted { color: red; }
+        .fixed { color: green; }
+    </style>
+</head>
+<body>
+    <h1>PDFMake Arabic Support Test</h1>
+    
+    <div class="test-section">
+        <h3>Test Corrupted Arabic Text</h3>
+        <p class="corrupted" id="corrupted">•þŽþãþîþàþÌþäþßþ• þ"þôþèþØþ— þâþ´þ× þ"þãþªþØþ˜þäþßþ• þŽþôþŸþîþßþîþèþÜþ˜þßþ• þ"þÛþ®þ· 3</p>
+        <p class="fixed" id="fixed"></p>
+        <button onclick="testTextFix()">Test Text Fix</button>
+    </div>
+    
+    <div class="test-section">
+        <h3>PDF Export Test</h3>
+        <button onclick="testPDFMake()">Export PDF with PDFMake (Strong Arabic Support)</button>
+        <button onclick="testOriginalPDF()">Export PDF with Original Method</button>
+    </div>
+    
+    <script src="js/pdf-export-helper.js"></script>
+    <script src="js/pdfmake-arabic.js"></script>
+    
+    <script>
+        function testTextFix() {
+            const corrupted = document.getElementById('corrupted').innerText;
+            const fixed = window.PDFExporterArabic.fixArabicText(corrupted);
+            document.getElementById('fixed').innerText = fixed;
+            console.log('Original:', corrupted);
+            console.log('Fixed:', fixed);
+        }
+        
+        function testPDFMake() {
+            const headers = ['#', 'القسم', 'الحالة', 'الموظفين'];
+            const data = [
+                ['1', 'قسم المبيعات', 'نشط', 'لديه ثلاثة موظفين'],
+                ['2', 'قسم الموارد البشرية', 'نشط', 'لديه خمسة موظفين'],
+                ['3', '•þŽþãþîþàþÌþäþßþ• þ"þôþèþØþ— þâþ´þ× þ"þãþªþØþ˜þäþßþ• þŽþôþŸþîþßþîþèþÜþ˜þßþ• þ"þÛþ®þ· 3', 'نشط', '5']
+            ];
+            
+            window.PDFExporterArabic.exportToPDF(data, headers, 'تقرير الأقسام', 'departments-test');
+        }
+        
+        function testOriginalPDF() {
+            const headers = ['#', 'القسم', 'الحالة', 'الموظفين'];
+            const data = [
+                ['1', 'قسم المبيعات', 'نشط', 'لديه ثلاثة موظفين'],
+                ['2', 'قسم الموارد البشرية', 'نشط', 'لديه خمسة موظفين'],
+                ['3', '•þŽþãþîþàþÌþäþßþ• þ"þôþèþØþ— þâþ´þ× þ"þãþªþØþ˜þäþßþ• þŽþôþŸþîþßþîþèþÜþ˜þßþ• þ"þÛþ®þ· 3', 'نشط', '5']
+            ];
+            
+            // This will use the original jsPDF method
+            window.PDFExporter.exportToPDF(data, headers, 'تقرير الأقسام', 'departments-original');
+        }
+        
+        // Auto-test on load
+        document.addEventListener('DOMContentLoaded', testTextFix);
+    </script>
+</body>
+</html>

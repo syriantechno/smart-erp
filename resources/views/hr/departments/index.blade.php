@@ -7,6 +7,45 @@
 @include('components.datatable.styles')
 @include('components.datatable.theme')
 
+@push('styles')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+    <style>
+        /* Make table more compact with better readability */
+        #departments-table {
+            font-size: 0.95rem; /* 15px - slightly larger */
+            line-height: 1.4;
+        }
+
+        #departments-table tbody tr {
+            height: 2.25rem; /* 36px - more compact */
+        }
+
+        #departments-table th {
+            font-size: 0.8rem; /* 13px - slightly larger headers */
+            font-weight: 700;
+            padding: 0.5rem 1.25rem; /* py-2 px-5 */
+        }
+
+        #departments-table td {
+            padding: 0.375rem 1.25rem; /* py-1.5 px-5 - even more compact */
+        }
+
+        /* Status badges - compact and readable */
+        #departments-table .inline-flex {
+            padding: 0.125rem 0.5rem; /* 2px 8px */
+            font-size: 0.75rem; /* 12px */
+            font-weight: 600;
+        }
+
+        /* Actions column - keep compact */
+        #departments-table .px-5.py-1\.5 {
+            padding: 0.375rem 1.25rem;
+        }
+    </style>
+@endpush
+
 @section('subcontent')
     @include('components.global-notifications')
     <div class="intro-y mt-8 flex items-center">
@@ -80,7 +119,7 @@
                                 </label>
                                 <x-base.form-select id="departments-filter-length" class="mt-2 w-full sm:mt-0 sm:w-auto">
                                     <option value="10">10</option>
-                                    <option value="25">25</option>
+                                    <option value="25" selected>25</option>
                                     <option value="50">50</option>
                                     <option value="100">100</option>
                                 </x-base.form-select>
@@ -109,14 +148,14 @@
                         <table id="departments-table" data-tw-merge data-erp-table class="datatable-default w-full min-w-full table-auto text-left text-sm">
                             <thead>
                                 <tr>
-                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">#</th>
-                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Code</th>
-                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Name</th>
-                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Company</th>
-                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Manager</th>
-                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Employees</th>
-                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Status</th>
-                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Actions</th>
+                                    <th data-tw-merge class="font-semibold px-5 py-2 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">#</th>
+                                    <th data-tw-merge class="font-semibold px-5 py-2 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Code</th>
+                                    <th data-tw-merge class="font-semibold px-5 py-2 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Name</th>
+                                    <th data-tw-merge class="font-semibold px-5 py-2 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Company</th>
+                                    <th data-tw-merge class="font-semibold px-5 py-2 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Manager</th>
+                                    <th data-tw-merge class="font-semibold px-5 py-2 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Employees</th>
+                                    <th data-tw-merge class="font-semibold px-5 py-2 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Status</th>
+                                    <th data-tw-merge class="font-semibold px-5 py-2 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -146,7 +185,7 @@
         const refreshBtn = document.getElementById('departments-refresh');
         const codeInput = document.getElementById('code');
 
-        const initialLength = lengthSelect ? parseInt(lengthSelect.value, 10) || 10 : 10;
+        const initialLength = lengthSelect ? parseInt(lengthSelect.value, 10) || 25 : 25;
 
         const table = window.initDataTable('#departments-table', {
             ajax: {
@@ -174,16 +213,33 @@
             dom:
                 "t<'datatable-footer flex flex-col md:flex-row md:items-center md:justify-between mt-5 gap-4'<'datatable-info text-slate-500'i><'datatable-pagination'p>>",
             columns: [
-                { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center font-medium' },
-                { data: 'code', name: 'code', className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700 whitespace-nowrap' },
-                { data: 'name', name: 'name', className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700 datatable-cell-wrap' },
+                {
+                    data: 'DT_RowIndex',
+                    name: 'DT_RowIndex',
+                    className: 'px-5 py-1.5 border-b dark:border-darkmode-300 text-center font-medium',
+                    title: '#'
+                },
+                {
+                    data: 'code',
+                    name: 'code',
+                    className: 'px-5 py-1.5 border-b dark:border-darkmode-300 font-medium text-slate-700 whitespace-nowrap',
+                    title: 'Code',
+                    defaultContent: '-'
+                },
+                {
+                    data: 'name',
+                    name: 'name',
+                    className: 'px-5 py-1.5 border-b dark:border-darkmode-300 font-medium text-slate-700 datatable-cell-wrap',
+                    title: 'Name'
+                },
                 {
                     data: 'company',
-
+                    name: 'company.name',
                     render: function (data) {
                         return data && data.name ? data.name : '-';
                     },
-                    className: 'px-5 py-3 border-b dark:border-darkmode-300 datatable-cell-wrap'
+                    className: 'px-5 py-1.5 border-b dark:border-darkmode-300 datatable-cell-wrap',
+                    title: 'Company'
                 },
                 {
                     data: 'manager',
@@ -191,26 +247,34 @@
                     render: function (data) {
                         return data && data.full_name ? data.full_name : '-';
                     },
-                    className: 'px-5 py-3 border-b dark:border-darkmode-300 datatable-cell-wrap'
+                    className: 'px-5 py-1.5 border-b dark:border-darkmode-300 datatable-cell-wrap',
+                    title: 'Manager'
                 },
-                { data: 'employees_count', name: 'employees_count', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center whitespace-nowrap font-medium' },
+                {
+                    data: 'employees_count',
+                    name: 'employees_count',
+                    className: 'px-5 py-1.5 border-b dark:border-darkmode-300 text-center whitespace-nowrap font-medium',
+                    title: 'Employees'
+                },
                 {
                     data: 'is_active',
                     name: 'is_active',
                     className: 'text-center',
+                    title: 'Status',
                     render: function (value) {
                         const status = Boolean(value);
                         const badgeClass = status
                             ? 'bg-green-100 text-green-700'
                             : 'bg-red-100 text-red-700';
                         const label = status ? 'Active' : 'Inactive';
-                        return `<span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${badgeClass}">${label}</span>`;
+                        return `<span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${badgeClass}">${label}</span>`;
                     }
                 },
                 {
                     data: 'actions',
                     name: 'actions',
-                    className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center',
+                    className: 'px-5 py-1.5 border-b dark:border-darkmode-300 text-center',
+                    title: 'Actions',
                     orderable: false,
                     searchable: false
                 }
@@ -285,8 +349,8 @@
                     filterValue.value = '';
                 }
                 if (lengthSelect) {
-                    lengthSelect.value = String(initialLength);
-                    table.page.len(initialLength).draw();
+                    lengthSelect.value = String(25);
+                    table.page.len(25).draw();
                 }
                 reloadTable();
             });

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arabic Font PDF Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; direction: rtl; }
+        .test-box { border: 2px solid #28a745; padding: 20px; margin: 20px 0; border-radius: 8px; }
+        .corrupted { color: red; font-weight: bold; font-size: 18px; }
+        .fixed { color: green; font-weight: bold; font-size: 18px; }
+        button { padding: 15px 30px; margin: 10px; background: #28a745; color: white; border: none; cursor: pointer; font-size: 16px; border-radius: 5px; }
+        button:hover { background: #218838; }
+        .success { color: green; font-weight: bold; }
+        .info { color: #17a2b8; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Arabic Font PDF Export Test</h1>
+    
+    <div class="test-box">
+        <h2>🔧 Corruption Fix Test</h2>
+        <p class="corrupted" id="corrupted-text">•þŽþãþîþàþÌþäþßþ• þ"þôþèþØþ— þâþ´þ× þ"þãþªþØþ˜þäþßþ• þŽþôþŸþîþßþîþèþÜþ˜þßþ• þ"þÛþ®þ· 3</p>
+        <p class="fixed" id="fixed-text">...</p>
+        <button onclick="testTextFix()">✅ Test Text Fix</button>
+    </div>
+    
+    <div class="test-box">
+        <h2>📄 PDF Export with Font Support</h2>
+        <p>Test PDF export with enhanced Arabic font support:</p>
+        <button onclick="testPDFExport()">📥 Export PDF with Arabic Fonts</button>
+        <div id="export-status" class="success"></div>
+        <div id="debug-info" class="info"></div>
+    </div>
+    
+    <div class="test-box">
+        <h2>🧪 Console Test</h2>
+        <p>Open console and run: <code>window.PDFExporterArabicFont.testCorruption()</code></p>
+        <button onclick="runConsoleTest()">🔍 Run Console Test</button>
+    </div>
+    
+    <script src="js/pdf-arabic-font.js"></script>
+    
+    <script>
+        function testTextFix() {
+            console.log('🧪 Testing text fix...');
+            
+            const corrupted = document.getElementById('corrupted-text').innerText;
+            console.log('Corrupted text:', corrupted);
+            
+            const fixed = window.PDFExporterArabicFont.fixArabicText(corrupted);
+            console.log('Fixed text:', fixed);
+            
+            document.getElementById('fixed-text').innerText = fixed;
+            
+            if (fixed.includes('قسم') && !fixed.includes('þ')) {
+                alert('✅ Success! Arabic text corruption was fixed correctly.');
+            } else {
+                alert('❌ Text fix failed. Check console for details.');
+            }
+        }
+        
+        function testPDFExport() {
+            console.log('📄 Testing PDF export with font support...');
+            
+            const status = document.getElementById('export-status');
+            const debug = document.getElementById('debug-info');
+            
+            status.innerText = '⏳ Preparing PDF export with font support...';
+            debug.innerHTML = '';
+            
+            const headers = ['#', 'Department Name', 'الحالة', 'Employees Count'];
+            const data = [
+                ['1', 'Sales Department', 'نشط', 'لديه ثلاثة موظفين'],
+                ['2', 'HR Department', 'نشط', 'لديه خمسة موظفين'],
+                ['3', '•þŽþãþîþàþÌþäþßþ• þ"þôþèþØþ— þâþ´þ× þ"þãþªþØþ˜þäþßþ• þŽþôþŸþîþßþîþèþÜþ˜þßþ• þ"þÛþ®þ· 3', 'نشط', '5'],
+                ['4', 'IT Department', 'نشط', 'لديه عشرة موظفين']
+            ];
+            
+            // Log debug info
+            debug.innerHTML = `
+                <strong>Debug Info:</strong><br>
+                Headers: ${JSON.stringify(headers)}<br>
+                Data sample: ${JSON.stringify(data.slice(0, 2))}<br>
+                Check console for detailed processing...
+            `;
+            
+            window.PDFExporterArabicFont.exportToPDF(data, headers, 'Departments Report - تقرير الأقسام', 'departments-font-test')
+                .then(() => {
+                    status.innerText = '✅ PDF exported successfully with font support! Check your downloads.';
+                    debug.innerHTML = 'Font-based Arabic PDF export completed. Check if Arabic text is now readable.';
+                    setTimeout(() => {
+                        status.innerText = '';
+                        debug.innerHTML = '';
+                    }, 10000);
+                })
+                .catch(error => {
+                    console.error('PDF export failed:', error);
+                    status.innerText = '❌ PDF export failed. Check console.';
+                    debug.innerHTML = `Error: ${error.message}`;
+                    setTimeout(() => {
+                        status.innerText = '';
+                        debug.innerHTML = '';
+                    }, 5000);
+                });
+        }
+        
+        function runConsoleTest() {
+            const result = window.PDFExporterArabicFont.testCorruption();
+            alert(`Console test result:\n\nOriginal: •þŽþãþîþàþÌþäþßþ• þ"þôþèþØþ— þâþ´þ× þ"þãþªþØþ˜þäþßþ• þŽþôþŸþîþßþîþèþÜþ˜þßþ• þ"þÛþ®þ· 3\n\nFixed: ${result}`);
+        }
+        
+        // Auto-test on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Arabic Font PDF test page loaded...');
+            setTimeout(testTextFix, 1000);
+        });
+    </script>
+</body>
+</html>

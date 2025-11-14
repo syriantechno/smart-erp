@@ -74,6 +74,19 @@ License: You must have a valid license purchased only from themeforest(the above
     <script src="{{ asset('vendor/datatables/datatables.min.js') }}"></script>
     <script src="{{ asset('vendor/datatables/sweetalert2.min.js') }}"></script>
 
+    <!-- Alpine.js CDN -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+        // Wait for Alpine.js to load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof Alpine !== 'undefined') {
+                console.log('✅ Alpine.js loaded successfully');
+            } else {
+                console.error('❌ Alpine.js not loaded');
+            }
+        });
+    </script>
+
     <!-- Lucide Icons Local JavaScript -->
     <script src="{{ asset('vendor/lucide/lucide.umd.min.js') }}"></script>
     <script>

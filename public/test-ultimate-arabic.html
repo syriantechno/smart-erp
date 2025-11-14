@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Arabic PDF Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; direction: rtl; }
+        .test-box { border: 2px solid #007bff; padding: 20px; margin: 20px 0; border-radius: 8px; }
+        .corrupted { color: red; font-weight: bold; font-size: 18px; }
+        .fixed { color: green; font-weight: bold; font-size: 18px; }
+        button { padding: 15px 30px; margin: 10px; background: #007bff; color: white; border: none; cursor: pointer; font-size: 16px; border-radius: 5px; }
+        button:hover { background: #0056b3; }
+        .success { color: green; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Ultimate Arabic PDF Export Test</h1>
+    
+    <div class="test-box">
+        <h2>🔧 Text Fixing Test</h2>
+        <p class="corrupted" id="corrupted-text">•þŽþãþîþàþÌþäþßþ• þ"þôþèþØþ— þâþ´þ× þ"þãþªþØþ˜þäþßþ• þŽþôþŸþîþßþîþèþÜþ˜þßþ• þ"þÛþ®þ· 3</p>
+        <p class="fixed" id="fixed-text">...</p>
+        <button onclick="testTextFix()">✅ Fix Arabic Text</button>
+    </div>
+    
+    <div class="test-box">
+        <h2>📄 PDF Export Test</h2>
+        <p>Test PDF export with corrupted and clean Arabic text:</p>
+        <button onclick="testPDFExport()">📥 Export PDF with Arabic Support</button>
+        <div id="export-status" class="success"></div>
+    </div>
+    
+    <script src="js/pdf-arabic-ultimate.js"></script>
+    
+    <script>
+        function testTextFix() {
+            console.log('Testing text fix...');
+            
+            const corrupted = document.getElementById('corrupted-text').innerText;
+            console.log('Corrupted text:', corrupted);
+            
+            const fixed = window.PDFExporterUltimate.fixArabicText(corrupted);
+            console.log('Fixed text:', fixed);
+            
+            document.getElementById('fixed-text').innerText = fixed;
+            
+            if (fixed.includes('قسم') && !fixed.includes('þ')) {
+                alert('✅ Success! Arabic text was fixed correctly.');
+            } else {
+                alert('❌ Text fix failed. Check console for details.');
+            }
+        }
+        
+        function testPDFExport() {
+            console.log('Testing PDF export...');
+            
+            const status = document.getElementById('export-status');
+            status.innerText = '⏳ Preparing PDF export...';
+            
+            const headers = ['#', 'Department Name', 'الحالة', 'Employees Count'];
+            const data = [
+                ['1', 'Sales Department', 'نشط', 'لديه ثلاثة موظفين'],
+                ['2', 'HR Department', 'نشط', 'لديه خمسة موظفين'],
+                ['3', '•þŽþãþîþàþÌþäþßþ• þ"þôþèþØþ— þâþ´þ× þ"þãþªþØþ˜þäþßþ• þŽþôþŸþîþßþîþèþÜþ˜þßþ• þ"þÛþ®þ· 3', 'نشط', '5'],
+                ['4', 'IT Department', 'نشط', 'لديه عشرة موظفين']
+            ];
+            
+            window.PDFExporterUltimate.exportToPDF(data, headers, 'Departments Report - تقرير الأقسام', 'departments-ultimate')
+                .then(() => {
+                    status.innerText = '✅ PDF exported successfully! Check your downloads.';
+                    setTimeout(() => status.innerText = '', 5000);
+                })
+                .catch(error => {
+                    console.error('PDF export failed:', error);
+                    status.innerText = '❌ PDF export failed. Check console.';
+                    setTimeout(() => status.innerText = '', 5000);
+                });
+        }
+        
+        // Auto-test on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, ready for testing...');
+            setTimeout(testTextFix, 1000);
+        });
+    </script>
+</body>
+</html>

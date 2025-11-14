@@ -59,7 +59,10 @@ class PositionController extends Controller
             $validated['code'] = $this->codeGenerator->generate('position');
             $validated['is_active'] = $request->boolean('is_active', true);
 
-            Position::create($validated);
+            $position = Position::create($validated);
+
+            // Send notification
+            \App\Http\Controllers\NotificationController::positionCreated($position);
 
             DB::commit();
 

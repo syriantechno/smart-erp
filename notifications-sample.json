@@ -1,0 +1,135 @@
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "type": "success",
+      "title": "New Position Added",
+      "message": "Position 'Software Developer' has been added to department 'IT Department'.",
+      "user_id": 1,
+      "created_by": 2,
+      "is_read": false,
+      "read_at": null,
+      "action_url": "/hr/positions",
+      "icon": "Plus",
+      "data": null,
+      "created_at": "2025-11-14T11:30:00.000000Z",
+      "updated_at": "2025-11-14T11:30:00.000000Z",
+      "creator": {
+        "id": 2,
+        "name": "Admin User",
+        "email": "admin@example.com"
+      }
+    },
+    {
+      "id": 2,
+      "type": "success",
+      "title": "New Department Added",
+      "message": "Department 'Human Resources' has been created.",
+      "user_id": 1,
+      "created_by": 3,
+      "is_read": false,
+      "read_at": null,
+      "action_url": "/hr/departments",
+      "icon": "Building",
+      "data": null,
+      "created_at": "2025-11-14T11:25:00.000000Z",
+      "updated_at": "2025-11-14T11:25:00.000000Z",
+      "creator": {
+        "id": 3,
+        "name": "HR Manager",
+        "email": "hr@example.com"
+      }
+    },
+    {
+      "id": 3,
+      "type": "info",
+      "title": "Welcome to the ERP System",
+      "message": "Welcome! You have successfully logged into the ERP system. Explore the features available.",
+      "user_id": 1,
+      "created_by": 1,
+      "is_read": true,
+      "read_at": "2025-11-14T11:20:00.000000Z",
+      "action_url": "/dashboard",
+      "icon": "InformationCircle",
+      "data": null,
+      "created_at": "2025-11-14T11:15:00.000000Z",
+      "updated_at": "2025-11-14T11:20:00.000000Z",
+      "creator": {
+        "id": 1,
+        "name": "System",
+        "email": "system@example.com"
+      }
+    },
+    {
+      "id": 4,
+      "type": "warning",
+      "title": "System Maintenance",
+      "message": "Scheduled maintenance will occur tonight from 2:00 AM to 4:00 AM. Some features may be unavailable.",
+      "user_id": 1,
+      "created_by": 1,
+      "is_read": false,
+      "read_at": null,
+      "action_url": "/maintenance",
+      "icon": "ExclamationTriangle",
+      "data": null,
+      "created_at": "2025-11-14T11:10:00.000000Z",
+      "updated_at": "2025-11-14T11:10:00.000000Z",
+      "creator": {
+        "id": 1,
+        "name": "System",
+        "email": "system@example.com"
+      }
+    },
+    {
+      "id": 5,
+      "type": "error",
+      "title": "Failed Login Attempt",
+      "message": "There was a failed login attempt to your account from IP 192.168.1.100. Please verify your account security.",
+      "user_id": 1,
+      "created_by": 1,
+      "is_read": false,
+      "read_at": null,
+      "action_url": "/profile/security",
+      "icon": "ExclamationCircle",
+      "data": {
+        "ip_address": "192.168.1.100",
+        "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "attempt_time": "2025-11-14T11:05:00.000000Z"
+      },
+      "created_at": "2025-11-14T11:05:00.000000Z",
+      "updated_at": "2025-11-14T11:05:00.000000Z",
+      "creator": {
+        "id": 1,
+        "name": "Security System",
+        "email": "security@example.com"
+      }
+    },
+    {
+      "id": 6,
+      "type": "success",
+      "title": "Task Completed",
+      "message": "Your task 'Review quarterly reports' has been marked as completed.",
+      "user_id": 1,
+      "created_by": 4,
+      "is_read": true,
+      "read_at": "2025-11-14T11:00:00.000000Z",
+      "action_url": "/tasks/123",
+      "icon": "CheckCircle",
+      "data": {
+        "task_id": 123,
+        "task_name": "Review quarterly reports",
+        "completed_at": "2025-11-14T11:00:00.000000Z"
+      },
+      "created_at": "2025-11-14T11:00:00.000000Z",
+      "updated_at": "2025-11-14T11:00:00.000000Z",
+      "creator": {
+        "id": 4,
+        "name": "Task Manager",
+        "email": "tasks@example.com"
+      }
+    }
+  ],
+  "unread_count": 4,
+  "total_count": 6
+}
