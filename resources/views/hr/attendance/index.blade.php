@@ -124,33 +124,33 @@
                         </div>
                     </div>
 
-                    <div class="mt-4 flex flex-wrap items-center gap-3 text-xs text-slate-600 dark:text-slate-300">
+                    <div class="mt-4 flex flex-wrap items-center gap-4 text-xs bg-slate-800 text-slate-100 dark:bg-slate-800 dark:text-slate-100 rounded-lg px-4 py-3">
                         <div class="flex items-center gap-2">
-                            <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold bg-success text-white">✓</span>
+                            <span class="text-base">✓</span>
                             <span>Present (Full Day)</span>
                         </div>
                         <div class="flex items-center gap-2">
-                            <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold bg-danger text-white">✗</span>
+                            <span class="text-base">✗</span>
                             <span>Absent</span>
                         </div>
                         <div class="flex items-center gap-2">
-                            <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold bg-info text-white">🏖️</span>
+                            <span class="text-base">🏖️</span>
                             <span>Vacation</span>
                         </div>
                         <div class="flex items-center gap-2">
-                            <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold bg-warning text-white">✈️</span>
+                            <span class="text-base">✈️</span>
                             <span>Travel</span>
                         </div>
                         <div class="flex items-center gap-2">
-                            <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold bg-secondary text-white">½</span>
+                            <span class="text-base">½</span>
                             <span>Half Day</span>
                         </div>
                         <div class="flex items-center gap-2">
-                            <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold bg-primary text-white">🎉</span>
+                            <span class="text-base">🎉</span>
                             <span>Weekend & Holidays</span>
                         </div>
                         <div class="flex items-center gap-2">
-                            <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold bg-slate-100 text-slate-400">❌</span>
+                            <span class="text-base">❌</span>
                             <span>Not Recorded</span>
                         </div>
                     </div>
