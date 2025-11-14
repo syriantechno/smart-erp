@@ -4,7 +4,7 @@ if (!function_exists('notify_success')) {
     /**
      * إرسال إشعار نجاح
      */
-    function notify_success(string $message, string $title = 'نجح!'): void
+    function notify_success(string $message, string $title = 'Success!'): void
     {
         session()->flash('notification', [
             'type' => 'success',
@@ -18,7 +18,7 @@ if (!function_exists('notify_error')) {
     /**
      * إرسال إشعار خطأ
      */
-    function notify_error(string $message, string $title = 'خطأ!'): void
+    function notify_error(string $message, string $title = 'Error!'): void
     {
         session()->flash('notification', [
             'type' => 'error',
@@ -32,7 +32,7 @@ if (!function_exists('notify_warning')) {
     /**
      * إرسال إشعار تحذير
      */
-    function notify_warning(string $message, string $title = 'تحذير!'): void
+    function notify_warning(string $message, string $title = 'Warning!'): void
     {
         session()->flash('notification', [
             'type' => 'warning',
@@ -46,7 +46,7 @@ if (!function_exists('notify_info')) {
     /**
      * إرسال إشعار معلومات
      */
-    function notify_info(string $message, string $title = 'معلومات'): void
+    function notify_info(string $message, string $title = 'Information'): void
     {
         session()->flash('notification', [
             'type' => 'info',

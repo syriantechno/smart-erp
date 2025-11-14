@@ -226,6 +226,55 @@
             });
         }
 
+        // Handle Notification Settings Form with AJAX
+        const notificationForm = document.getElementById('notification-settings-form');
+        if (notificationForm && !notificationForm.dataset.listenerAdded) {
+            console.log('Notification settings form found');
+            notificationForm.dataset.listenerAdded = 'true';
+
+            notificationForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Saving...';
+
+                fetch('{{ route("settings.notifications.update") }}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        window.showToast(data.message || 'Notification settings updated successfully!', 'success');
+                    } else {
+                        window.showToast(data.message || 'Error updating notification settings', 'error');
+                    }
+                })
+                .catch(error => {
+                    window.showToast('An error occurred while saving notification settings', 'error');
+                    console.error('Error:', error);
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                });
+            });
+        }
+
         // Preview functionality for prefix settings
         function updatePreview(id) {
             const prefix = document.querySelector(`.prefix-input[data-id="${id}"]`)?.value;

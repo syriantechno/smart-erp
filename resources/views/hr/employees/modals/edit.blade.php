@@ -40,12 +40,35 @@
 
             <div class="col-span-12 md:col-span-6">
                 <x-base.form-label for="edit-hire-date">Hire Date <span class="text-danger">*</span></x-base.form-label>
-                <x-base.form-input id="edit-hire-date" name="hire_date" type="date" class="w-full" required />
+                <div class="relative mx-auto w-56">
+                    <div
+                        class="absolute flex h-full w-10 items-center justify-center rounded-l border bg-slate-100 text-slate-500 dark:border-darkmode-800 dark:bg-darkmode-700 dark:text-slate-400">
+                        <x-base.lucide icon="calendar" class="stroke-1.5 w-5 h-5"></x-base.lucide>
+                    </div>
+                    <x-base.litepicker
+                        id="edit-hire-date"
+                        name="hire_date"
+                        class="pl-12"
+                        data-single-mode="true"
+                        required
+                    />
+                </div>
             </div>
 
             <div class="col-span-12 md:col-span-6">
                 <x-base.form-label for="edit-birth-date">Birth Date</x-base.form-label>
-                <x-base.form-input id="edit-birth-date" name="birth_date" type="date" class="w-full" />
+                <div class="relative mx-auto w-56">
+                    <div
+                        class="absolute flex h-full w-10 items-center justify-center rounded-l border bg-slate-100 text-slate-500 dark:border-darkmode-800 dark:bg-darkmode-700 dark:text-slate-400">
+                        <x-base.lucide icon="calendar" class="stroke-1.5 w-5 h-5"></x-base.lucide>
+                    </div>
+                    <x-base.litepicker
+                        id="edit-birth-date"
+                        name="birth_date"
+                        class="pl-12"
+                        data-single-mode="true"
+                    />
+                </div>
             </div>
 
             <div class="col-span-12 md:col-span-6">

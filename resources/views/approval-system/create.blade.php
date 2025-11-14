@@ -93,12 +93,34 @@
                             <div class="grid grid-cols-12 gap-4">
                                 <div class="col-span-12 md:col-span-6">
                                     <label class="form-label">Start Date</label>
-                                    <input id="request-start-date" name="start_date" type="date" class="w-full form-control" />
+                                    <div class="relative mx-auto w-56">
+                                        <div
+                                            class="absolute flex h-full w-10 items-center justify-center rounded-l border bg-slate-100 text-slate-500 dark:border-darkmode-800 dark:bg-darkmode-700 dark:text-slate-400">
+                                            <x-base.lucide icon="calendar" class="stroke-1.5 w-5 h-5"></x-base.lucide>
+                                        </div>
+                                        <x-base.litepicker
+                                            id="request-start-date"
+                                            name="start_date"
+                                            class="pl-12"
+                                            data-single-mode="true"
+                                        />
+                                    </div>
                                 </div>
 
                                 <div class="col-span-12 md:col-span-6">
                                     <label class="form-label">End Date</label>
-                                    <input id="request-end-date" name="end_date" type="date" class="w-full form-control" />
+                                    <div class="relative mx-auto w-56">
+                                        <div
+                                            class="absolute flex h-full w-10 items-center justify-center rounded-l border bg-slate-100 text-slate-500 dark:border-darkmode-800 dark:bg-darkmode-700 dark:text-slate-400">
+                                            <x-base.lucide icon="calendar" class="stroke-1.5 w-5 h-5"></x-base.lucide>
+                                        </div>
+                                        <x-base.litepicker
+                                            id="request-end-date"
+                                            name="end_date"
+                                            class="pl-12"
+                                            data-single-mode="true"
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>

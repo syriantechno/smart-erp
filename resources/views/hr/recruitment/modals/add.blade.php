@@ -62,14 +62,20 @@
                             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                                 Application Date *
                             </label>
-                            <x-base.form-input
-                                id="application_date"
-                                name="application_date"
-                                type="date"
-                                class="w-full"
-                                :value="date('Y-m-d')"
-                                required
-                            />
+                            <div class="relative mx-auto w-56">
+                                <div
+                                    class="absolute flex h-full w-10 items-center justify-center rounded-l border bg-slate-100 text-slate-500 dark:border-darkmode-800 dark:bg-darkmode-700 dark:text-slate-400">
+                                    <x-base.lucide icon="calendar" class="stroke-1.5 w-5 h-5"></x-base.lucide>
+                                </div>
+                                <x-base.litepicker
+                                    id="application_date"
+                                    name="application_date"
+                                    class="pl-12"
+                                    data-single-mode="true"
+                                    :value="date('Y-m-d')"
+                                    required
+                                />
+                            </div>
                         </div>
                     </div>
 

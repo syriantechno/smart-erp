@@ -173,6 +173,7 @@
 @include('components.datatable.scripts')
 
 @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         const filterField = document.getElementById('departments-filter-field');
@@ -216,7 +217,7 @@
                 {
                     data: 'DT_RowIndex',
                     name: 'DT_RowIndex',
-                    className: 'px-5 py-1.5 border-b dark:border-darkmode-300 text-center font-medium',
+                    className: 'px-5 py-1.5 border-b dark:border-darkmode-300 whitespace-nowrap text-center font-medium',
                     title: '#'
                 },
                 {
@@ -325,6 +326,75 @@
 
         refreshDepartmentCode();
 
+        const closeModal = function (modalEl) {
+            if (!modalEl) {
+                return;
+            }
+
+            const dismissTrigger = modalEl.querySelector('[data-tw-dismiss="modal"]');
+            if (dismissTrigger) {
+                dismissTrigger.click();
+            }
+        };
+
+        const createForm = document.getElementById('create-department-form');
+        const createModal = document.getElementById('create-department-modal');
+
+        if (createForm) {
+            createForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                const formData = new FormData(createForm);
+
+                fetch(createForm.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    },
+                    body: formData,
+                })
+                    .then(async (response) => {
+                        if (response.ok) {
+                            return response.json();
+                        }
+
+                        if (response.status === 422) {
+                            const data = await response.json();
+                            const errors = data.errors || {};
+                            const firstError = Object.values(errors)[0];
+                            if (firstError) {
+                                showToast(Array.isArray(firstError) ? firstError[0] : firstError, 'error');
+                            } else {
+                                showToast(data.message || 'Validation error', 'error');
+                            }
+                            throw new Error('validation');
+                        }
+
+                        throw new Error('request');
+                    })
+                    .then((data) => {
+                        if (data.success) {
+                            showToast(data.message || 'Department created successfully', 'success');
+                            createForm.reset();
+                            refreshDepartmentCode();
+                            closeModal(createModal);
+                            reloadTable();
+                        } else {
+                            showToast(data.message || 'Failed to create department', 'error');
+                        }
+                    })
+                    .catch((error) => {
+                        if (error.message === 'validation') {
+                            return;
+                        }
+                        console.error('Department create error:', error);
+                        showToast('An error occurred while saving the department', 'error');
+                    });
+            });
+        }
+
         if (filterGoBtn) {
             filterGoBtn.addEventListener('click', reloadTable);
         }
@@ -373,7 +443,7 @@
                 try {
                     const rows = table.rows({ search: 'applied' }).data().toArray();
                     if (!rows.length) {
-                        showError('No data available for export');
+                        showToast('No data available for export', 'error');
                         return;
                     }
 
@@ -399,10 +469,10 @@
                     link.download = 'departments_' + new Date().toISOString().split('T')[0] + '.csv';
                     link.click();
                     URL.revokeObjectURL(url);
-                    showSuccess('Data exported successfully');
+                    showToast('Data exported successfully', 'success');
                 } catch (error) {
                     console.error('Export error:', error);
-                    showError('Failed to export data');
+                    showToast('Failed to export data', 'error');
                 }
             });
         }
@@ -428,14 +498,14 @@
                 .then(data => {
                     if (data.success) {
                         reloadTable();
-                        showSuccess(data.message || 'Department deleted successfully');
+                        showToast(data.message || 'Department deleted successfully', 'delete');
                     } else {
-                        showError(data.message || 'Failed to delete department');
+                        showToast(data.message || 'Failed to delete department', 'error');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    showError('An error occurred while deleting the department');
+                    showToast('An error occurred while deleting the department', 'error');
                 });
             });
         };

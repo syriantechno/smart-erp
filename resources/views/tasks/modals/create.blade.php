@@ -54,7 +54,18 @@
 
                 <div class="col-span-12 md:col-span-4">
                     <x-base.form-label for="due_date">Due Date</x-base.form-label>
-                    <x-base.form-input id="due_date" name="due_date" type="date" class="w-full" />
+                    <div class="relative mx-auto w-56">
+                        <div
+                            class="absolute flex h-full w-10 items-center justify-center rounded-l border bg-slate-100 text-slate-500 dark:border-darkmode-800 dark:bg-darkmode-700 dark:text-slate-400">
+                            <x-base.lucide icon="calendar" class="stroke-1.5 w-5 h-5"></x-base.lucide>
+                        </div>
+                        <x-base.litepicker
+                            id="due_date"
+                            name="due_date"
+                            class="pl-12"
+                            data-single-mode="true"
+                        />
+                    </div>
                 </div>
             </div>
         </div>

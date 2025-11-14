@@ -198,15 +198,15 @@ class DepartmentController extends Controller
 
         $department->update($validated);
 
+        \App\Http\Controllers\NotificationController::departmentUpdated($department);
+
         if ($request->ajax()) {
-            notify_updated('Department');
             return response()->json([
                 'success' => true,
                 'message' => 'Department updated successfully'
             ]);
         }
 
-        notify_updated('Department');
         return redirect()->route('hr.departments.index')
             ->with('success', 'Department updated successfully');
     }
@@ -248,14 +248,14 @@ class DepartmentController extends Controller
             DB::commit();
 
             if (request()->ajax()) {
-                notify_deleted('Department');
+                \App\Http\Controllers\NotificationController::departmentDeleted($department);
                 return response()->json([
                     'success' => true,
                     'message' => 'Department deleted successfully'
                 ]);
             }
 
-            notify_deleted('Department');
+            \App\Http\Controllers\NotificationController::departmentDeleted($department);
             return redirect()->route('hr.departments.index')
                 ->with('success', 'Department deleted successfully');
 

@@ -218,7 +218,7 @@ class NotificationController extends Controller
             };
         }
 
-        $users = \App\Models\User::where('id', '!=', auth()->id())->get();
+        $users = \App\Models\User::all();
 
         foreach ($users as $user) {
             Notification::create([
@@ -254,11 +254,50 @@ class NotificationController extends Controller
      */
     public static function positionCreated(\App\Models\Position $position): void
     {
+        if (!function_exists('setting') || !setting('notifications.position.created', true)) {
+            return;
+        }
+
         $title = 'New Position Added';
-        $message = "Position '{$position->title}' has been added to department '{$position->department->name}'.";
+        $actor = auth()->user()?->name ?? 'System';
+        $message = "User {$actor} added position '{$position->title}' to department '{$position->department->name}'.";
         $actionUrl = route('hr.positions.index');
 
         self::sendToAllUsers($title, $message, 'success', $actionUrl, 'Plus');
+    }
+
+    /**
+     * Send notification when position is updated.
+     */
+    public static function positionUpdated(\App\Models\Position $position): void
+    {
+        if (!function_exists('setting') || !setting('notifications.position.updated', true)) {
+            return;
+        }
+
+        $title = 'Position Updated';
+        $actor = auth()->user()?->name ?? 'System';
+        $message = "User {$actor} updated position '{$position->title}'.";
+        $actionUrl = route('hr.positions.index');
+
+        self::sendToAllUsers($title, $message, 'info', $actionUrl, 'Pencil');
+    }
+
+    /**
+     * Send notification when position is deleted.
+     */
+    public static function positionDeleted(\App\Models\Position $position): void
+    {
+        if (!function_exists('setting') || !setting('notifications.position.deleted', true)) {
+            return;
+        }
+
+        $title = 'Position Deleted';
+        $actor = auth()->user()?->name ?? 'System';
+        $message = "User {$actor} deleted position '{$position->title}'.";
+        $actionUrl = route('hr.positions.index');
+
+        self::sendToAllUsers($title, $message, 'error', $actionUrl, 'Trash2');
     }
 
     /**
@@ -266,11 +305,50 @@ class NotificationController extends Controller
      */
     public static function departmentCreated(\App\Models\Department $department): void
     {
+        if (!function_exists('setting') || !setting('notifications.department.created', true)) {
+            return;
+        }
+
         $title = 'New Department Added';
-        $message = "Department '{$department->name}' has been created.";
+        $actor = auth()->user()?->name ?? 'System';
+        $message = "User {$actor} created department '{$department->name}'.";
         $actionUrl = route('hr.departments.index');
 
         self::sendToAllUsers($title, $message, 'success', $actionUrl, 'Building');
+    }
+
+    /**
+     * Send notification when department is updated.
+     */
+    public static function departmentUpdated(\App\Models\Department $department): void
+    {
+        if (!function_exists('setting') || !setting('notifications.department.updated', true)) {
+            return;
+        }
+
+        $title = 'Department Updated';
+        $actor = auth()->user()?->name ?? 'System';
+        $message = "User {$actor} updated department '{$department->name}'.";
+        $actionUrl = route('hr.departments.index');
+
+        self::sendToAllUsers($title, $message, 'info', $actionUrl, 'Pencil');
+    }
+
+    /**
+     * Send notification when department is deleted.
+     */
+    public static function departmentDeleted(\App\Models\Department $department): void
+    {
+        if (!function_exists('setting') || !setting('notifications.department.deleted', true)) {
+            return;
+        }
+
+        $title = 'Department Deleted';
+        $actor = auth()->user()?->name ?? 'System';
+        $message = "User {$actor} deleted department '{$department->name}'.";
+        $actionUrl = route('hr.departments.index');
+
+        self::sendToAllUsers($title, $message, 'error', $actionUrl, 'Trash2');
     }
 
     /**
@@ -278,10 +356,32 @@ class NotificationController extends Controller
      */
     public static function employeeCreated(\App\Models\Employee $employee): void
     {
+        if (!function_exists('setting') || !setting('notifications.employee.created', true)) {
+            return;
+        }
+
         $title = 'New Employee Added';
-        $message = "Employee '{$employee->first_name} {$employee->last_name}' has joined the company.";
+        $actor = auth()->user()?->name ?? 'System';
+        $message = "User {$actor} created employee '{$employee->first_name} {$employee->last_name}'.";
         $actionUrl = route('hr.employees.index');
 
         self::sendToAllUsers($title, $message, 'success', $actionUrl, 'UserPlus');
+    }
+
+    /**
+     * Send notification when employee is deleted.
+     */
+    public static function employeeDeleted(\App\Models\Employee $employee): void
+    {
+        if (!function_exists('setting') || !setting('notifications.employee.deleted', true)) {
+            return;
+        }
+
+        $title = 'Employee Deleted';
+        $actor = auth()->user()?->name ?? 'System';
+        $message = "User {$actor} deleted employee '{$employee->first_name} {$employee->last_name}'.";
+        $actionUrl = route('hr.employees.index');
+
+        self::sendToAllUsers($title, $message, 'error', $actionUrl, 'UserMinus');
     }
 }

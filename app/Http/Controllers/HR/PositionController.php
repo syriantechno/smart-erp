@@ -141,6 +141,8 @@ class PositionController extends Controller
                 ]);
             }
 
+            \App\Http\Controllers\NotificationController::positionUpdated($position);
+
             return redirect()->route('hr.positions.index')
                 ->with('success', 'Position updated successfully');
 
@@ -183,11 +185,14 @@ class PositionController extends Controller
             DB::commit();
 
             if ($request->ajax()) {
+                \App\Http\Controllers\NotificationController::positionDeleted($position);
                 return response()->json([
                     'success' => true,
                     'message' => 'Position deleted successfully',
                 ]);
             }
+
+            \App\Http\Controllers\NotificationController::positionDeleted($position);
 
             return redirect()->route('hr.positions.index')
                 ->with('success', 'Position deleted successfully');

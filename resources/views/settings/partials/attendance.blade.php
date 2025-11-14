@@ -203,15 +203,21 @@
                         {{ $attendanceSettings['attendance.auto_checkout_time']['label'] }}
                         <span class="text-danger">*</span>
                     </x-base.form-label>
-                    <x-base.form-input
-                        id="attendance.auto_checkout_time"
-                        name="attendance.auto_checkout_time"
-                        type="time"
-                        value="{{ $attendanceSettings['attendance.auto_checkout_time']['value'] }}"
-                        placeholder="{{ $attendanceSettings['attendance.auto_checkout_time']['placeholder'] }}"
-                        class="w-full"
-                        required
-                    />
+                    <div class="relative mx-auto w-56">
+                        <div
+                            class="absolute flex h-full w-10 items-center justify-center rounded-l border bg-slate-100 text-slate-500 dark:border-darkmode-800 dark:bg-darkmode-700 dark:text-slate-400">
+                            <x-base.lucide icon="Clock" class="stroke-1.5 w-5 h-5"></x-base.lucide>
+                        </div>
+                        <x-base.litepicker
+                            id="attendance.auto_checkout_time"
+                            name="attendance.auto_checkout_time"
+                            class="pl-12"
+                            data-single-mode="false"
+                            value="{{ $attendanceSettings['attendance.auto_checkout_time']['value'] }}"
+                            data-format="HH:mm"
+                            required
+                        />
+                    </div>
                     <div class="text-sm text-slate-500 mt-1">
                         {{ $attendanceSettings['attendance.auto_checkout_time']['description'] }}
                     </div>

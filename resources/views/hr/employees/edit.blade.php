@@ -63,8 +63,19 @@
                         
                         <div class="col-span-12 sm:col-span-6">
                             <label for="birth_date" class="form-label">تاريخ الميلاد</label>
-                            <input id="birth_date" name="birth_date" type="date" class="form-control" 
-                                   value="{{ old('birth_date', optional($employee->birth_date)->format('Y-m-d')) }}">
+                            <div class="relative mx-auto w-56">
+                                <div
+                                    class="absolute flex h-full w-10 items-center justify-center rounded-l border bg-slate-100 text-slate-500 dark:border-darkmode-800 dark:bg-darkmode-700 dark:text-slate-400">
+                                    <x-base.lucide icon="calendar" class="stroke-1.5 w-5 h-5"></x-base.lucide>
+                                </div>
+                                <x-base.litepicker
+                                    id="birth_date"
+                                    name="birth_date"
+                                    class="pl-12"
+                                    data-single-mode="true"
+                                    value="{{ old('birth_date', optional($employee->birth_date)->format('Y-m-d')) }}"
+                                />
+                            </div>
                             @error('birth_date')
                                 <div class="text-danger mt-2">{{ $message }}</div>
                             @enderror
@@ -216,8 +227,20 @@
                         
                         <div class="col-span-12 sm:col-span-6">
                             <label for="hire_date" class="form-label">تاريخ التعيين <span class="text-danger">*</span></label>
-                            <input id="hire_date" name="hire_date" type="date" class="form-control" 
-                                   value="{{ old('hire_date', $employee->hire_date->format('Y-m-d')) }}" required>
+                            <div class="relative mx-auto w-56">
+                                <div
+                                    class="absolute flex h-full w-10 items-center justify-center rounded-l border bg-slate-100 text-slate-500 dark:border-darkmode-800 dark:bg-darkmode-700 dark:text-slate-400">
+                                    <x-base.lucide icon="calendar" class="stroke-1.5 w-5 h-5"></x-base.lucide>
+                                </div>
+                                <x-base.litepicker
+                                    id="hire_date"
+                                    name="hire_date"
+                                    class="pl-12"
+                                    data-single-mode="true"
+                                    value="{{ old('hire_date', $employee->hire_date->format('Y-m-d')) }}"
+                                    required
+                                />
+                            </div>
                             @error('hire_date')
                                 <div class="text-danger mt-2">{{ $message }}</div>
                             @enderror

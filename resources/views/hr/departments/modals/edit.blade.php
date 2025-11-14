@@ -10,9 +10,6 @@ $departments = \App\Models\Department::where('id', '!=', $department->id)
     ->where('is_active', true)
     ->get();
 @endphp
-
-@include('components.global-notifications')
-
 <x-base.dialog id="edit-department-modal-{{ $department->id }}" size="lg">
     <x-base.dialog.panel>
         <x-base.dialog.title>
@@ -158,7 +155,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
 
                     // Show success message
-                    showSuccess(data.message || 'Department updated successfully');
+                    showToast(data.message || 'Department updated successfully', 'update');
 
                     // Reload table
                     if (typeof table !== 'undefined') {
@@ -166,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 } else {
                     // Show error message
-                    showError(data.message || 'Failed to update department');
+                    showToast(data.message || 'Failed to update department', 'error');
 
                     // Handle validation errors
                     if (data.errors) {
@@ -175,14 +172,14 @@ document.addEventListener('DOMContentLoaded', function() {
                             errorMessages = errorMessages.concat(data.errors[field]);
                         }
                         if (errorMessages.length > 0) {
-                            showError('Please correct the following errors: ' + errorMessages.join(', '));
+                            showToast('Please correct the following errors: ' + errorMessages.join(', '), 'error');
                         }
                     }
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                showError('An error occurred while updating the department');
+                showToast('An error occurred while updating the department', 'error');
             });
         });
     }

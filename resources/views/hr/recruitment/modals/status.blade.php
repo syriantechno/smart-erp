@@ -44,18 +44,23 @@
                         </x-base.form-select>
                     </div>
 
-                    <!-- Conditional Fields -->
                     <div id="interview-fields" class="hidden space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                                 Interview Date *
                             </label>
-                            <x-base.form-input
-                                id="interview_date"
-                                name="interview_date"
-                                type="datetime-local"
-                                class="w-full"
-                            />
+                            <div class="relative mx-auto w-56">
+                                <div
+                                    class="absolute flex h-full w-10 items-center justify-center rounded-l border bg-slate-100 text-slate-500 dark:border-darkmode-800 dark:bg-darkmode-700 dark:text-slate-400">
+                                    <x-base.lucide icon="calendar" class="stroke-1.5 w-5 h-5"></x-base.lucide>
+                                </div>
+                                <x-base.litepicker
+                                    id="interview_date"
+                                    name="interview_date"
+                                    class="pl-12"
+                                    data-single-mode="false"
+                                />
+                            </div>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
@@ -92,12 +97,18 @@
                             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                                 Joining Date *
                             </label>
-                            <x-base.form-input
-                                id="joining_date"
-                                name="joining_date"
-                                type="date"
-                                class="w-full"
-                            />
+                            <div class="relative mx-auto w-56">
+                                <div
+                                    class="absolute flex h-full w-10 items-center justify-center rounded-l border bg-slate-100 text-slate-500 dark:border-darkmode-800 dark:bg-darkmode-700 dark:text-slate-400">
+                                    <x-base.lucide icon="calendar" class="stroke-1.5 w-5 h-5"></x-base.lucide>
+                                </div>
+                                <x-base.litepicker
+                                    id="joining_date"
+                                    name="joining_date"
+                                    class="pl-12"
+                                    data-single-mode="true"
+                                />
+                            </div>
                         </div>
                     </div>
 

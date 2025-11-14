@@ -1,7 +1,7 @@
 @extends('../themes/' . $activeTheme . '/' . $activeLayout)
 
 @section('subhead')
-    <title>الحضور والغياب - {{ config('app.name') }}</title>
+    <title>Attendance - {{ config('app.name') }}</title>
 @endsection
 
 @include('components.datatable.styles')
@@ -15,7 +15,7 @@
 @section('subcontent')
     @include('components.global-notifications')
     <div class="intro-y mt-8 flex items-center">
-        <h2 class="mr-auto text-lg font-medium">📊 الحضور والغياب</h2>
+        <h2 class="mr-auto text-lg font-medium">📊 Attendance</h2>
     </div>
 
     <div class="mt-5 grid grid-cols-12 gap-6">
@@ -30,7 +30,7 @@
                                     <x-base.lucide icon="Calendar" class="h-8 w-8 text-success" />
                                 </div>
                                 <div class="flex-grow">
-                                    <h6 class="mb-1">إجمالي الأيام</h6>
+                                    <h6 class="mb-1">Total Days</h6>
                                     <h4 class="mb-0 font-bold" id="total-days">0</h4>
                                 </div>
                             </div>
@@ -45,7 +45,7 @@
                                     <x-base.lucide icon="UserCheck" class="h-8 w-8 text-primary" />
                                 </div>
                                 <div class="flex-grow">
-                                    <h6 class="mb-1">الحضور</h6>
+                                    <h6 class="mb-1">Present</h6>
                                     <h4 class="mb-0 font-bold text-success" id="total-present">0</h4>
                                 </div>
                             </div>
@@ -60,7 +60,7 @@
                                     <x-base.lucide icon="UserX" class="h-8 w-8 text-danger" />
                                 </div>
                                 <div class="flex-grow">
-                                    <h6 class="mb-1">الغياب</h6>
+                                    <h6 class="mb-1">Absent</h6>
                                     <h4 class="mb-0 font-bold text-danger" id="total-absent">0</h4>
                                 </div>
                             </div>
@@ -75,7 +75,7 @@
                                     <x-base.lucide icon="Sun" class="h-8 w-8 text-info" />
                                 </div>
                                 <div class="flex-grow">
-                                    <h6 class="mb-1">الإجازات</h6>
+                                    <h6 class="mb-1">Vacation</h6>
                                     <h4 class="mb-0 font-bold text-info" id="total-vacation">0</h4>
                                 </div>
                             </div>
@@ -91,7 +91,7 @@
                 <div class="p-5">
                     <div class="flex flex-col sm:flex-row sm:items-end xl:items-start justify-between mb-4">
                         <div class="flex items-center gap-2 mb-4 sm:mb-0">
-                            <h5 class="font-semibold">جدول الحضور والغياب - {{ \Carbon\Carbon::create($year, $month)->locale('ar')->monthName }} {{ $year }}</h5>
+                            <h5 class="font-semibold">Attendance Table - {{ \Carbon\Carbon::create($year, $month)->locale('ar')->monthName }} {{ $year }}</h5>
                         </div>
                         <div class="flex gap-2">
                             <!-- Month/Year Selector -->
@@ -110,33 +110,33 @@
                                 </select>
                                 <x-base.button variant="primary" size="sm" id="load-month-btn">
                                     <x-base.lucide icon="RefreshCw" class="w-4 h-4 mr-1" />
-                                    تحديث
+                                    Refresh
                                 </x-base.button>
                             </div>
                             <x-base.button variant="primary" size="sm" id="add-attendance-btn">
                                 <x-base.lucide icon="Plus" class="w-4 h-4 mr-1" />
-                                إضافة حضور
+                                Add Attendance
                             </x-base.button>
                             <x-base.button variant="outline-primary" size="sm" id="export-btn">
                                 <x-base.lucide icon="Download" class="w-4 h-4 mr-1" />
-                                تصدير
+                                Export
                             </x-base.button>
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto xl:overflow-visible" data-erp-table-wrapper>
+                    <div class="overflow-x-auto" data-erp-table-wrapper>
                         <table class="datatable-default w-full min-w-full table-auto text-left text-sm" id="attendance-table">
                             <thead>
                                 <tr>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center align-middle" style="min-width: 200px;">الموظف</th>
+                                    <th class="font-medium px-3 py-12 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center align-middle" style="min-width: 200px;">Employee</th>
                                     @for($day = 1; $day <= 31; $day++)
-                                        <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 text-center" style="width: 40px; font-size: 12px;">{{ $day }}</th>
+                                        <th class="font-medium px-2 py-3 border-b-2 dark:border-darkmode-300 text-center" style="width: 24px; font-size: 13px;">{{ $day }}</th>
                                     @endfor
                                 </tr>
                                 <tr>
                                     @for($day = 1; $day <= 31; $day++)
-                                        <th class="px-5 py-3 border-b dark:border-darkmode-300 text-center p-1" style="font-size: 10px; width: 40px;">
-                                            {{ \Carbon\Carbon::createFromDate($year, $month, $day)->locale('ar')->dayName }}
+                                        <th class="px-2 py-3 border-b dark:border-darkmode-300 text-center p-0.5" style="font-size: 12px; width: 24px;">
+                                            {{ \Carbon\Carbon::createFromDate($year, $month, $day)->format('D') }}
                                         </th>
                                     @endfor
                                 </tr>
@@ -144,18 +144,17 @@
                             <tbody>
                             @foreach($employees as $employee)
                             <tr data-employee-id="{{ $employee->id }}">
-                                <td class="font-medium text-slate-700 whitespace-nowrap px-5 py-3 border-b dark:border-darkmode-300">
+                                <td class="font-medium text-slate-700 whitespace-nowrap px-3 py-4 border-b dark:border-darkmode-300">
                                     <div class="flex items-center">
                                         <div class="avatar avatar-sm mr-2">
                                             @if($employee->profile_picture_url)
-                                                <img src="{{ $employee->profile_picture_url }}" alt="{{ $employee->full_name }}" class="rounded-full w-full h-full object-cover" style="width: 32px; height: 32px;">
+                                                <img src="{{ $employee->profile_picture_url }}" alt="{{ $employee->full_name }}" class="rounded-full w-full h-full object-cover" style="width: 28px; height: 28px;">
                                             @else
-                                                <span class="avatar-initial bg-primary rounded-full">{{ substr($employee->first_name, 0, 1) }}</span>
+                                                <span class="avatar-initial bg-primary rounded-full text-xs">{{ substr($employee->first_name, 0, 1) }}</span>
                                             @endif
                                         </div>
                                         <div>
-                                            <div class="font-bold">{{ $employee->full_name }}</div>
-                                            <small class="text-slate-500">{{ $employee->position ?? 'غير محدد' }}</small>
+                                            <div class="font-bold text-xs">{{ $employee->full_name }}</div>
                                         </div>
                                     </div>
                                 </td>
@@ -167,7 +166,7 @@
                                         $isValidDate = \Carbon\Carbon::createFromDate($year, $month, $day)->isValid() &&
                                                       \Carbon\Carbon::createFromDate($year, $month, $day)->format('m') == $month;
                                     @endphp
-                                    <td class="px-5 py-3 border-b dark:border-darkmode-300 text-center {{ !$isValidDate ? 'bg-slate-100 dark:bg-darkmode-600' : '' }}"
+                                    <td class="px-2 py-2 border-b dark:border-darkmode-300 text-center {{ !$isValidDate ? 'bg-slate-100 dark:bg-darkmode-600' : '' }}"
                                         data-date="{{ $date }}"
                                         data-employee-id="{{ $employee->id }}">
                                         @if($isValidDate)
@@ -179,7 +178,7 @@
                                                     'travel' => '✈️',
                                                     'half_day' => '½',
                                                     'holiday' => '🎉',
-                                                    default => ''
+                                                    default => '❌'
                                                 };
                                                 $statusColor = match($attendance?->status ?? '') {
                                                     'present' => 'text-success',
@@ -191,15 +190,12 @@
                                                     default => 'text-slate-400'
                                                 };
                                             @endphp
-                                            <span class="attendance-status-display {{ $statusColor }} font-semibold cursor-pointer relative"
+                                            <span class="attendance-status-display {{ $statusColor }} font-semibold cursor-pointer text-center block"
                                                   data-employee-id="{{ $employee->id }}"
                                                   data-date="{{ $date }}"
                                                   data-status="{{ $attendance?->status ?? '' }}"
-                                                  title="{{ $attendance?->status ? __('attendance.' . $attendance->status) : '' }}">
+                                                  title="{{ $attendance?->status ? __('attendance.' . $attendance->status) : 'Not Recorded' }}">
                                                 {{ $statusSymbol }}
-                                                @if($attendance && $attendance->status === 'absent')
-                                                    <span class="absolute -top-1 -right-1 text-xs text-red-500 font-bold">✕</span>
-                                                @endif
                                             </span>
                                         @else
                                             <span class="text-slate-400">-</span>
@@ -217,7 +213,7 @@
     </div>
 
     <!-- Attendance Entry Modal -->
-    <x-modal.form id="attendanceEntryModal" title="إضافة حضور" size="lg" style="z-index: 99999 !important;">
+    <x-modal.form id="attendanceEntryModal" title="Add Attendance" size="lg" style="z-index: 99999 !important;">
         <form id="attendance-form" action="{{ route('hr.attendance.store') }}" method="POST">
             @csrf
 
@@ -225,18 +221,18 @@
             <div class="mb-6">
                 <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
                     <x-base.lucide icon="Settings" class="h-5 w-5"></x-base.lucide>
-                    نوع الإدخال
+                    Entry Type
                 </h4>
                 <div class="grid grid-cols-12 gap-4 gap-y-4">
                     <div class="col-span-12">
                         <div class="flex gap-6">
                             <label class="flex items-center cursor-pointer">
                                 <input type="radio" name="entry_type" value="individual" checked class="form-check-input">
-                                <span class="ml-3 text-slate-700 dark:text-slate-300">فردي</span>
+                                <span class="ml-3 text-slate-700 dark:text-slate-300">Individual</span>
                             </label>
                             <label class="flex items-center cursor-pointer">
                                 <input type="radio" name="entry_type" value="department" class="form-check-input">
-                                <span class="ml-3 text-slate-700 dark:text-slate-300">للقسم كاملاً</span>
+                                <span class="ml-3 text-slate-700 dark:text-slate-300">For Entire Department</span>
                             </label>
                         </div>
                     </div>
@@ -247,25 +243,25 @@
             <div class="mb-6">
                 <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
                     <x-base.lucide icon="Users" class="h-5 w-5"></x-base.lucide>
-                    الاختيار
+                    Selection
                 </h4>
                 <div class="grid grid-cols-12 gap-4 gap-y-4">
                     <!-- Employee Selection (for individual) -->
                     <div class="col-span-12" id="employee-selection">
-                        <x-base.form-label for="employee_id">الموظف <span class="text-danger">*</span></x-base.form-label>
+                        <x-base.form-label for="employee_id">Employee <span class="text-danger">*</span></x-base.form-label>
                         <x-base.form-select id="employee_id" name="employee_id" class="w-full" required>
-                            <option value="">اختر الموظف</option>
+                            <option value="">Select Employee</option>
                             @foreach($employees as $employee)
-                                <option value="{{ $employee->id }}">{{ $employee->full_name }} - {{ $employee->position ?? 'غير محدد' }}</option>
+                                <option value="{{ $employee->id }}">{{ $employee->full_name }} - {{ $employee->position ?? 'Not Specified' }}</option>
                             @endforeach
                         </x-base.form-select>
                     </div>
 
                     <!-- Department Selection (for department) -->
                     <div class="col-span-12" id="department-selection" style="display: none;">
-                        <x-base.form-label for="department_id">القسم <span class="text-danger">*</span></x-base.form-label>
+                        <x-base.form-label for="department_id">Department <span class="text-danger">*</span></x-base.form-label>
                         <x-base.form-select id="department_id" name="department_id" class="w-full">
-                            <option value="">اختر القسم</option>
+                            <option value="">Select Department</option>
                             @foreach($employees->pluck('department')->unique() as $department)
                                 @if($department)
                                     <option value="{{ $department->id }}">{{ $department->name }}</option>
@@ -280,37 +276,37 @@
             <div class="mb-6">
                 <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
                     <x-base.lucide icon="Calendar" class="h-5 w-5"></x-base.lucide>
-                    تفاصيل الحضور
+                    Attendance Details
                 </h4>
                 <div class="grid grid-cols-12 gap-4 gap-y-4">
                     <!-- Date -->
                     <div class="col-span-12 md:col-span-6">
-                        <x-base.form-label for="attendance_date">التاريخ <span class="text-danger">*</span></x-base.form-label>
+                        <x-base.form-label for="attendance_date">Date <span class="text-danger">*</span></x-base.form-label>
                         <x-base.form-input id="attendance_date" name="attendance_date" type="date" class="w-full" required />
                     </div>
 
                     <!-- Status -->
                     <div class="col-span-12 md:col-span-6">
-                        <x-base.form-label for="status">الحالة <span class="text-danger">*</span></x-base.form-label>
+                        <x-base.form-label for="status">Status <span class="text-danger">*</span></x-base.form-label>
                         <x-base.form-select id="status" name="status" class="w-full" required>
-                            <option value="present">حاضر</option>
-                            <option value="absent">غائب</option>
-                            <option value="vacation">إجازة</option>
-                            <option value="travel">سفر</option>
-                            <option value="half_day">نصف يوم</option>
-                            <option value="holiday">عطلة</option>
+                            <option value="present">Present</option>
+                            <option value="absent">Absent</option>
+                            <option value="vacation">Vacation</option>
+                            <option value="travel">Travel</option>
+                            <option value="half_day">Half Day</option>
+                            <option value="holiday">Holiday</option>
                         </x-base.form-select>
                     </div>
 
                     <!-- Check In Time -->
                     <div class="col-span-12 md:col-span-6">
-                        <x-base.form-label for="check_in">وقت الدخول</x-base.form-label>
+                        <x-base.form-label for="check_in">Check In Time</x-base.form-label>
                         <x-base.form-input id="check_in" name="check_in" type="time" class="w-full" />
                     </div>
 
                     <!-- Check Out Time -->
                     <div class="col-span-12 md:col-span-6">
-                        <x-base.form-label for="check_out">وقت الخروج</x-base.form-label>
+                        <x-base.form-label for="check_out">Check Out Time</x-base.form-label>
                         <x-base.form-input id="check_out" name="check_out" type="time" class="w-full" />
                     </div>
                 </div>
@@ -320,11 +316,11 @@
             <div class="mb-6">
                 <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
                     <x-base.lucide icon="FileText" class="h-5 w-5"></x-base.lucide>
-                    ملاحظات
+                    Notes
                 </h4>
                 <div class="grid grid-cols-12 gap-4 gap-y-4">
                     <div class="col-span-12">
-                        <x-base.form-textarea id="notes" name="notes" rows="3" placeholder="أضف ملاحظات إضافية..." class="w-full"></x-base.form-textarea>
+                        <x-base.form-textarea id="notes" name="notes" rows="3" placeholder="Add additional notes..." class="w-full"></x-base.form-textarea>
                     </div>
                 </div>
             </div>
@@ -338,7 +334,7 @@
                     type="button"
                     variant="outline-secondary"
                 >
-                    إلغاء
+                    Cancel
                 </x-base.button>
                 <x-base.button
                     class="w-32"
@@ -348,39 +344,42 @@
                     id="save-attendance-btn"
                 >
                     <x-base.lucide icon="Save" class="w-4 h-4 mr-2" />
-                    حفظ
+                    Save
                 </x-base.button>
             </div>
         @endslot
     </x-modal.form>
 
     <!-- Status Legend Modal -->
-    <x-modal.form id="statusLegendModal" title="دليل الحالات" size="sm" style="z-index: 99999 !important;">
+    <x-modal.form id="statusLegendModal" title="Status Legend" size="sm" style="z-index: 99999 !important;">
         <div class="grid grid-cols-2 gap-3">
             <div class="flex items-center mb-2">
                 <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold bg-success text-white mr-2">✓</span>
-                <small>حاضر</small>
+                <small>Present</small>
             </div>
             <div class="flex items-center mb-2">
                 <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold bg-danger text-white mr-2">✗</span>
-                <small>غائب</small>
+                <small>Absent</small>
             </div>
             <div class="flex items-center mb-2">
                 <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold bg-info text-white mr-2">🏖️</span>
-                <small>إجازة</small>
+                <small>Vacation</small>
             </div>
             <div class="flex items-center mb-2">
                 <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold bg-warning text-white mr-2">✈️</span>
-                <small>سفر</small>
+                <small>Travel</small>
             </div>
             <div class="flex items-center mb-2">
                 <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold bg-secondary text-white mr-2">½</span>
-                <small>نصف يوم</small>
+                <small>Half Day</small>
             </div>
             <div class="flex items-center mb-2">
                 <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold bg-primary text-white mr-2">🎉</span>
-                <small>عطلة</small>
+                <small>Holiday</small>
             </div>
+            <div class="flex items-center mb-2">
+                <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold bg-slate-100 text-slate-400 mr-2">❌</span>
+                <small>Not Recorded</small>
         </div>
 
         @slot('footer')
@@ -390,7 +389,7 @@
                     size="sm"
                     data-tw-dismiss="modal"
                 >
-                    إغلاق
+                    Close
                 </x-base.button>
             </div>
         @endslot
@@ -421,6 +420,29 @@
 .modal.show {
     z-index: 99999 !important;
 }
+
+/* Ultra-compact table styling */
+#attendance-table {
+    line-height: 2.5 !important;
+}
+
+#attendance-table th,
+#attendance-table td {
+    line-height: 2.2 !important;
+    margin: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+#attendance-table .avatar {
+    margin: 0 !important;
+    margin-right: 0.5rem !important; /* 8px */
+}
+
+#attendance-table .font-bold {
+    margin: 0 !important;
+    line-height: 2.8 !important;
+}
 </style>
 @endpush
 
@@ -431,7 +453,7 @@
     <script>
 document.addEventListener('DOMContentLoaded', function() {
     try {
-        console.log('🚀 تحميل صفحة الحضور...');
+        console.log('🚀 Loading attendance page...');
 
         // Attendance status display click handler
         document.querySelectorAll('.attendance-status-display').forEach(span => {
@@ -489,12 +511,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 const month = document.getElementById('month-select')?.value;
 
                 if (!year || !month) {
-                    showToast('يرجى اختيار السنة والشهر', 'error');
+                    showToast('Please select year and month', 'error');
                     return;
                 }
 
                 // Create CSV content
-                let csv = 'الموظف,';
+                let csv = 'Employee,';
                 for (let day = 1; day <= 31; day++) {
                     csv += day + ',';
                 }
@@ -509,12 +531,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (span) {
                             const status = span.dataset.status;
                             const statusMap = {
-                                'present': 'حاضر',
-                                'absent': 'غائب',
-                                'vacation': 'إجازة',
-                                'travel': 'سفر',
-                                'half_day': 'نصف يوم',
-                                'holiday': 'عطلة'
+                                'present': 'Present',
+                                'absent': 'Absent',
+                                'vacation': 'Vacation',
+                                'travel': 'Travel',
+                                'half_day': 'Half Day',
+                                'holiday': 'Holiday',
+                                '': 'Not Recorded'
                             };
                             csv += '"' + (statusMap[status] || '') + '",';
                         } else {
@@ -532,30 +555,30 @@ document.addEventListener('DOMContentLoaded', function() {
                 link.click();
                 URL.revokeObjectURL(link);
 
-                showToast('تم تصدير البيانات بنجاح', 'success');
+                showToast('Data exported successfully', 'success');
             });
         }
 
-        console.log('✅ تم تحميل جميع مكونات صفحة الحضور بنجاح');
+        console.log('✅ All attendance page components loaded successfully');
 
     } catch (error) {
-        console.error('❌ خطأ في تحميل صفحة الحضور:', error);
+        console.error('❌ Error loading attendance page:', error);
     }
 });
 
     function openAttendanceModal(employeeId = null, date = null, status = null) {
-        console.log('🚀 بدء فتح مودال الحضور...');
-        console.log('المعاملات المرسلة:', { employeeId, date, status });
+        console.log('🚀 Starting to open attendance modal...');
+        console.log('Parameters received:', { employeeId, date, status });
 
         const modal = document.getElementById('attendanceEntryModal');
         const form = document.getElementById('attendance-form');
 
         if (!modal) {
-            console.error('❌ لم يتم العثور على عنصر المودال في الصفحة!');
-            console.log('العناصر الموجودة في الصفحة:', document.querySelectorAll('[id*="modal"]').length);
+            console.error('❌ Modal element not found on the page!');
+            console.log('Available elements:', document.querySelectorAll('[id*="modal"]').length);
             return;
         }
-        console.log('✅ تم العثور على عنصر المودال بنجاح');
+        console.log('✅ Modal element found successfully');
 
         // Reset form and set defaults
         if (form) {
@@ -567,9 +590,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Trigger the toggle to show correct fields
                 toggleEntryType('individual');
             }
-            console.log('✅ تم إعادة تعيين النموذج وتعيين الإعدادات الافتراضية');
+            console.log('✅ Form reset and default settings applied');
         } else {
-            console.warn('⚠️ لم يتم العثور على النموذج');
+            console.warn('⚠️ Form not found');
         }
 
         // Set default date to today if not provided
@@ -577,10 +600,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!date) {
                 const today = new Date().toISOString().split('T')[0];
                 form.attendance_date.value = today;
-                console.log('📅 تعيين التاريخ الافتراضي:', today);
+                console.log('📅 Setting default date:', today);
             } else {
                 form.attendance_date.value = date;
-                console.log('📅 تعيين التاريخ المحدد:', date);
+                console.log('📅 Setting specified date:', date);
             }
         }
 
@@ -588,21 +611,21 @@ document.addEventListener('DOMContentLoaded', function() {
         if (employeeId && date && form) {
             if (form.employee_id) {
                 form.employee_id.value = employeeId;
-                console.log('👤 تعيين رقم الموظف:', employeeId);
+                console.log('👤 Setting employee ID:', employeeId);
             }
             if (form.status) {
                 form.status.value = status || 'present';
-                console.log('📊 تعيين حالة الحضور:', status || 'present');
+                console.log('📊 Setting attendance status:', status || 'present');
             }
         }
 
         // Show modal using proper methods
-        console.log('🎯 محاولة فتح المودال...');
-        console.log('window.twModal موجود:', typeof window.twModal);
-        console.log('window.twModal.show موجود:', typeof window.twModal?.show);
+        console.log('🎯 Attempting to open modal...');
+        console.log('window.twModal available:', typeof window.twModal);
+        console.log('window.twModal.show available:', typeof window.twModal?.show);
 
         if (typeof window.twModal !== 'undefined' && typeof window.twModal.show === 'function') {
-            console.log('🎯 استخدام twModal API');
+            console.log('🎯 Using twModal API');
             try {
                 // Reduce z-index of other elements
                 const mainContent = document.querySelector('.intro-y');
@@ -617,12 +640,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (backdrop) {
                     backdrop.style.zIndex = '99998';
                 }
-                console.log('✅ تم فتح المودال باستخدام twModal');
+                console.log('✅ Modal opened using twModal');
             } catch (error) {
-                console.error('❌ خطأ في فتح المودال باستخدام twModal:', error);
+                console.error('❌ Error opening modal with twModal:', error);
             }
         } else {
-            console.log('🔧 استخدام الطريقة اليدوية لفتح المودال');
+            console.log('🔧 Using manual method to open modal');
 
             // Reduce z-index of other elements
             const mainContent = document.querySelector('.intro-y');
@@ -644,26 +667,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 backdrop.className = 'modal-backdrop fade show';
                 backdrop.style.zIndex = '99998'; // Just below modal
                 document.body.appendChild(backdrop);
-                console.log('✅ تمت إضافة خلفية المودال يدوياً');
+                console.log('✅ Modal backdrop added manually');
             }
 
             // Force focus to modal
             setTimeout(() => {
                 modal.focus();
-                console.log('✅ تم التركيز على المودال');
+                console.log('✅ Modal focused');
             }, 100);
         }
     }
 
     function toggleEntryType(type) {
-        console.log('🔄 بدء تبديل نوع الإدخال إلى:', type);
+        console.log('🔄 Starting to toggle entry type to:', type);
 
         const employeeSelection = document.getElementById('employee-selection');
         const departmentSelection = document.getElementById('department-selection');
         const employeeField = document.querySelector('[name="employee_id"]');
         const departmentField = document.querySelector('[name="department_id"]');
 
-        console.log('العناصر الموجودة:', {
+        console.log('Available elements:', {
             employeeSelection: !!employeeSelection,
             departmentSelection: !!departmentSelection,
             employeeField: !!employeeField,
@@ -683,15 +706,15 @@ document.addEventListener('DOMContentLoaded', function() {
             if (employeeField) {
                 employeeField.required = true;
                 employeeField.style.display = 'block';
-                console.log('✅ تم تفعيل حقل الموظف');
+                console.log('✅ Employee field activated');
             }
             if (departmentField) {
                 departmentField.required = false;
                 departmentField.style.display = 'none';
-                console.log('✅ تم إلغاء تفعيل حقل القسم');
+                console.log('✅ Department field deactivated');
             }
 
-            console.log('🔄 تم تبديل إلى الإدخال الفردي بنجاح');
+            console.log('🔄 Successfully switched to individual entry');
         } else {
             // Show department selection, hide employee selection
             if (employeeSelection) {
@@ -705,15 +728,15 @@ document.addEventListener('DOMContentLoaded', function() {
             if (departmentField) {
                 departmentField.required = true;
                 departmentField.style.display = 'block';
-                console.log('✅ تم تفعيل حقل القسم');
+                console.log('✅ Department field activated');
             }
             if (employeeField) {
                 employeeField.required = false;
                 employeeField.style.display = 'none';
-                console.log('✅ تم إلغاء تفعيل حقل الموظف');
+                console.log('✅ Employee field deactivated');
             }
 
-            console.log('🔄 تم تبديل إلى الإدخال القسمي بنجاح');
+            console.log('🔄 Successfully switched to department entry');
         }
     }
 
@@ -722,8 +745,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = new FormData(form);
         const data = Object.fromEntries(formData);
 
-        console.log('📤 البيانات المرسلة:', data);
-        console.log('📊 تفاصيل البيانات:');
+        console.log('📤 Data being sent:', data);
+        console.log('📊 Data details:');
         console.log('- entry_type:', data.entry_type);
         console.log('- employee_id:', data.employee_id);
         console.log('- department_id:', data.department_id);
@@ -732,51 +755,51 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Validate based on entry type
         if (data.entry_type === 'individual') {
-            console.log('🔍 التحقق من الإدخال الفردي...');
+            console.log('🔍 Validating individual entry...');
             if (!data.employee_id || data.employee_id.trim() === '') {
-                console.error('❌ خطأ: لم يتم اختيار الموظف');
-                showToast('يرجى اختيار الموظف', 'error');
+                console.error('❌ Error: Employee not selected');
+                showToast('Please select an employee', 'error');
                 return;
             }
-            console.log('✅ تم اختيار الموظف:', data.employee_id);
+            console.log('✅ Employee selected:', data.employee_id);
         } else if (data.entry_type === 'department') {
-            console.log('🔍 التحقق من الإدخال القسمي...');
+            console.log('🔍 Validating department entry...');
             if (!data.department_id || data.department_id.trim() === '') {
-                console.error('❌ خطأ: لم يتم اختيار القسم');
-                showToast('يرجى اختيار القسم', 'error');
+                console.error('❌ Error: Department not selected');
+                showToast('Please select a department', 'error');
                 return;
             }
-            console.log('✅ تم اختيار القسم:', data.department_id);
+            console.log('✅ Department selected:', data.department_id);
         } else {
-            console.error('❌ خطأ: نوع الإدخال غير محدد:', data.entry_type);
-            showToast('يرجى اختيار نوع الإدخال', 'error');
+            console.error('❌ Error: Entry type not defined:', data.entry_type);
+            showToast('Please select entry type', 'error');
             return;
         }
 
-        console.log('🚀 بدء إرسال البيانات إلى الخادم...');
+        console.log('🚀 Starting to send data to server...');
 
         // Additional validation before sending
         if (!data.attendance_date || data.attendance_date.trim() === '') {
-            console.error('❌ خطأ: التاريخ مطلوب');
-            showToast('يرجى اختيار التاريخ', 'error');
+            console.error('❌ Error: Date is required');
+            showToast('Please select a date', 'error');
             return;
         }
 
         if (!data.status || data.status.trim() === '') {
-            console.error('❌ خطأ: الحالة مطلوبة');
-            showToast('يرجى اختيار الحالة', 'error');
+            console.error('❌ Error: Status is required');
+            showToast('Please select a status', 'error');
             return;
         }
 
         // Ensure CSRF token is available
         const csrfToken = '{{ csrf_token() }}';
         if (!csrfToken) {
-            console.error('❌ خطأ: رمز CSRF غير متوفر');
-            showToast('حدث خطأ في الأمان، يرجى إعادة تحميل الصفحة', 'error');
+            console.error('❌ Error: CSRF token not available');
+            showToast('Security error occurred, please reload the page', 'error');
             return;
         }
 
-        console.log('✅ تم التحقق من صحة البيانات، جاري الإرسال...');
+        console.log('✅ Data validation completed, sending...');
 
         fetch('{{ route('hr.attendance.store') }}', {
             method: 'POST',
@@ -788,14 +811,14 @@ document.addEventListener('DOMContentLoaded', function() {
             body: JSON.stringify(data)
         })
         .then(response => {
-            console.log('📡 استجابة الخادم:', response.status, response.statusText);
+            console.log('📡 Server response:', response.status, response.statusText);
             return response.json();
         })
         .then(data => {
-            console.log('📨 بيانات الاستجابة:', data);
+            console.log('📨 Response data:', data);
             if (data.success) {
-                console.log('✅ تم حفظ البيانات بنجاح');
-                showToast(data.message || 'تم حفظ الحضور بنجاح', 'success');
+                console.log('✅ Data saved successfully');
+                showToast(data.message || 'Attendance saved successfully', 'success');
                 // Close modal using tw-starter API
                 const modal = document.getElementById('attendanceEntryModal');
                 if (window.twModal) {
@@ -809,16 +832,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Reload page to refresh data
                 setTimeout(() => location.reload(), 1000);
             } else {
-                console.error('❌ فشل في حفظ البيانات:', data);
-                showToast(data.message || 'فشل في حفظ الحضور', 'error');
+                console.error('❌ Failed to save data:', data);
+                showToast(data.message || 'Failed to save attendance', 'error');
                 if (data.errors) {
-                    console.error('تفاصيل الأخطاء:', data.errors);
+                    console.error('Error details:', data.errors);
                 }
             }
         })
         .catch(error => {
-            console.error('💥 خطأ في الشبكة:', error);
-            showToast('حدث خطأ أثناء الحفظ', 'error');
+            console.error('💥 Network error:', error);
+            showToast('Error occurred while saving', 'error');
         });
     }
 

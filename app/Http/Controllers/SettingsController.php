@@ -209,6 +209,37 @@ class SettingsController extends Controller
         return redirect()->route('settings.index')->with('success', 'تم حفظ إعدادات الحضور والغياب بنجاح!');
     }
 
+    public function updateNotifications(Request $request)
+    {
+        $keys = [
+            'notifications.department.created' => 'Notify when a department is created',
+            'notifications.department.updated' => 'Notify when a department is updated',
+            'notifications.department.deleted' => 'Notify when a department is deleted',
+
+            'notifications.position.created' => 'Notify when a position is created',
+            'notifications.position.updated' => 'Notify when a position is updated',
+            'notifications.position.deleted' => 'Notify when a position is deleted',
+
+            'notifications.employee.created' => 'Notify when an employee is created',
+            'notifications.employee.deleted' => 'Notify when an employee is deleted',
+        ];
+
+        foreach ($keys as $key => $description) {
+            $fieldName = str_replace('.', '_', $key);
+            $value = $request->boolean($fieldName);
+            Setting::set($key, $value, 'boolean', $description);
+        }
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Notification settings updated successfully!',
+            ]);
+        }
+
+        return redirect()->route('settings.index')->with('success', 'Notification settings updated successfully!');
+    }
+
     /**
      * إنشاء ملف CSS مخصص للألوان المختارة
      */

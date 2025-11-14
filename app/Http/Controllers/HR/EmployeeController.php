@@ -202,9 +202,11 @@ class EmployeeController extends Controller
                 $validated['profile_picture'] = $path;
             }
 
-            Employee::create($validated);
+            $employee = Employee::create($validated);
 
             DB::commit();
+
+            \App\Http\Controllers\NotificationController::employeeCreated($employee);
 
             if ($request->ajax()) {
                 return response()->json([
@@ -251,12 +253,14 @@ class EmployeeController extends Controller
             DB::commit();
 
             if ($request->ajax()) {
+                \App\Http\Controllers\NotificationController::employeeDeleted($employee);
                 return response()->json([
                     'success' => true,
                     'message' => 'Employee deleted successfully',
                 ]);
             }
 
+            \App\Http\Controllers\NotificationController::employeeDeleted($employee);
             return redirect()->route('hr.employees.index')
                 ->with('success', 'تم حذف الموظف بنجاح');
         } catch (\Exception $e) {

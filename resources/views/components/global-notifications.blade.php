@@ -82,6 +82,7 @@
         .toast-icon-warning { color: #f59e0b; }
         .toast-icon-info { color: #3b82f6; }
         .toast-icon-delete { color: #ef4444; }
+        .toast-icon-update { color: #0ea5e9; }
 
         /* Confirm Modal Icons */
         .confirm-icon-delete { color: #ef4444; font-size: 2rem; }
@@ -230,6 +231,26 @@
         <button type="button" class="toast-close-btn">×</button>
     </div>
 
+    <!-- Delete Toast -->
+    <div id="toast-template-delete" class="toast-wrapper">
+        <x-base.lucide icon="Trash2" class="toast-icon-delete stroke-1.5 w-6 h-6"></x-base.lucide>
+        <div class="ml-4 mr-4 flex-1">
+            <div class="toast-title">Deleted!</div>
+            <div class="toast-message"></div>
+        </div>
+        <button type="button" class="toast-close-btn">×</button>
+    </div>
+
+    <!-- Update Toast -->
+    <div id="toast-template-update" class="toast-wrapper">
+        <x-base.lucide icon="Pencil" class="toast-icon-update stroke-1.5 w-6 h-6"></x-base.lucide>
+        <div class="ml-4 mr-4 flex-1">
+            <div class="toast-title">Updated!</div>
+            <div class="toast-message"></div>
+        </div>
+        <button type="button" class="toast-close-btn">×</button>
+    </div>
+
     <!-- Confirm Modal Templates -->
     <div id="confirm-template-delete">
         <x-base.lucide icon="Trash2" class="confirm-icon-delete stroke-1.5 w-8 h-8"></x-base.lucide>
@@ -325,7 +346,9 @@
             'success': 'Success!',
             'error': 'Error!',
             'warning': 'Warning!',
-            'info': 'Information'
+            'info': 'Information',
+            'delete': 'Deleted!',
+            'update': 'Updated!'
         };
         return createToast(type, titleMap[type] || 'Information', message);
     };
@@ -409,8 +432,43 @@
 
     /**
      * Confirm deletion
+     *
+     * If SweetAlert2 (Swal) is available, use it with the same style
+     * as the Positions module. Otherwise, fall back to the internal
+     * confirm modal implementation.
      */
     window.confirmDelete = function(itemName = 'this item', onConfirm = () => {}) {
+        if (typeof Swal !== 'undefined') {
+            return Swal.fire({
+                title: 'Delete Item?',
+                html: `Are you sure you want to delete <strong>"${itemName}"</strong>?<br>This action cannot be undone.`,
+                icon: 'warning',
+                iconColor: '#ef4444',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel',
+                background: '#ffffff',
+                customClass: {
+                    popup: 'rounded-xl shadow-2xl',
+                    confirmButton: 'px-6 py-2 rounded-lg font-semibold',
+                    cancelButton: 'px-6 py-2 rounded-lg font-semibold',
+                },
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown animate__faster',
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp animate__faster',
+                },
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    onConfirm();
+                }
+                return result.isConfirmed;
+            });
+        }
+
         return showConfirm({
             title: 'Confirm Deletion',
             message: `Are you sure you want to delete "${itemName}"? This action cannot be undone.`,
