@@ -6,6 +6,7 @@ use App\Models\ElectronicMail;
 use App\Models\Department;
 use App\Models\Company;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use App\Services\DocumentCodeGenerator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -34,6 +35,8 @@ class ElectronicMailController extends Controller
 
         $currentFolder = $request->get('folder', 'inbox');
 
+        $mailAccount = Auth::check() ? Auth::user()->defaultMailAccount : null;
+
         return view('electronic-mail.index', compact(
             'companies',
             'departments',
@@ -42,7 +45,8 @@ class ElectronicMailController extends Controller
             'sentCount',
             'draftCount',
             'starredCount',
-            'currentFolder'
+            'currentFolder',
+            'mailAccount'
         ));
     }
 

@@ -183,9 +183,9 @@
                                 <x-base.lucide class="mr-2 h-4 w-4" icon="Edit" />
                                 New Message
                             </x-base.menu.item>
-                            <x-base.menu.item>
+                            <x-base.menu.item onclick="openMailAccountSettingsModal()">
                                 <x-base.lucide class="mr-2 h-4 w-4" icon="Settings" />
-                                Settings
+                                Personal Mail Settings
                             </x-base.menu.item>
                         </x-base.menu.items>
                     </x-base.menu>
@@ -229,7 +229,7 @@
                         <a class="ml-5 flex h-5 w-5 items-center justify-center" href="#">
                             <x-base.lucide class="h-4 w-4" icon="ChevronRight" />
                         </a>
-                        <a class="ml-5 flex h-5 w-5 items-center justify-center" href="#">
+                        <a class="ml-5 flex h-5 w-5 items-center justify-center" href="#" onclick="openMailAccountSettingsModal(); return false;">
                             <x-base.lucide class="h-4 w-4" icon="Settings" />
                         </a>
                     </div>
@@ -251,8 +251,124 @@
         </div>
     </div>
 
- 
-    
+    <!-- Personal Mail Account Settings Modal -->
+    <div
+        id="mail-account-settings-modal"
+        class="fixed inset-0 z-[99999] hidden items-center justify-center bg-slate-900/60"
+        aria-hidden="true"
+        style="display: none;"
+    >
+        <div class="modal-dialog modal-lg max-w-4xl w-full mx-4">
+            <div class="modal-content bg-white dark:bg-darkmode-600 rounded-lg shadow-lg">
+                <div class="modal-header flex items-center justify-between px-5 py-3 border-b border-slate-200/60 dark:border-darkmode-400">
+                    <h2 class="font-medium text-base mr-auto">Personal Email Settings</h2>
+                    <button type="button" class="text-slate-400 hover:text-slate-600" onclick="closeMailAccountSettingsModal()">
+                        <x-base.lucide icon="X" class="w-6 h-6" />
+                    </button>
+                </div>
+                <div class="modal-body p-6">
+                    <form id="mail-account-settings-form">
+                        @csrf
+                        <div class="grid grid-cols-12 gap-4">
+                            <div class="col-span-12 md:col-span-6">
+                                <x-base.form-label for="mail_label">Account Label</x-base.form-label>
+                                <x-base.form-input id="mail_label" name="label" type="text" class="w-full" value="{{ $mailAccount->label ?? 'Default Mail Account' }}" />
+                            </div>
+
+                            <div class="col-span-12 md:col-span-6">
+                                <x-base.form-label for="from_name">From Name</x-base.form-label>
+                                <x-base.form-input id="from_name" name="from_name" type="text" class="w-full" value="{{ $mailAccount->from_name ?? auth()->user()->name }}" />
+                            </div>
+
+                            <div class="col-span-12 md:col-span-6">
+                                <x-base.form-label for="from_email">From Email</x-base.form-label>
+                                <x-base.form-input id="from_email" name="from_email" type="email" class="w-full" value="{{ $mailAccount->from_email ?? auth()->user()->email }}" />
+                            </div>
+
+                            <div class="col-span-12 md:col-span-6">
+                                <x-base.form-label for="smtp_host">SMTP Host</x-base.form-label>
+                                <x-base.form-input id="smtp_host" name="smtp_host" type="text" class="w-full" value="{{ $mailAccount->smtp_host ?? '' }}" />
+                            </div>
+
+                            <div class="col-span-6 md:col-span-3">
+                                <x-base.form-label for="smtp_port">SMTP Port</x-base.form-label>
+                                <x-base.form-input id="smtp_port" name="smtp_port" type="number" class="w-full" value="{{ $mailAccount->smtp_port ?? 587 }}" />
+                            </div>
+
+                            <div class="col-span-6 md:col-span-3">
+                                <x-base.form-label for="smtp_encryption">SMTP Encryption</x-base.form-label>
+                                <x-base.form-select id="smtp_encryption" name="smtp_encryption" class="w-full">
+                                    <option value="" {{ empty($mailAccount?->smtp_encryption) ? 'selected' : '' }}>None</option>
+                                    <option value="ssl" {{ ($mailAccount->smtp_encryption ?? '') === 'ssl' ? 'selected' : '' }}>SSL</option>
+                                    <option value="tls" {{ ($mailAccount->smtp_encryption ?? '') === 'tls' ? 'selected' : '' }}>TLS</option>
+                                </x-base.form-select>
+                            </div>
+
+                            <div class="col-span-12 md:col-span-6">
+                                <x-base.form-label for="smtp_username">SMTP Username</x-base.form-label>
+                                <x-base.form-input id="smtp_username" name="smtp_username" type="text" class="w-full" value="{{ $mailAccount->smtp_username ?? '' }}" />
+                            </div>
+
+                            <div class="col-span-12 md:col-span-6">
+                                <x-base.form-label for="smtp_password">SMTP Password</x-base.form-label>
+                                <x-base.form-input id="smtp_password" name="smtp_password" type="password" class="w-full" value="{{ $mailAccount->smtp_password ?? '' }}" />
+                            </div>
+
+                            <div class="col-span-12 md:col-span-4">
+                                <x-base.form-label for="incoming_protocol">Incoming Protocol</x-base.form-label>
+                                <x-base.form-select id="incoming_protocol" name="incoming_protocol" class="w-full">
+                                    <option value="imap" {{ ($mailAccount->incoming_protocol ?? 'imap') === 'imap' ? 'selected' : '' }}>IMAP</option>
+                                    <option value="pop3" {{ ($mailAccount->incoming_protocol ?? '') === 'pop3' ? 'selected' : '' }}>POP3</option>
+                                </x-base.form-select>
+                            </div>
+
+                            <div class="col-span-12 md:col-span-4">
+                                <x-base.form-label for="incoming_host">Incoming Host</x-base.form-label>
+                                <x-base.form-input id="incoming_host" name="incoming_host" type="text" class="w-full" value="{{ $mailAccount->incoming_host ?? '' }}" />
+                            </div>
+
+                            <div class="col-span-6 md:col-span-2">
+                                <x-base.form-label for="incoming_port">Incoming Port</x-base.form-label>
+                                <x-base.form-input id="incoming_port" name="incoming_port" type="number" class="w-full" value="{{ $mailAccount->incoming_port ?? '' }}" />
+                            </div>
+
+                            <div class="col-span-6 md:col-span-2">
+                                <x-base.form-label for="incoming_encryption">Incoming Encryption</x-base.form-label>
+                                <x-base.form-select id="incoming_encryption" name="incoming_encryption" class="w-full">
+                                    <option value="" {{ empty($mailAccount?->incoming_encryption) ? 'selected' : '' }}>None</option>
+                                    <option value="ssl" {{ ($mailAccount->incoming_encryption ?? '') === 'ssl' ? 'selected' : '' }}>SSL</option>
+                                    <option value="tls" {{ ($mailAccount->incoming_encryption ?? '') === 'tls' ? 'selected' : '' }}>TLS</option>
+                                </x-base.form-select>
+                            </div>
+
+                            <div class="col-span-12 md:col-span-6">
+                                <x-base.form-label for="incoming_username">Incoming Username</x-base.form-label>
+                                <x-base.form-input id="incoming_username" name="incoming_username" type="text" class="w-full" value="{{ $mailAccount->incoming_username ?? '' }}" />
+                            </div>
+
+                            <div class="col-span-12 md:col-span-6">
+                                <x-base.form-label for="incoming_password">Incoming Password</x-base.form-label>
+                                <x-base.form-input id="incoming_password" name="incoming_password" type="password" class="w-full" value="{{ $mailAccount->incoming_password ?? '' }}" />
+                            </div>
+                        </div>
+
+                        <div class="mt-6 flex justify-end gap-2">
+                            <x-base.button type="button" variant="outline-secondary" onclick="closeMailAccountSettingsModal()" class="w-24">
+                                Cancel
+                            </x-base.button>
+                            <x-base.button type="button" variant="outline-secondary" class="w-36" id="test-mail-account-settings-btn">
+                                Test Connection
+                            </x-base.button>
+                            <x-base.button type="submit" variant="primary" class="w-32" id="save-mail-account-settings-btn">
+                                Save Settings
+                            </x-base.button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 @push('scripts')
@@ -260,6 +376,7 @@
         let currentPage = 1;
         let totalRecords = 0;
         let currentFolder = '{{ $currentFolder }}';
+        const MAIL_CSRF_TOKEN = '{{ csrf_token() }}';
 
         $(document).ready(function() {
             loadMails();
@@ -278,6 +395,105 @@
                     loadMails();
                 }
             });
+
+            const mailAccountForm = document.getElementById('mail-account-settings-form');
+            const testBtn = document.getElementById('test-mail-account-settings-btn');
+
+            if (mailAccountForm) {
+                mailAccountForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    const submitBtn = document.getElementById('save-mail-account-settings-btn');
+                    const originalText = submitBtn ? submitBtn.textContent : '';
+
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.textContent = 'Saving...';
+                    }
+
+                    const formData = new FormData(mailAccountForm);
+
+                    fetch('{{ route('user-mail-accounts.save') }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': MAIL_CSRF_TOKEN,
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                        body: formData,
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showToast(data.message || 'Mail account settings saved successfully.', 'success');
+
+                            const modal = document.getElementById('mail-account-settings-modal');
+                            if (modal) {
+                                modal.classList.add('hidden');
+                                modal.style.display = 'none';
+                            }
+                        } else {
+                            if (data.errors) {
+                                const firstError = Object.values(data.errors)[0][0] || 'Validation error';
+                                showToast(firstError, 'error');
+                            } else {
+                                showToast(data.message || 'Failed to save mail account settings.', 'error');
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error saving mail account settings:', error);
+                        showToast('An error occurred while saving mail account settings.', 'error');
+                    })
+                    .finally(() => {
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = originalText;
+                        }
+                    });
+                });
+
+                if (testBtn) {
+                    testBtn.addEventListener('click', function() {
+                        const formData = new FormData(mailAccountForm);
+
+                        const testOriginalText = testBtn.textContent;
+                        testBtn.disabled = true;
+                        testBtn.textContent = 'Testing...';
+
+                        fetch('{{ route('user-mail-accounts.test') }}', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': MAIL_CSRF_TOKEN,
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                            },
+                            body: formData,
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                showToast(data.message || 'SMTP connection successful.', 'success');
+                            } else {
+                                if (data.errors) {
+                                    const firstError = Object.values(data.errors)[0][0] || 'Validation error';
+                                    showToast(firstError, 'error');
+                                } else {
+                                    showToast(data.message || 'SMTP connection failed.', 'error');
+                                }
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error testing mail account settings:', error);
+                            showToast('An error occurred while testing SMTP connection.', 'error');
+                        })
+                        .finally(() => {
+                            testBtn.disabled = false;
+                            testBtn.textContent = testOriginalText;
+                        });
+                    });
+                }
+            }
         }
 
         // Global handler for folder changes (used by inline onclick on sidebar links)
@@ -310,28 +526,56 @@
             return false;
         };
 
+        // Open Personal Mail Account Settings Modal
+        window.openMailAccountSettingsModal = function() {
+            const modal = document.getElementById('mail-account-settings-modal');
+            if (!modal) {
+                console.error('Mail account settings modal not found');
+                return;
+            }
+
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+        };
+
+        // Close Personal Mail Account Settings Modal
+        window.closeMailAccountSettingsModal = function() {
+            const modal = document.getElementById('mail-account-settings-modal');
+            if (!modal) {
+                return;
+            }
+
+            modal.classList.add('hidden');
+            modal.style.display = 'none';
+        };
+
         function loadMails() {
             const search = $('#mail-search').val();
             const folder = currentFolder;
 
             $('#mails-container').html('<div class="text-center py-8 text-slate-500">Loading mails...</div>');
 
-            $.ajax({
-                url: '{{ route("electronic-mail.datatable") }}',
-                type: 'GET',
-                data: {
-                    folder: folder,
-                    search: search,
-                    page: currentPage
+            const params = new URLSearchParams({
+                folder: folder || '',
+                search: search || '',
+                page: currentPage || 1,
+            });
+
+            fetch('{{ route("electronic-mail.datatable") }}' + '?' + params.toString(), {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
                 },
-                success: function(response) {
-                    renderMails(response.data || []);
-                    updateMailCount(response.recordsTotal || 0, response.recordsFiltered || 0);
-                },
-                error: function(xhr) {
-                    console.error('Error loading mails:', xhr);
-                    $('#mails-container').html('<div class="text-center py-8 text-slate-500">Error loading mails</div>');
-                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                renderMails(data.data || []);
+                updateMailCount(data.recordsTotal || 0, data.recordsFiltered || 0);
+            })
+            .catch(error => {
+                console.error('Error loading mails:', error);
+                $('#mails-container').html('<div class="text-center py-8 text-slate-500">Error loading mails</div>');
             });
         }
 
@@ -391,23 +635,50 @@
 
         // Global functions
         window.viewMail = function(id) {
-            $.get('{{ route("electronic-mail.show", ":id") }}'.replace(':id', id))
-                .done(function(response) {
-                    if (response.success) {
-                        displayMailContent(response.mail);
-                        $('#view-mail-modal').modal('show');
-                    }
-                });
+            const url = '{{ route("electronic-mail.show", ":id") }}'.replace(':id', id);
+
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // المودال الأصلي لعرض الرسالة تم حذفه، لذلك نكتفي بعرض المحتوى في الكونسول لاحقاً إذا احتجنا
+                    displayMailContent(data.mail);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading mail:', error);
+                showToast('Failed to load mail details.', 'error');
+            });
         };
 
         window.toggleStar = function(id) {
-            $.post('{{ route("electronic-mail.toggle-star", ":id") }}'.replace(':id', id))
-                .done(function(response) {
-                    if (response.success) {
-                        loadMails();
-                        showToast('Mail star status updated', 'success');
-                    }
-                });
+            const url = '{{ route("electronic-mail.toggle-star", ":id") }}'.replace(':id', id);
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': MAIL_CSRF_TOKEN,
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    loadMails();
+                    showToast('Mail star status updated', 'success');
+                }
+            })
+            .catch(error => {
+                console.error('Error toggling star:', error);
+                showToast('Failed to update star status.', 'error');
+            });
         };
 
         window.refreshMails = function() {

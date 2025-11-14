@@ -5,6 +5,7 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\LayoutController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\UserMailAccountController;
 
 /*
 |--------------------------------------------------------------------------
@@ -237,6 +238,12 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{electronicMail}', [App\Http\Controllers\ElectronicMailController::class, 'destroy'])->name('destroy');
         Route::post('/{electronicMail}/toggle-star', [App\Http\Controllers\ElectronicMailController::class, 'toggleStar'])->name('toggle-star');
         Route::post('/{electronicMail}/mark-read', [App\Http\Controllers\ElectronicMailController::class, 'markAsRead'])->name('mark-read');
+    });
+
+    // User Mail Account Routes (personal email settings)
+    Route::prefix('user-mail-accounts')->name('user-mail-accounts.')->group(function () {
+        Route::post('/save', [UserMailAccountController::class, 'save'])->name('save');
+        Route::post('/test', [UserMailAccountController::class, 'test'])->name('test');
     });
 
     // Approval System Routes

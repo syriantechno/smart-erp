@@ -133,6 +133,16 @@ class User extends Authenticatable
                    ->count();
     }
 
+    public function mailAccounts()
+    {
+        return $this->hasMany(UserMailAccount::class);
+    }
+
+    public function defaultMailAccount()
+    {
+        return $this->hasOne(UserMailAccount::class)->where('is_default', true);
+    }
+
     /**
      * Get the URL to the user's profile photo.
      *
