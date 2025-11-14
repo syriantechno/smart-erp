@@ -8,6 +8,7 @@ use App\Models\Company;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 use App\Services\DocumentCodeGenerator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -372,6 +373,15 @@ class ElectronicMailController extends Controller
         $subject = $data['subject'] ?? '(No Subject)';
         $body = $data['content'] ?? '';
 
+        Log::info('Attempting SMTP send via user_smtp', [
+            'to' => $data['recipient_email'] ?? null,
+            'recipient_name' => $data['recipient_name'] ?? null,
+            'host' => $account->smtp_host,
+            'port' => $account->smtp_port,
+            'encryption' => $account->smtp_encryption,
+            'username' => $account->smtp_username,
+        ]);
+
         try {
             Mail::mailer('user_smtp')->raw($body, function ($message) use ($data, $subject) {
                 $message->to($data['recipient_email']);
@@ -391,7 +401,11 @@ class ElectronicMailController extends Controller
                     }
                 }
             });
+            Log::info('SMTP send via user_smtp completed without exception.');
         } catch (\Throwable $e) {
+            Log::error('SMTP send via user_smtp failed', [
+                'error' => $e->getMessage(),
+            ]);
             throw new \RuntimeException('SMTP send failed: ' . $e->getMessage());
         }
     }
