@@ -5,6 +5,7 @@
 @endsection
 
 @section('subcontent')
+    @include('components.global-notifications')
     <div class="mt-8 grid grid-cols-12 gap-6">
         <div class="col-span-12 lg:col-span-3 2xl:col-span-2">
             <h2 class="intro-y mr-auto mt-2 text-lg font-medium">Electronic Mail</h2>
@@ -359,7 +360,7 @@
                             <x-base.button type="button" variant="outline-secondary" class="w-36" id="test-mail-account-settings-btn">
                                 Test Connection
                             </x-base.button>
-                            <x-base.button type="submit" variant="primary" class="w-32" id="save-mail-account-settings-btn">
+                            <x-base.button type="button" variant="primary" class="w-32" id="save-mail-account-settings-btn">
                                 Save Settings
                             </x-base.button>
                         </div>
@@ -378,38 +379,42 @@
         let currentFolder = '{{ $currentFolder }}';
         const MAIL_CSRF_TOKEN = '{{ csrf_token() }}';
 
-        $(document).ready(function() {
-            loadMails();
-            setupEventListeners();
-        });
+        // Script is loaded at the bottom of the page, so DOM is already ready
+        loadMails();
+        setupEventListeners();
 
         function setupEventListeners() {
-            $('#mail-search-btn').on('click', function() {
-                currentPage = 1;
-                loadMails();
-            });
+            const searchBtn = document.getElementById('mail-search-btn');
+            const searchInput = document.getElementById('mail-search');
 
-            $('#mail-search').on('keypress', function(e) {
-                if (e.which === 13) {
+            if (searchBtn) {
+                searchBtn.addEventListener('click', function() {
                     currentPage = 1;
                     loadMails();
-                }
-            });
+                });
+            }
+
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        currentPage = 1;
+                        loadMails();
+                    }
+                });
+            }
 
             const mailAccountForm = document.getElementById('mail-account-settings-form');
             const testBtn = document.getElementById('test-mail-account-settings-btn');
+            const saveBtn = document.getElementById('save-mail-account-settings-btn');
 
-            if (mailAccountForm) {
-                mailAccountForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
+            if (mailAccountForm && saveBtn) {
+                saveBtn.addEventListener('click', function() {
+                    const submitBtn = saveBtn;
+                    const originalText = submitBtn.textContent;
 
-                    const submitBtn = document.getElementById('save-mail-account-settings-btn');
-                    const originalText = submitBtn ? submitBtn.textContent : '';
-
-                    if (submitBtn) {
-                        submitBtn.disabled = true;
-                        submitBtn.textContent = 'Saving...';
-                    }
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Saving...';
 
                     const formData = new FormData(mailAccountForm);
 
@@ -446,53 +451,51 @@
                         showToast('An error occurred while saving mail account settings.', 'error');
                     })
                     .finally(() => {
-                        if (submitBtn) {
-                            submitBtn.disabled = false;
-                            submitBtn.textContent = originalText;
-                        }
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = originalText;
                     });
                 });
+            }
 
-                if (testBtn) {
-                    testBtn.addEventListener('click', function() {
-                        const formData = new FormData(mailAccountForm);
+            if (mailAccountForm && testBtn) {
+                testBtn.addEventListener('click', function() {
+                    const formData = new FormData(mailAccountForm);
 
-                        const testOriginalText = testBtn.textContent;
-                        testBtn.disabled = true;
-                        testBtn.textContent = 'Testing...';
+                    const testOriginalText = testBtn.textContent;
+                    testBtn.disabled = true;
+                    testBtn.textContent = 'Testing...';
 
-                        fetch('{{ route('user-mail-accounts.test') }}', {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': MAIL_CSRF_TOKEN,
-                                'Accept': 'application/json',
-                                'X-Requested-With': 'XMLHttpRequest',
-                            },
-                            body: formData,
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                showToast(data.message || 'SMTP connection successful.', 'success');
+                    fetch('{{ route('user-mail-accounts.test') }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': MAIL_CSRF_TOKEN,
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                        body: formData,
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showToast(data.message || 'SMTP connection successful.', 'success');
+                        } else {
+                            if (data.errors) {
+                                const firstError = Object.values(data.errors)[0][0] || 'Validation error';
+                                showToast(firstError, 'error');
                             } else {
-                                if (data.errors) {
-                                    const firstError = Object.values(data.errors)[0][0] || 'Validation error';
-                                    showToast(firstError, 'error');
-                                } else {
-                                    showToast(data.message || 'SMTP connection failed.', 'error');
-                                }
+                                showToast(data.message || 'SMTP connection failed.', 'error');
                             }
-                        })
-                        .catch(error => {
-                            console.error('Error testing mail account settings:', error);
-                            showToast('An error occurred while testing SMTP connection.', 'error');
-                        })
-                        .finally(() => {
-                            testBtn.disabled = false;
-                            testBtn.textContent = testOriginalText;
-                        });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error testing mail account settings:', error);
+                        showToast('An error occurred while testing SMTP connection.', 'error');
+                    })
+                    .finally(() => {
+                        testBtn.disabled = false;
+                        testBtn.textContent = testOriginalText;
                     });
-                }
+                });
             }
         }
 
@@ -550,10 +553,14 @@
         };
 
         function loadMails() {
-            const search = $('#mail-search').val();
+            const searchInput = document.getElementById('mail-search');
+            const search = searchInput ? searchInput.value : '';
             const folder = currentFolder;
 
-            $('#mails-container').html('<div class="text-center py-8 text-slate-500">Loading mails...</div>');
+            const mailsContainer = document.getElementById('mails-container');
+            if (mailsContainer) {
+                mailsContainer.innerHTML = '<div class="text-center py-8 text-slate-500">Loading mails...</div>';
+            }
 
             const params = new URLSearchParams({
                 folder: folder || '',
@@ -575,16 +582,20 @@
             })
             .catch(error => {
                 console.error('Error loading mails:', error);
-                $('#mails-container').html('<div class="text-center py-8 text-slate-500">Error loading mails</div>');
+                if (mailsContainer) {
+                    mailsContainer.innerHTML = '<div class="text-center py-8 text-slate-500">Error loading mails</div>';
+                }
             });
         }
 
         function renderMails(mails) {
-            const container = $('#mails-container');
-            container.empty();
+            const container = document.getElementById('mails-container');
+            if (!container) return;
+
+            container.innerHTML = '';
 
             if (mails.length === 0) {
-                container.html('<div class="text-center py-8 text-slate-500">No mails found</div>');
+                container.innerHTML = '<div class="text-center py-8 text-slate-500">No mails found</div>';
                 return;
             }
 
@@ -622,14 +633,17 @@
                         </div>
                     </div>
                 `;
-                container.append(row);
+                container.insertAdjacentHTML('beforeend', row);
             });
         }
 
         function updateMailCount(total, filtered) {
             const start = ((currentPage - 1) * 25) + 1;
             const end = Math.min(currentPage * 25, filtered);
-            $('#mail-count').text(`${start} - ${end} of ${total}`);
+            const mailCount = document.getElementById('mail-count');
+            if (mailCount) {
+                mailCount.textContent = `${start} - ${end} of ${total}`;
+            }
             totalRecords = total;
         }
 
@@ -688,39 +702,48 @@
 
         // Bulk selection functions
         window.selectAllMails = function() {
-            $('.mail-checkbox').prop('checked', true);
+            document.querySelectorAll('.mail-checkbox').forEach(function(cb) {
+                cb.checked = true;
+            });
         };
 
         window.selectNoMails = function() {
-            $('.mail-checkbox').prop('checked', false);
+            document.querySelectorAll('.mail-checkbox').forEach(function(cb) {
+                cb.checked = false;
+            });
         };
 
         window.selectReadMails = function() {
-            $('.mail-checkbox').each(function() {
-                $(this).prop('checked', true);
+            document.querySelectorAll('.mail-checkbox').forEach(function(cb) {
+                cb.checked = true;
             });
         };
 
         window.selectUnreadMails = function() {
-            $('.mail-checkbox').each(function() {
-                $(this).prop('checked', false);
+            document.querySelectorAll('.mail-checkbox').forEach(function(cb) {
+                cb.checked = false;
             });
         };
 
         window.selectStarredMails = function() {
-            $('.mail-checkbox').each(function() {
-                $(this).prop('checked', false);
+            document.querySelectorAll('.mail-checkbox').forEach(function(cb) {
+                cb.checked = false;
             });
         };
 
         window.selectUnstarredMails = function() {
-            $('.mail-checkbox').each(function() {
-                $(this).prop('checked', true);
+            document.querySelectorAll('.mail-checkbox').forEach(function(cb) {
+                cb.checked = true;
             });
         };
 
         function displayMailContent(mail) {
-            $('#mail-subject').text(mail.subject);
+            const subjectEl = document.getElementById('mail-subject');
+            const contentEl = document.getElementById('mail-content');
+
+            if (subjectEl) {
+                subjectEl.textContent = mail.subject;
+            }
 
             let content = `
                 <div class="border-b pb-4 mb-4">
@@ -753,22 +776,10 @@
                 </div>
             `;
 
-            $('#mail-content').html(content);
+            if (contentEl) {
+                contentEl.innerHTML = content;
+            }
         }
 
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.className = `fixed top-4 right-4 z-50 px-4 py-2 rounded-lg text-white ${
-                type === 'success' ? 'bg-green-500' :
-                type === 'error' ? 'bg-red-500' :
-                type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
-            }`;
-            toast.textContent = message;
-            document.body.appendChild(toast);
-
-            setTimeout(() => {
-                toast.remove();
-            }, 3000);
-        }
     </script>
 @endpush
