@@ -396,96 +396,61 @@
         let currentSessionId = null;
         let aiAvailable = false;
 
-        $(document).ready(function() {
+        jQuery(document).ready(function() {
             checkAIAvailability();
             loadRecentActivity();
         });
 
         function checkAIAvailability() {
-            $.get('{{ route("ai.available") }}')
+            jQuery.get('{{ route("ai.available") }}')
                 .done(function(response) {
                     aiAvailable = response.available;
 
                     if (!aiAvailable) {
-                        $('#ai-setup-alert').show();
-                        // Disable all interactive buttons
-                        $('.btn').not('.btn-secondary').prop('disabled', true).addClass('opacity-50');
+                        jQuery('#ai-setup-alert').show();
+                        jQuery('.btn').not('.btn-secondary').prop('disabled', true).addClass('opacity-50');
                     } else {
-                        $('#ai-status-banner').show();
+                        jQuery('#ai-status-alert').hide();
                     }
                 })
                 .fail(function() {
-                    $('#ai-setup-alert').show();
-                    $('.btn').not('.btn-secondary').prop('disabled', true).addClass('opacity-50');
+                    aiAvailable = false;
+                    jQuery('#ai-setup-alert').show();
+                    jQuery('.btn').not('.btn-secondary').prop('disabled', true).addClass('opacity-50');
                 });
         }
 
         function loadRecentActivity() {
-            $.get('{{ route("ai.datatable") }}', {
-                length: 5,
-                start: 0
-            })
-            .done(function(response) {
-                renderRecentActivity(response.data || []);
-            });
-        }
+            jQuery.get('{{ route("ai.datatable") }}', { length: 5, start: 0 })
+                .done(function(response) {
+                    var data = response.data || [];
+                    var container = jQuery('#recent-activity');
 
-        function renderRecentActivity(interactions) {
-            const container = $('#recent-activity');
+                    if (!data.length) {
+                        container.html('<div class="text-center py-4 text-gray-500 text-sm">No recent activity</div>');
+                        return;
+                    }
 
-            if (interactions.length === 0) {
-                container.html('<div class="text-center py-4 text-gray-500 text-sm">No recent activity</div>');
-                return;
-            }
+                    var html = '';
+                    data.forEach(function(item) {
+                        html += '<div class="flex items-start space-x-3 p-3 rounded-lg bg-gray-50">' +
+                            '<div class="flex-shrink-0 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold">' +
+                                (item.interaction_type ? item.interaction_type.charAt(0).toUpperCase() : '?') +
+                            '</div>' +
+                            '<div class="flex-1 min-w-0">' +
+                                '<p class="text-sm font-medium text-gray-900 truncate">' +
+                                    (item.user_input ? item.user_input.substring(0, 50) : '') +
+                                '</p>' +
+                                '<div class="flex items-center space-x-2 mt-1 text-xs text-gray-500">' +
+                                    '<span>' + (item.status || '') + '</span>' +
+                                    '<span>' + (item.formatted_date || '') + '</span>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>';
+                    });
 
-            let html = '';
-            interactions.forEach(function(interaction) {
-                const typeClass = getTypeClass(interaction.interaction_type);
-                const statusClass = getStatusClass(interaction.status);
-
-                html += `
-                    <div class="flex items-start space-x-3 p-3 rounded-lg bg-gray-50">
-                        <div class="flex-shrink-0">
-                            <div class="w-8 h-8 ${typeClass} rounded-full flex items-center justify-center">
-                                <span class="text-white text-xs font-bold">${interaction.interaction_type.charAt(0).toUpperCase()}</span>
-                            </div>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-gray-900 truncate">
-                                ${interaction.user_input.substring(0, 50)}${interaction.user_input.length > 50 ? '...' : ''}
-                            </p>
-                            <div class="flex items-center space-x-2 mt-1">
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${statusClass}">
-                                    ${interaction.status}
-                                </span>
-                                <span class="text-xs text-gray-500">${interaction.formatted_date}</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-
-            container.html(html);
-        }
-
-        function getTypeClass(type) {
-            switch(type) {
-                case 'query': return 'bg-blue-500';
-                case 'command': return 'bg-green-500';
-                case 'analysis': return 'bg-purple-500';
-                case 'generation': return 'bg-yellow-500';
-                case 'chat': return 'bg-indigo-500';
-                default: return 'bg-gray-500';
-            }
-        }
-
-        function getStatusClass(status) {
-            switch(status) {
-                case 'completed': return 'bg-green-100 text-green-800';
-                case 'processing': return 'bg-blue-100 text-blue-800';
-                case 'failed': return 'bg-red-100 text-red-800';
-                default: return 'bg-yellow-100 text-yellow-800';
-            }
+                    container.html(html);
+                });
         }
 
         function startChat() {
@@ -495,9 +460,9 @@
             }
 
             currentSessionId = generateSessionId();
-            $('#ai-chat-modal').modal('show');
-            $('#chat-messages').empty();
-            addMessage('Hello! I\'m your AI assistant. I can help you with various tasks in the ERP system. What would you like to do?', 'ai');
+            jQuery('#ai-chat-modal').modal('show');
+            jQuery('#chat-messages').empty();
+            addMessage("Hello! I'm your AI assistant. I can help you with various tasks in the ERP system. What would you like to do?", 'ai');
         }
 
         function showCommandMode() {
@@ -507,11 +472,10 @@
             }
 
             currentSessionId = generateSessionId();
-            $('#interaction-type').val('command');
-            $('#ai-chat-modal').modal('show');
-            $('#chat-messages').empty();
+            jQuery('#interaction-type').val('command');
+            jQuery('#ai-chat-modal').modal('show');
+            jQuery('#chat-messages').empty();
             addMessage('Command Mode Activated! I can execute commands to create, update, or manage system data. Try commands like:', 'ai');
-            addMessage('• "Create a task for project planning"<br>• "Add a new material: Laptop, price $1000"<br>• "Generate a sales report"', 'ai');
         }
 
         function showAnalysisMode() {
@@ -521,11 +485,10 @@
             }
 
             currentSessionId = generateSessionId();
-            $('#interaction-type').val('analysis');
-            $('#ai-chat-modal').modal('show');
-            $('#chat-messages').empty();
-            addMessage('Analysis Mode Activated! I can analyze your ERP data and provide insights. Try asking for:', 'ai');
-            addMessage('• "Analyze sales performance"<br>• "Generate employee productivity report"<br>• "Show inventory trends"', 'ai');
+            jQuery('#interaction-type').val('analysis');
+            jQuery('#ai-chat-modal').modal('show');
+            jQuery('#chat-messages').empty();
+            addMessage('Analysis Mode Activated! I can analyze your ERP data and provide insights.', 'ai');
         }
 
         function showGenerationMode() {
@@ -535,123 +498,106 @@
             }
 
             currentSessionId = generateSessionId();
-            $('#interaction-type').val('generation');
-            $('#ai-chat-modal').modal('show');
-            $('#chat-messages').empty();
-            addMessage('Content Generation Mode! I can create various types of content. Try:', 'ai');
-            addMessage('• "Write an email about project update"<br>• "Create a monthly report template"<br>• "Generate meeting agenda"', 'ai');
+            jQuery('#interaction-type').val('generation');
+            jQuery('#ai-chat-modal').modal('show');
+            jQuery('#chat-messages').empty();
+            addMessage('Content Generation Mode! I can create various types of content.', 'ai');
         }
 
         function showSetupInstructions() {
-            $('#setup-modal').modal('show');
+            jQuery('#setup-modal').modal('show');
         }
 
         function testAIConnection() {
-            $('#setup-modal button').prop('disabled', true);
-            $('#setup-modal button:last').text('Testing...');
+            jQuery('#setup-modal button').prop('disabled', true);
+            jQuery('#setup-modal button:last').text('Testing...');
 
-            $.post('{{ route("ai.interact") }}', {
+            jQuery.post('{{ route("ai.interact") }}', {
                 message: 'Hello, this is a test message to verify AI connection.',
                 type: 'chat',
                 _token: '{{ csrf_token() }}'
             })
             .done(function(response) {
                 if (response.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Connection Successful!',
-                        text: 'AI is working correctly. You can now use all AI features.',
-                        timer: 3000,
-                        showConfirmButton: false
-                    }).then(() => {
-                        location.reload(); // Reload to enable buttons
-                    });
+                    alert('AI connection successful!');
                 } else {
-                    Swal.fire('Connection Failed', response.error || 'Unable to connect to AI service', 'error');
+                    alert(response.error || 'Unable to connect to AI service');
                 }
             })
-            .fail(function(xhr) {
-                Swal.fire('Connection Failed', 'Unable to connect to AI service. Please check your API key configuration.', 'error');
+            .fail(function() {
+                alert('Unable to connect to AI service. Please check your AI configuration.');
             })
             .always(function() {
-                $('#setup-modal button').prop('disabled', false);
-                $('#setup-modal button:last').text('Test Connection');
+                jQuery('#setup-modal button').prop('disabled', false);
+                jQuery('#setup-modal button:last').text('Test Connection');
             });
         }
 
         function sendMessage() {
-            const input = $('#chat-input');
-            const message = input.val().trim();
+            var input = jQuery('#chat-input');
+            var message = input.val().trim();
 
             if (!message) return;
 
             addMessage(message, 'user');
             input.val('');
 
-            // Show typing indicator
-            $('#typing-indicator').addClass('show');
+            jQuery('#typing-indicator').addClass('show');
 
-            const interactionType = $('#interaction-type').val();
+            var interactionType = jQuery('#interaction-type').val();
 
-            $.post('{{ route("ai.interact") }}', {
+            jQuery.post('{{ route("ai.interact") }}', {
                 message: message,
                 type: interactionType,
                 session_id: currentSessionId,
                 _token: '{{ csrf_token() }}'
             })
             .done(function(response) {
-                $('#typing-indicator').removeClass('show');
+                jQuery('#typing-indicator').removeClass('show');
 
                 if (response.success) {
                     addMessage(response.response, 'ai');
 
-                    // Handle command results
                     if (response.metadata && response.metadata.command_result) {
-                        const result = response.metadata.command_result;
+                        var result = response.metadata.command_result;
                         if (result.type) {
-                            addMessage(`✅ ${result.message}`, 'ai', 'success');
+                            addMessage('✅ ' + result.message, 'ai', 'success');
                         }
                     }
 
-                    // Refresh activity
                     loadRecentActivity();
                 } else {
                     addMessage(response.error || 'Sorry, I encountered an error processing your request.', 'ai', 'error');
                 }
             })
-            .fail(function(xhr) {
-                $('#typing-indicator').removeClass('show');
-                const error = xhr.responseJSON?.error || 'Network error occurred';
-                addMessage(`❌ ${error}`, 'ai', 'error');
+            .fail(function() {
+                jQuery('#typing-indicator').removeClass('show');
+                addMessage('❌ Network error occurred', 'ai', 'error');
             });
         }
 
-        function addMessage(content, sender, type = 'normal') {
-            const messagesContainer = $('#chat-messages');
-            const messageClass = sender === 'user' ? 'user' : 'ai';
-            const bgClass = type === 'success' ? 'bg-green-100' :
-                           type === 'error' ? 'bg-red-100' : 'bg-white';
+        function addMessage(content, sender, type) {
+            type = type || 'normal';
+            var messagesContainer = jQuery('#chat-messages');
+            var messageClass = sender === 'user' ? 'user' : 'ai';
+            var bgClass = 'bg-white';
+            if (type === 'success') bgClass = 'bg-green-100';
+            else if (type === 'error') bgClass = 'bg-red-100';
 
-            const messageHtml = `
-                <div class="chat-bubble ${messageClass}">
-                    <div class="${bgClass} p-3 rounded-lg shadow-sm max-w-lg">
-                        <div class="flex items-center mb-1">
-                            ${sender === 'ai' ?
-                                '<x-base.lucide icon="Bot" class="w-4 h-4 mr-2 text-blue-600" />' :
-                                '<x-base.lucide icon="User" class="w-4 h-4 mr-2 text-green-600" />'
-                            }
-                            <span class="font-medium text-sm">${sender === 'ai' ? 'AI Assistant' : 'You'}</span>
-                        </div>
-                        <div class="text-sm">${content}</div>
-                    </div>
-                </div>
-            `;
+            var label = sender === 'ai' ? 'AI:' : 'You:';
 
-            messagesContainer.append(messageHtml);
+            var html = '' +
+                '<div class="chat-bubble ' + messageClass + '">' +
+                    '<div class="' + bgClass + ' p-3 rounded-lg shadow-sm max-w-lg">' +
+                        '<div class="flex items-center mb-1">' +
+                            '<span class="font-semibold mr-2">' + label + '</span>' +
+                        '</div>' +
+                        '<div class="text-sm">' + content + '</div>' +
+                    '</div>' +
+                '</div>';
+
+            messagesContainer.append(html);
             messagesContainer.scrollTop(messagesContainer[0].scrollHeight);
-
-            // Reinitialize Lucide icons
-            lucide.createIcons();
         }
 
         function handleChatKeyPress(event) {
@@ -665,10 +611,14 @@
             return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         }
 
-        // Global functions for quick actions
+        // Expose globally for inline handlers
         window.startChat = startChat;
         window.showCommandMode = showCommandMode;
         window.showAnalysisMode = showAnalysisMode;
         window.showGenerationMode = showGenerationMode;
+        window.showSetupInstructions = showSetupInstructions;
+        window.testAIConnection = testAIConnection;
+        window.handleChatKeyPress = handleChatKeyPress;
+        window.sendMessage = sendMessage;
     </script>
 @endpush

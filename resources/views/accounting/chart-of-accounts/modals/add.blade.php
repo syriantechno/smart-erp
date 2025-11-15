@@ -88,7 +88,14 @@
                         <!-- Is Active -->
                         <div class="col-span-12 md:col-span-6">
                             <label class="flex items-center">
-                                <x-base.form-checkbox id="is_active" name="is_active" value="1" checked />
+                                <input
+                                    id="is_active"
+                                    name="is_active"
+                                    type="checkbox"
+                                    value="1"
+                                    checked
+                                    class="form-checkbox rounded text-primary border-slate-300 dark:border-darkmode-400"
+                                />
                                 <span class="ml-2 text-sm font-medium text-slate-700 dark:text-slate-300">Active Account</span>
                             </label>
                             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">

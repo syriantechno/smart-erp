@@ -288,68 +288,13 @@ class ProjectController extends Controller
                     $project->name,
                     $project->company?->name ?? 'N/A',
                     $project->department?->name ?? 'N/A',
-}
-
-/**
- * Update project status
- */
-public function updateStatus(Request $request, Project $project): JsonResponse
-{
-    $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
-        'status' => 'required|in:planning,active,on_hold,completed,cancelled',
-        'progress_percentage' => 'nullable|integer|min:0|max:100',
-        'actual_end_date' => 'nullable|date',
-        'actual_cost' => 'nullable|numeric|min:0',
-        'notes' => 'nullable|string'
-    ]);
-
-    if ($validator->fails()) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Validation error',
-            'errors' => $validator->errors()
-        ], 422);
-    }
-
-    try {
-        $updateData = [
-            'status' => $request->status,
-            'notes' => $request->notes
-        ];
-
-        if ($request->has('progress_percentage')) {
-            $updateData['progress_percentage'] = $request->progress_percentage;
-        }
-
-        if ($request->has('actual_end_date')) {
-            $updateData['actual_end_date'] = $request->actual_end_date;
-        }
-
-        if ($request->has('actual_cost')) {
-            $updateData['actual_cost'] = $request->actual_cost;
-        }
-
-        $project->update($updateData);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Project status updated successfully',
-            'data' => $project
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Failed to update project status',
-            'error' => $e->getMessage()
-        ], 500);
-    }
-}
-
-/**
- * Get project statistics
- */
-public function stats(Request $request): JsonResponse
-{
+                    $project->manager?->full_name ?? 'N/A',
+                    $project->status_label,
+                    $project->priority_label,
+                    $project->start_date->format('Y-m-d'),
+                    $project->end_date ? $project->end_date->format('Y-m-d') : 'N/A',
+                    $project->budget ?? 0,
+                    $project->progress_percentage . '%'
     try {
         $stats = [
             'total_projects' => Project::active()->count(),
