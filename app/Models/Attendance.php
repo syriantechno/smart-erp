@@ -16,6 +16,7 @@ class Attendance extends Model
         'check_in',
         'check_out',
         'working_hours',
+        'overtime_hours',
     ];
 
     protected $casts = [
@@ -23,6 +24,7 @@ class Attendance extends Model
         'check_in' => 'datetime:H:i',
         'check_out' => 'datetime:H:i',
         'working_hours' => 'decimal:2',
+        'overtime_hours' => 'decimal:2',
     ];
 
     // Relationships
@@ -112,6 +114,21 @@ class Attendance extends Model
             'travel_days' => (clone $query)->where('status', 'travel')->count(),
             'holiday_days' => (clone $query)->where('status', 'holiday')->count(),
         ];
+    }
+
+    /**
+     * حساب ساعات الأوفر تايم بناءً على ساعات العمل اليومية في الإعدادات
+     */
+    public function calculateOvertimeHours(): float
+    {
+        $workingHoursPerDay = (float) setting('attendance.working_hours_per_day', 8);
+        $worked = (float) ($this->working_hours ?? 0);
+
+        if ($worked <= $workingHoursPerDay) {
+            return 0.0;
+        }
+
+        return $worked - $workingHoursPerDay;
     }
 
     /**

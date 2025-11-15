@@ -110,6 +110,9 @@ class AttendanceService
             // تحديث حالة الحضور تلقائياً
             $attendance->status = $attendance->calculateAttendanceStatus();
 
+            // حساب ساعات الأوفر تايم بناءً على إعدادات ساعات العمل اليومية
+            $attendance->overtime_hours = $attendance->calculateOvertimeHours();
+
             // حفظ البيانات الإضافية
             if ($location) {
                 $attendance->notes = ($attendance->notes ? $attendance->notes . ' | ' : '') . "Checkout Location: {$location}";

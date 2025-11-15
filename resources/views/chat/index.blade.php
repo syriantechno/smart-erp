@@ -116,7 +116,9 @@
                 <div class="flex items-center justify-between p-5 border-b border-slate-200/60">
                     <div class="flex items-center">
                         <div class="image-fit h-10 w-10 relative">
-                            <img id="chat-avatar" class="rounded-full" src="https://via.placeholder.com/40x40/cccccc/666666?text=U" alt="User" />
+                            <div id="chat-avatar" class="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-700 font-semibold">
+                                U
+                            </div>
                         </div>
                         <div class="ml-3">
                             <div id="chat-title" class="font-medium text-slate-900 dark:text-white">Select a conversation</div>
@@ -292,6 +294,12 @@
         }
 
         function setupRealTimeUpdates() {
+            // Skip realtime wiring if Echo is not configured
+            if (typeof window.Echo === 'undefined' || !window.Echo) {
+                console.warn('Laravel Echo is not available on the chat page. Realtime updates are disabled.');
+                return;
+            }
+
             // Listen for new messages
             window.Echo.private('user.' + {{ auth()->id() }})
                 .listen('.message.sent', (e) => {
@@ -336,7 +344,9 @@
                         <div class="flex items-center justify-between">
                             <div class="flex items-center flex-1 min-w-0">
                                 <div class="image-fit h-10 w-10 relative flex-shrink-0">
-                                    <img class="rounded-full" src="https://via.placeholder.com/40x40/cccccc/666666?text=${conversation.display_name.charAt(0)}" alt="User" />
+                                    <div class="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-700 font-semibold">
+                                        ${conversation.display_name.charAt(0)}
+                                    </div>
                                 </div>
                                 <div class="ml-3 flex-1 min-w-0">
                                     <div class="font-medium text-slate-900 dark:text-white truncate">${conversation.display_name}</div>
@@ -503,7 +513,9 @@
                     <label class="flex items-center p-2 hover:bg-slate-100 rounded cursor-pointer">
                         <input type="checkbox" class="participant-checkbox mr-3" value="${user.id}">
                         <div class="image-fit h-8 w-8 relative mr-3">
-                            <img class="rounded-full" src="https://via.placeholder.com/32x32/cccccc/666666?text=${user.name.charAt(0)}" alt="User" />
+                            <div class="h-8 w-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-700 text-xs font-semibold">
+                                ${user.name.charAt(0)}
+                            </div>
                         </div>
                         <div>
                             <div class="font-medium">${user.name}</div>

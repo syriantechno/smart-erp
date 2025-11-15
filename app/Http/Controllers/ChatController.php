@@ -22,8 +22,10 @@ class ChatController extends Controller
                                    ->orderByDesc('updated_at')
                                    ->get();
 
+        // All other users that can be selected as chat participants
         $users = User::where('id', '!=', auth()->id())
-                    ->select('id', 'name')
+                    ->select('id', 'name', 'email')
+                    ->orderBy('name')
                     ->get();
 
         $unreadCount = $this->getTotalUnreadCount();

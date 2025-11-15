@@ -78,7 +78,7 @@ class AttendanceController extends Controller
             }
 
             $savedRecords = 0;
-            $requiredHours = 8.0; // TODO: Make this configurable or get from shift
+            $requiredHours = (float) setting('attendance.working_hours_per_day', 8.0); // يمكن ضبطها من إعدادات الحضور
 
             foreach ($employeeIds as $employeeId) {
                 // If no shift is specified, try to find the employee's assigned shift
@@ -87,9 +87,9 @@ class AttendanceController extends Controller
                     $shiftId = $this->findEmployeeShift($employeeId, $request->attendance_date);
                 }
 
-                // Get working hours from shift or use default
+                // Get working hours from shift or use default from attendance settings
                 $shift = $shiftId ? \App\Models\Shift::find($shiftId) : null;
-                $requiredHours = $shift ? $shift->working_hours : 8.0;
+                $requiredHours = $shift ? (float) $shift->working_hours : (float) setting('attendance.working_hours_per_day', 8.0);
 
                 $workingHours = $this->calculateWorkingHours($request->check_in, $request->check_out, $request->status);
                 $status = $request->status;
@@ -111,6 +111,7 @@ class AttendanceController extends Controller
                         'shift_id' => $shiftId,
                         'notes' => $request->notes,
                         'working_hours' => $workingHours,
+                        'overtime_hours' => max(0, $workingHours - $requiredHours),
                     ]
                 );
                 $savedRecords++;
@@ -150,12 +151,16 @@ class AttendanceController extends Controller
         }
 
         try {
+            $workingHours = $this->calculateWorkingHours($request->check_in, $request->check_out, $request->status);
+            $requiredHours = (float) setting('attendance.working_hours_per_day', 8.0);
+
             $attendance->update([
                 'status' => $request->status,
                 'check_in' => $request->check_in,
                 'check_out' => $request->check_out,
                 'notes' => $request->notes,
-                'working_hours' => $this->calculateWorkingHours($request->check_in, $request->check_out, $request->status),
+                'working_hours' => $workingHours,
+                'overtime_hours' => max(0, $workingHours - $requiredHours),
             ]);
 
             return response()->json([
