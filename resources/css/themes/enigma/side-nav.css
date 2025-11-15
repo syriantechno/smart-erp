@@ -251,6 +251,38 @@
     }
 }
 
+/* Ensure the top bar pattern is available when only side-nav.css is loaded */
+.enigma,
+.smart-erp {
+    .top-bar-pattern {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, #0f172a 0%, #123a8a 35%, #1d4ed8 70%, #020617 100%) !important;
+    }
+
+    .top-bar-pattern::before {
+        content: "";
+        position: absolute;
+        inset: -5%;
+        pointer-events: none;
+        /* Translucent square blocks rotated at different angles (45, 60, 30, 35 deg) */
+        background-image:
+            /* 45° square */
+            linear-gradient(45deg, rgba(255, 255, 255, 0.10) 0, rgba(255, 255, 255, 0.10) 25%, transparent 25%, transparent 100%),
+            /* 60° square */
+            linear-gradient(60deg, rgba(255, 255, 255, 0.08) 0, rgba(255, 255, 255, 0.08) 25%, transparent 25%, transparent 100%),
+            /* 30° square */
+            linear-gradient(30deg, rgba(255, 255, 255, 0.07) 0, rgba(255, 255, 255, 0.07) 25%, transparent 25%, transparent 100%),
+            /* 35° square */
+            linear-gradient(35deg, rgba(255, 255, 255, 0.06) 0, rgba(255, 255, 255, 0.06) 25%, transparent 25%, transparent 100%);
+        background-size: 18% 18%, 20% 20%, 22% 22%, 24% 24%;
+        background-position: 10% 25%, 85% 18%, 40% 80%, 70% 55%;
+        background-repeat: no-repeat;
+        opacity: 0.9;
+    }
+}
+
+
 @keyframes intro-divider-animation {
     100% {
         opacity: 1;

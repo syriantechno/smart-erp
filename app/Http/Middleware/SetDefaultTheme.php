@@ -16,9 +16,9 @@ class SetDefaultTheme
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Always set the theme to 'enigma' for all requests
+        // Always set the theme to 'smart-erp' for all requests
         if (!Session::has('activeTheme')) {
-            Session::put('activeTheme', 'enigma');
+            Session::put('activeTheme', 'smart-erp');
         }
         
         return $next($request);

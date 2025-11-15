@@ -11,9 +11,10 @@
         <x-base.lucide icon="Eye" class="w-4 h-4" />
     </a>
 
-    <!-- Edit Button (UI only for now, no route) -->
+    <!-- Edit Button (UI only for now, calls editShift handler) -->
     @if($canEdit)
         <button type="button"
+                onclick="editShift({{ $shift->id }})"
                 class="flex items-center px-2 py-1 text-xs font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200"
                 title="Edit">
             <x-base.lucide icon="Edit" class="w-4 h-4" />

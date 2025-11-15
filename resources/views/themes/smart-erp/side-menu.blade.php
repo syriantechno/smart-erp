@@ -6,31 +6,19 @@
 
 @section('content')
     <div @class([
-        'tinker md:bg-black/[0.15] dark:bg-transparent relative py-5 px-5 md:py-0 sm:px-8 md:px-0',
-        "after:content-[''] after:bg-gradient-to-b after:from-theme-1 after:to-theme-2 dark:after:from-darkmode-800 dark:after:to-darkmode-800 after:fixed after:inset-0 after:z-[-2]",
+        'enigma py-5 px-5 md:py-0 sm:px-8 md:px-0 bg-slate-100 dark:bg-darkmode-800',
     ])>
         <x-mobile-menu />
-        <div class="mt-[4.7rem] flex overflow-hidden md:mt-0">
+        <div class="relative z-10">
+            <x-themes.enigma.top-bar layout="side-menu" />
+        </div>
+        <div class="flex mt-8">
             <!-- BEGIN: Side Menu -->
-            <nav class="side-nav z-10 hidden overflow-x-hidden px-5 pb-16 md:block md:w-[100px] xl:w-[250px]">
-                <a
-                    class="flex items-center pt-4 pl-5 mt-3 intro-x"
-                    href=""
-                >
-                    <img
-                        class="w-6"
-                        src="{{ Vite::asset('resources/images/logo.svg') }}"
-                        alt="Tinker Tailwind HTML Admin Template"
-                    />
-                    <span class="hidden ml-3 text-lg text-white xl:block">
-                        Tinker
-                    </span>
-                </a>
-                <div class="my-6 side-nav__divider"></div>
+            <nav class="side-nav z-50 -mt-4 hidden w-[100px] xl:w-[260px] overflow-hidden px-5 pb-16 pt-32 md:block bg-white/95 rounded-[26px] shadow-lg dark:bg-darkmode-700/80">
                 <ul>
                     @foreach ($mainMenu as $menuKey => $menu)
                         @if ($menu == 'divider')
-                            <li class="my-6 side-nav__divider"></li>
+                            <li class="side-nav__divider my-6"></li>
                         @else
                             <li>
                                 <a
@@ -114,13 +102,13 @@
             </nav>
             <!-- END: Side Menu -->
             <!-- BEGIN: Content -->
-            <div @class([
-                'rounded-[30px] md:rounded-[35px/50px_0px_0px_0px] min-w-0 min-h-screen max-w-full md:max-w-none bg-slate-100 flex-1 pb-10 px-4 md:px-6 relative md:ml-4 dark:bg-darkmode-700',
-                "before:content-[''] before:w-full before:h-px before:block",
-                "after:content-[''] after:z-[-1] after:rounded-[40px_0px_0px_0px] after:w-full after:inset-y-0 after:absolute after:left-0 after:bg-white/10 after:mt-8 after:-ml-4 after:dark:bg-darkmode-400/50 after:hidden md:after:block",
-            ])>
-                <x-themes.tinker.top-bar />
-                @yield('subcontent')
+            <div class="flex-1 w-full flex justify-center md:justify-start mt-24 md:mt-28 pr-6 pl-6">
+                <div @class([
+                    'w-full rounded-[26px] px-4 md:px-8 min-h-[calc(100vh-9rem)] bg-white/95 shadow-sm md:pt-8 pb-10 mt-6 md:mt-4 relative z-10 dark:bg-darkmode-700/95',
+                    "before:content-[''] before:w-full before:h-px before:block",
+                ])>
+                    @yield('subcontent')
+                </div>
             </div>
             <!-- END: Content -->
         </div>
@@ -129,7 +117,7 @@
 
 @pushOnce('styles')
     @vite('resources/css/vendors/tippy.css')
-    @vite('resources/css/themes/tinker/side-nav.css')
+    @vite('resources/css/themes/enigma/side-nav.css')
 @endPushOnce
 
 @pushOnce('vendors')
@@ -137,5 +125,5 @@
 @endPushOnce
 
 @pushOnce('scripts')
-    @vite('resources/js/themes/tinker.js')
+    @vite('resources/js/themes/enigma.js')
 @endPushOnce

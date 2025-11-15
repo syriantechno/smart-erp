@@ -281,6 +281,28 @@
     }
 }
 
+/* Custom blue gradient pattern for the smart-erp (enigma) top bar */
+.enigma,
+.smart-erp {
+    .top-bar-pattern {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, #0f172a 0%, #123a8a 35%, #1d4ed8 70%, #020617 100%);
+    }
+
+    .top-bar-pattern::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        /* Axis-aligned translucent rectangles (no rotation) layered like overlapping cards */
+        background:
+            linear-gradient(to right, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)) 8% 20% / 260px 120px no-repeat,
+            linear-gradient(to right, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015)) 70% 18% / 280px 130px no-repeat,
+            linear-gradient(to right, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01)) 32% 65% / 300px 140px no-repeat;
+    }
+}
+
 @keyframes active-top-menu-chevron {
     100% {
         opacity: 1;

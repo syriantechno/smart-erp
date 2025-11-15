@@ -219,8 +219,15 @@
                     }
                 ],
                 drawCallback: function () {
-                    if (typeof window.Lucide !== 'undefined') {
-                        window.Lucide.createIcons();
+                    // Re-render Lucide icons inside the table after each draw
+                    try {
+                        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+                            window.lucide.createIcons();
+                        } else if (window.Lucide && typeof window.Lucide.createIcons === 'function') {
+                            window.Lucide.createIcons();
+                        }
+                    } catch (e) {
+                        // ignore icon rendering errors to avoid breaking the table
                     }
                 }
             });
@@ -413,8 +420,19 @@
         });
     };
 
+    // Simple view handler for now - can be extended to open a modal later
+    window.viewShift = function (id) {
+        showToast('View shift #' + id + ' (view details modal not implemented yet)', 'info');
+    };
+
+    // Simple edit handler for now - can be extended to open an edit modal
+    window.editShift = function (id) {
+        showToast('Edit shift #' + id + ' (edit modal not implemented yet)', 'info');
+    };
+
     window.toggleShiftStatus = function (id) {
-        fetch(`{{ route('hr.shifts.toggle-status', '') }}/${id}`, {
+        const baseUrl = '{{ rtrim(route('hr.shifts.toggle-status', ['shift' => '__ID__']), '__ID__') }}';
+        fetch(baseUrl + id, {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',

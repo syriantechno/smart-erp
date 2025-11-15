@@ -511,12 +511,19 @@
         }
 
         function saveCategory() {
+            const jq = window.jQuery;
+            if (!jq) {
+                console.error('jQuery is not available; cannot save category.');
+                Swal.fire('Error', 'jQuery is not loaded; cannot save category.', 'error');
+                return;
+            }
+
             const formData = {
-                name: $('#category-name').val(),
-                description: $('#category-description').val(),
-                color: $('#category-color').val(),
-                icon: $('#category-icon').val(),
-                parent_id: $('#category-parent').val(),
+                name: jq('#category-name').val(),
+                description: jq('#category-description').val(),
+                color: jq('#category-color').val(),
+                icon: jq('#category-icon').val(),
+                parent_id: jq('#category-parent').val(),
                 _token: '{{ csrf_token() }}'
             };
 
@@ -525,8 +532,11 @@
                 return;
             }
 
-            $.post('{{ route("documents.store-category") }}', formData)
-                .done(function(response) {
+            jq.ajax({
+                url: '{{ route("documents.store-category") }}',
+                type: 'POST',
+                data: formData,
+                success: function(response) {
                     if (response.success) {
                         closeModalById('category-modal');
                         location.reload(); // Reload to show new category
@@ -534,10 +544,11 @@
                     } else {
                         Swal.fire('Error', response.message, 'error');
                     }
-                })
-                .fail(function() {
+                },
+                error: function() {
                     Swal.fire('Error', 'Failed to save category', 'error');
-                });
+                }
+            });
         }
 
         function updateStats() {
