@@ -226,7 +226,7 @@
             </div>
         </div>
 
-        <!-- Recent Activity -->
+        <!-- Recent Activity (per user) -->
         <div class="col-span-12 lg:col-span-4">
             <div class="bg-white rounded-lg p-6 shadow-sm border">
                 <h2 class="text-xl font-semibold mb-6 flex items-center">
@@ -242,6 +242,33 @@
                 </div>
             </div>
         </div>
+
+        @if(auth()->user() && auth()->user()->hasRole('admin'))
+            <!-- Admin: Users Recent Conversations -->
+            <div class="col-span-12">
+                <div class="bg-white rounded-lg p-6 shadow-sm border mt-6">
+                    <h2 class="text-xl font-semibold mb-4 flex items-center">
+                        <x-base.lucide icon="Users" class="w-6 h-6 mr-2 text-blue-600" />
+                        Users Recent Conversations
+                    </h2>
+                    <div class="mb-4 flex flex-col md:flex-row md:items-center gap-3">
+                        <div class="md:w-64">
+                            <label class="block text-xs font-medium text-slate-600 mb-1">Select User</label>
+                            <x-base.form-select id="admin-users-select" class="text-xs md:text-sm w-full">
+                                <option value="">All Users</option>
+                            </x-base.form-select>
+                        </div>
+                    </div>
+
+                    <div id="admin-recent-activity" class="space-y-3">
+                        <div class="text-center py-6 text-gray-500">
+                            <x-base.lucide icon="Loader" class="w-6 h-6 mx-auto mb-2 animate-spin" />
+                            <p>Loading users recent conversations...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 
     <!-- AI Chat Modal -->
@@ -416,6 +443,9 @@
         jQuery(document).ready(function() {
             checkAIAvailability();
             loadRecentActivity();
+            @if(auth()->user() && auth()->user()->hasRole('admin'))
+                loadAdminUsersAndActivity();
+            @endif
         });
 
         function checkAIAvailability() {
@@ -467,6 +497,87 @@
                     });
 
                     container.html(html);
+                });
+        }
+
+        function loadAdminRecentActivity(selectedUserId) {
+            var container = jQuery('#admin-recent-activity');
+            if (!container.length) return;
+
+            var params = {};
+            if (selectedUserId) {
+                params.user_id = selectedUserId;
+            }
+
+            jQuery.get('{{ route("ai.admin-recent") }}', params)
+                .done(function(response) {
+                    if (!response.success) {
+                        container.html('<div class="text-center py-4 text-red-500 text-sm">' + (response.message || 'Unable to load admin recent activity') + '</div>');
+                        return;
+                    }
+
+                    var data = response.data || [];
+
+                    if (!data.length) {
+                        container.html('<div class="text-center py-4 text-gray-500 text-sm">No recent conversations found.</div>');
+                        return;
+                    }
+
+                    var html = '';
+                    data.forEach(function(item) {
+                        html += '<div class="flex items-start gap-3 p-3 rounded-lg bg-slate-50">' +
+                            '<div class="flex-shrink-0 w-9 h-9 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-semibold">' +
+                                (item.user_name ? item.user_name.charAt(0).toUpperCase() : '?') +
+                            '</div>' +
+                            '<div class="flex-1 min-w-0">' +
+                                '<div class="flex items-center justify-between text-xs text-slate-600 mb-1">' +
+                                    '<span class="font-semibold text-slate-800 truncate mr-2">' + (item.user_name || 'Unknown user') + '</span>' +
+                                    '<span class="text-[11px] text-slate-500">' + (item.formatted_date || '') + '</span>' +
+                                '</div>' +
+                                '<p class="text-xs text-slate-700 mb-1 truncate">' + (item.user_input ? item.user_input.substring(0, 120) : '') + '</p>' +
+                                '<div class="flex items-center gap-2 text-[11px] text-slate-500">' +
+                                    '<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">' +
+                                        (item.interaction_type ? item.interaction_type.toUpperCase() : 'N/A') +
+                                    '</span>' +
+                                    '<span>' + (item.status || '') + '</span>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>';
+                    });
+
+                    container.html(html);
+                })
+                .fail(function() {
+                    container.html('<div class="text-center py-4 text-red-500 text-sm">Failed to load users conversations.</div>');
+                });
+        }
+
+        function loadAdminUsersAndActivity() {
+            var select = jQuery('#admin-users-select');
+            var container = jQuery('#admin-recent-activity');
+            if (!select.length || !container.length) return;
+
+            jQuery.get('{{ route("ai.admin-users") }}')
+                .done(function(response) {
+                    var data = (response && response.success) ? (response.data || []) : [];
+
+                    select.empty();
+                    select.append('<option value="">All Users</option>');
+
+                    data.forEach(function(user) {
+                        select.append('<option value="' + user.id + '">' + user.name + (user.email ? ' (' + user.email + ')' : '') + '</option>');
+                    });
+
+                    // تحميل النشاط لأول اختيار (الكل)
+                    loadAdminRecentActivity('');
+
+                    select.off('change').on('change', function() {
+                        var userId = jQuery(this).val();
+                        loadAdminRecentActivity(userId);
+                    });
+                })
+                .fail(function() {
+                    container.html('<div class="text-center py-4 text-red-500 text-sm">Failed to load users list.</div>');
                 });
         }
 

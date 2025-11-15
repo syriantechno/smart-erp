@@ -156,18 +156,53 @@ class AiController extends Controller
             ->make(true);
     }
 
-    public function adminRecent(): JsonResponse
+    public function adminUsers(): JsonResponse
     {
-        // Admin-only: get recent interactions for all users
+        // Admin-only: list users who have AI interactions
         $user = auth()->user();
 
         if (!$user || !$user->hasRole('admin')) {
             return response()->json(['success' => false, 'message' => 'Access denied'], 403);
         }
 
-        $interactions = AiInteraction::with('user')
-            ->latest()
-            ->limit(10)
+        $users = AiInteraction::with('user')
+            ->select('user_id')
+            ->whereNotNull('user_id')
+            ->distinct()
+            ->get()
+            ->map(function (AiInteraction $interaction) {
+                return [
+                    'id' => $interaction->user?->id,
+                    'name' => $interaction->user?->name ?? 'Unknown',
+                    'email' => $interaction->user?->email ?? null,
+                ];
+            })
+            ->filter(fn ($u) => !empty($u['id']))
+            ->values();
+
+        return response()->json([
+            'success' => true,
+            'data' => $users,
+        ]);
+    }
+
+    public function adminRecent(Request $request): JsonResponse
+    {
+        // Admin-only: get recent interactions, optionally filtered by user_id
+        $user = auth()->user();
+
+        if (!$user || !$user->hasRole('admin')) {
+            return response()->json(['success' => false, 'message' => 'Access denied'], 403);
+        }
+
+        $query = AiInteraction::with('user')->latest();
+
+        if ($request->filled('user_id')) {
+            $query->where('user_id', $request->user_id);
+        }
+
+        $interactions = $query
+            ->limit(20)
             ->get()
             ->map(function (AiInteraction $interaction) {
                 return [

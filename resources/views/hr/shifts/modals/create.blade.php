@@ -50,10 +50,11 @@
                     <x-base.form-input id="end-time" name="end_time" type="time" class="w-full" required />
                 </div>
 
-                <!-- Working Hours -->
+                <!-- Working Hours (auto calculated) -->
                 <div class="col-span-12 md:col-span-4">
                     <x-base.form-label for="working-hours">Working Hours <span class="text-danger">*</span></x-base.form-label>
-                    <x-base.form-input id="working-hours" name="working_hours" type="number" step="0.5" min="0" max="24" class="w-full" required />
+                    <x-base.form-input id="working-hours" name="working_hours" type="number" step="0.5" min="0" max="24" class="w-full" readonly required />
+                    <small class="text-slate-500">Calculated automatically from start and end time</small>
                 </div>
 
                 <!-- Color -->
@@ -270,13 +271,34 @@ function handleFormSubmit(form) {
         }
 
         if (!data.start_time || !data.end_time) {
-            showToast('Please specify working hours', 'error');
+            showToast('Please specify start and end time', 'error');
             return;
         }
 
-        if (!data.working_hours || isNaN(data.working_hours) || data.working_hours <= 0) {
-            showToast('Please enter correct working hours', 'error');
+        // Auto-calculate working hours from start and end time
+        function calculateWorkingHours(start, end) {
+            const [sh, sm] = start.split(':').map(Number);
+            const [eh, em] = end.split(':').map(Number);
+            if (isNaN(sh) || isNaN(sm) || isNaN(eh) || isNaN(em)) return null;
+
+            const startMinutes = sh * 60 + sm;
+            const endMinutes = eh * 60 + em;
+            if (endMinutes <= startMinutes) return null;
+
+            const diffHours = (endMinutes - startMinutes) / 60;
+            return Math.round(diffHours * 2) / 2; // round to nearest 0.5
+        }
+
+        const autoHours = calculateWorkingHours(data.start_time, data.end_time);
+        if (autoHours === null || autoHours <= 0 || autoHours > 24) {
+            showToast('Working hours derived from time range are invalid', 'error');
             return;
+        }
+
+        data.working_hours = autoHours;
+        const workingHoursInput = document.getElementById('working-hours');
+        if (workingHoursInput) {
+            workingHoursInput.value = autoHours;
         }
 
         if (!data.color || !/^#[a-fA-F0-9]{6}$/.test(data.color)) {

@@ -130,6 +130,7 @@
 @endsection
 
 @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
     <script>
     // Silence console output ONLY within this script scope
     const console = {
@@ -318,35 +319,98 @@
     });
 
     window.deleteShift = function (id, name) {
-        if (!confirm(`Are you sure you want to delete the shift "${name}"?`)) {
+        if (typeof Swal === 'undefined') {
+            // Fallback to native confirm if SweetAlert is not loaded for any reason
+            if (!confirm(`Are you sure you want to delete the shift "${name}"?`)) {
+                return;
+            }
+
+            fetch(`{{ route('hr.shifts.destroy', '') }}/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                },
+                credentials: 'same-origin',
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast(data.message || 'Shift deleted successfully', 'success');
+                        if (window.reloadTable) {
+                            window.reloadTable();
+                        } else {
+                            window.location.reload();
+                        }
+                    } else {
+                        showToast(data.message || 'Failed to delete shift', 'error');
+                    }
+                })
+                .catch(() => {
+                    showToast('An error occurred while deleting', 'error');
+                });
+
             return;
         }
 
-        fetch(`{{ route('hr.shifts.destroy', '') }}/${id}`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json',
-            },
-            credentials: 'same-origin',
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    if (window.reloadTable) {
-                        window.reloadTable();
-                    } else {
-                        location.reload();
-                    }
-                    showToast(data.message || 'Shift deleted successfully', 'success');
-                } else {
-                    showToast(data.message || 'Failed to delete shift', 'error');
-                }
+        Swal.fire({
+            title: 'Delete Shift',
+            text: `Are you sure you want to delete the shift "${name}"? This action cannot be undone.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#e11d48',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Yes, delete',
+            cancelButtonText: 'Cancel',
+        }).then((result) => {
+            if (!result.isConfirmed) {
+                return;
+            }
+
+            fetch(`{{ route('hr.shifts.destroy', '') }}/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                },
+                credentials: 'same-origin',
             })
-            .catch(() => {
-                showToast('An error occurred while deleting', 'error');
-            });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Deleted',
+                            text: data.message || 'Shift deleted successfully',
+                            timer: 1200,
+                            showConfirmButton: false,
+                        });
+                        // بعد الحذف، أعد تحميل الجدول فقط إن أمكن، وإلا أعد تحميل الصفحة
+                        setTimeout(() => {
+                            if (window.reloadTable) {
+                                window.reloadTable();
+                            } else {
+                                window.location.reload();
+                            }
+                        }, 1200);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message || 'Failed to delete shift',
+                        });
+                    }
+                })
+                .catch(() => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while deleting',
+                    });
+                });
+        });
     };
 
     window.toggleShiftStatus = function (id) {

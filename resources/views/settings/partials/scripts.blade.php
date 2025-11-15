@@ -205,6 +205,48 @@
                 providerSelect.addEventListener('change', toggleAiProviderSections);
                 toggleAiProviderSections();
             }
+
+            // Test AI connection button
+            const testBtn = document.getElementById('ai-test-connection-btn');
+            if (testBtn && !testBtn.dataset.listenerAdded) {
+                testBtn.dataset.listenerAdded = 'true';
+
+                testBtn.addEventListener('click', function () {
+                    const originalText = testBtn.textContent;
+                    testBtn.disabled = true;
+                    testBtn.textContent = 'Testing...';
+
+                    fetch('{{ route("ai.interact") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({
+                            message: 'Test connection from settings page',
+                            type: 'chat'
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data && data.success) {
+                            window.showToast('AI connection is working correctly.', 'success');
+                        } else {
+                            const errorMsg = (data && data.error) ? data.error : 'Unable to connect to AI service. Please check your configuration.';
+                            window.showToast(errorMsg, 'error');
+                        }
+                    })
+                    .catch(() => {
+                        window.showToast('Failed to contact AI service. Please verify server/API settings.', 'error');
+                    })
+                    .finally(() => {
+                        testBtn.disabled = false;
+                        testBtn.textContent = originalText;
+                    });
+                });
+            }
         }
 
         // Handle Prefix Settings Form with AJAX
