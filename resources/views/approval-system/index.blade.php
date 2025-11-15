@@ -15,7 +15,7 @@
     @include('components.global-notifications')
 
     <div class="mt-8 grid grid-cols-12 gap-6">
-        <!-- Stats Cards -->
+        @if(false)
         <div class="col-span-12">
             <div class="grid grid-cols-12 gap-6">
                 <!-- My Requests -->
@@ -79,6 +79,7 @@
                 </div>
             </div>
         </div>
+        @endif
 
         <!-- Main Content -->
         <div class="col-span-12">
@@ -142,6 +143,7 @@
                         </div>
                     </div>
 
+                    @if(false)
                     <!-- Filters -->
                     <div class="mt-5 grid grid-cols-12 gap-4">
                         <div class="col-span-12 md:col-span-3">
@@ -184,6 +186,7 @@
                             </button>
                         </div>
                     </div>
+                    @endif
                 </div>
 
                 <!-- Data Table -->
@@ -211,16 +214,25 @@
     </div>
 
     <!-- View Request Modal -->
-    <div id="view-request-modal" class="modal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
+    <div
+        id="view-request-modal"
+        class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/70 hidden"
+        tabindex="-1"
+        aria-hidden="true"
+    >
+        <div class="modal-dialog modal-xl w-full max-w-5xl mx-4">
+            <div class="modal-content bg-white dark:bg-darkmode-600 rounded-lg shadow-xl overflow-hidden">
+                <div class="modal-header flex items-center justify-between border-b border-slate-200/60 dark:border-darkmode-400 px-5 py-3">
                     <h2 class="font-medium text-base mr-auto" id="request-title"></h2>
-                    <button type="button" class="text-slate-400 hover:text-slate-600" data-tw-dismiss="modal">
+                    <button
+                        type="button"
+                        class="text-slate-400 hover:text-slate-600"
+                        onclick="closeModal('view-request-modal')"
+                    >
                         <x-base.lucide icon="X" class="w-6 h-6" />
                     </button>
                 </div>
-                <div class="modal-body p-6">
+                <div class="modal-body p-6 max-h-[70vh] overflow-auto">
                     <div id="request-details"></div>
                 </div>
             </div>
@@ -228,12 +240,21 @@
     </div>
 
     <!-- Approve/Reject Modals -->
-    <div id="approve-modal" class="modal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
+    <div
+        id="approve-modal"
+        class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/70 hidden"
+        tabindex="-1"
+        aria-hidden="true"
+    >
+        <div class="modal-dialog w-full max-w-lg mx-4">
+            <div class="modal-content bg-white dark:bg-darkmode-600 rounded-lg shadow-xl overflow-hidden">
+                <div class="modal-header flex items-center justify-between border-b border-slate-200/60 dark:border-darkmode-400 px-5 py-3">
                     <h2 class="font-medium text-base mr-auto">Approve Request</h2>
-                    <button type="button" class="text-slate-400 hover:text-slate-600" data-tw-dismiss="modal">
+                    <button
+                        type="button"
+                        class="text-slate-400 hover:text-slate-600"
+                        onclick="closeModal('approve-modal')"
+                    >
                         <x-base.lucide icon="X" class="w-6 h-6" />
                     </button>
                 </div>
@@ -241,24 +262,51 @@
                     <form id="approve-form">
                         <div class="mb-4">
                             <label class="form-label">Comments (Optional)</label>
-                            <textarea id="approve-comments" name="comments" rows="3" class="form-control" placeholder="Add approval comments..."></textarea>
+                            <textarea
+                                id="approve-comments"
+                                name="comments"
+                                rows="3"
+                                class="form-control"
+                                placeholder="Add approval comments..."
+                            ></textarea>
                         </div>
                     </form>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-tw-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-success" onclick="submitApproval()">Approve</button>
+                <div class="modal-footer flex justify-end gap-2 border-t border-slate-200/60 dark:border-darkmode-400 px-5 py-3">
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        onclick="closeModal('approve-modal')"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-success"
+                        onclick="submitApproval()"
+                    >
+                        Approve
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="reject-modal" class="modal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
+    <div
+        id="reject-modal"
+        class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/70 hidden"
+        tabindex="-1"
+        aria-hidden="true"
+    >
+        <div class="modal-dialog w-full max-w-lg mx-4">
+            <div class="modal-content bg-white dark:bg-darkmode-600 rounded-lg shadow-xl overflow-hidden">
+                <div class="modal-header flex items-center justify-between border-b border-slate-200/60 dark:border-darkmode-400 px-5 py-3">
                     <h2 class="font-medium text-base mr-auto">Reject Request</h2>
-                    <button type="button" class="text-slate-400 hover:text-slate-600" data-tw-dismiss="modal">
+                    <button
+                        type="button"
+                        class="text-slate-400 hover:text-slate-600"
+                        onclick="closeModal('reject-modal')"
+                    >
                         <x-base.lucide icon="X" class="w-6 h-6" />
                     </button>
                 </div>
@@ -266,22 +314,49 @@
                     <form id="reject-form">
                         <div class="mb-4">
                             <label class="form-label">Rejection Reason <span class="text-red-500">*</span></label>
-                            <textarea id="reject-reason" name="reason" rows="3" class="form-control" placeholder="Please provide the reason for rejection..." required></textarea>
+                            <textarea
+                                id="reject-reason"
+                                name="reason"
+                                rows="3"
+                                class="form-control"
+                                placeholder="Please provide the reason for rejection..."
+                                required
+                            ></textarea>
                         </div>
                         <div class="mb-4">
                             <label class="form-label">Comments (Optional)</label>
-                            <textarea id="reject-comments" name="comments" rows="2" class="form-control" placeholder="Additional comments..."></textarea>
+                            <textarea
+                                id="reject-comments"
+                                name="comments"
+                                rows="2"
+                                class="form-control"
+                                placeholder="Additional comments..."
+                            ></textarea>
                         </div>
                     </form>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-tw-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger" onclick="submitRejection()">Reject</button>
+                <div class="modal-footer flex justify-end gap-2 border-t border-slate-200/60 dark:border-darkmode-400 px-5 py-3">
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        onclick="closeModal('reject-modal')"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-danger"
+                        onclick="submitRejection()"
+                    >
+                        Reject
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 @endsection
+
+@include('components.datatable.scripts')
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
@@ -290,22 +365,42 @@
         let approvalTable;
         let currentRequestId = null;
 
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            if (!modal) return;
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            if (!modal) return;
+            modal.classList.add('hidden');
+        }
+
         $(document).ready(function() {
             initializeDataTable();
             setupEventListeners();
         });
 
         function initializeDataTable() {
-            approvalTable = $('#approval-requests-table').DataTable({
-                processing: true,
-                serverSide: true,
+            if (typeof window.initDataTable !== 'function') {
+                console.error('initDataTable helper is not available.');
+                return;
+            }
+
+            approvalTable = window.initDataTable('#approval-requests-table', {
                 ajax: {
                     url: '{{ route("approval-system.datatable") }}',
                     data: function(d) {
                         d.tab = '{{ $currentTab }}';
-                        d.type_filter = $('#type-filter').val();
-                        d.status_filter = $('#status-filter').val();
-                        d.priority_filter = $('#priority-filter').val();
+
+                        const typeEl = document.getElementById('type-filter');
+                        const statusEl = document.getElementById('status-filter');
+                        const priorityEl = document.getElementById('priority-filter');
+
+                        d.type_filter = typeEl ? typeEl.value : '';
+                        d.status_filter = statusEl ? statusEl.value : '';
+                        d.priority_filter = priorityEl ? priorityEl.value : '';
                     }
                 },
                 columns: [
@@ -321,7 +416,6 @@
                     { data: 'actions', name: 'actions', orderable: false, searchable: false }
                 ],
                 pageLength: 25,
-                responsive: true,
                 dom: '<"flex flex-col sm:flex-row items-center gap-4"<"flex-1"l><"flex-1"f><"flex-1"B>>rt<"flex flex-col sm:flex-row items-center gap-4"<"flex-1"i><"flex-1"p>>',
                 buttons: [
                     {
@@ -335,8 +429,15 @@
                 ]
             });
 
+            if (!approvalTable) {
+                console.error('Failed to initialise approval requests DataTable.');
+                return;
+            }
+
             approvalTable.on('draw', function() {
-                lucide.createIcons();
+                if (window.lucide && typeof window.lucide.createIcons === 'function') {
+                    window.lucide.createIcons();
+                }
             });
         }
 
@@ -357,19 +458,19 @@
                 .done(function(response) {
                     if (response.success) {
                         displayRequestDetails(response.request);
-                        $('#view-request-modal').modal('show');
+                        openModal('view-request-modal');
                     }
                 });
         };
 
         window.approveRequest = function(id) {
             currentRequestId = id;
-            $('#approve-modal').modal('show');
+            openModal('approve-modal');
         };
 
         window.rejectRequest = function(id) {
             currentRequestId = id;
-            $('#reject-modal').modal('show');
+            openModal('reject-modal');
         };
 
         window.submitApproval = function() {
@@ -381,7 +482,7 @@
             })
             .done(function(response) {
                 if (response.success) {
-                    $('#approve-modal').modal('hide');
+                    closeModal('approve-modal');
                     approvalTable.ajax.reload();
                     Swal.fire('Success!', response.message, 'success');
                 } else {
@@ -409,7 +510,7 @@
             })
             .done(function(response) {
                 if (response.success) {
-                    $('#reject-modal').modal('hide');
+                    closeModal('reject-modal');
                     approvalTable.ajax.reload();
                     Swal.fire('Success!', response.message, 'success');
                 } else {

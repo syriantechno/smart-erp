@@ -4,6 +4,8 @@ namespace App\Http\Controllers\HR;
 
 use App\Http\Controllers\Controller;
 use App\Models\Department;
+use App\Models\ApprovalRequest;
+use App\Models\ApprovalTemplate;
 use App\Services\DocumentCodeGenerator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -49,12 +51,69 @@ class DepartmentController extends Controller
             DB::beginTransaction();
 
             $validated['code'] = $this->codeGenerator->generate('department');
+            
+            // Try to find a default approval template for department creation
+            $template = ApprovalTemplate::active()
+                ->where('entity_type', Department::class)
+                ->where('action_type', 'create')
+                ->first();
+
+            // If there is a template, keep department inactive until fully approved
+            if ($template) {
+                $validated['is_active'] = false;
+            }
 
             $department = Department::create($validated);
-            DB::commit();
 
-            // Send notification
-            \App\Http\Controllers\NotificationController::departmentCreated($department);
+            // If we have a template, create an approval request for this department
+            if ($template) {
+                $levels = $template->buildLevels();
+                $firstApproverId = $levels[0]['approver_id'] ?? null;
+
+                $approvalRequest = ApprovalRequest::create([
+                    'code' => $this->codeGenerator->generate('approval_requests'),
+                    'title' => 'Department Creation: ' . $department->name,
+                    'description' => 'Approval workflow for creating department ' . $department->name,
+                    'type' => 'other',
+                    'priority' => 'normal',
+                    'request_data' => [
+                        'department_id' => $department->id,
+                        'company_id' => $department->company_id,
+                        'requested_by' => auth()->id(),
+                    ],
+                    'requester_id' => auth()->id(),
+                    'current_approver_id' => $firstApproverId,
+                    'department_id' => $department->id,
+                    'company_id' => $department->company_id,
+                    'approval_template_id' => $template->id,
+                    'approval_levels' => $levels,
+                    'current_level' => 1,
+                    'status' => 'pending',
+                    'approvable_type' => Department::class,
+                    'approvable_id' => $department->id,
+                ]);
+
+                // Log submission
+                $approvalRequest->logs()->create([
+                    'action' => 'submitted',
+                    'user_id' => auth()->id(),
+                ]);
+
+                if ($firstApproverId) {
+                    \App\Http\Controllers\NotificationController::sendToUser(
+                        $firstApproverId,
+                        'Approval Request Pending',
+                        'You have a new approval request pending your action.',
+                        'info',
+                        route('approval-system.index', ['tab' => 'pending-approval'])
+                    );
+                }
+            } else {
+                // No template configured: behave as before and create department directly
+                \App\Http\Controllers\NotificationController::departmentCreated($department);
+            }
+
+            DB::commit();
 
             if ($request->ajax()) {
                 notify_created('Department');

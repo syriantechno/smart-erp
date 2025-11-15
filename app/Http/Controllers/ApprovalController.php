@@ -131,12 +131,22 @@ class ApprovalController extends Controller
 
                 if ($tab === 'pending-approval' && $request->canBeApprovedBy(auth()->id())) {
                     $actions .= "
-                        <button onclick='approveRequest({$request->id})' class='text-green-600 hover:text-green-800 mr-2' title='Approve'>
+                        <button
+                            type='button'
+                            onclick='approveRequest({$request->id})'
+                            class='inline-flex items-center justify-center p-2 text-emerald-600 transition hover:text-emerald-800 focus:outline-none'
+                            title='Approve'
+                        >
                             <svg class='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                                 <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 13l4 4L19 7'/>
                             </svg>
                         </button>
-                        <button onclick='rejectRequest({$request->id})' class='text-red-600 hover:text-red-800 mr-2' title='Reject'>
+                        <button
+                            type='button'
+                            onclick='rejectRequest({$request->id})'
+                            class='inline-flex items-center justify-center p-2 text-red-600 transition hover:text-red-800 focus:outline-none'
+                            title='Reject'
+                        >
                             <svg class='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                                 <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 18L18 6M6 6l12 12'/>
                             </svg>
@@ -145,7 +155,12 @@ class ApprovalController extends Controller
                 }
 
                 $actions .= "
-                    <button onclick='viewRequest({$request->id})' class='text-blue-600 hover:text-blue-800' title='View Details'>
+                    <button
+                        type='button'
+                        onclick='viewRequest({$request->id})'
+                        class='inline-flex items-center justify-center p-2 text-slate-600 transition hover:text-primary focus:outline-none'
+                        title='View Details'
+                    >
                         <svg class='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                             <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M15 12a3 3 0 11-6 0 3 3 0 016 0z'/>
                             <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z'/>
