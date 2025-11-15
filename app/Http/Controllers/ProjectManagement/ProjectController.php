@@ -295,122 +295,70 @@ class ProjectController extends Controller
                     $project->end_date ? $project->end_date->format('Y-m-d') : 'N/A',
                     $project->budget ?? 0,
                     $project->progress_percentage . '%'
-    try {
-        $stats = [
-            'total_projects' => Project::active()->count(),
-            'planning' => Project::active()->where('status', 'planning')->count(),
-            'active' => Project::active()->where('status', 'active')->count(),
-            'on_hold' => Project::active()->where('status', 'on_hold')->count(),
-            'completed' => Project::active()->where('status', 'completed')->count(),
-            'cancelled' => Project::active()->where('status', 'cancelled')->count(),
-            'overdue' => Project::active()->where('end_date', '<', now())->whereNotIn('status', ['completed', 'cancelled'])->count(),
-            'total_budget' => Project::active()->sum('budget'),
-            'average_progress' => Project::active()->avg('progress_percentage'),
-        ];
+                ];
+            }
 
-        return response()->json([
-            'success' => true,
-            'data' => $stats
-        ]);
+            notify_exported('بيانات المشاريع');
 
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Failed to get project stats',
-            'error' => $e->getMessage()
-        ], 500);
-    }
-}
+            return response()->json([
+                'success' => true,
+                'message' => 'Project data exported successfully',
+                'data' => $csvData
+            ]);
 
-/**
- * Export project data
- */
-public function export(Request $request): JsonResponse
-{
-    try {
-        $projects = Project::active()
-            ->with(['company', 'department', 'manager'])
-            ->get();
+        } catch (\Exception $e) {
+            Log::error('Project export failed:', $e->getMessage());
 
-        $csvData = [];
-        $csvData[] = ['Code', 'Name', 'Company', 'Department', 'Manager', 'Status', 'Priority', 'Start Date', 'End Date', 'Budget', 'Progress'];
+            notify_error_code(5003, 'فشل في تصدير بيانات المشاريع');
 
-        foreach ($projects as $project) {
-            $csvData[] = [
-                $project->code,
-                $project->name,
-                $project->company?->name ?? 'N/A',
-                $project->department?->name ?? 'N/A',
-                $project->manager?->full_name ?? 'N/A',
-                $project->status_label,
-                $project->priority_label,
-                $project->start_date->format('Y-m-d'),
-                $project->end_date ? $project->end_date->format('Y-m-d') : 'N/A',
-                $project->budget ?? 0,
-                $project->progress_percentage . '%'
-            ];
-        }
-
-        notify_exported('بيانات المشاريع');
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Project data exported successfully',
-            'data' => $csvData
-        ]);
-
-    } catch (\Exception $e) {
-        Log::error('Project export failed:', $e->getMessage());
-
-        notify_error_code(5003, 'فشل في تصدير بيانات المشاريع');
-
-        return response()->json([
-            'success' => false,
-            'message' => 'Failed to export project data',
-            'error' => $e->getMessage()
-        ], 500);
-    }
-}
-
-/**
- * Remove the specified resource from storage.
- */
-public function destroy(Project $project): JsonResponse
-{
-    try {
-        // Check if project has related data that prevents deletion
-        if ($project->tasks()->exists() || $project->timeLogs()->exists()) {
-            notify_error_code(6001, 'لا يمكن حذف المشروع لوجود بيانات مرتبطة به');
             return response()->json([
                 'success' => false,
-                'message' => 'Cannot delete project with related data'
-            ], 422);
+                'message' => 'Failed to export project data',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $projectName = $project->name;
-        $project->delete();
-
-        Log::info('Project deleted successfully:', ['name' => $projectName]);
-
-        notify_deleted('المشروع');
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Project deleted successfully'
-        ]);
-    } catch (\Exception $e) {
-        Log::error('Project deletion failed:', [
-            'project_id' => $project->id,
-            'error' => $e->getMessage()
-        ]);
-
-        notify_error_code(1004, 'فشل في حذف المشروع');
-
-        return response()->json([
-            'success' => false,
-            'message' => 'Failed to delete project',
-            'error' => $e->getMessage()
-        ], 500);
     }
-}
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Project $project): JsonResponse
+    {
+        try {
+            // Check if project has related data that prevents deletion
+            if ($project->tasks()->exists() || $project->timeLogs()->exists()) {
+                notify_error_code(6001, 'لا يمكن حذف المشروع لوجود بيانات مرتبطة به');
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot delete project with related data'
+                ], 422);
+            }
+
+            $projectName = $project->name;
+            $project->delete();
+
+            Log::info('Project deleted successfully:', ['name' => $projectName]);
+
+            notify_deleted('المشروع');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Project deleted successfully'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Project deletion failed:', [
+                'project_id' => $project->id,
+                'error' => $e->getMessage()
+            ]);
+
+            notify_error_code(1004, 'فشل في حذف المشروع');
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete project',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
 }

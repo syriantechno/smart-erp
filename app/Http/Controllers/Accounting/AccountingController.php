@@ -32,7 +32,7 @@ class AccountingController extends Controller
             $accounts = Accounting::with(['parent', 'children'])
                 ->select(['id', 'code', 'name', 'type', 'category', 'parent_id', 'level', 'is_active', 'created_at']);
 
-            Log::info('Accounts query count:', $accounts->count());
+            Log::info('Accounts query count:', ['count' => $accounts->count()]);
 
             return \Yajra\DataTables\Facades\DataTables::of($accounts)
                 ->addIndexColumn()

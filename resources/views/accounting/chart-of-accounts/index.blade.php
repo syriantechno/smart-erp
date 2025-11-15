@@ -362,6 +362,8 @@
                 }
             });
 
+            window.accountTable = table;
+
             if (!table) {
                 return;
             }
