@@ -133,7 +133,7 @@ class ApprovalController extends Controller
                     $actions .= "
                         <button
                             type='button'
-                            onclick='approveRequest({$request->id})'
+                            onclick='approveRequest({$request->id}); return false;'
                             class='inline-flex items-center justify-center p-2 text-emerald-600 transition hover:text-emerald-800 focus:outline-none'
                             title='Approve'
                         >
@@ -143,7 +143,7 @@ class ApprovalController extends Controller
                         </button>
                         <button
                             type='button'
-                            onclick='rejectRequest({$request->id})'
+                            onclick='rejectRequest({$request->id}); return false;'
                             class='inline-flex items-center justify-center p-2 text-red-600 transition hover:text-red-800 focus:outline-none'
                             title='Reject'
                         >
@@ -157,7 +157,7 @@ class ApprovalController extends Controller
                 $actions .= "
                     <button
                         type='button'
-                        onclick='viewRequest({$request->id})'
+                        onclick='viewRequest({$request->id}); return false;'
                         class='inline-flex items-center justify-center p-2 text-slate-600 transition hover:text-primary focus:outline-none'
                         title='View Details'
                     >

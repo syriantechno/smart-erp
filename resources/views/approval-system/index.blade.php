@@ -90,9 +90,10 @@
                         <h2 class="mr-5 text-lg font-medium">Approval Requests</h2>
                         <div class="flex items-center">
                             <x-base.button
+                                id="new-request-btn"
                                 variant="primary"
                                 class="mr-2 shadow-md"
-                                onclick="window.location.href='{{ route('approval-system.create') }}'"
+                                type="button"
                             >
                                 <x-base.lucide icon="Plus" class="w-4 h-4 mr-2" />
                                 New Request
@@ -210,6 +211,208 @@
                     </table>
                 </div>
             </x-base.preview-component>
+        </div>
+    </div>
+
+    <!-- Create Request Modal -->
+    <div
+        id="create-request-modal"
+        class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/70 hidden"
+        tabindex="-1"
+        aria-hidden="true"
+    >
+        <div class="modal-dialog w-full max-w-4xl mx-4">
+            <div class="modal-content bg-white dark:bg-darkmode-600 rounded-lg shadow-xl overflow-hidden">
+                <div class="modal-header flex items-center justify-between border-b border-slate-200/60 dark:border-darkmode-400 px-5 py-3">
+                    <h2 class="font-medium text-base mr-auto">Create New Approval Request</h2>
+                    <button
+                        type="button"
+                        class="text-slate-400 hover:text-slate-600"
+                        onclick="closeModal('create-request-modal')"
+                    >
+                        <x-base.lucide icon="X" class="w-6 h-6" />
+                    </button>
+                </div>
+                <div class="modal-body p-6 max-h-[80vh] overflow-auto">
+                    <form id="create-request-form" enctype="multipart/form-data">
+                        @csrf
+
+                        <!-- Request Type & Priority -->
+                        <div class="grid grid-cols-12 gap-4 mb-6">
+                            <div class="col-span-12 md:col-span-6">
+                                <label class="form-label">Request Type <span class="text-danger">*</span></label>
+                                <select id="request-type" name="type" class="w-full form-select" required>
+                                    <option value="">Select Request Type</option>
+                                    <option value="leave_request">Leave Request</option>
+                                    <option value="purchase_request">Purchase Request</option>
+                                    <option value="expense_claim">Expense Claim</option>
+                                    <option value="loan_request">Loan Request</option>
+                                    <option value="overtime_request">Overtime Request</option>
+                                    <option value="training_request">Training Request</option>
+                                    <option value="equipment_request">Equipment Request</option>
+                                    <option value="other">Other Request</option>
+                                </select>
+                            </div>
+
+                            <div class="col-span-12 md:col-span-6">
+                                <label class="form-label">Priority <span class="text-danger">*</span></label>
+                                <select id="request-priority" name="priority" class="w-full form-select" required>
+                                    <option value="normal">Normal</option>
+                                    <option value="low">Low</option>
+                                    <option value="high">High</option>
+                                    <option value="urgent">Urgent</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Basic Information -->
+                        <div class="mb-6">
+                            <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">Basic Information</h4>
+
+                            <div class="grid grid-cols-12 gap-4">
+                                <div class="col-span-12">
+                                    <label class="form-label">Title <span class="text-danger">*</span></label>
+                                    <input id="request-title" name="title" type="text" class="w-full form-control" placeholder="Enter request title" required />
+                                </div>
+
+                                <div class="col-span-12">
+                                    <label class="form-label">Description <span class="text-danger">*</span></label>
+                                    <textarea id="request-description" name="description" rows="4" class="w-full form-control" placeholder="Describe your request in detail" required></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Financial Information -->
+                        <div id="financial-section" class="mb-6" style="display: none;">
+                            <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">Financial Information</h4>
+
+                            <div class="grid grid-cols-12 gap-4">
+                                <div class="col-span-12 md:col-span-6">
+                                    <label class="form-label">Amount ($)</label>
+                                    <input id="request-amount" name="amount" type="number" step="0.01" min="0" class="w-full form-control" placeholder="0.00" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Date Information -->
+                        <div id="date-section" class="mb-6" style="display: none;">
+                            <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">Date Information</h4>
+
+                            <div class="grid grid-cols-12 gap-4">
+                                <div class="col-span-12 md:col-span-6">
+                                    <label class="form-label">Start Date</label>
+                                    <div class="relative mx-auto w-56">
+                                        <div
+                                            class="absolute flex h-full w-10 items-center justify-center rounded-l border bg-slate-100 text-slate-500 dark:border-darkmode-800 dark:bg-darkmode-700 dark:text-slate-400">
+                                            <x-base.lucide icon="calendar" class="stroke-1.5 w-5 h-5"></x-base.lucide>
+                                        </div>
+                                        <x-base.litepicker
+                                            id="request-start-date"
+                                            name="start_date"
+                                            class="pl-12"
+                                            data-single-mode="true"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div class="col-span-12 md:col-span-6">
+                                    <label class="form-label">End Date</label>
+                                    <div class="relative mx-auto w-56">
+                                        <div
+                                            class="absolute flex h-full w-10 items-center justify-center rounded-l border bg-slate-100 text-slate-500 dark:border-darkmode-800 dark:bg-darkmode-700 dark:text-slate-400">
+                                            <x-base.lucide icon="calendar" class="stroke-1.5 w-5 h-5"></x-base.lucide>
+                                        </div>
+                                        <x-base.litepicker
+                                            id="request-end-date"
+                                            name="end_date"
+                                            class="pl-12"
+                                            data-single-mode="true"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Organization -->
+                        <div class="mb-6">
+                            <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">Organization</h4>
+
+                            <div class="grid grid-cols-12 gap-4">
+                                <div class="col-span-12 md:col-span-6">
+                                    <label class="form-label">Company</label>
+                                    <select id="request-company" name="company_id" class="w-full form-select">
+                                        <option value="">Select Company</option>
+                                        @foreach($companies as $company)
+                                            <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="col-span-12 md:col-span-6">
+                                    <label class="form-label">Department</label>
+                                    <select id="request-department" name="department_id" class="w-full form-select">
+                                        <option value="">Select Department</option>
+                                        @foreach($departments as $department)
+                                            <option value="{{ $department->id }}">{{ $department->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Attachments -->
+                        <div class="mb-6">
+                            <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">Attachments</h4>
+
+                            <div class="border-2 border-dashed border-slate-300 dark:border-darkmode-400 rounded-lg p-4">
+                                <div class="text-center">
+                                    <x-base.lucide icon="Upload" class="w-12 h-12 text-slate-400 mx-auto mb-2" />
+                                    <p class="text-slate-600 dark:text-slate-400 mb-2">Drop files here or click to browse</p>
+                                    <p class="text-xs text-slate-500 mb-4">Supported: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG (Max 10MB each)</p>
+                                    <input type="file" id="attachments" name="attachments[]" multiple class="hidden" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" />
+                                    <x-base.button
+                                        variant="outline-primary"
+                                        type="button"
+                                        onclick="document.getElementById('attachments').click()"
+                                    >
+                                        Choose Files
+                                    </x-base.button>
+                                </div>
+                                <div id="file-list" class="mt-4 space-y-2"></div>
+                            </div>
+                        </div>
+
+                        <!-- Preview -->
+                        <div id="preview-section" class="mb-6" style="display: none;">
+                            <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">Approval Preview</h4>
+
+                            <div class="bg-slate-50 dark:bg-darkmode-600 p-4 rounded-lg">
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                    <div><strong>Approver:</strong> <span id="preview-approver">Loading...</span></div>
+                                    <div><strong>Level:</strong> <span id="preview-level">1</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer flex justify-end gap-2 border-t border-slate-200/60 dark:border-darkmode-400 px-5 py-3">
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        onclick="closeModal('create-request-modal')"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                        id="submit-request-btn"
+                        form="create-request-form"
+                    >
+                        Submit Request
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -365,21 +568,41 @@
         let approvalTable;
         let currentRequestId = null;
 
-        function openModal(id) {
+        window.openModal = function (id) {
             const modal = document.getElementById(id);
             if (!modal) return;
             modal.classList.remove('hidden');
-        }
+        };
 
-        function closeModal(id) {
+        window.closeModal = function (id) {
             const modal = document.getElementById(id);
             if (!modal) return;
             modal.classList.add('hidden');
-        }
+        };
+
+        window.openCreateRequestModal = function () {
+            const form = document.getElementById('create-request-form');
+            if (form) {
+                form.reset();
+            }
+            const fileList = document.getElementById('file-list');
+            if (fileList) {
+                fileList.innerHTML = '';
+            }
+            const financialSection = document.getElementById('financial-section');
+            const dateSection = document.getElementById('date-section');
+            const previewSection = document.getElementById('preview-section');
+            if (financialSection) financialSection.style.display = 'none';
+            if (dateSection) dateSection.style.display = 'none';
+            if (previewSection) previewSection.style.display = 'none';
+
+            openModal('create-request-modal');
+        };
 
         $(document).ready(function() {
             initializeDataTable();
             setupEventListeners();
+            setupCreateRequestModal();
         });
 
         function initializeDataTable() {
@@ -446,6 +669,144 @@
             $('#type-filter, #status-filter, #priority-filter').on('change', function() {
                 approvalTable.ajax.reload();
             });
+
+            const newRequestBtn = document.getElementById('new-request-btn');
+            if (newRequestBtn) {
+                newRequestBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    openCreateRequestModal();
+                });
+            }
+        }
+
+        function setupCreateRequestModal() {
+            const requestType = document.getElementById('request-type');
+            const fileInput = document.getElementById('attachments');
+            const fileList = document.getElementById('file-list');
+            const companySelect = document.getElementById('request-company');
+            const departmentSelect = document.getElementById('request-department');
+            const form = document.getElementById('create-request-form');
+            const submitBtn = document.getElementById('submit-request-btn');
+
+            if (requestType) {
+                requestType.addEventListener('change', function() {
+                    const financialSection = document.getElementById('financial-section');
+                    const dateSection = document.getElementById('date-section');
+                    const previewSection = document.getElementById('preview-section');
+
+                    const showFinancial = ['purchase_request', 'expense_claim', 'loan_request', 'equipment_request'].includes(this.value);
+                    const showDate = ['leave_request', 'training_request'].includes(this.value);
+
+                    if (financialSection) financialSection.style.display = showFinancial ? 'block' : 'none';
+                    if (dateSection) dateSection.style.display = showDate ? 'block' : 'none';
+                    if (previewSection) previewSection.style.display = this.value ? 'block' : 'none';
+
+                    if (this.value) {
+                        document.getElementById('preview-approver').textContent = 'Department Manager';
+                        document.getElementById('preview-level').textContent = '1';
+                    }
+                });
+            }
+
+            if (fileInput && fileList) {
+                fileInput.addEventListener('change', function(e) {
+                    fileList.innerHTML = '';
+                    Array.from(e.target.files).forEach((file, index) => {
+                        const fileItem = document.createElement('div');
+                        fileItem.className = 'flex items-center justify-between bg-slate-50 dark:bg-darkmode-600 p-2 rounded';
+                        fileItem.innerHTML = `
+                            <div class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <span class="text-sm">${file.name}</span>
+                            </div>
+                        `;
+                        fileList.appendChild(fileItem);
+                    });
+                });
+            }
+
+            if (companySelect && departmentSelect) {
+                companySelect.addEventListener('change', function() {
+                    const value = this.value;
+                    departmentSelect.innerHTML = '<option value="">Select Department</option>';
+                    @foreach($departments as $department)
+                        (function() {
+                            const deptCompanyId = {{ $department->company_id ?? 'null' }};
+                            if (!value || String(deptCompanyId) === value) {
+                                const opt = document.createElement('option');
+                                opt.value = '{{ $department->id }}';
+                                opt.textContent = '{{ $department->name }}';
+                                departmentSelect.appendChild(opt);
+                            }
+                        })();
+                    @endforeach
+                });
+            }
+
+            if (form && submitBtn) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    const formData = new FormData(form);
+                    const originalText = submitBtn.innerHTML;
+
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<svg class="w-4 h-4 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Submitting...';
+
+                    fetch('{{ route("approval-system.store") }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json',
+                        },
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success!',
+                                text: 'Approval request submitted successfully',
+                                timer: 3000,
+                                showConfirmButton: false
+                            }).then(() => {
+                                closeModal('create-request-modal');
+                                if (approvalTable) {
+                                    approvalTable.ajax.reload();
+                                }
+                            });
+                        } else {
+                            let errorMessage = 'Failed to submit request';
+                            if (data.errors) {
+                                errorMessage = Object.values(data.errors).flat().join('\n');
+                            } else if (data.message) {
+                                errorMessage = data.message;
+                            }
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: errorMessage
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: 'An error occurred while submitting the request'
+                        });
+                    })
+                    .finally(() => {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                    });
+                });
+            }
         }
 
         function applyFilters() {

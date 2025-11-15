@@ -10,6 +10,38 @@
 @push('styles')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+    <style>
+        /* Match general compact table style used in HR modules */
+        #warehouses-table {
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        #warehouses-table tbody tr {
+            height: 2.25rem;
+        }
+
+        #warehouses-table th {
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.5rem 1.25rem;
+        }
+
+        #warehouses-table td {
+            padding: 0.375rem 1.25rem;
+        }
+
+        #warehouses-table .inline-flex {
+            padding: 0.125rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        #warehouses-table .px-5.py-1\.5 {
+            padding: 0.375rem 1.25rem;
+        }
+    </style>
 @endpush
 
 @section('subcontent')
@@ -90,15 +122,45 @@
             <!-- Warehouses Table -->
             <x-base.preview-component class="intro-y box">
                 <div class="p-5">
-                    <div class="overflow-x-auto">
-                        <table id="warehouses-table" class="table table-report -mt-2">
+                    <div class="overflow-x-auto sm:overflow-visible" data-erp-table-wrapper>
+                        <table
+                            id="warehouses-table"
+                            data-tw-merge
+                            data-erp-table
+                            class="datatable-default w-full min-w-full table-auto text-left text-sm"
+                        >
                             <thead>
                                 <tr>
-                                    <th class="whitespace-nowrap">Code</th>
-                                    <th class="whitespace-nowrap">Name</th>
-                                    <th class="whitespace-nowrap">Location</th>
-                                    <th class="whitespace-nowrap">Status</th>
-                                    <th class="whitespace-nowrap">Actions</th>
+                                    <th
+                                        data-tw-merge
+                                        class="font-semibold px-5 py-2 border-b-2 dark:border-darkmode-300 whitespace-nowrap"
+                                    >
+                                        Code
+                                    </th>
+                                    <th
+                                        data-tw-merge
+                                        class="font-semibold px-5 py-2 border-b-2 dark:border-darkmode-300 whitespace-nowrap"
+                                    >
+                                        Name
+                                    </th>
+                                    <th
+                                        data-tw-merge
+                                        class="font-semibold px-5 py-2 border-b-2 dark:border-darkmode-300 whitespace-nowrap"
+                                    >
+                                        Location
+                                    </th>
+                                    <th
+                                        data-tw-merge
+                                        class="font-semibold px-5 py-2 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center"
+                                    >
+                                        Status
+                                    </th>
+                                    <th
+                                        data-tw-merge
+                                        class="font-semibold px-5 py-2 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center"
+                                    >
+                                        Actions
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody></tbody>

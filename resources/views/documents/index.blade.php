@@ -1,4 +1,4 @@
-@extends('themes.icewall.side-menu')
+@extends('../themes/' . $activeTheme . '/' . $activeLayout)
 
 @section('subhead')
     <title>Document Management - {{ config('app.name') }}</title>
