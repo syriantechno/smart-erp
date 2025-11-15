@@ -14,7 +14,7 @@
                 <x-base.button
                     class="mt-1 w-full bg-white text-slate-600 dark:border-darkmode-300 dark:bg-darkmode-300 dark:text-slate-300"
                     type="button"
-                    onclick="window.location.href='{{ route('electronic-mail.compose') }}'"
+                    onclick="openComposeModal(); return false;"
                 >
                     <x-base.lucide
                         class="mr-2 h-4 w-4"
@@ -170,7 +170,7 @@
                     </x-base.menu>
                 </div>
                 <div class="flex w-full sm:w-auto">
-                    <x-base.button class="mr-2 shadow-md" variant="primary" onclick="window.location.href='{{ route('electronic-mail.compose') }}'">
+                    <x-base.button class="mr-2 shadow-md" variant="primary" onclick="openComposeModal(); return false;">
                         Compose
                     </x-base.button>
                     <x-base.menu>
@@ -180,7 +180,7 @@
                             </span>
                         </x-base.menu.button>
                         <x-base.menu.items class="w-40">
-                            <x-base.menu.item onclick="window.location.href='{{ route('electronic-mail.compose') }}'">
+                            <x-base.menu.item onclick="openComposeModal(); return false;">
                                 <x-base.lucide class="mr-2 h-4 w-4" icon="Edit" />
                                 New Message
                             </x-base.menu.item>
@@ -224,6 +224,9 @@
                     </div>
                     <div class="flex items-center sm:ml-auto">
                         <div id="mail-count">Loading...</div>
+                        <a class="ml-5 flex h-5 w-5 items-center justify-center" href="#" onclick="syncInbox(); return false;" title="Sync Inbox">
+                            <x-base.lucide class="h-4 w-4" icon="RefreshCw" />
+                        </a>
                         <a class="ml-5 flex h-5 w-5 items-center justify-center" href="#">
                             <x-base.lucide class="h-4 w-4" icon="ChevronLeft" />
                         </a>
@@ -252,6 +255,47 @@
         </div>
     </div>
 
+    <!-- View Mail Modal -->
+    <div
+        id="view-mail-modal"
+        class="fixed inset-0 z-[99997] hidden items-center justify-center bg-slate-900/60"
+        aria-hidden="true"
+        style="display: none;"
+    >
+        <div class="modal-dialog modal-xl max-w-4xl w-full mx-4">
+            <div class="modal-content bg-white dark:bg-darkmode-600 rounded-lg shadow-lg max-h-[90vh] flex flex-col">
+                <div class="modal-header flex items-center justify-between px-5 py-3 border-b border-slate-200/60 dark:border-darkmode-400">
+                    <h2 id="mail-subject" class="font-medium text-base mr-auto truncate">
+                        Mail Details
+                    </h2>
+                    <div class="flex items-center gap-2 mr-4">
+                        <x-base.button type="button" variant="outline-secondary" size="sm" onclick="replyToCurrentMail()">
+                            <x-base.lucide icon="Reply" class="w-4 h-4 mr-1" />
+                            Reply
+                        </x-base.button>
+                        <x-base.button type="button" variant="outline-secondary" size="sm" onclick="forwardCurrentMail()">
+                            <x-base.lucide icon="CornerDownRight" class="w-4 h-4 mr-1" />
+                            Forward
+                        </x-base.button>
+                    </div>
+                    <button type="button" class="text-slate-400 hover:text-slate-600" onclick="closeViewMailModal()">
+                        <x-base.lucide icon="X" class="w-6 h-6" />
+                    </button>
+                </div>
+                <div class="modal-body px-5 py-4 overflow-y-auto">
+                    <div id="mail-content" class="text-sm text-slate-800 dark:text-slate-100">
+                        <!-- Mail content will be injected here by displayMailContent -->
+                    </div>
+                </div>
+                <div class="px-5 py-3 border-t border-slate-200/60 dark:border-darkmode-400 flex justify-end gap-2">
+                    <x-base.button type="button" variant="outline-secondary" onclick="closeViewMailModal()">
+                        Close
+                    </x-base.button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Personal Mail Account Settings Modal -->
     <div
         id="mail-account-settings-modal"
@@ -267,7 +311,7 @@
                         <x-base.lucide icon="X" class="w-6 h-6" />
                     </button>
                 </div>
-                <div class="modal-body p-6">
+                <div class="modal-body px-5 py-4 overflow-y-auto">
                     <form id="mail-account-settings-form">
                         @csrf
                         <div class="grid grid-cols-12 gap-4">
@@ -370,9 +414,204 @@
         </div>
     </div>
 
-@endsection
+    <!-- Compose Mail Modal -->
+    <div
+        id="compose-mail-modal"
+        class="fixed inset-0 z-[99998] hidden items-center justify-center bg-slate-900/60"
+        aria-hidden="true"
+        style="display: none;"
+    >
+        <div class="modal-dialog modal-xl max-w-5xl w-full mx-4">
+            <div class="modal-content bg-white dark:bg-darkmode-600 rounded-lg shadow-lg max-h-[90vh] flex flex-col">
+                <div class="modal-header flex items-center justify-between px-5 py-2 border-b border-slate-200/60 dark:border-darkmode-400">
+                    <h2 class="font-medium text-base mr-auto">Compose New Mail</h2>
+                    <button type="button" class="text-slate-400 hover:text-slate-600" onclick="closeComposeModal()">
+                        <x-base.lucide icon="X" class="w-6 h-6" />
+                    </button>
+                </div>
+                <div class="modal-body p-6">
+                    <form id="compose-mail-form" enctype="multipart/form-data">
+                        @csrf
 
-@push('scripts')
+                        <!-- Mail Type & Priority -->
+                        <div class="mb-6">
+                            <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                                <x-base.lucide icon="Send" class="h-5 w-5"></x-base.lucide>
+                                Mail Options
+                            </h4>
+                            <div class="grid grid-cols-12 gap-4 gap-y-4">
+                            <div class="col-span-12 md:col-span-3">
+                                <label class="form-label">Mail Type <span class="text-danger">*</span></label>
+                                <x-base.form-select id="compose-mail-type" name="type" class="w-full" required>
+                                    <option value="outgoing">Outgoing (Send)</option>
+                                    <option value="incoming">Incoming (Receive)</option>
+                                </x-base.form-select>
+                            </div>
+
+                            <div class="col-span-12 md:col-span-3">
+                                <label class="form-label">Priority <span class="text-danger">*</span></label>
+                                <x-base.form-select id="compose-mail-priority" name="priority" class="w-full" required>
+                                    <option value="normal">Normal</option>
+                                    <option value="low">Low</option>
+                                    <option value="high">High</option>
+                                    <option value="urgent">Urgent</option>
+                                </x-base.form-select>
+                            </div>
+                        </div>
+                        
+                        <!-- Recipients -->
+                        <div id="compose-recipients-section" class="mb-6">
+                            <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                                <x-base.lucide icon="Users" class="h-5 w-5"></x-base.lucide>
+                                Recipients
+                            </h4>
+
+                            <div class="grid grid-cols-12 gap-4 gap-y-4">
+                                <div class="col-span-12 md:col-span-3">
+                                    <label class="form-label">Recipient Name</label>
+                                    <x-base.form-input
+                                        id="compose-recipient-name"
+                                        name="recipient_name"
+                                        type="text"
+                                        placeholder="Enter recipient name"
+                                        class="w-full"
+                                    />
+                                </div>
+
+                                <div class="col-span-12 md:col-span-3">
+                                    <label class="form-label">Recipient Email</label>
+                                    <x-base.form-input
+                                        id="compose-recipient-email"
+                                        name="recipient_email"
+                                        type="email"
+                                        placeholder="Enter recipient email"
+                                        class="w-full"
+                                    />
+                                </div>
+
+                                <div class="col-span-12 md:col-span-3">
+                                    <label class="form-label">Internal User (Optional)</label>
+                                    <x-base.form-select id="compose-recipient-user-id" name="recipient_user_id" class="w-full">
+                                        <option value="">Select internal user</option>
+                                        @foreach($users as $user)
+                                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                        @endforeach
+                                    </x-base.form-select>
+                                </div>
+
+                                <div class="col-span-12 md:col-span-3">
+                                    <label class="form-label">CC (Optional)</label>
+                                    <x-base.form-input
+                                        id="compose-cc"
+                                        name="cc[]"
+                                        type="email"
+                                        placeholder="Add CC email"
+                                        class="w-full"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Organization -->
+                        <div class="mb-6">
+                            <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                                <x-base.lucide icon="Building" class="h-5 w-5"></x-base.lucide>
+                                Organization
+                            </h4>
+
+                            <div class="grid grid-cols-12 gap-4 gap-y-4">
+                                <div class="col-span-12 md:col-span-3">
+                                    <label class="form-label">Company</label>
+                                    <x-base.form-select id="compose-company-id" name="company_id" class="w-full">
+                                        <option value="">Select Company</option>
+                                        @foreach($companies as $company)
+                                            <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                        @endforeach
+                                    </x-base.form-select>
+                                </div>
+
+                                <div class="col-span-12 md:col-span-6">
+                                    <label class="form-label">Department</label>
+                                    <x-base.form-select id="compose-department-id" name="department_id" class="w-full">
+                                        <option value="">Select Department</option>
+                                        @foreach($departments as $department)
+                                            <option value="{{ $department->id }}">{{ $department->name }}</option>
+                                        @endforeach
+                                    </x-base.form-select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Attachments -->
+                        <div class="mb-6">
+                            <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                                <x-base.lucide icon="Paperclip" class="h-5 w-5"></x-base.lucide>
+                                Attachments
+                            </h4>
+
+                            <div class="border-2 border-dashed border-slate-300 dark:border-darkmode-400 rounded-lg p-4">
+                                <div class="text-center">
+                                    <x-base.lucide icon="Upload" class="w-12 h-12 text-slate-400 mx-auto mb-2" />
+                                    <p class="text-slate-600 dark:text-slate-400 mb-2">Drop files here or click to browse</p>
+                                    <input type="file" id="compose-attachments" name="attachments[]" multiple class="hidden" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.zip,.rar">
+                                    <x-base.button
+                                        variant="outline-primary"
+                                        type="button"
+                                        onclick="document.getElementById('compose-attachments').click()"
+                                    >
+                                        Choose Files
+                                    </x-base.button>
+                                </div>
+                                <div id="compose-file-list" class="mt-4 space-y-2"></div>
+                            </div>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="mb-6">
+                            <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                                <x-base.lucide icon="Activity" class="h-5 w-5"></x-base.lucide>
+                                Status
+                            </h4>
+
+                            <div class="flex items-center gap-4">
+                                <label class="flex items-center">
+                                    <input type="radio" name="status" value="draft" checked class="mr-2">
+                                    <span class="text-slate-600 dark:text-slate-400">Save as Draft</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="status" value="sent" class="mr-2">
+                                    <span class="text-slate-600 dark:text-slate-400">Send Now</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="flex justify-end gap-2 pt-4 border-t">
+                            <x-base.button
+                                variant="outline-secondary"
+                                type="button"
+                                onclick="closeComposeModal()"
+                            >
+                                Cancel
+                            </x-base.button>
+                            <x-base.button
+                                variant="primary"
+                                type="submit"
+                                id="compose-send-mail-btn"
+                            >
+                                <x-base.lucide icon="Send" class="w-4 h-4 mr-2" />
+                                Send Mail
+                            </x-base.button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @endsection
+
+    @push('scripts')
     <script>
         let currentPage = 1;
         let totalRecords = 0;
@@ -382,6 +621,7 @@
         // Script is loaded at the bottom of the page, so DOM is already ready
         loadMails();
         setupEventListeners();
+        setupComposeModal();
 
         function setupEventListeners() {
             const searchBtn = document.getElementById('mail-search-btn');
@@ -499,6 +739,105 @@
             }
         }
 
+        function setupComposeModal() {
+            const mailType = document.getElementById('compose-mail-type');
+            const recipientsSection = document.getElementById('compose-recipients-section');
+            const senderSection = document.getElementById('compose-sender-section');
+            const fileInput = document.getElementById('compose-attachments');
+            const fileList = document.getElementById('compose-file-list');
+            const form = document.getElementById('compose-mail-form');
+            const submitBtn = document.getElementById('compose-send-mail-btn');
+            const companySelect = document.getElementById('compose-company-id');
+            const departmentSelect = document.getElementById('compose-department-id');
+
+            if (mailType && recipientsSection && senderSection) {
+                mailType.addEventListener('change', function() {
+                    if (this.value === 'incoming') {
+                        recipientsSection.style.display = 'none';
+                        senderSection.style.display = 'block';
+                    } else {
+                        recipientsSection.style.display = 'block';
+                        senderSection.style.display = 'none';
+                    }
+                });
+            }
+
+            if (fileInput && fileList) {
+                fileInput.addEventListener('change', function(e) {
+                    fileList.innerHTML = '';
+                    Array.from(e.target.files).forEach((file, index) => {
+                        const fileItem = document.createElement('div');
+                        fileItem.className = 'flex items-center justify-between bg-slate-50 dark:bg-darkmode-600 p-2 rounded';
+                        fileItem.innerHTML = `
+                            <div class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <span class="text-sm">${file.name}</span>
+                                <span class="text-xs text-slate-500">(${formatFileSizeCompose(file.size)})</span>
+                            </div>
+                            <button type="button" onclick="removeComposeFile(${index})" class="text-red-500 hover:text-red-700">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        `;
+                        fileList.appendChild(fileItem);
+                    });
+                });
+            }
+
+            if (companySelect && departmentSelect) {
+                companySelect.addEventListener('change', function() {
+                    departmentSelect.selectedIndex = 0;
+                });
+            }
+
+            if (form && submitBtn) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    const formData = new FormData(form);
+                    const originalText = submitBtn.innerHTML;
+
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<svg class="w-4 h-4 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Sending...';
+
+                    fetch('{{ route("electronic-mail.store") }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': MAIL_CSRF_TOKEN,
+                            'Accept': 'application/json',
+                        },
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showToast(data.message || 'Mail sent successfully.', 'success');
+                            closeComposeModal();
+                            loadMails();
+                        } else {
+                            if (data.errors) {
+                                const firstError = Object.values(data.errors)[0][0] || 'Validation error';
+                                showToast(firstError, 'error');
+                            } else {
+                                showToast(data.message || 'Failed to send mail', 'error');
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('An error occurred while sending the mail', 'error');
+                    })
+                    .finally(() => {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                    });
+                });
+            }
+        }
+
         // Global handler for folder changes (used by inline onclick on sidebar links)
         window.changeMailFolder = function(event, folder) {
             if (event) {
@@ -529,6 +868,51 @@
             return false;
         };
 
+        // Open Compose Modal
+        window.openComposeModal = function() {
+            const modal = document.getElementById('compose-mail-modal');
+            if (!modal) {
+                console.error('Compose mail modal not found');
+                return;
+            }
+
+            // Reset form when opening
+            const form = document.getElementById('compose-mail-form');
+            const fileList = document.getElementById('compose-file-list');
+            const attachments = document.getElementById('compose-attachments');
+
+            if (form) {
+                form.reset();
+            }
+            if (fileList) {
+                fileList.innerHTML = '';
+            }
+            if (attachments) {
+                attachments.value = '';
+            }
+
+            const recipientsSection = document.getElementById('compose-recipients-section');
+            const senderSection = document.getElementById('compose-sender-section');
+            if (recipientsSection && senderSection) {
+                recipientsSection.style.display = 'block';
+                senderSection.style.display = 'none';
+            }
+
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+        };
+
+        // Close Compose Modal
+        window.closeComposeModal = function() {
+            const modal = document.getElementById('compose-mail-modal');
+            if (!modal) {
+                return;
+            }
+
+            modal.classList.add('hidden');
+            modal.style.display = 'none';
+        };
+
         // Open Personal Mail Account Settings Modal
         window.openMailAccountSettingsModal = function() {
             const modal = document.getElementById('mail-account-settings-modal');
@@ -551,6 +935,8 @@
             modal.classList.add('hidden');
             modal.style.display = 'none';
         };
+
+        let currentViewedMail = null;
 
         function loadMails() {
             const searchInput = document.getElementById('mail-search');
@@ -700,6 +1086,32 @@
             showToast('Mails refreshed', 'success');
         };
 
+        window.syncInbox = function() {
+            const url = '{{ route("electronic-mail.sync") }}';
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': MAIL_CSRF_TOKEN,
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(data.message || 'Inbox synced successfully.', 'success');
+                    loadMails();
+                } else {
+                    showToast(data.message || 'Failed to sync inbox.', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error syncing inbox:', error);
+                showToast('An error occurred while syncing inbox.', 'error');
+            });
+        };
+
         // Bulk selection functions
         window.selectAllMails = function() {
             document.querySelectorAll('.mail-checkbox').forEach(function(cb) {
@@ -738,6 +1150,7 @@
         };
 
         function displayMailContent(mail) {
+            currentViewedMail = mail;
             const subjectEl = document.getElementById('mail-subject');
             const contentEl = document.getElementById('mail-content');
 
@@ -779,6 +1192,113 @@
             if (contentEl) {
                 contentEl.innerHTML = content;
             }
+
+            openViewMailModal();
+        }
+
+        window.openViewMailModal = function() {
+            const modal = document.getElementById('view-mail-modal');
+            if (!modal) return;
+
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+        };
+
+        window.closeViewMailModal = function() {
+            const modal = document.getElementById('view-mail-modal');
+            if (!modal) return;
+
+            modal.classList.add('hidden');
+            modal.style.display = 'none';
+        };
+
+        window.replyToCurrentMail = function() {
+            if (!currentViewedMail) return;
+
+            const mail = currentViewedMail;
+
+            // Open compose modal
+            openComposeModal();
+
+            const typeSelect = document.getElementById('compose-mail-type');
+            const subjectInput = document.getElementById('compose-mail-subject');
+            const contentTextarea = document.getElementById('compose-mail-content');
+            const recipientNameInput = document.getElementById('compose-recipient-name');
+            const recipientEmailInput = document.getElementById('compose-recipient-email');
+
+            if (typeSelect) typeSelect.value = 'outgoing';
+
+            if (mail.type === 'incoming') {
+                if (recipientNameInput) recipientNameInput.value = mail.sender_name || '';
+                if (recipientEmailInput) recipientEmailInput.value = mail.sender_email || '';
+            } else {
+                if (recipientNameInput) recipientNameInput.value = mail.recipient_name || '';
+                if (recipientEmailInput) recipientEmailInput.value = mail.recipient_email || '';
+            }
+
+            if (subjectInput) {
+                const prefix = mail.subject && mail.subject.trim().toLowerCase().startsWith('re:') ? '' : 'Re: ';
+                subjectInput.value = prefix + (mail.subject || '');
+            }
+
+            if (contentTextarea) {
+                const original = mail.content || '';
+                contentTextarea.value = '\n\n---- Original message ----\n' + original;
+            }
+
+            closeViewMailModal();
+        };
+
+        window.forwardCurrentMail = function() {
+            if (!currentViewedMail) return;
+
+            const mail = currentViewedMail;
+
+            openComposeModal();
+
+            const typeSelect = document.getElementById('compose-mail-type');
+            const subjectInput = document.getElementById('compose-mail-subject');
+            const contentTextarea = document.getElementById('compose-mail-content');
+            const recipientNameInput = document.getElementById('compose-recipient-name');
+            const recipientEmailInput = document.getElementById('compose-recipient-email');
+
+            if (typeSelect) typeSelect.value = 'outgoing';
+
+            if (recipientNameInput) recipientNameInput.value = '';
+            if (recipientEmailInput) recipientEmailInput.value = '';
+
+            if (subjectInput) {
+                const prefix = mail.subject && mail.subject.trim().toLowerCase().startsWith('fwd:') ? '' : 'Fwd: ';
+                subjectInput.value = prefix + (mail.subject || '');
+            }
+
+            if (contentTextarea) {
+                const original = mail.content || '';
+                contentTextarea.value = '\n\n---- Forwarded message ----\n' + original;
+            }
+
+            closeViewMailModal();
+        };
+
+        function removeComposeFile(index) {
+            const fileInput = document.getElementById('compose-attachments');
+            const dt = new DataTransfer();
+            const files = Array.from(fileInput.files);
+
+            files.splice(index, 1);
+
+            files.forEach(file => dt.items.add(file));
+            fileInput.files = dt.files;
+
+            fileInput.dispatchEvent(new Event('change'));
+        }
+
+        function formatFileSizeCompose(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
     </script>

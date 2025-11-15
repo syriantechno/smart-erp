@@ -44,6 +44,11 @@
                 <div class="settings-content hidden" id="attendance-content">
                     @include('settings.partials.attendance')
                 </div>
+
+                <!-- AI Settings Tab -->
+                <div class="settings-content hidden" id="ai-content">
+                    @include('settings.partials.ai')
+                </div>
             </div>
         </div>
     </div>

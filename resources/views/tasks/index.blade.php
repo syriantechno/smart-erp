@@ -446,66 +446,73 @@
                 statusFilter.addEventListener('change', function() {
                     setTimeout(reloadTable, 300);
                 });
+            }
 
-                // Edit form handler
-                const editForm = document.getElementById('edit-task-form');
-                const editModal = document.getElementById('edit-task-modal');
+            // Edit form handler
+            const editForm = document.getElementById('edit-task-form');
+            const editModal = document.getElementById('edit-task-modal');
 
-                if (editForm) {
-                    editForm.addEventListener('submit', function (event) {
-                        event.preventDefault();
+            if (editForm) {
+                editForm.addEventListener('submit', function (event) {
+                    event.preventDefault();
 
-                        const formData = new FormData(editForm);
-                        const taskId = document.getElementById('edit-task-id').value;
+                    const formData = new FormData(editForm);
+                    const taskId = document.getElementById('edit-task-id').value;
 
-                        fetch(`/tasks/${taskId}`, {
-                            method: 'POST',
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest',
-                                'Accept': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                'X-HTTP-Method-Override': 'PUT',
-                            },
-                            body: formData,
-                        })
-                            .then(async (response) => {
-                                if (response.ok) {
-                                    return response.json();
-                                }
+                    fetch(`/tasks/${taskId}`, {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'X-HTTP-Method-Override': 'PUT',
+                        },
+                        body: formData,
+                    })
+                        .then(async (response) => {
+                            if (response.ok) {
+                                return response.json();
+                            }
 
-                                if (response.status === 422) {
-                                    const data = await response.json();
-                                    const errors = data.errors || {};
-                                    const firstError = Object.values(errors)[0];
-                                    if (firstError) {
-                                        showToast(Array.isArray(firstError) ? firstError[0] : firstError, 'error');
-                                    } else {
-                                        showToast(data.message || 'Validation error', 'error');
-                                    }
-                                    throw new Error('validation');
-                                }
-
-                                throw new Error('request');
-                            })
-                            .then((data) => {
-                                if (data.success) {
-                                    showToast(data.message || 'Task updated successfully', 'success');
-                                    editModal.__tippy?.hide?.();
-                                    reloadTable();
+                            if (response.status === 422) {
+                                const data = await response.json();
+                                const errors = data.errors || {};
+                                const firstError = Object.values(errors)[0];
+                                if (firstError) {
+                                    showToast(Array.isArray(firstError) ? firstError[0] : firstError, 'error');
                                 } else {
-                                    showToast(data.message || 'Failed to update task', 'error');
+                                    showToast(data.message || 'Validation error', 'error');
                                 }
-                            })
-                            .catch((error) => {
-                                if (error.message === 'validation') {
-                                    return;
-                                }
-                                console.error('Task update error:', error);
-                                showToast('An error occurred while updating the task', 'error');
-                            });
-                    });
-                            return;
-                        }
+                                throw new Error('validation');
+                            }
+
+                            throw new Error('request');
+                        })
+                        .then((data) => {
+                            if (data.success) {
+                                showToast(data.message || 'Task updated successfully', 'success');
+                                editModal.__tippy?.hide?.();
+                                reloadTable();
+                            } else {
+                                showToast(data.message || 'Failed to update task', 'error');
+                            }
+                        })
+                        .catch((error) => {
+                            if (error.message === 'validation') {
+                                return;
+                            }
+                            console.error('Task update error:', error);
+                            showToast('An error occurred while updating the task', 'error');
+                        });
+                });
+            }
+
+            // Export CSV handler
+            if (exportBtn) {
+                exportBtn.addEventListener('click', function () {
+                    try {
+                        const data = table.ajax.json();
+                        const rows = (data && data.data) ? data.data : [];
 
                         const headers = ['#', 'Code', 'Title', 'Priority', 'Status', 'Assigned To', 'Due Date'];
                         const csvRows = [headers.join(',')];

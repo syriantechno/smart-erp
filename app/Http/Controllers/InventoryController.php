@@ -17,7 +17,7 @@ class InventoryController extends Controller
     {
         $warehouses = Warehouse::active()->select('id', 'name')->get();
         $materials = Material::active()->select('id', 'name')->get();
-        return view('warehouse.inventory.index', compact('warehouses', 'materials'));
+        return view('warehouse.index', compact('warehouses', 'materials'));
     }
 
     public function datatable(Request $request): JsonResponse

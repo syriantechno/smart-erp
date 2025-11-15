@@ -103,7 +103,7 @@
 
                     <!-- Tab Navigation -->
                     <div class="mt-5">
-                        <div class="nav nav-tabs flex-col sm:flex-row" role="tablist">
+                        <div class="nav nav-tabs flex flex-row flex-wrap gap-2" role="tablist">
                             <a href="{{ route('approval-system.index', ['tab' => 'my-requests']) }}"
                                class="nav-link {{ $currentTab === 'my-requests' ? 'active' : '' }}">
                                 <x-base.lucide icon="FileText" class="w-4 h-4 mr-2" />
@@ -192,23 +192,30 @@
 
                 <!-- Data Table -->
                 <div class="p-5">
-                    <table id="approval-requests-table" class="table table-report -mt-2">
-                        <thead>
-                            <tr>
-                                <th>Code</th>
-                                <th>Title</th>
-                                <th>Type</th>
-                                <th>Priority</th>
-                                <th>Status</th>
-                                <th>Requester</th>
-                                <th>Approver</th>
-                                <th>Amount</th>
-                                <th>Date</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
+                    <div class="overflow-x-auto sm:overflow-visible" data-erp-table-wrapper>
+                        <table
+                            id="approval-requests-table"
+                            data-tw-merge
+                            data-erp-table
+                            class="datatable-default w-full min-w-full table-auto text-left text-sm"
+                        >
+                            <thead>
+                                <tr>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Code</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Title</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Type</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Priority</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Status</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Requester</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Approver</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Amount</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Date</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
             </x-base.preview-component>
         </div>
@@ -219,7 +226,6 @@
         id="create-request-modal"
         class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/70 hidden"
         tabindex="-1"
-        aria-hidden="true"
     >
         <div class="modal-dialog w-full max-w-4xl mx-4">
             <div class="modal-content bg-white dark:bg-darkmode-600 rounded-lg shadow-xl overflow-hidden">
@@ -240,8 +246,8 @@
                         <!-- Request Type & Priority -->
                         <div class="grid grid-cols-12 gap-4 mb-6">
                             <div class="col-span-12 md:col-span-6">
-                                <label class="form-label">Request Type <span class="text-danger">*</span></label>
-                                <select id="request-type" name="type" class="w-full form-select" required>
+                                <x-base.form-label for="request-type">Request Type <span class="text-danger">*</span></x-base.form-label>
+                                <x-base.form-select id="request-type" name="type" class="w-full" required>
                                     <option value="">Select Request Type</option>
                                     <option value="leave_request">Leave Request</option>
                                     <option value="purchase_request">Purchase Request</option>
@@ -251,17 +257,17 @@
                                     <option value="training_request">Training Request</option>
                                     <option value="equipment_request">Equipment Request</option>
                                     <option value="other">Other Request</option>
-                                </select>
+                                </x-base.form-select>
                             </div>
 
                             <div class="col-span-12 md:col-span-6">
-                                <label class="form-label">Priority <span class="text-danger">*</span></label>
-                                <select id="request-priority" name="priority" class="w-full form-select" required>
+                                <x-base.form-label for="request-priority">Priority <span class="text-danger">*</span></x-base.form-label>
+                                <x-base.form-select id="request-priority" name="priority" class="w-full" required>
                                     <option value="normal">Normal</option>
                                     <option value="low">Low</option>
                                     <option value="high">High</option>
                                     <option value="urgent">Urgent</option>
-                                </select>
+                                </x-base.form-select>
                             </div>
                         </div>
 
@@ -271,13 +277,27 @@
 
                             <div class="grid grid-cols-12 gap-4">
                                 <div class="col-span-12">
-                                    <label class="form-label">Title <span class="text-danger">*</span></label>
-                                    <input id="request-title" name="title" type="text" class="w-full form-control" placeholder="Enter request title" required />
+                                    <x-base.form-label for="request-title">Title <span class="text-danger">*</span></x-base.form-label>
+                                    <x-base.form-input
+                                        id="request-title"
+                                        name="title"
+                                        type="text"
+                                        class="w-full"
+                                        placeholder="Enter request title"
+                                        required
+                                    />
                                 </div>
 
                                 <div class="col-span-12">
-                                    <label class="form-label">Description <span class="text-danger">*</span></label>
-                                    <textarea id="request-description" name="description" rows="4" class="w-full form-control" placeholder="Describe your request in detail" required></textarea>
+                                    <x-base.form-label for="request-description">Description <span class="text-danger">*</span></x-base.form-label>
+                                    <x-base.form-textarea
+                                        id="request-description"
+                                        name="description"
+                                        rows="4"
+                                        class="w-full"
+                                        placeholder="Describe your request in detail"
+                                        required
+                                    ></x-base.form-textarea>
                                 </div>
                             </div>
                         </div>
@@ -288,8 +308,16 @@
 
                             <div class="grid grid-cols-12 gap-4">
                                 <div class="col-span-12 md:col-span-6">
-                                    <label class="form-label">Amount ($)</label>
-                                    <input id="request-amount" name="amount" type="number" step="0.01" min="0" class="w-full form-control" placeholder="0.00" />
+                                    <x-base.form-label for="request-amount">Amount ($)</x-base.form-label>
+                                    <x-base.form-input
+                                        id="request-amount"
+                                        name="amount"
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        class="w-full"
+                                        placeholder="0.00"
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -300,7 +328,7 @@
 
                             <div class="grid grid-cols-12 gap-4">
                                 <div class="col-span-12 md:col-span-6">
-                                    <label class="form-label">Start Date</label>
+                                    <x-base.form-label for="request-start-date">Start Date</x-base.form-label>
                                     <div class="relative mx-auto w-56">
                                         <div
                                             class="absolute flex h-full w-10 items-center justify-center rounded-l border bg-slate-100 text-slate-500 dark:border-darkmode-800 dark:bg-darkmode-700 dark:text-slate-400">
@@ -316,7 +344,7 @@
                                 </div>
 
                                 <div class="col-span-12 md:col-span-6">
-                                    <label class="form-label">End Date</label>
+                                    <x-base.form-label for="request-end-date">End Date</x-base.form-label>
                                     <div class="relative mx-auto w-56">
                                         <div
                                             class="absolute flex h-full w-10 items-center justify-center rounded-l border bg-slate-100 text-slate-500 dark:border-darkmode-800 dark:bg-darkmode-700 dark:text-slate-400">
@@ -339,23 +367,23 @@
 
                             <div class="grid grid-cols-12 gap-4">
                                 <div class="col-span-12 md:col-span-6">
-                                    <label class="form-label">Company</label>
-                                    <select id="request-company" name="company_id" class="w-full form-select">
+                                    <x-base.form-label for="request-company">Company</x-base.form-label>
+                                    <x-base.form-select id="request-company" name="company_id" class="w-full">
                                         <option value="">Select Company</option>
                                         @foreach($companies as $company)
                                             <option value="{{ $company->id }}">{{ $company->name }}</option>
                                         @endforeach
-                                    </select>
+                                    </x-base.form-select>
                                 </div>
 
                                 <div class="col-span-12 md:col-span-6">
-                                    <label class="form-label">Department</label>
-                                    <select id="request-department" name="department_id" class="w-full form-select">
+                                    <x-base.form-label for="request-department">Department</x-base.form-label>
+                                    <x-base.form-select id="request-department" name="department_id" class="w-full">
                                         <option value="">Select Department</option>
                                         @foreach($departments as $department)
                                             <option value="{{ $department->id }}">{{ $department->name }}</option>
                                         @endforeach
-                                    </select>
+                                    </x-base.form-select>
                                 </div>
                             </div>
                         </div>
@@ -393,24 +421,26 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Actions -->
+                        <div class="flex justify-end gap-2 pt-6 border-t">
+                            <x-base.button
+                                variant="outline-secondary"
+                                type="button"
+                                onclick="closeModal('create-request-modal')"
+                            >
+                                Cancel
+                            </x-base.button>
+                            <x-base.button
+                                variant="primary"
+                                type="submit"
+                                id="submit-request-btn"
+                            >
+                                <x-base.lucide icon="Send" class="w-4 h-4 mr-2" />
+                                Submit Request
+                            </x-base.button>
+                        </div>
                     </form>
-                </div>
-                <div class="modal-footer flex justify-end gap-2 border-t border-slate-200/60 dark:border-darkmode-400 px-5 py-3">
-                    <button
-                        type="button"
-                        class="btn btn-secondary"
-                        onclick="closeModal('create-request-modal')"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        type="submit"
-                        class="btn btn-primary"
-                        id="submit-request-btn"
-                        form="create-request-form"
-                    >
-                        Submit Request
-                    </button>
                 </div>
             </div>
         </div>
@@ -421,7 +451,6 @@
         id="view-request-modal"
         class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/70 hidden"
         tabindex="-1"
-        aria-hidden="true"
     >
         <div class="modal-dialog modal-xl w-full max-w-5xl mx-4">
             <div class="modal-content bg-white dark:bg-darkmode-600 rounded-lg shadow-xl overflow-hidden">
@@ -447,7 +476,6 @@
         id="approve-modal"
         class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/70 hidden"
         tabindex="-1"
-        aria-hidden="true"
     >
         <div class="modal-dialog w-full max-w-lg mx-4">
             <div class="modal-content bg-white dark:bg-darkmode-600 rounded-lg shadow-xl overflow-hidden">
@@ -499,7 +527,6 @@
         id="reject-modal"
         class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/70 hidden"
         tabindex="-1"
-        aria-hidden="true"
     >
         <div class="modal-dialog w-full max-w-lg mx-4">
             <div class="modal-content bg-white dark:bg-darkmode-600 rounded-lg shadow-xl overflow-hidden">
@@ -639,7 +666,10 @@
                     { data: 'actions', name: 'actions', orderable: false, searchable: false }
                 ],
                 pageLength: 25,
-                dom: '<"flex flex-col sm:flex-row items-center gap-4"<"flex-1"l><"flex-1"f><"flex-1"B>>rt<"flex flex-col sm:flex-row items-center gap-4"<"flex-1"i><"flex-1"p>>',
+                lengthChange: false,
+                searching: false,
+                order: [[0, 'asc']],
+                dom: "t<'datatable-footer flex flex-col md:flex-row md:items-center md:justify-between mt-5 gap-4'<'datatable-info text-slate-500'i><'datatable-pagination'p>>",
                 buttons: [
                     {
                         extend: 'excel',

@@ -39,6 +39,12 @@
                 </svg>
                 Attendance Settings
             </a>
+            <a href="#" class="settings-tab flex items-center px-3 py-2 text-sm font-medium rounded-md text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-darkmode-400" data-tab="ai">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                AI Settings
+            </a>
         </nav>
     </div>
 </div>

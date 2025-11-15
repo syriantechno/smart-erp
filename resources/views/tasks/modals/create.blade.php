@@ -5,7 +5,7 @@
     $departments = \App\Models\Department::active()->get();
     $employees = \App\Models\Employee::active()->get();
 @endphp
-<x-modal.form id="create-task-modal" title="Add New Task" size="lg">
+<x-modal.form id="create-task-modal" title="Add New Task" size="xl">
     <form id="create-task-form" action="{{ route('tasks.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 

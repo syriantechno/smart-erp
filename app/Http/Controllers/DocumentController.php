@@ -114,7 +114,7 @@ class DocumentController extends Controller
             $q->orWhere(function ($subQ) use ($user) {
                 $subQ->where('access_level', 'restricted')
                      ->whereHas('sharedUsers', function ($shareQ) use ($user) {
-                         $shareQ->where('user_id', $user->id);
+                         $shareQ->where('shared_with_user_id', $user->id);
                      });
             });
 

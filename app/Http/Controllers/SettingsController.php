@@ -209,6 +209,41 @@ class SettingsController extends Controller
         return redirect()->route('settings.index')->with('success', 'تم حفظ إعدادات الحضور والغياب بنجاح!');
     }
 
+    public function updateAiSettings(Request $request)
+    {
+        $request->validate([
+            'provider' => 'required|in:openai,ollama',
+            'openai_api_key' => 'nullable|string',
+            'openai_model' => 'nullable|string',
+            'openai_max_tokens' => 'nullable|integer|min:1',
+            'openai_temperature' => 'nullable|numeric|min:0|max:2',
+            'ollama_base_url' => 'nullable|string',
+            'ollama_model' => 'nullable|string',
+        ]);
+
+        $provider = $request->input('provider', 'openai');
+        Setting::set('ai.provider', $provider, 'string', 'AI provider (openai or ollama)');
+
+        // OpenAI settings
+        Setting::set('ai.api_key', $request->input('openai_api_key'), 'string', 'OpenAI API key');
+        Setting::set('ai.model', $request->input('openai_model', 'gpt-3.5-turbo'), 'string', 'OpenAI model');
+        Setting::set('ai.max_tokens', $request->input('openai_max_tokens', 2000), 'number', 'OpenAI max tokens');
+        Setting::set('ai.temperature', $request->input('openai_temperature', 0.7), 'number', 'OpenAI temperature');
+
+        // Ollama settings
+        Setting::set('ai.ollama_base_url', $request->input('ollama_base_url', 'http://127.0.0.1:11434'), 'string', 'Ollama base URL');
+        Setting::set('ai.ollama_model', $request->input('ollama_model', 'llama3'), 'string', 'Ollama model');
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'AI settings updated successfully!',
+            ]);
+        }
+
+        return redirect()->route('settings.index', ['#ai'])->with('success', 'AI settings updated successfully!');
+    }
+
     public function updateNotifications(Request $request)
     {
         $keys = [

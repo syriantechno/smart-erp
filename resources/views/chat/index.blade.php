@@ -192,57 +192,61 @@
     </div>
 
     <!-- New Chat Modal -->
-    <div id="new-chat-modal" class="modal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="font-medium text-base mr-auto">Start New Conversation</h2>
-                    <button type="button" class="text-slate-400 hover:text-slate-600" data-tw-dismiss="modal">
-                        <x-base.lucide icon="X" class="w-6 h-6" />
-                    </button>
-                </div>
-                <div class="modal-body p-6">
-                    <form id="new-chat-form">
-                        <div class="mb-4">
-                            <label class="form-label">Conversation Type</label>
-                            <div class="flex gap-4">
-                                <label class="flex items-center">
-                                    <input type="radio" name="chat_type" value="direct" checked class="mr-2">
-                                    <span>Direct Message</span>
-                                </label>
-                                <label class="flex items-center">
-                                    <input type="radio" name="chat_type" value="group" class="mr-2">
-                                    <span>Group Chat</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div id="group-title-section" class="mb-4" style="display: none;">
-                            <label class="form-label">Group Title</label>
-                            <x-base.form-input
-                                id="group-title"
-                                name="group_title"
-                                type="text"
-                                placeholder="Enter group name"
-                                class="w-full"
-                            />
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="form-label">Select Participants</label>
-                            <div id="participants-list" class="max-h-48 overflow-y-auto border border-slate-200 rounded p-2">
-                                <!-- Participants will be loaded here -->
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-tw-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" onclick="startNewConversation()">Start Chat</button>
+    <x-modal.form id="new-chat-modal" title="Start New Conversation">
+        <form id="new-chat-form">
+            <div class="mb-4">
+                <label class="form-label">Conversation Type</label>
+                <div class="flex gap-4">
+                    <label class="flex items-center">
+                        <input type="radio" name="chat_type" value="direct" checked class="mr-2">
+                        <span>Direct Message</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="radio" name="chat_type" value="group" class="mr-2">
+                        <span>Group Chat</span>
+                    </label>
                 </div>
             </div>
-        </div>
-    </div>
+
+            <div id="group-title-section" class="mb-4" style="display: none;">
+                <label class="form-label">Group Title</label>
+                <x-base.form-input
+                    id="group-title"
+                    name="group_title"
+                    type="text"
+                    placeholder="Enter group name"
+                    class="w-full"
+                />
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Select Participants</label>
+                <div id="participants-list" class="max-h-48 overflow-y-auto border border-slate-200 rounded p-2">
+                    <!-- Participants will be loaded here -->
+                </div>
+            </div>
+        </form>
+
+        @slot('footer')
+            <div class="flex justify-end w-full gap-2">
+                <x-base.button
+                    type="button"
+                    variant="outline-secondary"
+                    data-tw-dismiss="modal"
+                >
+                    Cancel
+                </x-base.button>
+                <x-base.button
+                    type="button"
+                    variant="primary"
+                    onclick="startNewConversation()"
+                >
+                    <x-base.lucide icon="MessageCircle" class="w-4 h-4 mr-2" />
+                    Start Chat
+                </x-base.button>
+            </div>
+        @endslot
+    </x-modal.form>
 @endsection
 
 @push('scripts')
@@ -250,11 +254,18 @@
         let currentConversationId = null;
         let selectedFile = null;
 
-        $(document).ready(function() {
-            loadConversations();
-            setupEventListeners();
-            setupRealTimeUpdates();
-        });
+        // Ensure jQuery alias `$` is available even if jQuery is in noConflict mode
+        const $ = window.jQuery || window.$;
+
+        if ($) {
+            $(document).ready(function() {
+                loadConversations();
+                setupEventListeners();
+                setupRealTimeUpdates();
+            });
+        } else {
+            console.error('jQuery is not available on the chat page.');
+        }
 
         function setupEventListeners() {
             // Message input
@@ -472,7 +483,10 @@
 
         function showNewChatModal() {
             loadUsersForChat();
-            $('#new-chat-modal').modal('show');
+            const modalEl = document.getElementById('new-chat-modal');
+            if (modalEl) {
+                modalEl.dispatchEvent(new CustomEvent('open-modal'));
+            }
         }
 
         function loadUsersForChat() {
@@ -529,7 +543,10 @@
             $.post('{{ route("chat.start-conversation") }}', data)
                 .done(function(response) {
                     if (response.success) {
-                        $('#new-chat-modal').modal('hide');
+                        const modalEl = document.getElementById('new-chat-modal');
+                        if (modalEl) {
+                            modalEl.dispatchEvent(new CustomEvent('close-modal'));
+                        }
                         loadConversations();
                         if (response.conversation_id) {
                             openConversation(response.conversation_id);

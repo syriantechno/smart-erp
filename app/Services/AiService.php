@@ -9,15 +9,26 @@ use App\Models\AiGeneratedContent;
 
 class AiService
 {
+    protected $provider;
     protected $apiKey;
     protected $baseUrl;
     protected $model;
 
     public function __construct()
     {
-        $this->apiKey = config('services.openai.api_key');
-        $this->baseUrl = 'https://api.openai.com/v1';
-        $this->model = config('services.openai.model', 'gpt-3.5-turbo');
+        $this->provider = setting('ai.provider', config('ai.provider', 'openai'));
+
+        if ($this->provider === 'ollama') {
+            // Local Ollama server
+            $this->baseUrl = rtrim(setting('ai.ollama_base_url', config('ai.ollama_base_url', 'http://127.0.0.1:11434')), '/');
+            $this->model = setting('ai.ollama_model', config('ai.ollama_model', 'llama3'));
+            $this->apiKey = null; // Not needed for Ollama
+        } else {
+            // Default: OpenAI
+            $this->apiKey = setting('ai.api_key', config('ai.api_key', config('services.openai.api_key')));
+            $this->baseUrl = 'https://api.openai.com/v1';
+            $this->model = setting('ai.model', config('ai.model', config('services.openai.model', 'gpt-3.5-turbo')));
+        }
     }
 
     /**
@@ -32,20 +43,58 @@ class AiService
                 ['role' => 'user', 'content' => $userInput]
             ];
 
+            if ($this->provider === 'ollama') {
+                // Call local Ollama server
+                $response = Http::timeout(60)
+                    ->post("{$this->baseUrl}/api/chat", [
+                        'model' => $this->model,
+                        'messages' => $messages,
+                        'stream' => false,
+                    ]);
+
+                if ($response->successful()) {
+                    $data = $response->json();
+                    // Ollama returns a single message in "message" or in the last entry of messages
+                    $aiResponse = $data['message']['content'] ?? ($data['messages'][0]['content'] ?? '');
+
+                    return [
+                        'success' => true,
+                        'response' => $aiResponse,
+                        'metadata' => [
+                            'model' => $this->model,
+                            'provider' => 'ollama',
+                            'tokens_used' => null,
+                            'cost' => 0,
+                        ]
+                    ];
+                }
+
+                Log::error('Ollama API Error: ' . $response->body());
+                return [
+                    'success' => false,
+                    'error' => 'Failed to get AI response from Ollama',
+                    'details' => $response->json(),
+                ];
+            }
+
+            // Default: OpenAI
+            $maxTokens = (int) setting('ai.max_tokens', config('ai.max_tokens', 2000));
+            $temperature = (float) setting('ai.temperature', config('ai.temperature', 0.7));
+
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $this->apiKey,
                 'Content-Type' => 'application/json',
             ])->post("{$this->baseUrl}/chat/completions", [
                 'model' => $this->model,
                 'messages' => $messages,
-                'max_tokens' => 2000,
-                'temperature' => 0.7,
+                'max_tokens' => $maxTokens,
+                'temperature' => $temperature,
             ]);
 
             if ($response->successful()) {
                 $data = $response->json();
                 $aiResponse = $data['choices'][0]['message']['content'];
-                $tokensUsed = $data['usage']['total_tokens'];
+                $tokensUsed = $data['usage']['total_tokens'] ?? 0;
                 $cost = $this->calculateCost($tokensUsed);
 
                 return [
@@ -53,18 +102,19 @@ class AiService
                     'response' => $aiResponse,
                     'metadata' => [
                         'model' => $this->model,
+                        'provider' => 'openai',
                         'tokens_used' => $tokensUsed,
                         'cost' => $cost,
                     ]
                 ];
-            } else {
-                Log::error('OpenAI API Error: ' . $response->body());
-                return [
-                    'success' => false,
-                    'error' => 'Failed to get AI response',
-                    'details' => $response->json()
-                ];
             }
+
+            Log::error('OpenAI API Error: ' . $response->body());
+            return [
+                'success' => false,
+                'error' => 'Failed to get AI response',
+                'details' => $response->json()
+            ];
         } catch (\Exception $e) {
             Log::error('AI Service Error: ' . $e->getMessage());
             return [
@@ -383,6 +433,12 @@ class AiService
      */
     public function isAvailable(): bool
     {
+        if ($this->provider === 'ollama') {
+            // For local Ollama we assume availability if the base URL is set;
+            // connection issues will be surfaced when calling generateResponse.
+            return !empty($this->baseUrl);
+        }
+
         return !empty($this->apiKey);
     }
 }

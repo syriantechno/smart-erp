@@ -332,6 +332,151 @@ class ElectronicMailController extends Controller
         return view('electronic-mail.compose', compact('companies', 'departments', 'users'));
     }
 
+    public function syncIncoming(Request $request): JsonResponse
+    {
+        $user = Auth::user();
+        if (! $user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not authenticated.',
+            ], 401);
+        }
+
+        $account = $user->defaultMailAccount;
+        if (! $account) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No personal mail account configured for the current user.',
+            ], 400);
+        }
+
+        if (! $account->is_active) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Your personal mail account is inactive. Please enable it in settings.',
+            ], 400);
+        }
+
+        if (! function_exists('imap_open')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'PHP IMAP extension is not enabled on the server. Incoming sync requires IMAP.',
+            ], 500);
+        }
+
+        $protocol = $account->incoming_protocol ?: 'imap';
+        $host = $account->incoming_host;
+        $port = $account->incoming_port;
+        $encryption = $account->incoming_encryption;
+
+        if (! $host) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Incoming mail host is not configured.',
+            ], 400);
+        }
+
+        if (! $port) {
+            if ($protocol === 'imap') {
+                $port = $encryption === 'ssl' ? 993 : 143;
+            } else {
+                $port = $encryption === 'ssl' ? 995 : 110;
+            }
+        }
+
+        $flags = $protocol === 'imap' ? '/imap' : '/pop3';
+        if ($encryption === 'ssl') {
+            $flags .= '/ssl';
+        } elseif ($encryption === 'tls') {
+            $flags .= '/tls';
+        }
+        $flags .= '/novalidate-cert';
+
+        $mailbox = sprintf('{%s:%d%s}INBOX', $host, $port, $flags);
+
+        Log::info('Attempting IMAP/POP sync for user', [
+            'user_id' => $user->id,
+            'mailbox' => $mailbox,
+        ]);
+
+        try {
+            $connection = @imap_open($mailbox, $account->incoming_username, $account->incoming_password);
+            if (! $connection) {
+                $error = imap_last_error();
+                Log::error('IMAP/POP connection failed', ['error' => $error]);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to connect to incoming mail server: ' . ($error ?: 'Unknown error'),
+                ], 500);
+            }
+
+            $criteria = 'UNSEEN';
+            $emails = imap_search($connection, $criteria, SE_UID);
+
+            $imported = 0;
+            if ($emails && count($emails) > 0) {
+                rsort($emails);
+                $emails = array_slice($emails, 0, 20);
+
+                foreach ($emails as $uid) {
+                    $overview = imap_fetch_overview($connection, $uid, FT_UID);
+                    $header = $overview[0] ?? null;
+                    if (! $header) {
+                        continue;
+                    }
+
+                    $from = imap_rfc822_parse_adrlist($header->from ?? '', '');
+                    $senderEmail = $from[0]->mailbox . '@' . $from[0]->host;
+                    $senderName = property_exists($from[0], 'personal') ? $from[0]->personal : null;
+
+                    $subject = isset($header->subject) ? imap_utf8($header->subject) : '(No Subject)';
+                    $date = isset($header->date) ? new \DateTime($header->date) : now();
+
+                    $body = imap_body($connection, $uid, FT_UID | FT_PEEK) ?: '';
+
+                    ElectronicMail::create([
+                        'code' => $this->codeGenerator->generate('electronic_mails'),
+                        'subject' => $subject,
+                        'content' => $body,
+                        'type' => 'incoming',
+                        'status' => 'received',
+                        'priority' => 'normal',
+                        'sender_name' => $senderName,
+                        'sender_email' => $senderEmail,
+                        'recipient_user_id' => $user->id,
+                        'recipient_name' => $user->name,
+                        'recipient_email' => $account->from_email ?: $account->incoming_username,
+                        'is_starred' => false,
+                        'is_read' => false,
+                        'sent_at' => $date,
+                    ]);
+
+                    $imported++;
+                }
+            }
+
+            imap_close($connection);
+
+            return response()->json([
+                'success' => true,
+                'message' => $imported > 0
+                    ? ("Inbox synced successfully. Imported {$imported} new message" . ($imported > 1 ? 's' : '') . '.')
+                    : 'Inbox synced successfully. No new messages found.',
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Incoming mail sync failed', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Incoming mail sync failed: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
     /**
      * Configure a temporary mailer using the current user's personal mail account
      * and send the outgoing email.

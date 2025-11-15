@@ -40,6 +40,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/settings/company', [SettingsController::class, 'updateCompany'])->name('settings.company.update');
     Route::post('/settings/attendance', [SettingsController::class, 'updateAttendance'])->name('settings.attendance.update');
     Route::post('/settings/notifications', [SettingsController::class, 'updateNotifications'])->name('settings.notifications.update');
+    Route::post('/settings/ai', [SettingsController::class, 'updateAiSettings'])->name('settings.ai.update');
 
     // HR Routes
     Route::prefix('hr')->name('hr.')->group(function () {
@@ -232,6 +233,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [App\Http\Controllers\ElectronicMailController::class, 'index'])->name('index');
         Route::get('/compose', [App\Http\Controllers\ElectronicMailController::class, 'compose'])->name('compose');
         Route::get('/datatable', [App\Http\Controllers\ElectronicMailController::class, 'datatable'])->name('datatable');
+        Route::post('/sync', [App\Http\Controllers\ElectronicMailController::class, 'syncIncoming'])->name('sync');
         Route::post('/', [App\Http\Controllers\ElectronicMailController::class, 'store'])->name('store');
         Route::get('/{electronicMail}', [App\Http\Controllers\ElectronicMailController::class, 'show'])->name('show');
         Route::put('/{electronicMail}', [App\Http\Controllers\ElectronicMailController::class, 'update'])->name('update');
@@ -285,6 +287,43 @@ Route::middleware('auth')->group(function () {
         Route::get('/available', [App\Http\Controllers\AiController::class, 'isAvailable'])->name('available');
     });
 
+    // Accounting Routes (Chart of Accounts & Journal Entries)
+    Route::prefix('accounting')->name('accounting.')->group(function () {
+        // Chart of Accounts main page
+        Route::get('chart-of-accounts', [App\Http\Controllers\Accounting\AccountingController::class, 'index'])
+            ->name('chart-of-accounts.index');
+
+        // Datatable data for Chart of Accounts
+        Route::get('chart-of-accounts/datatable', [App\Http\Controllers\Accounting\AccountingController::class, 'datatable'])
+            ->name('chart-of-accounts.datatable');
+
+        // Store new account
+        Route::post('chart-of-accounts', [App\Http\Controllers\Accounting\AccountingController::class, 'store'])
+            ->name('chart-of-accounts.store');
+
+        // Update account status
+        Route::post('chart-of-accounts/{account}/status', [App\Http\Controllers\Accounting\AccountingController::class, 'updateStatus'])
+            ->name('chart-of-accounts.update-status');
+
+        // Get accounts for dropdowns
+        Route::get('chart-of-accounts/accounts', [App\Http\Controllers\Accounting\AccountingController::class, 'getAccounts'])
+            ->name('chart-of-accounts.accounts');
+
+        // Export accounts data
+        Route::get('chart-of-accounts/export', [App\Http\Controllers\Accounting\AccountingController::class, 'export'])
+            ->name('chart-of-accounts.export');
+
+        // Journal Entries page & data
+        Route::get('journal-entries', [App\Http\Controllers\Accounting\AccountingController::class, 'journalEntries'])
+            ->name('journal-entries.index');
+
+        Route::get('journal-entries/datatable', [App\Http\Controllers\Accounting\AccountingController::class, 'journalEntriesDatatable'])
+            ->name('journal-entries.datatable');
+
+        Route::get('journal-entries/stats', [App\Http\Controllers\Accounting\AccountingController::class, 'journalEntriesStats'])
+            ->name('journal-entries.stats');
+    });
+
     // Document Management Routes
     Route::prefix('documents')->name('documents.')->group(function () {
         Route::get('/', [App\Http\Controllers\DocumentController::class, 'index'])->name('index');
@@ -300,6 +339,67 @@ Route::middleware('auth')->group(function () {
         Route::post('/categories', [App\Http\Controllers\DocumentController::class, 'storeCategory'])->name('store-category');
         Route::put('/categories/{category}', [App\Http\Controllers\DocumentController::class, 'updateCategory'])->name('update-category');
         Route::delete('/categories/{category}', [App\Http\Controllers\DocumentController::class, 'destroyCategory'])->name('destroy-category');
+    });
+
+    // Manufacturing Routes
+    Route::prefix('manufacturing')->name('manufacturing.')->group(function () {
+        // Main dashboard
+        Route::get('/', [App\Http\Controllers\ManufacturingController::class, 'index'])->name('index');
+
+        // Production Orders
+        Route::get('/orders', [App\Http\Controllers\ManufacturingController::class, 'ordersIndex'])->name('orders.index');
+        Route::get('/orders/create', [App\Http\Controllers\ManufacturingController::class, 'createOrder'])->name('orders.create');
+        Route::post('/orders', [App\Http\Controllers\ManufacturingController::class, 'storeOrder'])->name('orders.store');
+        Route::get('/orders/{order}', [App\Http\Controllers\ManufacturingController::class, 'showOrder'])->name('orders.show');
+        Route::get('/orders/{order}/edit', [App\Http\Controllers\ManufacturingController::class, 'editOrder'])->name('orders.edit');
+        Route::put('/orders/{order}', [App\Http\Controllers\ManufacturingController::class, 'updateOrder'])->name('orders.update');
+        Route::delete('/orders/{order}', [App\Http\Controllers\ManufacturingController::class, 'destroyOrder'])->name('orders.destroy');
+
+        // Production Stages
+        Route::get('/stages', [App\Http\Controllers\ManufacturingController::class, 'stagesIndex'])->name('stages.index');
+        Route::post('/stages', [App\Http\Controllers\ManufacturingController::class, 'storeStage'])->name('stages.store');
+        Route::put('/stages/{stage}', [App\Http\Controllers\ManufacturingController::class, 'updateStage'])->name('stages.update');
+        Route::delete('/stages/{stage}', [App\Http\Controllers\ManufacturingController::class, 'destroyStage'])->name('stages.destroy');
+
+        // Machines
+        Route::get('/machines', [App\Http\Controllers\ManufacturingController::class, 'machinesIndex'])->name('machines.index');
+        Route::post('/machines', [App\Http\Controllers\ManufacturingController::class, 'storeMachine'])->name('machines.store');
+        Route::put('/machines/{machine}', [App\Http\Controllers\ManufacturingController::class, 'updateMachine'])->name('machines.update');
+        Route::delete('/machines/{machine}', [App\Http\Controllers\ManufacturingController::class, 'destroyMachine'])->name('machines.destroy');
+
+        // Quality Control
+        Route::get('/quality', [App\Http\Controllers\ManufacturingController::class, 'qualityIndex'])->name('quality.index');
+        Route::post('/quality', [App\Http\Controllers\ManufacturingController::class, 'storeQualityCheck'])->name('quality.store');
+        Route::put('/quality/{check}', [App\Http\Controllers\ManufacturingController::class, 'updateQualityCheck'])->name('quality.update');
+
+        // Reports
+        Route::get('/reports', [App\Http\Controllers\ManufacturingController::class, 'reportsIndex'])->name('reports.index');
+        Route::post('/reports', [App\Http\Controllers\ManufacturingController::class, 'generateReport'])->name('reports.generate');
+
+        // AJAX helpers
+        Route::get('/orders/datatable', [App\Http\Controllers\ManufacturingController::class, 'ordersDatatable'])->name('orders.datatable');
+        Route::get('/stages/active', [App\Http\Controllers\ManufacturingController::class, 'getActiveStages'])->name('stages.active');
+        Route::get('/machines/available', [App\Http\Controllers\ManufacturingController::class, 'getAvailableMachines'])->name('machines.available');
+    });
+
+    // Project Management Routes
+    Route::prefix('project-management')->name('project-management.')->group(function () {
+        // Main CRUD & listing
+        Route::get('projects', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'index'])->name('projects.index');
+        Route::get('projects/create', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'create'])->name('projects.create');
+        Route::get('projects/{project}', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'show'])->name('projects.show');
+        Route::get('projects/{project}/edit', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'edit'])->name('projects.edit');
+
+        // Data & operations
+        Route::get('projects/datatable', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'datatable'])->name('projects.datatable');
+        Route::post('projects', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'store'])->name('projects.store');
+        Route::put('projects/{project}', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'update'])->name('projects.update');
+        Route::delete('projects/{project}', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'destroy'])->name('projects.destroy');
+
+        // Status, stats & export
+        Route::put('projects/{project}/status', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'updateStatus'])->name('projects.update-status');
+        Route::get('projects/stats', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'stats'])->name('projects.stats');
+        Route::get('projects/export', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'export'])->name('projects.export');
     });
 
     // Dashboard and other pages

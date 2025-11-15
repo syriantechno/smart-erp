@@ -122,10 +122,89 @@
                     console.error('Error:', error);
                 })
                 .finally(() => {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = originalText;
+                    }
+                });
+            });
+        }
+
+        // Handle AI Settings Form with AJAX
+        const aiForm = document.getElementById('ai-settings-form');
+        if (aiForm && !aiForm.dataset.listenerAdded) {
+            console.log('AI settings form found');
+            aiForm.dataset.listenerAdded = 'true';
+
+            aiForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+                // The submit button is outside the form and linked via form="ai-settings-form"
+                let submitBtn = this.querySelector('button[type="submit"]');
+                if (!submitBtn) {
+                    submitBtn = document.querySelector('button[form="ai-settings-form"]');
+                }
+                const originalText = submitBtn ? submitBtn.textContent : '';
+
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Saving...';
+                }
+
+                fetch('{{ route("settings.ai.update") }}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        window.showToast(data.message || 'AI settings updated successfully!', 'success');
+                    } else {
+                        window.showToast(data.message || 'Error updating AI settings', 'error');
+                    }
+                })
+                .catch(error => {
+                    window.showToast('An error occurred while saving AI settings', 'error');
+                    console.error('Error:', error);
+                })
+                .finally(() => {
                     submitBtn.disabled = false;
                     submitBtn.textContent = originalText;
                 });
             });
+
+            // Provider toggle
+            const providerSelect = document.getElementById('ai_provider');
+            const openaiSection = document.getElementById('openai-settings');
+            const ollamaSection = document.getElementById('ollama-settings');
+
+            function toggleAiProviderSections() {
+                if (!providerSelect || !openaiSection || !ollamaSection) return;
+                const provider = providerSelect.value;
+                if (provider === 'ollama') {
+                    openaiSection.classList.add('hidden');
+                    ollamaSection.classList.remove('hidden');
+                } else {
+                    openaiSection.classList.remove('hidden');
+                    ollamaSection.classList.add('hidden');
+                }
+            }
+
+            if (providerSelect) {
+                providerSelect.addEventListener('change', toggleAiProviderSections);
+                toggleAiProviderSections();
+            }
         }
 
         // Handle Prefix Settings Form with AJAX

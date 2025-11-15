@@ -1,4 +1,4 @@
-@extends('themes.icewall.side-menu')
+@extends('../themes/' . $activeTheme . '/' . $activeLayout)
 
 @section('subhead')
     <title>AI Assistant - {{ config('app.name') }}</title>

@@ -17,13 +17,13 @@
             </button>
         </x-base.dialog.title>
 
-        <x-base.dialog.description class="p-5">
-            {{ $slot->toHtml() }}
+        <x-base.dialog.description class="p-5 max-h-[80vh] overflow-y-auto">
+            {!! $slot->toHtml() !!}
         </x-base.dialog.description>
 
         @isset($footer)
             <x-base.dialog.footer class="border-t border-gray-200 dark:border-dark-5 pt-4 mt-4">
-                {{ $footer->toHtml() }}
+                {!! $footer->toHtml() !!}
             </x-base.dialog.footer>
         @endisset
     </x-base.dialog.panel>

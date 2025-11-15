@@ -173,6 +173,7 @@
 
     @include('warehouse.modals.create')
     @include('warehouse.modals.edit')
+    @stack('modals')
 @endsection
 
 @include('components.datatable.scripts')
@@ -183,20 +184,29 @@
     <script>
         let warehousesTable;
 
-        $(document).ready(function() {
+        document.addEventListener('DOMContentLoaded', function () {
+            const jq = window.jQuery || window.$;
+
+            if (!jq || typeof jq.fn === 'undefined' || typeof jq.fn.DataTable === 'undefined') {
+                console.error('DataTables is not loaded; warehouses table will not be initialised.');
+                return;
+            }
+
             initializeWarehousesDataTable();
             setupWarehousesEventListeners();
         });
 
         function initializeWarehousesDataTable() {
-            warehousesTable = $('#warehouses-table').DataTable({
-                processing: true,
-                serverSide: true,
+            warehousesTable = window.initDataTable('#warehouses-table', {
                 ajax: {
-                    url: '{{ route("warehouse.warehouses.datatable") }}',
-                    data: function(d) {
-                        d.status = $('#warehouses-status-filter').val();
-                        d.filter_value = $('#warehouses-search-filter').val();
+                    url: @json(route('warehouse.warehouses.datatable')),
+                    type: 'GET',
+                    data: function (d) {
+                        const statusEl = document.getElementById('warehouses-status-filter');
+                        const searchEl = document.getElementById('warehouses-search-filter');
+
+                        d.status = statusEl ? statusEl.value : '';
+                        d.filter_value = searchEl ? searchEl.value : '';
                         d.filter_field = 'all';
                         d.filter_type = 'contains';
                     }
@@ -209,35 +219,38 @@
                     { data: 'actions', name: 'actions', orderable: false, searchable: false }
                 ],
                 pageLength: 25,
-                responsive: true,
-                dom: '<"flex flex-col sm:flex-row items-center gap-4"<"flex-1"l><"flex-1"f><"flex-1"B>>rt<"flex flex-col sm:flex-row items-center gap-4"<"flex-1"i><"flex-1"p>>',
-                buttons: [
-                    {
-                        extend: 'excel',
-                        text: '<i class="w-4 h-4 mr-2" data-lucide="file-spreadsheet"></i> Export Excel',
-                        className: 'btn btn-success',
-                        exportOptions: {
-                            columns: [0, 1, 2, 3]
-                        }
-                    }
-                ]
+                lengthChange: false,
+                searching: false,
+                dom:
+                    "t<'datatable-footer flex flex-col md:flex-row md:items-center md:justify-between mt-5 gap-4'<'datatable-info text-slate-500'i><'datatable-pagination'p>>",
             });
 
-            warehousesTable.on('draw', function() {
-                if (typeof lucide !== 'undefined') {
-                    lucide.createIcons();
+            window.warehousesTable = warehousesTable;
+
+            if (!warehousesTable) {
+                return;
+            }
+
+            warehousesTable.on('draw', function () {
+                if (typeof window.lucide !== 'undefined' && window.lucide.createIcons) {
+                    window.lucide.createIcons();
                 }
             });
         }
 
         function setupWarehousesEventListeners() {
-            $('#warehouses-search-filter').on('keypress', function(e) {
+            const jq = window.jQuery || window.$;
+            if (!jq) {
+                return;
+            }
+
+            jq('#warehouses-search-filter').on('keypress', function (e) {
                 if (e.which === 13) {
                     applyWarehousesFilters();
                 }
             });
 
-            $('#warehouses-status-filter').on('change', function() {
+            jq('#warehouses-status-filter').on('change', function () {
                 applyWarehousesFilters();
             });
         }
@@ -250,8 +263,13 @@
         }
 
         function clearWarehousesFilters() {
-            $('#warehouses-status-filter').val('');
-            $('#warehouses-search-filter').val('');
+            const jq = window.jQuery || window.$;
+            if (!jq) {
+                return;
+            }
+
+            jq('#warehouses-status-filter').val('');
+            jq('#warehouses-search-filter').val('');
             if (warehousesTable) {
                 warehousesTable.ajax.reload();
             }
@@ -259,21 +277,38 @@
         }
 
         function updateWarehousesActiveFiltersIndicator() {
-            const hasActiveFilters = $('#warehouses-status-filter').val() || $('#warehouses-search-filter').val();
-            $('#warehouses-active-filters-indicator').toggleClass('hidden', !hasActiveFilters);
+            const jq = window.jQuery || window.$;
+            if (!jq) {
+                return;
+            }
+
+            const hasActiveFilters = jq('#warehouses-status-filter').val() || jq('#warehouses-search-filter').val();
+            jq('#warehouses-active-filters-indicator').toggleClass('hidden', !hasActiveFilters);
         }
 
         window.editWarehouse = function(id) {
-            $.get('{{ route("warehouse.warehouses.show", ":id") }}'.replace(':id', id))
+            const jq = window.jQuery || window.$;
+            if (!jq) {
+                return;
+            }
+
+            jq.get('{{ route("warehouse.warehouses.show", ":id") }}'.replace(':id', id))
                 .done(function(response) {
                     if (response.success) {
-                        populateEditWarehouseModal(response.warehouse);
-                        $('#edit-warehouse-modal').modal('show');
+                        if (typeof window.populateEditWarehouseModal === 'function') {
+                            window.populateEditWarehouseModal(response.warehouse);
+                        }
+                        jq('#edit-warehouse-modal').modal('show');
                     }
                 });
         };
 
         window.deleteWarehouse = function(id, name) {
+            const jq = window.jQuery || window.$;
+            if (!jq) {
+                return;
+            }
+
             Swal.fire({
                 title: 'Are you sure?',
                 text: `Delete warehouse "${name}"?`,
@@ -284,11 +319,11 @@
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    $.ajax({
+                    jq.ajax({
                         url: '{{ route("warehouse.warehouses.destroy", ":id") }}'.replace(':id', id),
                         type: 'DELETE',
                         headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            'X-CSRF-TOKEN': document.querySelector("meta[name='csrf-token']").getAttribute('content')
                         },
                         success: function(response) {
                             if (response.success) {

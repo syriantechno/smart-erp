@@ -65,10 +65,16 @@
                 <div class="p-5 border-b border-slate-200/60">
                     <div class="flex items-center justify-between">
                         <h2 class="text-lg font-medium">Categories</h2>
-                        <button onclick="showCreateCategoryModal()" class="btn btn-primary btn-sm">
+                        <x-base.button
+                            variant="primary"
+                            size="sm"
+                            class="ml-2"
+                            data-tw-toggle="modal"
+                            data-tw-target="#category-modal"
+                        >
                             <x-base.lucide icon="Plus" class="w-4 h-4 mr-1" />
                             Add
-                        </button>
+                        </x-base.button>
                     </div>
                 </div>
 
@@ -144,275 +150,134 @@
                             </div>
                         </div>
                         <div class="flex items-center space-x-3">
+                            <!-- Page Length -->
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm text-slate-600">Show</span>
+                                <x-base.form-select id="documents-length" class="w-20 text-sm">
+                                    <option value="10">10</option>
+                                    <option value="25" selected>25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </x-base.form-select>
+                                <span class="text-sm text-slate-600">entries</span>
+                            </div>
+
                             <!-- Search -->
-                            <div class="relative">
-                                <x-base.lucide icon="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                                <input
-                                    type="text"
+                            <div class="relative w-64">
+                                <x-base.lucide icon="Search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
+                                <x-base.form-input
                                     id="document-search"
+                                    type="text"
                                     placeholder="Search documents..."
-                                    class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    class="pl-10 w-full"
                                 />
                             </div>
                             <!-- Upload Button -->
-                            <button onclick="showUploadModal()" class="btn btn-primary">
-                                <x-base.lucide icon="upload" class="w-4 h-4 mr-2" />
+                            <x-base.button
+                                type="button"
+                                variant="primary"
+                                class="flex items-center"
+                                data-tw-toggle="modal"
+                                data-tw-target="#upload-modal"
+                            >
+                                <x-base.lucide icon="Upload" class="w-4 h-4 mr-2" />
                                 Upload
-                            </button>
+                            </x-base.button>
                         </div>
                     </div>
 
-                    <!-- Filters -->
-                    <div class="flex flex-wrap gap-3 mt-4">
-                        <select id="type-filter" class="form-select text-sm">
-                            <option value="">All Types</option>
-                            <option value="contract">Contracts</option>
-                            <option value="invoice">Invoices</option>
-                            <option value="report">Reports</option>
-                            <option value="certificate">Certificates</option>
-                            <option value="license">Licenses</option>
-                            <option value="agreement">Agreements</option>
-                            <option value="policy">Policies</option>
-                            <option value="manual">Manuals</option>
-                            <option value="other">Other</option>
-                        </select>
+                    <!-- Filters (styled like Tasks page) -->
+                    <div class="grid grid-cols-12 gap-4 mt-4">
+                        <div class="col-span-12 md:col-span-4">
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                Document Type
+                            </label>
+                            <x-base.form-select id="type-filter" class="w-full text-sm">
+                                <option value="">All Types</option>
+                                <option value="contract">Contracts</option>
+                                <option value="invoice">Invoices</option>
+                                <option value="report">Reports</option>
+                                <option value="certificate">Certificates</option>
+                                <option value="license">Licenses</option>
+                                <option value="agreement">Agreements</option>
+                                <option value="policy">Policies</option>
+                                <option value="manual">Manuals</option>
+                                <option value="other">Other</option>
+                            </x-base.form-select>
+                        </div>
 
-                        <select id="status-filter" class="form-select text-sm">
-                            <option value="">All Status</option>
-                            <option value="active">Active</option>
-                            <option value="archived">Archived</option>
-                        </select>
+                        <div class="col-span-12 md:col-span-4">
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                Status
+                            </label>
+                            <x-base.form-select id="status-filter" class="w-full text-sm">
+                                <option value="">All Status</option>
+                                <option value="active">Active</option>
+                                <option value="archived">Archived</option>
+                            </x-base.form-select>
+                        </div>
 
-                        <select id="access-filter" class="form-select text-sm">
-                            <option value="">All Access Levels</option>
-                            <option value="public">Public</option>
-                            <option value="internal">Internal</option>
-                            <option value="confidential">Confidential</option>
-                            <option value="restricted">Restricted</option>
-                        </select>
+                        <div class="col-span-12 md:col-span-4">
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                Access Level
+                            </label>
+                            <x-base.form-select id="access-filter" class="w-full text-sm">
+                                <option value="">All Access Levels</option>
+                                <option value="public">Public</option>
+                                <option value="internal">Internal</option>
+                                <option value="confidential">Confidential</option>
+                                <option value="restricted">Restricted</option>
+                            </x-base.form-select>
+                        </div>
 
-                        <button onclick="applyFilters()" class="btn btn-outline-primary btn-sm">
-                            Apply Filters
-                        </button>
+                        <div class="col-span-12 flex justify-end mt-2">
+                            <x-base.button
+                                type="button"
+                                variant="primary"
+                                size="sm"
+                                onclick="applyFilters()"
+                            >
+                                <x-base.lucide icon="Search" class="w-4 h-4 mr-2" />
+                                Apply Filters
+                            </x-base.button>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Documents Table -->
                 <div class="p-5">
-                    <table id="documents-table" class="table table-report -mt-2">
-                        <thead>
-                            <tr>
-                                <th>Document</th>
-                                <th>Type</th>
-                                <th>Category</th>
-                                <th>Access Level</th>
-                                <th>Size</th>
-                                <th>Uploaded</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
+                    <div class="overflow-x-auto sm:overflow-visible" data-erp-table-wrapper>
+                        <table
+                            id="documents-table"
+                            data-tw-merge
+                            data-erp-table
+                            class="datatable-default w-full min-w-full table-auto text-left text-sm"
+                        >
+                            <thead>
+                                <tr>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Document</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Type</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Category</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Access Level</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Size</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Uploaded</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Upload Modal -->
-    <div id="upload-modal" class="modal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="font-medium text-base mr-auto flex items-center">
-                        <x-base.lucide icon="upload" class="w-5 h-5 mr-2 text-blue-600" />
-                        Upload Document
-                    </h2>
-                    <button type="button" class="text-slate-400 hover:text-slate-600" data-tw-dismiss="modal">
-                        <x-base.lucide icon="X" class="w-6 h-6" />
-                    </button>
-                </div>
-                <div class="modal-body p-6">
-                    <form id="upload-form" enctype="multipart/form-data">
-                        @csrf
-                        <div class="grid grid-cols-12 gap-4">
-                            <!-- File Upload Area -->
-                            <div class="col-span-12">
-                                <label class="form-label">Document File <span class="text-danger">*</span></label>
-                                <div class="upload-area p-8 text-center" id="upload-area">
-                                    <x-base.lucide icon="upload" class="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                                    <p class="text-lg font-medium text-gray-700 mb-2">Drop files here or click to browse</p>
-                                    <p class="text-sm text-gray-500 mb-4">
-                                        Supports: PDF, DOC, DOCX, XLS, XLSX, TXT, JPG, PNG, GIF<br>
-                                        Maximum size: 50MB per file
-                                    </p>
-                                    <input type="file" id="document-file" name="file" class="hidden" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.jpg,.jpeg,.png,.gif" />
-                                    <x-base.button
-                                        variant="outline-primary"
-                                        type="button"
-                                        onclick="document.getElementById('document-file').click()"
-                                    >
-                                        Choose File
-                                    </x-base.button>
-                                </div>
-                                <div id="file-info" class="mt-3 hidden">
-                                    <div class="flex items-center p-3 bg-blue-50 rounded-lg">
-                                        <x-base.lucide icon="file" class="w-5 h-5 text-blue-600 mr-3" />
-                                        <div class="flex-1">
-                                            <p class="font-medium text-blue-900" id="file-name"></p>
-                                            <p class="text-sm text-blue-700" id="file-details"></p>
-                                        </div>
-                                        <button type="button" onclick="clearFile()" class="text-red-600 hover:text-red-800">
-                                            <x-base.lucide icon="x" class="w-5 h-5" />
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Document Details -->
-                            <div class="col-span-12 md:col-span-6">
-                                <label class="form-label">Title <span class="text-danger">*</span></label>
-                                <input id="document-title" name="title" type="text" class="form-control" placeholder="Enter document title" />
-                            </div>
-
-                            <div class="col-span-12 md:col-span-6">
-                                <label class="form-label">Type <span class="text-danger">*</span></label>
-                                <select id="document-type" name="document_type" class="form-select">
-                                    <option value="">Select Type</option>
-                                    <option value="contract">Contract</option>
-                                    <option value="invoice">Invoice</option>
-                                    <option value="report">Report</option>
-                                    <option value="certificate">Certificate</option>
-                                    <option value="license">License</option>
-                                    <option value="agreement">Agreement</option>
-                                    <option value="policy">Policy</option>
-                                    <option value="manual">Manual</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
-
-                            <div class="col-span-12">
-                                <label class="form-label">Description</label>
-                                <textarea id="document-description" name="description" rows="3" class="form-control" placeholder="Enter document description"></textarea>
-                            </div>
-
-                            <div class="col-span-12 md:col-span-6">
-                                <label class="form-label">Category</label>
-                                <select id="document-category" name="category_id" class="form-select">
-                                    <option value="">Select Category</option>
-                                    @foreach($categories as $category)
-                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div class="col-span-12 md:col-span-6">
-                                <label class="form-label">Access Level <span class="text-danger">*</span></label>
-                                <select id="document-access" name="access_level" class="form-select">
-                                    <option value="internal">Internal (Company)</option>
-                                    <option value="confidential">Confidential (Department)</option>
-                                    <option value="restricted">Restricted (Specific Users)</option>
-                                    <option value="public">Public (All Users)</option>
-                                </select>
-                            </div>
-
-                            <div class="col-span-12 md:col-span-6">
-                                <label class="form-label">Expiry Date</label>
-                                <div class="relative mx-auto w-56">
-                                    <div
-                                        class="absolute flex h-full w-10 items-center justify-center rounded-l border bg-slate-100 text-slate-500 dark:border-darkmode-800 dark:bg-darkmode-700 dark:text-slate-400">
-                                        <x-base.lucide icon="calendar" class="stroke-1.5 w-5 h-5"></x-base.lucide>
-                                    </div>
-                                    <x-base.litepicker
-                                        id="document-expiry"
-                                        name="expiry_date"
-                                        class="pl-12"
-                                        data-single-mode="true"
-                                    />
-                                </div>
-                            </div>
-
-                            <div class="col-span-12 md:col-span-6">
-                                <label class="form-label">Department</label>
-                                <select id="document-department" name="department_id" class="form-select">
-                                    <option value="">Select Department</option>
-                                    @foreach($departments as $department)
-                                        <option value="{{ $department->id }}">{{ $department->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div class="col-span-12">
-                                <label class="form-label">Tags</label>
-                                <input id="document-tags" name="tags[]" type="text" class="form-control" placeholder="Enter tags separated by commas" />
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-tw-dismiss="modal">Cancel</button>
-                    <button type="button" id="upload-btn" class="btn btn-primary" onclick="uploadDocument()" disabled>
-                        <x-base.lucide icon="upload" class="w-4 h-4 mr-2" />
-                        Upload Document
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Category Modal -->
-    <div id="category-modal" class="modal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="font-medium text-base mr-auto" id="category-modal-title">Create Category</h2>
-                    <button type="button" class="text-slate-400 hover:text-slate-600" data-tw-dismiss="modal">
-                        <x-base.lucide icon="X" class="w-6 h-6" />
-                    </button>
-                </div>
-                <div class="modal-body p-6">
-                    <form id="category-form">
-                        <div class="mb-4">
-                            <label class="form-label">Category Name <span class="text-danger">*</span></label>
-                            <input id="category-name" name="name" type="text" class="form-control" placeholder="Enter category name" />
-                        </div>
-                        <div class="mb-4">
-                            <label class="form-label">Description</label>
-                            <textarea id="category-description" name="description" rows="2" class="form-control" placeholder="Enter category description"></textarea>
-                        </div>
-                        <div class="mb-4">
-                            <label class="form-label">Color</label>
-                            <input id="category-color" name="color" type="color" class="form-control" value="#3b82f6" />
-                        </div>
-                        <div class="mb-4">
-                            <label class="form-label">Icon</label>
-                            <select id="category-icon" name="icon" class="form-select">
-                                <option value="folder">Folder</option>
-                                <option value="file-text">File Text</option>
-                                <option value="archive">Archive</option>
-                                <option value="briefcase">Briefcase</option>
-                                <option value="clipboard">Clipboard</option>
-                                <option value="book">Book</option>
-                            </select>
-                        </div>
-                        <div class="mb-4">
-                            <label class="form-label">Parent Category</label>
-                            <select id="category-parent" name="parent_id" class="form-select">
-                                <option value="">Root Category</option>
-                                @foreach($categories as $category)
-                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-tw-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" onclick="saveCategory()">Save Category</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    @include('documents.modals.create-document')
+    @include('documents.modals.create-category')
+    @stack('modals')
 @endsection
+
+@include('components.datatable.scripts')
 
 @push('scripts')
     <script>
@@ -428,9 +293,7 @@
         });
 
         function initializeDataTable() {
-            documentsTable = $('#documents-table').DataTable({
-                processing: true,
-                serverSide: true,
+            documentsTable = window.initDataTable('#documents-table', {
                 ajax: {
                     url: '{{ route("documents.datatable") }}',
                     data: function(d) {
@@ -451,36 +314,44 @@
                     { data: 'actions', name: 'actions', orderable: false, searchable: false }
                 ],
                 pageLength: 25,
+                lengthChange: false,
+                searching: false,
                 responsive: true,
-                dom: '<"flex flex-col sm:flex-row items-center gap-4"<"flex-1"l><"flex-1"f><"flex-1"B>>rt<"flex flex-col sm:flex-row items-center gap-4"<"flex-1"i><"flex-1"p>>',
-                buttons: [
-                    {
-                        extend: 'excel',
-                        text: '<i class="w-4 h-4 mr-2" data-lucide="file-spreadsheet"></i> Export Excel',
-                        className: 'btn btn-success',
-                        exportOptions: {
-                            columns: [0, 1, 2, 3, 4, 5]
-                        }
+                dom:
+                    "t<'datatable-footer flex flex-col md:flex-row md:items-center md:justify-between mt-5 gap-4" +
+                    "'<'datatable-info text-slate-500'i><'datatable-pagination'p>>",
+                drawCallback: function () {
+                    if (typeof window.Lucide !== 'undefined') {
+                        window.Lucide.createIcons();
+                    } else if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+                        lucide.createIcons();
                     }
-                ]
-            });
-
-            documentsTable.on('draw', function() {
-                lucide.createIcons();
+                }
             });
         }
 
         function setupEventListeners() {
-            // Search
+            // Search (custom themed input)
             $('#document-search').on('keypress', function(e) {
                 if (e.which === 13) {
-                    documentsTable.ajax.reload();
+                    if (documentsTable) {
+                        documentsTable.ajax.reload();
+                    }
                 }
+            });
+
+            // Page length (custom themed select)
+            $('#documents-length').on('change', function () {
+                if (!documentsTable) return;
+                const length = parseInt($(this).val(), 10) || 25;
+                documentsTable.page.len(length).draw();
             });
 
             // Filters
             $('#type-filter, #status-filter, #access-filter').on('change', function() {
-                documentsTable.ajax.reload();
+                if (documentsTable) {
+                    documentsTable.ajax.reload();
+                }
             });
         }
 
@@ -570,8 +441,13 @@
             documentsTable.ajax.reload();
         }
 
-        function showUploadModal() {
-            $('#upload-modal').modal('show');
+        function closeModalById(id) {
+            const modalEl = document.getElementById(id);
+            if (!modalEl) return;
+            const dismissTrigger = modalEl.querySelector('[data-tw-dismiss="modal"]');
+            if (dismissTrigger) {
+                dismissTrigger.click();
+            }
         }
 
         function uploadDocument() {
@@ -609,7 +485,7 @@
                 contentType: false,
                 success: function(response) {
                     if (response.success) {
-                        $('#upload-modal').modal('hide');
+                        closeModalById('upload-modal');
                         clearFile();
                         documentsTable.ajax.reload();
                         updateStats();
@@ -631,7 +507,7 @@
         function showCreateCategoryModal() {
             $('#category-modal-title').text('Create Category');
             $('#category-form')[0].reset();
-            $('#category-modal').modal('show');
+            document.getElementById('category-modal').dispatchEvent(new CustomEvent('open-modal'));
         }
 
         function saveCategory() {
@@ -652,7 +528,7 @@
             $.post('{{ route("documents.store-category") }}', formData)
                 .done(function(response) {
                     if (response.success) {
-                        $('#category-modal').modal('hide');
+                        closeModalById('category-modal');
                         location.reload(); // Reload to show new category
                         Swal.fire('Success', response.message, 'success');
                     } else {

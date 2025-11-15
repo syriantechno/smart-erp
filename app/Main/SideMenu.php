@@ -84,8 +84,28 @@ class SideMenu
                         'icon' => 'user-plus',
                         'title' => 'Recruitment',
                         'route_name' => 'hr.recruitment.index'
+                    ],
+                    'project-management' => [
+                        'icon' => 'folder',
+                        'title' => 'Project Management',
+                        'route_name' => 'project-management.projects.index'
                     ]
                 ]
+            ],
+            'accounting' => [
+                'icon' => 'file-text',
+                'route_name' => 'accounting.chart-of-accounts.index',
+                'title' => 'Accounting'
+            ],
+            'manufacturing' => [
+                'icon' => 'settings',
+                'route_name' => 'manufacturing.index',
+                'title' => 'Manufacturing'
+            ],
+            'projects-manager' => [
+                'icon' => 'folder',
+                'route_name' => 'project-management.projects.index',
+                'title' => 'Projects Manager'
             ],
             'warehouse' => [
                 'icon' => 'package',

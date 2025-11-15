@@ -103,17 +103,22 @@
             <!-- Materials Table -->
             <x-base.preview-component class="intro-y box">
                 <div class="p-5">
-                    <div class="overflow-x-auto">
-                        <table id="materials-table" class="table table-report -mt-2">
+                    <div class="overflow-x-auto sm:overflow-visible" data-erp-table-wrapper>
+                        <table
+                            id="materials-table"
+                            data-tw-merge
+                            data-erp-table
+                            class="datatable-default w-full min-w-full table-auto text-left text-sm"
+                        >
                             <thead>
                                 <tr>
-                                    <th class="whitespace-nowrap">Code</th>
-                                    <th class="whitespace-nowrap">Name</th>
-                                    <th class="whitespace-nowrap">Category</th>
-                                    <th class="whitespace-nowrap">Unit</th>
-                                    <th class="whitespace-nowrap">Price</th>
-                                    <th class="whitespace-nowrap">Status</th>
-                                    <th class="whitespace-nowrap">Actions</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Code</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Name</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Category</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Unit</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Price</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Status</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Actions</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -129,7 +134,12 @@
 
     <!-- Edit Material Modal -->
     @include('warehouse.materials.modals.edit')
+
+    <!-- Hidden button to trigger edit material modal -->
+    <button id="edit-material-trigger" data-tw-toggle="modal" data-tw-target="#edit-material-modal" class="hidden"></button>
 @endsection
+
+@include('components.datatable.scripts')
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
@@ -137,15 +147,21 @@
     <script>
         let materialsTable;
 
-        $(document).ready(function() {
-            initializeDataTable();
-            setupEventListeners();
+        document.addEventListener('DOMContentLoaded', function () {
+            const jq = window.jQuery || window.$;
+            if (!jq) {
+                console.error('jQuery not available on materials page.');
+                return;
+            }
+
+            jq(function () {
+                initializeDataTable();
+                setupEventListeners();
+            });
         });
 
         function initializeDataTable() {
-            materialsTable = $('#materials-table').DataTable({
-                processing: true,
-                serverSide: true,
+            materialsTable = window.initDataTable('#materials-table', {
                 ajax: {
                     url: '{{ route("warehouse.materials.datatable") }}',
                     data: function(d) {
@@ -166,23 +182,18 @@
                     { data: 'actions', name: 'actions', orderable: false, searchable: false }
                 ],
                 pageLength: 25,
+                lengthChange: false,
+                searching: false,
+                order: [[0, 'asc']],
                 responsive: true,
-                dom: '<"flex flex-col sm:flex-row items-center gap-4"<"flex-1"l><"flex-1"f><"flex-1"B>>rt<"flex flex-col sm:flex-row items-center gap-4"<"flex-1"i><"flex-1"p>>',
-                buttons: [
-                    {
-                        extend: 'excel',
-                        text: '<i class="w-4 h-4 mr-2" data-lucide="file-spreadsheet"></i> Export Excel',
-                        className: 'btn btn-success',
-                        exportOptions: {
-                            columns: [0, 1, 2, 3, 4, 5]
-                        }
+                dom: "t<'datatable-footer flex flex-col md:flex-row md:items-center md:justify-between mt-5 gap-4'<'datatable-info text-slate-500'i><'datatable-pagination'p>>",
+                drawCallback: function () {
+                    if (typeof window.Lucide !== 'undefined') {
+                        window.Lucide.createIcons();
+                    } else if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+                        lucide.createIcons();
                     }
-                ]
-            });
-
-            // Reinitialize Lucide icons after DataTable draw
-            materialsTable.on('draw', function() {
-                lucide.createIcons();
+                }
             });
         }
 
@@ -224,7 +235,10 @@
                 .done(function(response) {
                     if (response.success) {
                         populateEditModal(response.material);
-                        $('#edit-material-modal').modal('show');
+                        const trigger = document.getElementById('edit-material-trigger');
+                        if (trigger) {
+                            trigger.click();
+                        }
                     }
                 });
         };

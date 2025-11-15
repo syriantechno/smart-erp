@@ -1,4 +1,4 @@
-@extends('themes.icewall.side-menu')
+@extends('../themes/' . $activeTheme . '/' . $activeLayout)
 
 @section('subhead')
     <title>AI Chat - {{ config('app.name') }}</title>
@@ -119,15 +119,21 @@
                         </div>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <select id="interaction-mode" class="form-select text-sm">
+                        <x-base.form-select id="interaction-mode" class="text-sm">
                             <option value="chat">💬 Chat</option>
                             <option value="command">⚡ Command</option>
                             <option value="analysis">📊 Analysis</option>
                             <option value="generation">✨ Generation</option>
-                        </select>
-                        <button onclick="clearChat()" class="btn btn-outline-secondary btn-sm" title="Clear Chat">
+                        </x-base.form-select>
+                        <x-base.button
+                            type="button"
+                            variant="outline-secondary"
+                            size="sm"
+                            onclick="clearChat()"
+                            title="Clear Chat"
+                        >
                             <x-base.lucide icon="Trash2" class="w-4 h-4" />
-                        </button>
+                        </x-base.button>
                     </div>
                 </div>
 
@@ -180,14 +186,14 @@
                 <div class="border-t border-slate-200/60 p-4">
                     <div class="flex items-end space-x-3">
                         <div class="flex-1">
-                            <textarea
+                            <x-base.form-textarea
                                 id="message-input"
-                                class="form-control resize-none"
+                                class="resize-none"
                                 rows="1"
                                 placeholder="Ask me anything..."
                                 onkeydown="handleKeyPress(event)"
                                 oninput="autoResize(this)"
-                            ></textarea>
+                            ></x-base.form-textarea>
                             <div class="flex justify-between items-center mt-2">
                                 <div class="text-xs text-gray-500">
                                     <span id="mode-indicator">💬 Chat Mode</span>
@@ -197,14 +203,16 @@
                                 </div>
                             </div>
                         </div>
-                        <button
+                        <x-base.button
                             id="send-button"
+                            type="button"
+                            variant="primary"
+                            class="rounded-full p-3"
                             onclick="sendMessage()"
-                            class="btn btn-primary rounded-full p-3"
                             disabled
                         >
                             <x-base.lucide icon="Send" class="w-5 h-5" />
-                        </button>
+                        </x-base.button>
                     </div>
 
                     <!-- Quick Commands -->

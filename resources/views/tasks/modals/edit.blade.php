@@ -3,7 +3,7 @@
     $departments = \App\Models\Department::active()->get();
     $employees = \App\Models\Employee::active()->get();
 @endphp
-<x-modal.form id="edit-task-modal" title="Edit Task" size="lg">
+<x-modal.form id="edit-task-modal" title="Edit Task" size="xl">
     <form id="edit-task-form" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
@@ -156,7 +156,7 @@
                     if (departmentSelect) {
                         departmentSelect.innerHTML = '<option value="">Select Department</option>';
                         @foreach($departments as $department)
-                            const deptOption = document.createElement('option');
+                            var deptOption = document.createElement('option');
                             deptOption.value = '{{ $department->id }}';
                             deptOption.textContent = '{{ $department->name }}';
                             if ({{ $department->company_id }} == this.value || this.value === '') {
@@ -177,7 +177,7 @@
                     if (employeeSelect) {
                         employeeSelect.innerHTML = '<option value="">Select Employee</option>';
                         @foreach($employees as $employee)
-                            const empOption = document.createElement('option');
+                            var empOption = document.createElement('option');
                             empOption.value = '{{ $employee->id }}';
                             empOption.textContent = '{{ $employee->full_name }}';
                             if ({{ $employee->department_id ?? 'null' }} == this.value || this.value === '') {

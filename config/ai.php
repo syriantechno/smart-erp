@@ -11,10 +11,18 @@ return [
     |
     */
 
+    // Which provider to use: 'openai' or 'ollama'
+    'provider' => env('AI_PROVIDER', 'openai'),
+
+    // OpenAI settings (default)
     'api_key' => env('OPENAI_API_KEY'),
     'model' => env('OPENAI_MODEL', 'gpt-3.5-turbo'),
     'max_tokens' => env('OPENAI_MAX_TOKENS', 2000),
     'temperature' => env('OPENAI_TEMPERATURE', 0.7),
+
+    // Ollama local server settings
+    'ollama_base_url' => env('OLLAMA_BASE_URL', 'http://127.0.0.1:11434'),
+    'ollama_model' => env('OLLAMA_MODEL', 'llama3'),
 
     /*
     |--------------------------------------------------------------------------
