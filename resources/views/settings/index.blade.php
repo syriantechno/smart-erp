@@ -35,6 +35,16 @@
                     @include('settings.partials.notifications')
                 </div>
 
+                 <!-- AI Settings Tab -->
+                <div class="settings-content hidden" id="ai-content">
+                    @include('settings.partials.ai')
+                </div>
+
+                <!-- Permissions Settings Tab -->
+                <div class="settings-content hidden" id="permissions-content">
+                    @include('settings.partials.permissions')
+                </div>
+
                 <!-- Email Settings Tab -->
                 <div class="settings-content hidden" id="email-content">
                     @include('settings.partials.email')
@@ -45,10 +55,7 @@
                     @include('settings.partials.attendance')
                 </div>
 
-                <!-- AI Settings Tab -->
-                <div class="settings-content hidden" id="ai-content">
-                    @include('settings.partials.ai')
-                </div>
+               
             </div>
         </div>
     </div>

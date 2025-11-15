@@ -44,7 +44,7 @@ $departments = \App\Models\Department::where('id', '!=', $department->id)
 
                     <div class="col-span-12 sm:col-span-6">
                         <x-base.form-label for="company_id">Company <span class="text-danger">*</span></x-base.form-label>
-                        <x-base.tom-select
+                        <x-base.form-select
                             id="company_id"
                             name="company_id"
                             class="w-full"
@@ -52,12 +52,12 @@ $departments = \App\Models\Department::where('id', '!=', $department->id)
                             disabled
                         >
                             <option value="{{ $department->company_id }}" selected>{{ $department->company->name }}</option>
-                        </x-base.tom-select>
+                        </x-base.form-select>
                     </div>
 
                     <div class="col-span-12 sm:col-span-6">
                         <x-base.form-label for="parent_id">Parent Department</x-base.form-label>
-                        <x-base.tom-select
+                        <x-base.form-select
                             id="parent_id"
                             name="parent_id"
                             class="w-full"
@@ -68,12 +68,12 @@ $departments = \App\Models\Department::where('id', '!=', $department->id)
                                     {{ $dept->name }}
                                 </option>
                             @endforeach
-                        </x-base.tom-select>
+                        </x-base.form-select>
                     </div>
 
                     <div class="col-span-12 sm:col-span-6">
                         <x-base.form-label for="manager_id">Department Manager</x-base.form-label>
-                        <x-base.tom-select
+                        <x-base.form-select
                             id="manager_id"
                             name="manager_id"
                             class="w-full"
@@ -84,7 +84,7 @@ $departments = \App\Models\Department::where('id', '!=', $department->id)
                                     {{ $manager->full_name }}
                                 </option>
                             @endforeach
-                        </x-base.tom-select>
+                        </x-base.form-select>
                     </div>
 
                     <div class="col-span-12">

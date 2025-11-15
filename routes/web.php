@@ -37,6 +37,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/settings', [SettingsController::class, 'update'])->name('settings.update');
     Route::post('/settings/appearance', [SettingsController::class, 'updateAppearance'])->name('settings.appearance.update');
     Route::post('/settings/prefix', [SettingsController::class, 'updatePrefix'])->name('settings.prefix.update');
+    Route::post('/settings/permissions/roles/{role}', [SettingsController::class, 'updateRolePermissions'])->name('settings.permissions.roles.update');
     Route::post('/settings/company', [SettingsController::class, 'updateCompany'])->name('settings.company.update');
     Route::post('/settings/attendance', [SettingsController::class, 'updateAttendance'])->name('settings.attendance.update');
     Route::post('/settings/notifications', [SettingsController::class, 'updateNotifications'])->name('settings.notifications.update');

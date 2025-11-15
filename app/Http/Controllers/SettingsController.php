@@ -8,6 +8,8 @@ use App\Models\PrefixSetting;
 use App\Models\Company;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class SettingsController extends Controller
 {
@@ -16,12 +18,37 @@ class SettingsController extends Controller
         $settings = Setting::all()->pluck('value', 'key');
         $prefixSettings = PrefixSetting::all();
         $company = Company::first();
+        $roles = Role::with('permissions')->get();
+        $permissions = Permission::all();
 
         return view('settings.index', [
             'settings' => $settings,
             'prefixSettings' => $prefixSettings,
             'company' => $company,
+            'roles' => $roles,
+            'permissions' => $permissions,
         ]);
+    }
+
+    public function updateRolePermissions(Request $request, Role $role)
+    {
+        $data = $request->validate([
+            'permissions' => 'array',
+            'permissions.*' => 'integer|exists:permissions,id',
+        ]);
+
+        $permissionIds = $data['permissions'] ?? [];
+        $permissions = Permission::whereIn('id', $permissionIds)->get();
+        $role->syncPermissions($permissions);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Role permissions updated successfully.',
+            ]);
+        }
+
+        return redirect()->route('settings.index', ['#permissions'])->with('success', 'Role permissions updated successfully.');
     }
 
     public function update(Request $request)

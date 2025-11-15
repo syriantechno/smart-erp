@@ -444,7 +444,64 @@
                     submitBtn.textContent = originalText;
                 });
             });
+        }
+
+        const roleForms = document.querySelectorAll('.role-permissions-form');
+        roleForms.forEach(form => {
+            if (form.dataset.listenerAdded) {
+                return;
+            }
+            form.dataset.listenerAdded = 'true';
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const roleId = this.getAttribute('data-role-id');
+                const formData = new FormData(this);
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn ? submitBtn.textContent : '';
+
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Saving...';
+                }
+
+                fetch(`/settings/permissions/roles/${roleId}`, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        window.showToast(data.message || 'Role permissions updated successfully.', 'success');
+                    } else {
+                        window.showToast(data.message || 'Error updating role permissions', 'error');
+                    }
+                })
+                .catch(error => {
+                    window.showToast('An error occurred while updating role permissions', 'error');
+                    console.error('Error:', error);
+                })
+                .finally(() => {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = originalText;
+                    }
+                });
+            });
+        });
     } // Close initializeSettingsTabs function
-} // Close DOMContentLoaded event listener
+
+
 </script>
 @endpushonce
