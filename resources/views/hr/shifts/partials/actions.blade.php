@@ -11,13 +11,13 @@
         <x-base.lucide icon="Eye" class="w-4 h-4" />
     </a>
 
-    <!-- Edit Button -->
+    <!-- Edit Button (UI only for now, no route) -->
     @if($canEdit)
-        <a href="{{ route('hr.shifts.edit', $shift->id) }}"
-           class="flex items-center px-2 py-1 text-xs font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200"
-           title="Edit">
+        <button type="button"
+                class="flex items-center px-2 py-1 text-xs font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200"
+                title="Edit">
             <x-base.lucide icon="Edit" class="w-4 h-4" />
-        </a>
+        </button>
     @endif
 
     <!-- Toggle Status Button -->

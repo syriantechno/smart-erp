@@ -7,71 +7,96 @@
 @push('styles')
     <style>
         .chat-container {
-            height: calc(100vh - 200px);
+            height: calc(100vh - 220px);
             display: flex;
             flex-direction: column;
+            background: radial-gradient(circle at top left, rgba(59,130,246,0.08), transparent 55%),
+                        radial-gradient(circle at bottom right, rgba(147,51,234,0.08), transparent 55%);
         }
+
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: 1rem;
-            background: #f8fafc;
+            padding: 1.25rem 1.5rem;
+            background: linear-gradient(to bottom, #f9fafb, #f3f4f6);
         }
+
         .chat-bubble {
-            max-width: 70%;
+            max-width: 78%;
             margin-bottom: 1rem;
-            animation: fadeIn 0.3s ease-in;
+            animation: fadeIn 0.25s ease-out;
         }
+
         .chat-bubble.user {
             margin-left: auto;
             margin-right: 0;
         }
+
         .chat-bubble.ai {
             margin-left: 0;
             margin-right: auto;
         }
+
         .message-content {
-            padding: 1rem;
-            border-radius: 1rem;
+            padding: 0.9rem 1.1rem;
+            border-radius: 1.25rem;
             position: relative;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
         }
+
         .message-content.user {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            color: #f9fafb;
         }
+
         .message-content.ai {
-            background: white;
-            color: #374151;
-            border: 1px solid #e5e7eb;
+            background: rgba(255, 255, 255, 0.96);
+            color: #1f2933;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            backdrop-filter: blur(10px);
         }
+
         .typing-indicator {
             display: none;
-            padding: 1rem;
+            padding: 0.75rem 1.25rem;
             color: #6b7280;
             font-style: italic;
+            background: rgba(255, 255, 255, 0.9);
+            border-top: 1px solid #e5e7eb;
         }
+
         .typing-indicator.show {
             display: block;
         }
+
         .suggestion-chip {
             display: inline-block;
-            padding: 0.5rem 1rem;
+            padding: 0.4rem 0.95rem;
             margin: 0.25rem;
-            background: #f3f4f6;
-            border-radius: 2rem;
+            background: rgba(15,23,42,0.03);
+            border-radius: 9999px;
             cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.875rem;
+            transition: all 0.18s ease-out;
+            font-size: 0.8rem;
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            color: #475569;
         }
+
         .suggestion-chip:hover {
-            background: #e5e7eb;
+            background: rgba(59,130,246,0.08);
+            border-color: rgba(59,130,246,0.5);
             transform: translateY(-1px);
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(6px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
     </style>
 @endpush
@@ -80,21 +105,25 @@
     @include('components.global-notifications')
 
     <!-- AI Status Banner -->
-    <div id="ai-status-banner" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 rounded-lg mb-6" style="display: none;">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center">
-                <x-base.lucide icon="Bot" class="w-6 h-6 mr-3" />
+    <div id="ai-status-banner" class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white p-5 rounded-2xl mb-6 shadow-lg shadow-indigo-500/20" style="display: none;">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="h-11 w-11 rounded-2xl bg-white/10 flex items-center justify-center shadow-inner">
+                    <x-base.lucide icon="Bot" class="w-6 h-6" />
+                </div>
                 <div>
-                    <h3 class="font-semibold">AI Assistant Active</h3>
-                    <p class="text-sm opacity-90">Ready to help with your ERP tasks</p>
+                    <h3 class="font-semibold text-base">AI Assistant Connected</h3>
+                    <p class="text-xs md:text-sm text-white/80">Smart assistant ready to help you across the ERP modules.</p>
                 </div>
             </div>
-            <div class="flex items-center space-x-4">
-                <div class="text-sm">
-                    <span class="font-medium">Model:</span> GPT-3.5 Turbo
+            <div class="flex flex-wrap items-center gap-3 text-xs md:text-sm">
+                <div class="px-3 py-1 rounded-full bg-white/10 border border-white/20 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
+                    <span>Online</span>
                 </div>
-                <div class="text-sm">
-                    <span class="font-medium">Status:</span> <span class="text-green-300">Online</span>
+                <div class="px-3 py-1 rounded-full bg-white/10 border border-white/20">
+                    <span class="font-medium">Mode:</span>
+                    <span class="ml-1">Context-aware ERP assistant</span>
                 </div>
             </div>
         </div>
@@ -102,24 +131,27 @@
 
     <div class="grid grid-cols-12 gap-6">
         <!-- Main Chat Area -->
-        <div class="col-span-12 lg:col-span-8">
-            <div class="bg-white rounded-lg shadow-sm border chat-container">
+        <div class="col-span-12 xl:col-span-8">
+            <div class="bg-white dark:bg-darkmode-600 rounded-2xl shadow-sm border border-slate-200/70 dark:border-darkmode-400 chat-container overflow-hidden">
                 <!-- Chat Header -->
-                <div class="flex items-center justify-between p-5 border-b border-slate-200/60">
-                    <div class="flex items-center">
-                        <div class="image-fit h-10 w-10 relative">
-                            <img class="rounded-full" src="https://via.placeholder.com/40x40/667eea/ffffff?text=AI" alt="AI Assistant" />
+                <div class="flex items-center justify-between px-5 py-4 border-b border-slate-200/70 dark:border-darkmode-400 bg-slate-50/80 dark:bg-darkmode-700/80 backdrop-blur">
+                    <div class="flex items-center gap-3">
+                        <div class="relative h-11 w-11">
+                            <div class="absolute inset-0 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 opacity-80"></div>
+                            <div class="relative h-full w-full rounded-full flex items-center justify-center bg-white/10 border border-white/40">
+                                <x-base.lucide icon="Bot" class="w-5 h-5 text-white" />
+                            </div>
                         </div>
-                        <div class="ml-3">
-                            <div class="font-medium text-slate-900 dark:text-white">AI Assistant</div>
-                            <div class="text-slate-500 text-sm flex items-center">
-                                <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                                Online - Ready to help
+                        <div>
+                            <div class="font-semibold text-slate-900 dark:text-slate-50 text-sm md:text-base">AI Assistant</div>
+                            <div class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                <span>Ready to assist with tasks, reports and analysis</span>
                             </div>
                         </div>
                     </div>
-                    <div class="flex items-center space-x-2">
-                        <x-base.form-select id="interaction-mode" class="text-sm">
+                    <div class="flex items-center gap-2">
+                        <x-base.form-select id="interaction-mode" class="text-xs md:text-sm w-32 md:w-40">
                             <option value="chat">💬 Chat</option>
                             <option value="command">⚡ Command</option>
                             <option value="analysis">📊 Analysis</option>
@@ -129,8 +161,9 @@
                             type="button"
                             variant="outline-secondary"
                             size="sm"
+                            class="hidden sm:inline-flex"
                             onclick="clearChat()"
-                            title="Clear Chat"
+                            title="Clear Conversation"
                         >
                             <x-base.lucide icon="Trash2" class="w-4 h-4" />
                         </x-base.button>
@@ -144,25 +177,21 @@
                         <div class="message-content ai">
                             <div class="flex items-center mb-2">
                                 <x-base.lucide icon="Bot" class="w-4 h-4 mr-2 text-blue-600" />
-                                <span class="font-medium text-sm">AI Assistant</span>
-                                <span class="text-xs text-gray-500 ml-auto">{{ now()->format('H:i') }}</span>
+                                <span class="font-medium text-xs md:text-sm">AI Assistant</span>
+                                <span class="text-[10px] md:text-xs text-gray-400 ml-auto">{{ now()->format('H:i') }}</span>
                             </div>
                             <div class="mb-3">
-                                <p class="text-sm">👋 Hello! I'm your intelligent ERP assistant. I can help you with:</p>
-                                <ul class="text-sm mt-2 space-y-1">
-                                    <li>• 📝 Creating tasks, materials, and emails</li>
-                                    <li>• 📊 Analyzing your business data</li>
-                                    <li>• 📄 Generating reports and content</li>
-                                    <li>• ⚡ Executing system commands</li>
-                                </ul>
+                                <p class="text-xs md:text-sm">
+                                    👋 Welcome! I can help you create tasks, materials, analyze data, and generate ERP-related content.
+                                </p>
                             </div>
-                            <div class="border-t pt-3">
-                                <p class="text-xs text-gray-600 mb-2">💡 Try these suggestions:</p>
+                            <div class="border-t border-slate-200 pt-3">
+                                <p class="text-[11px] md:text-xs text-gray-500 mb-2">Quick suggestions:</p>
                                 <div class="flex flex-wrap">
                                     <span class="suggestion-chip" onclick="useSuggestion('Create a task for website development')">Create a task</span>
                                     <span class="suggestion-chip" onclick="useSuggestion('Analyze sales performance this month')">Analyze sales</span>
-                                    <span class="suggestion-chip" onclick="useSuggestion('Generate a monthly report')">Generate report</span>
-                                    <span class="suggestion-chip" onclick="useSuggestion('Show system statistics')">System stats</span>
+                                    <span class="suggestion-chip" onclick="useSuggestion('Generate a monthly sales report')">Monthly report</span>
+                                    <span class="suggestion-chip" onclick="useSuggestion('Draft an email to the accounting team')">Draft email</span>
                                 </div>
                             </div>
                         </div>
@@ -183,23 +212,23 @@
                 </div>
 
                 <!-- Input Area -->
-                <div class="border-t border-slate-200/60 p-4">
-                    <div class="flex items-end space-x-3">
+                <div class="border-t border-slate-200/70 dark:border-darkmode-400 px-4 py-3 bg-white/80 dark:bg-darkmode-600/90 backdrop-blur">
+                    <div class="flex items-end gap-3">
                         <div class="flex-1">
                             <x-base.form-textarea
                                 id="message-input"
-                                class="resize-none"
+                                class="resize-none text-xs md:text-sm"
                                 rows="1"
-                                placeholder="Ask me anything..."
+                                placeholder="Type your question or command..."
                                 onkeydown="handleKeyPress(event)"
                                 oninput="autoResize(this)"
                             ></x-base.form-textarea>
                             <div class="flex justify-between items-center mt-2">
-                                <div class="text-xs text-gray-500">
-                                    <span id="mode-indicator">💬 Chat Mode</span>
+                                <div class="text-[11px] md:text-xs text-gray-500">
+                                    <span id="mode-indicator">💬 Chat Mode - General conversation</span>
                                 </div>
-                                <div class="text-xs text-gray-400">
-                                    Press Enter to send, Shift+Enter for new line
+                                <div class="text-[10px] md:text-xs text-gray-400">
+                                    Enter to send · Shift+Enter for new line
                                 </div>
                             </div>
                         </div>
@@ -207,26 +236,26 @@
                             id="send-button"
                             type="button"
                             variant="primary"
-                            class="rounded-full p-3"
+                            class="rounded-full p-3 md:p-3.5 shadow-sm shadow-blue-500/20"
                             onclick="sendMessage()"
                             disabled
                         >
-                            <x-base.lucide icon="Send" class="w-5 h-5" />
+                            <x-base.lucide icon="Send" class="w-4 h-4 md:w-5 md:h-5" />
                         </x-base.button>
                     </div>
 
                     <!-- Quick Commands -->
                     <div id="quick-commands" class="mt-3 flex flex-wrap gap-2">
-                        <button onclick="quickCommand('create task')" class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs hover:bg-blue-200 transition-colors">
+                        <button onclick="quickCommand('create task')" class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-[11px] md:text-xs hover:bg-blue-100 transition-colors border border-blue-100">
                             + Task
                         </button>
-                        <button onclick="quickCommand('add material')" class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs hover:bg-green-200 transition-colors">
+                        <button onclick="quickCommand('add material')" class="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-[11px] md:text-xs hover:bg-emerald-100 transition-colors border border-emerald-100">
                             + Material
                         </button>
-                        <button onclick="quickCommand('generate report')" class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs hover:bg-purple-200 transition-colors">
+                        <button onclick="quickCommand('generate report')" class="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-[11px] md:text-xs hover:bg-purple-100 transition-colors border border-purple-100">
                             📊 Report
                         </button>
-                        <button onclick="quickCommand('analyze data')" class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs hover:bg-yellow-200 transition-colors">
+                        <button onclick="quickCommand('analyze data')" class="px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-[11px] md:text-xs hover:bg-amber-100 transition-colors border border-amber-100">
                             📈 Analyze
                         </button>
                     </div>
@@ -235,16 +264,18 @@
         </div>
 
         <!-- Sidebar -->
-        <div class="col-span-12 lg:col-span-4 space-y-6">
+        <div class="col-span-12 xl:col-span-4 space-y-6">
             <!-- Recent Interactions -->
-            <div class="bg-white rounded-lg p-5 shadow-sm border">
-                <h3 class="font-semibold mb-4 flex items-center">
-                    <x-base.lucide icon="Clock" class="w-5 h-5 mr-2 text-gray-600" />
-                    Recent Interactions
-                </h3>
-                <div id="recent-interactions" class="space-y-3 max-h-64 overflow-y-auto">
+            <div class="bg-white dark:bg-darkmode-600 rounded-2xl p-5 shadow-sm border border-slate-200/70 dark:border-darkmode-400">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold text-sm md:text-base flex items-center gap-2">
+                        <x-base.lucide icon="Clock" class="w-4 h-4 text-gray-600" />
+                        Recent Interactions
+                    </h3>
+                </div>
+                <div id="recent-interactions" class="space-y-3 max-h-64 overflow-y-auto pr-1">
                     <!-- Recent interactions will be loaded here -->
-                    <div class="text-center py-4 text-gray-500 text-sm">
+                    <div class="text-center py-4 text-gray-500 text-xs md:text-sm">
                         <x-base.lucide icon="Loader" class="w-5 h-5 mx-auto mb-2 animate-spin" />
                         Loading...
                     </div>
@@ -252,71 +283,71 @@
             </div>
 
             <!-- AI Capabilities -->
-            <div class="bg-white rounded-lg p-5 shadow-sm border">
-                <h3 class="font-semibold mb-4 flex items-center">
+            <div class="bg-white dark:bg-darkmode-600 rounded-2xl p-5 shadow-sm border border-slate-200/70 dark:border-darkmode-400">
+                <h3 class="font-semibold mb-4 flex items-center text-sm md:text-base">
                     <x-base.lucide icon="Brain" class="w-5 h-5 mr-2 text-purple-600" />
                     AI Capabilities
                 </h3>
-                <div class="space-y-3">
-                    <div class="flex items-start space-x-3">
-                        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div class="space-y-3 text-xs md:text-sm">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
                             <x-base.lucide icon="Plus" class="w-4 h-4 text-blue-600" />
                         </div>
                         <div>
                             <h4 class="font-medium text-sm">Content Creation</h4>
-                            <p class="text-xs text-gray-600">Create tasks, materials, emails, and more</p>
+                            <p class="text-xs text-gray-600">Create tasks, materials, emails, and ERP documents from natural language.</p>
                         </div>
                     </div>
 
-                    <div class="flex items-start space-x-3">
-                        <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 bg-green-50 rounded-xl flex items-center justify-center flex-shrink-0">
                             <x-base.lucide icon="BarChart3" class="w-4 h-4 text-green-600" />
                         </div>
                         <div>
                             <h4 class="font-medium text-sm">Data Analysis</h4>
-                            <p class="text-xs text-gray-600">Analyze trends and generate insights</p>
+                            <p class="text-xs text-gray-600">Analyze sales, HR, and accounting data for trends and insights.</p>
                         </div>
                     </div>
 
-                    <div class="flex items-start space-x-3">
-                        <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 bg-purple-50 rounded-xl flex items-center justify-center flex-shrink-0">
                             <x-base.lucide icon="Settings" class="w-4 h-4 text-purple-600" />
                         </div>
                         <div>
                             <h4 class="font-medium text-sm">Automation</h4>
-                            <p class="text-xs text-gray-600">Automate workflows and processes</p>
+                            <p class="text-xs text-gray-600">Trigger workflows and automate repetitive ERP operations.</p>
                         </div>
                     </div>
 
-                    <div class="flex items-start space-x-3">
-                        <div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <x-base.lucide icon="MessageSquare" class="w-4 h-4 text-yellow-600" />
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 bg-amber-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <x-base.lucide icon="MessageSquare" class="w-4 h-4 text-amber-600" />
                         </div>
                         <div>
                             <h4 class="font-medium text-sm">Natural Chat</h4>
-                            <p class="text-xs text-gray-600">Conversational AI assistance</p>
+                            <p class="text-xs text-gray-600">Ask questions across modules and get contextual assistance.</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Usage Stats -->
-            <div class="bg-white rounded-lg p-5 shadow-sm border">
-                <h3 class="font-semibold mb-4 flex items-center">
+            <div class="bg-white dark:bg-darkmode-600 rounded-2xl p-5 shadow-sm border border-slate-200/70 dark:border-darkmode-400">
+                <h3 class="font-semibold mb-4 flex items-center text-sm md:text-base">
                     <x-base.lucide icon="TrendingUp" class="w-5 h-5 mr-2 text-green-600" />
                     Usage Statistics
                 </h3>
-                <div class="space-y-3">
+                <div class="space-y-3 text-xs md:text-sm">
                     <div class="flex justify-between items-center">
-                        <span class="text-sm text-gray-600">Total Interactions</span>
+                        <span class="text-gray-600">Total Interactions</span>
                         <span class="font-semibold" id="total-interactions">-</span>
                     </div>
                     <div class="flex justify-between items-center">
-                        <span class="text-sm text-gray-600">Success Rate</span>
-                        <span class="font-semibold text-green-600" id="success-rate">-</span>
+                        <span class="text-gray-600">Success Rate</span>
+                        <span class="font-semibold text-emerald-600" id="success-rate">-</span>
                     </div>
                     <div class="flex justify-between items-center">
-                        <span class="text-sm text-gray-600">Tokens Used</span>
+                        <span class="text-gray-600">Tokens Used</span>
                         <span class="font-semibold" id="tokens-used">-</span>
                     </div>
                 </div>

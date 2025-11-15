@@ -1,30 +1,24 @@
-<div class="flex items-center justify-center gap-3">
+<div class="flex items-center justify-center gap-1">
     @include('hr.departments.modals.edit', ['department' => $department])
 
+    <!-- Edit Department -->
     <button
         type="button"
         data-tw-toggle="modal"
         data-tw-target="#edit-department-modal-{{ $department->id }}"
-        class="group inline-flex items-center justify-center p-2 text-slate-500 transition hover:text-primary focus:outline-none"
+        class="flex items-center px-2 py-1 text-xs font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200"
         title="Edit"
     >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 20h9" />
-            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z" />
-        </svg>
+        <x-base.lucide icon="Edit" class="w-4 h-4" />
     </button>
 
+    <!-- Delete Department -->
     <button
         type="button"
-        onclick="deleteDepartment({{ $department->id }}, '{{ $department->name }}')"
-        class="group inline-flex items-center justify-center p-2 text-slate-500 transition hover:text-danger focus:outline-none"
+        onclick="deleteDepartment({{ $department->id }}, '{{ addslashes($department->name) }}')"
+        class="flex items-center px-2 py-1 text-xs font-medium text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200"
         title="Delete"
     >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="3 6 5 6 21 6" />
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
-            <path d="M10 11v6" />
-            <path d="M14 11v6" />
-        </svg>
+        <x-base.lucide icon="Trash2" class="w-4 h-4" />
     </button>
 </div>

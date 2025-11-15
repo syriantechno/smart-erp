@@ -276,6 +276,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [App\Http\Controllers\AiController::class, 'index'])->name('index');
         Route::get('/chat', [App\Http\Controllers\AiController::class, 'chat'])->name('chat');
         Route::get('/datatable', [App\Http\Controllers\AiController::class, 'datatable'])->name('datatable');
+        Route::get('/admin-recent', [App\Http\Controllers\AiController::class, 'adminRecent'])->name('admin-recent');
         Route::post('/interact', [App\Http\Controllers\AiController::class, 'interact'])->name('interact');
         Route::get('/interactions/{aiInteraction}', [App\Http\Controllers\AiController::class, 'show'])->name('show');
         Route::post('/interactions/{aiInteraction}/retry', [App\Http\Controllers\AiController::class, 'retry'])->name('retry');

@@ -245,46 +245,57 @@
     </div>
 
     <!-- AI Chat Modal -->
-    <div id="ai-chat-modal" class="modal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="font-medium text-base mr-auto flex items-center">
-                        <x-base.lucide icon="Bot" class="w-5 h-5 mr-2 text-blue-600" />
-                        AI Assistant Chat
+    <div
+        id="ai-chat-modal"
+        class="modal fixed inset-0 z-[99] flex items-center justify-center bg-slate-900/70 backdrop-blur-sm overflow-y-auto hidden"
+        tabindex="-1"
+        aria-hidden="true"
+    >
+        <div class="modal-dialog modal-xl w-full max-w-5xl mx-auto my-8">
+            <div class="modal-content rounded-2xl overflow-hidden shadow-2xl bg-white dark:bg-darkmode-600">
+                <div class="modal-header px-5 py-3 border-b border-slate-200/80 dark:border-darkmode-500 bg-slate-50 dark:bg-darkmode-700">
+                    <h2 class="font-semibold text-sm md:text-base mr-auto flex items-center gap-2">
+                        <span class="inline-flex h-7 w-7 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 items-center justify-center text-white shadow-sm">
+                            <x-base.lucide icon="Bot" class="w-4 h-4" />
+                        </span>
+                        <span>AI Assistant Chat</span>
                     </h2>
-                    <div class="flex items-center space-x-2">
-                        <select id="interaction-type" class="form-select text-sm">
+                    <div class="flex items-center gap-2">
+                        <x-base.form-select id="interaction-type" class="text-xs md:text-sm w-32 md:w-40">
                             <option value="chat">Chat</option>
                             <option value="command">Command</option>
                             <option value="analysis">Analysis</option>
                             <option value="generation">Generation</option>
-                        </select>
-                        <button type="button" class="text-slate-400 hover:text-slate-600" data-tw-dismiss="modal">
-                            <x-base.lucide icon="X" class="w-6 h-6" />
+                        </x-base.form-select>
+                        <div class="flex-1"></div>
+                        <button type="button" class="text-slate-400 hover:text-slate-600" onclick="closeChatModal()">
+                            <x-base.lucide icon="X" class="w-5 h-5" />
                         </button>
                     </div>
                 </div>
-                <div class="modal-body p-0">
+                <div class="modal-body p-0 bg-slate-50 dark:bg-darkmode-700">
                     <div class="flex flex-col h-96">
                         <!-- Chat Messages -->
                         <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4">
                             <div class="chat-bubble ai">
-                                <div class="bg-gray-100 text-gray-800 p-3 rounded-lg max-w-md">
+                                <div class="bg-white dark:bg-darkmode-600 border border-slate-200/80 dark:border-darkmode-500 text-slate-800 dark:text-slate-100 p-3 rounded-2xl max-w-xl shadow-sm">
                                     <div class="flex items-center mb-2">
                                         <x-base.lucide icon="Bot" class="w-4 h-4 mr-2 text-blue-600" />
-                                        <span class="font-medium text-sm">AI Assistant</span>
+                                        <span class="font-medium text-xs md:text-sm">AI Assistant</span>
                                     </div>
-                                    <p class="text-sm">Hello! I'm your AI assistant. I can help you with various tasks in the ERP system. Try asking me to create a task, analyze data, or generate a report!</p>
+                                    <p class="text-xs md:text-sm">
+                                        Hello! I'm your AI assistant. I can help you create tasks, materials, analyze data, and generate reports inside the ERP.
+                                        Try asking me to create a task, analyze sales, or draft an email.
+                                    </p>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Typing Indicator -->
-                        <div id="typing-indicator" class="typing-indicator">
+                        <div id="typing-indicator" class="typing-indicator border-t border-slate-200/80 dark:border-darkmode-500 bg-white dark:bg-darkmode-600">
                             <div class="flex items-center">
                                 <x-base.lucide icon="Bot" class="w-4 h-4 mr-2 text-blue-600" />
-                                <span>AI is typing...</span>
+                                <span class="text-xs md:text-sm">AI is typing...</span>
                                 <div class="ml-2 flex space-x-1">
                                     <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
                                     <div class="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
@@ -294,25 +305,26 @@
                         </div>
 
                         <!-- Chat Input -->
-                        <div class="border-t p-4">
+                        <div class="border-t border-slate-200/80 dark:border-darkmode-500 p-4 bg-white dark:bg-darkmode-600">
                             <div class="flex space-x-2">
-                                <input
+                                <x-base.form-input
                                     type="text"
                                     id="chat-input"
-                                    class="flex-1 form-control"
-                                    placeholder="Ask me anything..."
+                                    class="flex-1 text-xs md:text-sm"
+                                    placeholder="Type your question or command..."
                                     onkeydown="handleChatKeyPress(event)"
                                 />
                                 <button
                                     onclick="sendMessage()"
-                                    class="btn btn-primary px-6"
+                                    class="btn btn-primary px-4 md:px-5 h-10 md:h-11 flex items-center justify-center rounded-full shadow-sm shadow-blue-500/30 hover:shadow-md hover:shadow-blue-500/40 transition-all text-white"
                                     id="send-btn"
                                 >
-                                    <x-base.lucide icon="Send" class="w-4 h-4" />
+                                    <x-base.lucide icon="Send" class="w-4 h-4 mr-1 text-white" />
+                                    <span class="hidden sm:inline text-xs md:text-sm text-white">Send</span>
                                 </button>
                             </div>
-                            <div class="mt-2 text-xs text-gray-500">
-                                Try: "Create a task for website development", "Generate a sales report", "Analyze employee performance"
+                            <div class="mt-2 text-[11px] md:text-xs text-gray-500">
+                                Try: "Create a task for website development", "Generate a sales report", "Analyze employee performance".
                             </div>
                         </div>
                     </div>
@@ -322,19 +334,24 @@
     </div>
 
     <!-- Setup Instructions Modal -->
-    <div id="setup-modal" class="modal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
+    <div
+        id="setup-modal"
+        class="modal fixed inset-0 z-[99] flex items-center justify-center bg-slate-900/60 overflow-y-auto hidden"
+        tabindex="-1"
+        aria-hidden="true"
+    >
+        <div class="modal-dialog modal-lg w-full max-w-3xl mx-auto my-8">
+            <div class="modal-content rounded-2xl overflow-hidden shadow-xl">
+                <div class="modal-header px-5 py-3 border-b border-slate-200/70 bg-slate-50/80 dark:bg-darkmode-700/80">
                     <h2 class="font-medium text-base mr-auto flex items-center">
                         <x-base.lucide icon="Settings" class="w-5 h-5 mr-2 text-blue-600" />
                         AI Setup Instructions
                     </h2>
-                    <button type="button" class="text-slate-400 hover:text-slate-600" data-tw-dismiss="modal">
+                    <button type="button" class="text-slate-400 hover:text-slate-600" onclick="closeSetupModal()">
                         <x-base.lucide icon="X" class="w-6 h-6" />
                     </button>
                 </div>
-                <div class="modal-body p-6">
+                <div class="modal-body p-6 bg-white dark:bg-darkmode-600">
                     <div class="space-y-6">
                         <div class="bg-blue-50 p-4 rounded-lg">
                             <h3 class="font-semibold text-blue-900 mb-2">Step 1: Get OpenAI API Key</h3>
@@ -382,8 +399,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-tw-dismiss="modal">Close</button>
+                <div class="modal-footer px-5 py-3 border-t border-slate-200/70 bg-slate-50/80 dark:bg-darkmode-700/80 flex justify-end gap-2">
+                    <button type="button" class="btn btn-secondary" onclick="closeSetupModal()">Close</button>
                     <button type="button" class="btn btn-primary" onclick="testAIConnection()">Test Connection</button>
                 </div>
             </div>
@@ -453,59 +470,76 @@
                 });
         }
 
+        function openChatModal() {
+            jQuery('#ai-chat-modal').removeClass('hidden');
+        }
+
+        function closeChatModal() {
+            jQuery('#ai-chat-modal').addClass('hidden');
+            jQuery('#typing-indicator').removeClass('show');
+        }
+
+        function openSetupModal() {
+            jQuery('#setup-modal').removeClass('hidden');
+        }
+
+        function closeSetupModal() {
+            jQuery('#setup-modal').addClass('hidden');
+        }
+
         function startChat() {
             if (!aiAvailable) {
-                showSetupInstructions();
+                openSetupModal();
                 return;
             }
 
             currentSessionId = generateSessionId();
-            jQuery('#ai-chat-modal').modal('show');
+            openChatModal();
             jQuery('#chat-messages').empty();
             addMessage("Hello! I'm your AI assistant. I can help you with various tasks in the ERP system. What would you like to do?", 'ai');
         }
 
         function showCommandMode() {
             if (!aiAvailable) {
-                showSetupInstructions();
+                openSetupModal();
                 return;
             }
 
             currentSessionId = generateSessionId();
             jQuery('#interaction-type').val('command');
-            jQuery('#ai-chat-modal').modal('show');
+            openChatModal();
             jQuery('#chat-messages').empty();
             addMessage('Command Mode Activated! I can execute commands to create, update, or manage system data. Try commands like:', 'ai');
         }
 
         function showAnalysisMode() {
             if (!aiAvailable) {
-                showSetupInstructions();
+                openSetupModal();
                 return;
             }
 
             currentSessionId = generateSessionId();
             jQuery('#interaction-type').val('analysis');
-            jQuery('#ai-chat-modal').modal('show');
+            openChatModal();
             jQuery('#chat-messages').empty();
             addMessage('Analysis Mode Activated! I can analyze your ERP data and provide insights.', 'ai');
         }
 
         function showGenerationMode() {
             if (!aiAvailable) {
-                showSetupInstructions();
+                openSetupModal();
                 return;
             }
 
             currentSessionId = generateSessionId();
             jQuery('#interaction-type').val('generation');
-            jQuery('#ai-chat-modal').modal('show');
+            openChatModal();
             jQuery('#chat-messages').empty();
             addMessage('Content Generation Mode! I can create various types of content.', 'ai');
         }
 
         function showSetupInstructions() {
-            jQuery('#setup-modal').modal('show');
+            openSetupModal();
         }
 
         function testAIConnection() {
@@ -580,19 +614,31 @@
             type = type || 'normal';
             var messagesContainer = jQuery('#chat-messages');
             var messageClass = sender === 'user' ? 'user' : 'ai';
+
+            // خلفية مميزة لرسائل المستخدم
             var bgClass = 'bg-white';
-            if (type === 'success') bgClass = 'bg-green-100';
-            else if (type === 'error') bgClass = 'bg-red-100';
+            var extraTextClasses = 'text-xs md:text-sm text-slate-800';
+            var wrapperClasses = 'chat-bubble ' + messageClass;
+
+            if (sender === 'user') {
+                bgClass = 'bg-blue-50 border border-blue-100';
+                extraTextClasses = 'text-sm md:text-[0.95rem] text-slate-900';
+                // اجعل الكارد بالكامل إلى أقصى اليمين
+                wrapperClasses += ' flex justify-end';
+            } else {
+                if (type === 'success') bgClass = 'bg-green-100';
+                else if (type === 'error') bgClass = 'bg-red-100';
+            }
 
             var label = sender === 'ai' ? 'AI:' : 'You:';
 
             var html = '' +
-                '<div class="chat-bubble ' + messageClass + '">' +
+                '<div class="' + wrapperClasses + '">' +
                     '<div class="' + bgClass + ' p-3 rounded-lg shadow-sm max-w-lg">' +
-                        '<div class="flex items-center mb-1">' +
-                            '<span class="font-semibold mr-2">' + label + '</span>' +
+                        '<div class="flex items-center mb-1 ' + (sender === 'user' ? 'justify-end space-x-reverse space-x-2' : '') + '">' +
+                            '<span class="font-semibold ' + (sender === 'user' ? 'ml-2' : 'mr-2') + '">' + label + '</span>' +
                         '</div>' +
-                        '<div class="text-sm">' + content + '</div>' +
+                        '<div class="' + extraTextClasses + '">' + content + '</div>' +
                     '</div>' +
                 '</div>';
 

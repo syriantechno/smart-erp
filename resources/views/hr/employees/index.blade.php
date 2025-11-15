@@ -114,7 +114,6 @@
                                 <x-base.form-select id="employees-filter-field" class="mt-2 w-full sm:mt-0 sm:w-auto 2xl:w-full">
                                     <option value="all">All Fields</option>
                                     <option value="code">Code</option>
-                                    <option value="employee_id">Employee ID</option>
                                     <option value="first_name">First Name</option>
                                     <option value="last_name">Last Name</option>
                                     <option value="email">Email</option>
@@ -172,14 +171,12 @@
                             <thead>
                                 <tr>
                                     <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">#</th>
-                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Photo</th>
                                     <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Code</th>
-                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Employee ID</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Photo</th>
                                     <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Full Name</th>
-                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Email</th>
-                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Position</th>
                                     <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Department</th>
-                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Hire Date</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Position</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Email</th>
                                     <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Status</th>
                                     <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Actions</th>
                                 </tr>
@@ -205,8 +202,7 @@
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
     <script>
-    try {
-        document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function () {
             const filterField = document.getElementById('employees-filter-field');
             const filterType = document.getElementById('employees-filter-type');
             const filterValue = document.getElementById('employees-filter-value');
@@ -251,26 +247,22 @@
                         }
                         d.page_length = lengthSelect ? parseInt(lengthSelect.value, 10) || initialLength : initialLength;
                     },
-                    error: function (xhr, textStatus, error) {
-                        console.error('DataTables AJAX error:', textStatus, error, xhr.responseText);
-                    }
+                    error: function () {}
                 },
                 pageLength: initialLength,
                 lengthChange: false,
                 searching: false,
-                order: [[2, 'asc']], // Order by code column (index 2)
+                order: [[1, 'asc']], // Order by code column (index 1)
                 dom:
                     "t<'datatable-footer flex flex-col md:flex-row md:items-center md:justify-between mt-5 gap-4'<'datatable-info text-slate-500'i><'datatable-pagination'p>>",
                 columns: [
                     { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center font-medium', orderable: false },
-                    { data: 'profile_picture', name: 'profile_picture', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center', orderable: false },
                     { data: 'code', name: 'code', className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700 whitespace-nowrap' },
-                    { data: 'employee_id', name: 'employee_id', className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700 whitespace-nowrap' },
+                    { data: 'profile_picture', name: 'profile_picture', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center', orderable: false },
                     { data: 'full_name', name: 'full_name', className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700 datatable-cell-wrap' },
-                    { data: 'email', name: 'email', className: 'px-5 py-3 border-b dark:border-darkmode-300 datatable-cell-wrap' },
-                    { data: 'position', name: 'position', className: 'px-5 py-3 border-b dark:border-darkmode-300 datatable-cell-wrap' },
                     { data: 'department_name', name: 'department_name', className: 'px-5 py-3 border-b dark:border-darkmode-300 datatable-cell-wrap' },
-                    { data: 'hire_date_formatted', name: 'hire_date_formatted', className: 'px-5 py-3 border-b dark:border-darkmode-300 whitespace-nowrap' },
+                    { data: 'position', name: 'position', className: 'px-5 py-3 border-b dark:border-darkmode-300 datatable-cell-wrap' },
+                    { data: 'email', name: 'email', className: 'px-5 py-3 border-b dark:border-darkmode-300 datatable-cell-wrap' },
                     {
                         data: 'is_active',
                         name: 'is_active',
@@ -461,8 +453,7 @@
                         }
                         loadPositionsForDepartment(''); // Reset positions when company changes
                     })
-                    .catch(error => {
-                        console.error('Error loading departments:', error);
+                    .catch(() => {
                         departmentFilter.innerHTML = '<option value="">Error loading departments</option>';
                     });
             }
@@ -502,8 +493,7 @@
                             });
                         }
                     })
-                    .catch(error => {
-                        console.error('Error loading positions:', error);
+                    .catch(() => {
                         positionFilter.innerHTML = '<option value="">Error loading positions</option>';
                     });
             }
@@ -529,8 +519,7 @@
                             codeInput.value = code;
                         }
                     })
-                    .catch(error => {
-                        console.error(error);
+                    .catch(() => {
                         codePreview.textContent = '-';
                         if (codeInput) {
                             codeInput.value = '-';
@@ -620,7 +609,6 @@
                             if (error.message === 'validation') {
                                 return;
                             }
-                            console.error('Employee create error:', error);
                             showToast('An error occurred while saving the employee', 'error');
                         });
                 });
@@ -635,20 +623,18 @@
                             return;
                         }
 
-                        const headers = ['#', 'Photo', 'Code', 'Employee ID', 'Full Name', 'Email', 'Position', 'Department', 'Hire Date', 'Status'];
+                        const headers = ['#', 'Code', 'Photo', 'Full Name', 'Department', 'Position', 'Email', 'Status'];
                         const csvRows = [headers.join(',')];
 
                         rows.forEach(function (row) {
                             const csvRow = [
                                 row.DT_RowIndex,
-                                row.profile_picture ? 'Yes' : 'No', // Photo indicator
                                 '"' + (row.code || '').replace(/"/g, '""') + '"',
-                                '"' + (row.employee_id || '').replace(/"/g, '""') + '"',
+                                row.profile_picture ? 'Yes' : 'No', // Photo indicator
                                 '"' + (row.full_name || '').replace(/"/g, '""') + '"',
-                                '"' + (row.email || '').replace(/"/g, '""') + '"',
-                                '"' + (row.position || '').replace(/"/g, '""') + '"',
                                 '"' + (row.department_name || '').replace(/"/g, '""') + '"',
-                                '"' + (row.hire_date_formatted || '').replace(/"/g, '""') + '"',
+                                '"' + (row.position || '').replace(/"/g, '""') + '"',
+                                '"' + (row.email || '').replace(/"/g, '""') + '"',
                                 row.is_active ? 'Active' : 'Inactive'
                             ];
                             csvRows.push(csvRow.join(','));
@@ -663,7 +649,6 @@
                         URL.revokeObjectURL(url);
                         showToast('Export completed successfully.', 'success');
                     } catch (error) {
-                        console.error('Export error:', error);
                         showToast('Failed to export data.', 'error');
                     }
                 });
@@ -680,8 +665,6 @@
             loadPositionsForDepartment('');
 
             window.openEditModal = function(id, employeeId, firstName, lastName, email, phone, position, salary, hireDate, birthDate, gender, address, city, country, postalCode, departmentId, companyId, isActive) {
-                console.log('Opening edit modal for employee:', id, employeeId);
-
                 // Populate form fields
                 document.getElementById('edit-employee-id').value = employeeId || '';
                 document.getElementById('edit-first-name').value = firstName || '';
@@ -709,8 +692,6 @@
                 const modalTrigger = document.getElementById('edit-employee-trigger');
                 if (modalTrigger) {
                     modalTrigger.click();
-                } else {
-                    console.error('Edit employee modal trigger not found');
                 }
             };
 
@@ -764,7 +745,6 @@
                             if (error.message === 'validation') {
                                 return;
                             }
-                            console.error('Employee update error:', error);
                             showToast('An error occurred while updating the employee', 'error');
                         });
                 });
@@ -812,72 +792,12 @@
                                     showToast(data.message || 'Failed to delete employee', 'error');
                                 }
                             })
-                            .catch(error => {
-                                console.error('Error:', error);
+                            .catch(() => {
                                 showToast('An error occurred while deleting the employee', 'error');
                             });
                     }
                 });
             };
-
-            // Test function for debugging
-            window.forceLoadEmployeeData = function() {
-                console.log('🧪 Manual test: forcing employee data load...');
-                
-                // Test companies API
-                fetch('{{ route("hr.employees.companies") }}', {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    credentials: 'same-origin'
-                })
-                .then(response => {
-                    console.log('🧪 Companies API Status:', response.status);
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('🧪 Companies Data:', data);
-                    showToast('Companies loaded: ' + (data.length || 0), 'success');
-                })
-                .catch(error => {
-                    console.error('🧪 Companies API Error:', error);
-                    showToast('Failed to load companies', 'error');
-                });
-
-                // Test code API
-                fetch('{{ route("hr.employees.preview-code") }}', {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    credentials: 'same-origin'
-                })
-                .then(response => {
-                    console.log('🧪 Code API Status:', response.status);
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('🧪 Code Data:', data);
-                    showToast('Code generated: ' + (data.code || 'N/A'), 'success');
-                })
-                .catch(error => {
-                    console.error('🧪 Code API Error:', error);
-                    showToast('Failed to generate code', 'error');
-                });
-            };
         });
-    } catch (error) {
-        console.error('❌ JavaScript error in employees index:', error);
-        console.error('Error details:', error.message);
-        console.error('Error stack:', error.stack);
-        
-        // Try to continue with basic functionality
-        console.log('🔄 Attempting to continue with limited functionality...');
-    }
     </script>
 @endpush

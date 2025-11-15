@@ -32,12 +32,8 @@ class AiController extends Controller
 
     public function chat()
     {
-        $recentInteractions = AiInteraction::forUser(auth()->id())
-                                         ->latest()
-                                         ->take(10)
-                                         ->get();
-
-        return view('ai.chat', compact('recentInteractions'));
+        // Redirect to main AI page where the chat is handled via modal
+        return redirect()->route('ai.index');
     }
 
     public function interact(Request $request): JsonResponse
@@ -158,6 +154,37 @@ class AiController extends Controller
             })
             ->rawColumns(['type_badge', 'status_badge', 'actions'])
             ->make(true);
+    }
+
+    public function adminRecent(): JsonResponse
+    {
+        // Admin-only: get recent interactions for all users
+        $user = auth()->user();
+
+        if (!$user || !$user->hasRole('admin')) {
+            return response()->json(['success' => false, 'message' => 'Access denied'], 403);
+        }
+
+        $interactions = AiInteraction::with('user')
+            ->latest()
+            ->limit(10)
+            ->get()
+            ->map(function (AiInteraction $interaction) {
+                return [
+                    'id' => $interaction->id,
+                    'user_name' => $interaction->user?->name ?? 'Unknown',
+                    'user_email' => $interaction->user?->email ?? null,
+                    'interaction_type' => $interaction->interaction_type,
+                    'status' => $interaction->status,
+                    'user_input' => $interaction->user_input,
+                    'formatted_date' => $interaction->formatted_date,
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'data' => $interactions,
+        ]);
     }
 
     public function show(AiInteraction $aiInteraction): JsonResponse

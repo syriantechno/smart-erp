@@ -47,16 +47,7 @@
                     <x-base.form-textarea id="requirements" name="requirements" rows="3" placeholder="Enter requirements" class="w-full"></x-base.form-textarea>
                 </div>
 
-                <div class="col-span-12">
-                    <x-base.form-check
-                        id="position_is_active"
-                        name="is_active"
-                        label="Active"
-                        :checked="true"
-                        type="checkbox"
-                    />
-                </div>
-            </div>
+                 </div>
         </form>
 
         @slot('footer')
