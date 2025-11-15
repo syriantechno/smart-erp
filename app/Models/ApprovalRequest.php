@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use App\Http\Controllers\NotificationController;
+use App\Models\ApprovalTemplate;
+use App\Models\Department;
 
 class ApprovalRequest extends Model
 {
@@ -27,6 +31,9 @@ class ApprovalRequest extends Model
         'current_approver_id',
         'department_id',
         'company_id',
+        'approval_template_id',
+        'approvable_type',
+        'approvable_id',
         'approval_levels',
         'current_level',
         'rejection_reason',
@@ -66,6 +73,16 @@ class ApprovalRequest extends Model
     public function logs(): HasMany
     {
         return $this->hasMany(ApprovalLog::class);
+    }
+
+    public function template(): BelongsTo
+    {
+        return $this->belongsTo(ApprovalTemplate::class, 'approval_template_id');
+    }
+
+    public function approvable(): MorphTo
+    {
+        return $this->morphTo();
     }
 
     // Scopes
@@ -179,6 +196,9 @@ class ApprovalRequest extends Model
 
         // Check if there are more approval levels
         $levels = $this->approval_levels ?? [];
+        $nextApproverId = null;
+        $wasFinalApproval = false;
+
         if ($this->current_level < count($levels)) {
             $this->current_level++;
             $nextApproverId = $levels[$this->current_level - 1]['approver_id'] ?? null;
@@ -186,9 +206,23 @@ class ApprovalRequest extends Model
         } else {
             $this->status = 'approved';
             $this->current_approver_id = null;
+            $wasFinalApproval = true;
         }
 
         $this->save();
+
+        // Notify next approver or finalize entity
+        if ($nextApproverId) {
+            NotificationController::sendToUser(
+                $nextApproverId,
+                'Approval Request Pending',
+                'You have a new approval request pending your action.',
+                'info',
+                route('approval-system.index', ['tab' => 'pending-approval'])
+            );
+        } elseif ($wasFinalApproval) {
+            $this->onFullyApproved();
+        }
     }
 
     public function reject($userId, $reason, $comments = null)
@@ -204,6 +238,8 @@ class ApprovalRequest extends Model
         $this->rejection_reason = $reason;
         $this->current_approver_id = null;
         $this->save();
+
+        $this->onRejected();
     }
 
     public function canBeApprovedBy($userId)
@@ -219,5 +255,72 @@ class ApprovalRequest extends Model
             return $levels[$this->current_level]['approver_id'] ?? null;
         }
         return null;
+    }
+
+    protected function onFullyApproved(): void
+    {
+        // Handle entity-specific logic when the workflow is fully approved
+        if ($this->approvable instanceof Department) {
+            $department = $this->approvable;
+            $department->is_active = true;
+            $department->save();
+
+            NotificationController::departmentCreated($department);
+        }
+
+        // Notify requester and all approvers that the request is approved
+        $userIds = [];
+
+        if ($this->requester_id) {
+            $userIds[] = $this->requester_id;
+        }
+
+        $levels = $this->approval_levels ?? [];
+        foreach ($levels as $level) {
+            if (!empty($level['approver_id'])) {
+                $userIds[] = $level['approver_id'];
+            }
+        }
+
+        $userIds = array_unique(array_filter($userIds));
+
+        foreach ($userIds as $id) {
+            NotificationController::sendToUser(
+                $id,
+                'Approval Request Approved',
+                'An approval request you are involved in has been fully approved.',
+                'success',
+                route('approval-system.index')
+            );
+        }
+    }
+
+    protected function onRejected(): void
+    {
+        // Notify requester and all approvers that the request was rejected
+        $userIds = [];
+
+        if ($this->requester_id) {
+            $userIds[] = $this->requester_id;
+        }
+
+        $levels = $this->approval_levels ?? [];
+        foreach ($levels as $level) {
+            if (!empty($level['approver_id'])) {
+                $userIds[] = $level['approver_id'];
+            }
+        }
+
+        $userIds = array_unique(array_filter($userIds));
+
+        foreach ($userIds as $id) {
+            NotificationController::sendToUser(
+                $id,
+                'Approval Request Rejected',
+                'An approval request you are involved in has been rejected.',
+                'error',
+                route('approval-system.index')
+            );
+        }
     }
 }
