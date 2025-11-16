@@ -71,6 +71,9 @@ class EmployeeDocumentController extends Controller
 
             DB::commit();
 
+            // Notify if the employee document is expiring within the configured window
+            \App\Http\Controllers\NotificationController::employeeDocumentExpiring($document);
+
             return redirect()->route('hr.employees.documents.index', $employee)
                 ->with('success', 'Document uploaded successfully');
 
@@ -138,6 +141,9 @@ class EmployeeDocumentController extends Controller
             $document->save();
 
             DB::commit();
+
+            // Notify if the employee document is expiring within the configured window
+            \App\Http\Controllers\NotificationController::employeeDocumentExpiring($document);
 
             return redirect()->route('hr.employees.documents.index', $employee)
                 ->with('success', 'Document updated successfully');

@@ -86,6 +86,61 @@
                 </div>
             </div>
 
+            <!-- Currency Code -->
+            <div class="col-span-12 md:col-span-4">
+                <x-base.form-label for="currency_code">
+                    Currency Code
+                </x-base.form-label>
+                <x-base.form-input
+                    id="currency_code"
+                    name="currency_code"
+                    type="text"
+                    class="w-full"
+                    placeholder="e.g. USD, SAR"
+                    value="{{ old('currency_code', $settings['currency.code'] ?? 'USD') }}"
+                />
+                <div class="text-sm text-slate-500 mt-1">
+                    ISO currency code used for reports (e.g. USD, SAR).
+                </div>
+            </div>
+
+            <!-- Currency Symbol -->
+            <div class="col-span-12 md:col-span-4">
+                <x-base.form-label for="currency_symbol">
+                    Currency Symbol
+                </x-base.form-label>
+                <x-base.form-input
+                    id="currency_symbol"
+                    name="currency_symbol"
+                    type="text"
+                    class="w-full"
+                    placeholder="$, SAR, د.إ"
+                    value="{{ old('currency_symbol', $settings['currency.symbol'] ?? '$') }}"
+                />
+                <div class="text-sm text-slate-500 mt-1">
+                    Symbol shown with amounts (e.g. $, SAR, د.إ).
+                </div>
+            </div>
+
+            <!-- Currency Position -->
+            <div class="col-span-12 md:col-span-4">
+                <x-base.form-label for="currency_position">
+                    Currency Position
+                </x-base.form-label>
+                <x-base.form-select
+                    id="currency_position"
+                    name="currency_position"
+                    class="w-full"
+                >
+                    @php $currencyPosition = old('currency_position', $settings['currency.position'] ?? 'before'); @endphp
+                    <option value="before" {{ $currencyPosition === 'before' ? 'selected' : '' }}>Before amount (e.g. $100)</option>
+                    <option value="after" {{ $currencyPosition === 'after' ? 'selected' : '' }}>After amount (e.g. 100$)</option>
+                </x-base.form-select>
+                <div class="text-sm text-slate-500 mt-1">
+                    Where to display the currency symbol relative to the amount.
+                </div>
+            </div>
+
             <!-- Enable Maintenance Mode -->
             <div class="col-span-12 md:col-span-6">
                 <div class="flex items-center mt-2">

@@ -264,12 +264,142 @@
                             </div>
                             <div>
                                 <div class="text-slate-500 text-sm">Salary</div>
-                                <div class="font-medium">${{ number_format($employee->salary, 2) }}</div>
+                                <div class="font-medium">{{ format_currency($employee->salary, 2) }}</div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <!-- END: Employment Information -->
+
+                <!-- BEGIN: Performance & Rewards -->
+                <div class="intro-y box col-span-12 2xl:col-span-6" id="performance-rewards">
+                    <div class="flex items-center border-b border-slate-200/60 px-5 py-5 dark:border-darkmode-400 sm:py-3">
+                        <h2 class="mr-auto text-base font-medium flex items-center">
+                            <x-base.lucide icon="Star" class="w-5 h-5 mr-2 text-amber-400" />
+                            Performance & Rewards
+                        </h2>
+                    </div>
+                    <div class="p-5">
+                        <div class="grid grid-cols-12 gap-4">
+                            <!-- Rating card -->
+                            <div class="col-span-12">
+                                <div class="rounded-lg border border-slate-200/60 p-4 dark:border-darkmode-400 bg-gradient-to-br from-amber-50/80 to-white dark:from-darkmode-600 dark:to-darkmode-700">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div class="text-sm font-medium text-slate-700 dark:text-slate-100">Overall Rating</div>
+                                        @php $avgRating = $employee->average_rating; @endphp
+                                        <div class="text-xs text-slate-500 dark:text-slate-400">
+                                            {{ $avgRating ? $avgRating . ' / 10' : 'Not rated yet' }}
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center mb-3">
+                                        @for ($i = 1; $i <= 10; $i++)
+                                            @php $filled = $avgRating && $avgRating >= $i; @endphp
+                                            <div class="transition-transform duration-200 hover:scale-110">
+                                                <x-base.lucide
+                                                    icon="Star"
+                                                    class="w-5 h-5 mr-1 {{ $filled ? 'text-amber-400 fill-amber-300/80' : 'text-slate-300 dark:text-slate-600' }}"
+                                                />
+                                            </div>
+                                        @endfor
+                                        <span class="ml-2 text-xs text-slate-500 dark:text-slate-400">
+                                            {{ $avgRating ? $avgRating . ' / 10' : 'Not rated yet' }}
+                                        </span>
+                                    </div>
+                                    @php
+                                        $latestEvaluations = $employee->evaluations()->latest('evaluated_at')->latest()->take(3)->get();
+                                    @endphp
+                                    @if($latestEvaluations->count())
+                                        <div class="space-y-2 max-h-40 overflow-y-auto text-xs">
+                                            @foreach($latestEvaluations as $eval)
+                                                <div class="flex items-start justify-between rounded-md bg-white/60 dark:bg-darkmode-600/80 px-3 py-2">
+                                                    <div class="mr-2">
+                                                        <div class="font-medium text-slate-800 dark:text-slate-100">
+                                                            {{ $eval->overall_rating }} ★
+                                                        </div>
+                                                        @if($eval->comments)
+                                                            <div class="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">{{ $eval->comments }}</div>
+                                                        @endif
+                                                    </div>
+                                                    <div class="text-right text-[11px] text-slate-400">
+                                                        @if($eval->evaluated_at)
+                                                            <div>{{ $eval->evaluated_at->format('Y-m-d') }}</div>
+                                                        @endif
+                                                        @if($eval->evaluator)
+                                                            <div>by {{ $eval->evaluator->name }}</div>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <div class="text-xs text-slate-500 dark:text-slate-400">
+                                            No evaluations recorded yet.
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <!-- Rewards card -->
+                            <div class="col-span-12">
+                                <div class="rounded-lg border border-slate-200/60 p-4 dark:border-darkmode-400 bg-gradient-to-br from-emerald-50/80 to-white dark:from-darkmode-600 dark:to-darkmode-700">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div class="text-sm font-medium text-slate-700 dark:text-slate-100 flex items-center">
+                                            <x-base.lucide icon="Gift" class="w-4 h-4 mr-2 text-emerald-500" />
+                                            Rewards & Points
+                                        </div>
+                                    </div>
+                                    @php
+                                        $totalPoints = $employee->total_points;
+                                        $rewards = $employee->rewards()->latest('granted_at')->latest()->take(3)->get();
+                                    @endphp
+                                    <div class="mb-3">
+                                        <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
+                                            <span>Total Points</span>
+                                            <span class="font-semibold text-emerald-600 dark:text-emerald-400">{{ $totalPoints }}</span>
+                                        </div>
+                                        <div class="h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-darkmode-600">
+                                            @php $progress = min(100, ($totalPoints / 100) * 100); @endphp
+                                            <div class="h-full rounded-full bg-emerald-500 transition-all duration-500" style="width: {{ $progress }}%"></div>
+                                        </div>
+                                    </div>
+
+                                    @if($rewards->count())
+                                        <div class="space-y-2 max-h-40 overflow-y-auto text-xs">
+                                            @foreach($rewards as $reward)
+                                                <div class="flex items-start justify-between rounded-md bg-white/60 dark:bg-darkmode-600/80 px-3 py-2">
+                                                    <div class="mr-2">
+                                                        <div class="font-medium text-slate-800 dark:text-slate-100 flex items-center">
+                                                            <span class="mr-1">+{{ $reward->points }} pts</span>
+                                                            @if($reward->amount)
+                                                                <span class="text-[11px] text-emerald-600">({{ format_currency($reward->amount, 2) }})</span>
+                                                            @endif
+                                                        </div>
+                                                        @if($reward->reason)
+                                                            <div class="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">{{ $reward->reason }}</div>
+                                                        @endif
+                                                    </div>
+                                                    <div class="text-right text-[11px] text-slate-400">
+                                                        @if($reward->granted_at)
+                                                            <div>{{ $reward->granted_at->format('Y-m-d') }}</div>
+                                                        @endif
+                                                        @if($reward->granter)
+                                                            <div>by {{ $reward->granter->name }}</div>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <div class="text-xs text-slate-500 dark:text-slate-400">
+                                            No rewards recorded yet.
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END: Performance & Rewards -->
 
                 <!-- BEGIN: Contact Information -->
                 <div class="intro-y box col-span-12 2xl:col-span-6" id="contact-info">

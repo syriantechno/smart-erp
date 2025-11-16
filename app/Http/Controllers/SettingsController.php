@@ -33,6 +33,9 @@ class SettingsController extends Controller
             'date_format' => 'nullable|string|in:Y-m-d,d/m/Y,m/d/Y',
             'maintenance_mode' => 'nullable|boolean',
             'debug_mode' => 'nullable|boolean',
+            'currency_code' => 'nullable|string|max:10',
+            'currency_symbol' => 'nullable|string|max:10',
+            'currency_position' => 'nullable|string|in:before,after',
         ]);
 
         // حفظ الإعدادات في قاعدة البيانات
@@ -42,6 +45,11 @@ class SettingsController extends Controller
         Setting::set('date_format', $request->date_format ?? 'Y-m-d', 'string', 'Date format');
         Setting::set('maintenance_mode', $request->boolean('maintenance_mode'), 'boolean', 'Maintenance mode');
         Setting::set('app.debug', $request->boolean('debug_mode'), 'boolean', 'Debug mode');
+
+        // إعدادات العملة العامة
+        Setting::set('currency.code', $request->currency_code ?? 'USD', 'string', 'Default currency code');
+        Setting::set('currency.symbol', $request->currency_symbol ?? '$', 'string', 'Default currency symbol');
+        Setting::set('currency.position', $request->currency_position ?? 'before', 'string', 'Currency symbol position (before or after amount)');
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
@@ -278,6 +286,18 @@ class SettingsController extends Controller
                 $days,
                 'number',
                 'Days before a document expiry to trigger reminders'
+            );
+        }
+
+        // Employee documents expiry reminder days (numeric setting)
+        if ($request->filled('notifications_employee_documents_expiry_reminder_days')) {
+            $days = (int) $request->input('notifications_employee_documents_expiry_reminder_days', 30);
+            $days = max(1, min(365, $days));
+            Setting::set(
+                'notifications.employee_documents.expiry_reminder_days',
+                $days,
+                'number',
+                'Days before an employee document expiry to trigger reminders'
             );
         }
 

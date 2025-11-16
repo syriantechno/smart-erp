@@ -16,7 +16,7 @@
                         <!-- Project Name -->
                         <div class="col-span-12 md:col-span-8">
                             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Project Name *
+                                Project Name <span class="text-red-500">*</span>
                             </label>
                             <x-base.form-input
                                 id="name"
@@ -31,7 +31,7 @@
                         <!-- Progress -->
                         <div class="col-span-12 md:col-span-4">
                             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Initial Progress (%) *
+                                Initial Progress (%) <span class="text-red-500">*</span>
                             </label>
                             <x-base.form-input
                                 id="progress_percentage"
@@ -65,7 +65,7 @@
                         <!-- Company -->
                         <div class="col-span-12 md:col-span-6">
                             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Company *
+                                Company <span class="text-red-500">*</span>
                             </label>
                             <x-base.form-select id="company_id" name="company_id" class="w-full" required>
                                 <option value="">Select Company</option>
@@ -101,7 +101,7 @@
                         <!-- Priority -->
                         <div class="col-span-12 md:col-span-6">
                             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Priority *
+                                Priority <span class="text-red-500">*</span>
                             </label>
                             <x-base.form-select id="priority" name="priority" class="w-full" required>
                                 <option value="">Select Priority</option>
@@ -118,7 +118,7 @@
                         <!-- Start Date -->
                         <div class="col-span-12 md:col-span-6">
                             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Start Date *
+                                Start Date <span class="text-red-500">*</span>
                             </label>
                             <div class="relative mx-auto w-56">
                                 <div
@@ -158,7 +158,7 @@
                         <!-- Status -->
                         <div class="col-span-12 md:col-span-6">
                             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Status *
+                                Status <span class="text-red-500">*</span>
                             </label>
                             <x-base.form-select id="status" name="status" class="w-full" required>
                                 <option value="">Select Status</option>
@@ -333,11 +333,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     projectForm.reset();
                     const modal = document.getElementById('add-project-modal');
                     if (modal) {
-                        modal.__tippy?.hide();
+                        // Use Alpine/tw-starter close event if available
+                        modal.dispatchEvent(new CustomEvent('close', { bubbles: true }));
                     }
 
-                    // Reload table
-                    if (window.projectTable) {
+                    // Reload projects table via AJAX without full page reload
+                    if (window.projectTable && typeof window.projectTable.ajax !== 'undefined') {
                         window.projectTable.ajax.reload(null, false);
                     }
                 } else {

@@ -114,3 +114,30 @@ if (!function_exists('accent_color')) {
         return setting('accent_color', '#06b6d4');
     }
 }
+
+if (!function_exists('format_currency')) {
+    /**
+     * Format a numeric amount using global currency settings.
+     *
+     * @param float|int|null $amount
+     * @param int $decimals
+     * @return string
+     */
+    function format_currency($amount, int $decimals = 2): string
+    {
+        if ($amount === null || $amount === '') {
+            return '';
+        }
+
+        $symbol = setting('currency.symbol', '$');
+        $position = setting('currency.position', 'before');
+
+        $formatted = number_format((float) $amount, $decimals);
+
+        if ($position === 'after') {
+            return $formatted . ' ' . $symbol;
+        }
+
+        return $symbol . $formatted;
+    }
+}

@@ -365,6 +365,45 @@ class DocumentController extends Controller
         }
     }
 
+    /**
+     * Get simple statistics for documents page.
+     */
+    public function stats(Request $request): JsonResponse
+    {
+        $user = auth()->user();
+
+        $baseQuery = Document::query();
+
+        if ($user->company_id) {
+            $baseQuery->where('company_id', $user->company_id);
+        }
+
+        $totalFiles = (clone $baseQuery)->count();
+
+        $monthlyFiles = (clone $baseQuery)
+            ->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])
+            ->count();
+
+        $totalSizeBytes = (clone $baseQuery)->sum('file_size');
+
+        $k = 1024;
+        $sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+        $sizeIndex = $totalSizeBytes > 0 ? (int) floor(log($totalSizeBytes, $k)) : 0;
+        $sizeIndex = max(0, min($sizeIndex, count($sizes) - 1));
+        $sizeValue = $totalSizeBytes > 0 ? $totalSizeBytes / pow($k, $sizeIndex) : 0;
+        $storageFormatted = number_format($sizeValue, 2) . ' ' . $sizes[$sizeIndex];
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'total_files' => $totalFiles,
+                'monthly_files' => $monthlyFiles,
+                'storage_used' => $totalSizeBytes,
+                'storage_used_formatted' => $storageFormatted,
+            ],
+        ]);
+    }
+
     // Categories Management
     public function categories()
     {

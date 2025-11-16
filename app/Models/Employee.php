@@ -96,6 +96,29 @@ class Employee extends Model
         return $this->birth_date ? $this->birth_date->age : null;
     }
 
+    public function getAverageRatingAttribute()
+    {
+        if (!$this->relationLoaded('evaluations')) {
+            $this->loadMissing('evaluations');
+        }
+
+        $count = $this->evaluations->count();
+        if ($count === 0) {
+            return null;
+        }
+
+        return (int) round($this->evaluations->avg('overall_rating'));
+    }
+
+    public function getTotalPointsAttribute()
+    {
+        if (!$this->relationLoaded('rewards')) {
+            $this->loadMissing('rewards');
+        }
+
+        return (int) $this->rewards->sum('points');
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -104,6 +127,16 @@ class Employee extends Model
     public function attendances(): HasMany
     {
         return $this->hasMany(Attendance::class);
+    }
+
+    public function evaluations(): HasMany
+    {
+        return $this->hasMany(\App\Models\HR\EmployeeEvaluation::class);
+    }
+
+    public function rewards(): HasMany
+    {
+        return $this->hasMany(\App\Models\HR\EmployeeReward::class);
     }
 
     /**

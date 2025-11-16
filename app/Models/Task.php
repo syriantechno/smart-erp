@@ -20,6 +20,7 @@ class Task extends Model
         'title',
         'description',
         'priority',
+        'color',
         'status',
         'due_date',
         'assigned_to',
@@ -27,6 +28,7 @@ class Task extends Model
         'employee_id',
         'department_id',
         'company_id',
+        'project_id',
         'is_active'
     ];
 
@@ -73,6 +75,11 @@ class Task extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+
+    public function project(): BelongsTo
+    {
+        return $this->belongsTo(Project::class);
     }
 
     /**

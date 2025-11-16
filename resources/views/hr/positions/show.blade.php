@@ -31,7 +31,7 @@
                                     <th>Salary Range:</th>
                                     <td>
                                         @if($position->minimum_salary && $position->maximum_salary)
-                                            {{ number_format($position->minimum_salary) }} - {{ number_format($position->maximum_salary) }} SAR
+                                            {{ format_currency($position->minimum_salary, 2) }} - {{ format_currency($position->maximum_salary, 2) }}
                                         @else
                                             Not specified
                                         @endif

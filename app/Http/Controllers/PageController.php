@@ -55,9 +55,42 @@ class PageController extends Controller
             ->limit(5)
             ->get();
 
+        // Employee documents expiring soon
+        $employeeDays = (int) setting('notifications.employee_documents.expiry_reminder_days', 30);
+        if ($employeeDays < 1) {
+            $employeeDays = 30;
+        }
+
+        $hrEmployeeExpiringDocuments = \App\Models\EmployeeDocument::active()
+            ->whereNotNull('expiry_date')
+            ->expiringSoon()
+            ->orderBy('expiry_date')
+            ->limit(5)
+            ->get();
+
+        // Top rated employees (by average evaluation)
+        $topRatedEmployees = \App\Models\Employee::with(['department'])
+            ->withAvg('evaluations as avg_rating', 'overall_rating')
+            ->orderByDesc('avg_rating')
+            ->whereNotNull('avg_rating')
+            ->limit(5)
+            ->get();
+
+        // Top rewarded employees (by total points)
+        $topRewardedEmployees = \App\Models\Employee::with(['department'])
+            ->withSum('rewards as total_points', 'points')
+            ->orderByDesc('total_points')
+            ->where('total_points', '>', 0)
+            ->limit(5)
+            ->get();
+
         return view('hr.dashboard', [
             'hrExpiringDocuments' => $hrExpiringDocuments,
             'hrExpiryDays' => $days,
+            'hrEmployeeExpiringDocuments' => $hrEmployeeExpiringDocuments,
+            'hrEmployeeExpiryDays' => $employeeDays,
+            'topRatedEmployees' => $topRatedEmployees,
+            'topRewardedEmployees' => $topRewardedEmployees,
         ]);
     }
 

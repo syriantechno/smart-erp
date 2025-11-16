@@ -85,6 +85,16 @@ Route::middleware('auth')->group(function () {
         Route::get('employees/test-data', [App\Http\Controllers\HR\EmployeeController::class, 'testData'])
             ->name('employees.test-data');
         Route::resource('employees', 'App\Http\Controllers\HR\EmployeeController');
+
+        // Employee evaluations & rewards overview
+        Route::get('employee-evaluations', [App\Http\Controllers\HR\EmployeeEvaluationController::class, 'index'])
+            ->name('employee-evaluations.index');
+        Route::post('employee-evaluations', [App\Http\Controllers\HR\EmployeeEvaluationController::class, 'store'])
+            ->name('employee-evaluations.store');
+        Route::get('employee-rewards', [App\Http\Controllers\HR\EmployeeRewardController::class, 'index'])
+            ->name('employee-rewards.index');
+        Route::post('employee-rewards', [App\Http\Controllers\HR\EmployeeRewardController::class, 'store'])
+            ->name('employee-rewards.store');
         
         // Employee Documents
         Route::prefix('employees/{employee}/documents')->name('employees.documents.')->group(function () {
@@ -330,6 +340,7 @@ Route::middleware('auth')->group(function () {
     // Document Management Routes
     Route::prefix('documents')->name('documents.')->group(function () {
         Route::get('/', [App\Http\Controllers\DocumentController::class, 'index'])->name('index');
+        Route::get('/stats', [App\Http\Controllers\DocumentController::class, 'stats'])->name('stats');
         Route::get('/categories', [App\Http\Controllers\DocumentController::class, 'categories'])->name('categories');
         Route::get('/datatable', [App\Http\Controllers\DocumentController::class, 'datatable'])->name('datatable');
         Route::get('/create', [App\Http\Controllers\DocumentController::class, 'create'])->name('create');
@@ -390,10 +401,8 @@ Route::middleware('auth')->group(function () {
         // Main CRUD & listing
         Route::get('projects', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'index'])->name('projects.index');
         Route::get('projects/create', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'create'])->name('projects.create');
-        Route::get('projects/{project}', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'show'])->name('projects.show');
-        Route::get('projects/{project}/edit', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'edit'])->name('projects.edit');
 
-        // Data & operations
+        // Data & operations (define BEFORE dynamic {project} routes to avoid conflicts)
         Route::get('projects/datatable', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'datatable'])->name('projects.datatable');
         Route::post('projects', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'store'])->name('projects.store');
         Route::put('projects/{project}', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'update'])->name('projects.update');
@@ -403,6 +412,10 @@ Route::middleware('auth')->group(function () {
         Route::put('projects/{project}/status', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'updateStatus'])->name('projects.update-status');
         Route::get('projects/stats', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'stats'])->name('projects.stats');
         Route::get('projects/export', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'export'])->name('projects.export');
+
+        // Detail & edit views (placed last so they don't swallow other routes)
+        Route::get('projects/{project}', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'show'])->name('projects.show');
+        Route::get('projects/{project}/edit', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'edit'])->name('projects.edit');
     });
 
     // Dashboard and other pages

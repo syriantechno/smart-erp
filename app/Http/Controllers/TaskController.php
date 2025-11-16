@@ -128,11 +128,13 @@ class TaskController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'priority' => 'required|in:low,medium,high',
+            'color' => 'nullable|string|max:32',
             'status' => 'required|in:pending,in_progress,completed,cancelled',
             'due_date' => 'nullable|date',
             'employee_id' => 'nullable|exists:employees,id',
             'department_id' => 'nullable|exists:departments,id',
             'company_id' => 'nullable|exists:companies,id',
+            'project_id' => 'nullable|exists:projects,id',
             'is_active' => 'nullable|boolean',
         ]);
 

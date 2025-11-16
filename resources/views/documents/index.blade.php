@@ -58,79 +58,87 @@
     @include('components.global-notifications')
 
     <div class="mt-8 grid grid-cols-12 gap-6">
-        <!-- Sidebar with Categories -->
+        <!-- Sidebar with Categories (styled like file manager menu) -->
         <div class="col-span-12 lg:col-span-3 2xl:col-span-2">
-            <div class="bg-white rounded-lg shadow-sm border">
-                <!-- Header -->
-                <div class="p-5 border-b border-slate-200/60">
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-lg font-medium">Categories</h2>
-                        <x-base.button
-                            variant="primary"
-                            size="sm"
-                            class="ml-2"
-                            data-tw-toggle="modal"
-                            data-tw-target="#category-modal"
-                        >
-                            <x-base.lucide icon="Plus" class="w-4 h-4 mr-1" />
-                            Add
-                        </x-base.button>
-                    </div>
+            <h2 class="intro-y mr-auto mt-2 text-lg font-medium">
+                Document Catalog
+            </h2>
+
+            <!-- BEGIN: Catalog Menu (similar to file-manager sidebar) -->
+            <div class="intro-y box mt-6 p-4">
+                <!-- Root entries -->
+                <div class="space-y-1">
+                    <!-- All Documents -->
+                    <a
+                        href="javascript:;"
+                        class="category-item flex items-center rounded-md px-3 py-2 text-sm {{ !$currentCategory ? 'bg-primary text-white' : 'text-slate-700 hover:bg-slate-100' }}"
+                        onclick="filterByCategory('')"
+                    >
+                        <x-base.lucide
+                            icon="Folder"
+                            class="mr-2 h-4 w-4 {{ !$currentCategory ? 'text-white' : 'text-blue-600' }}"
+                        />
+                        <span class="flex-1">All Documents</span>
+                    </a>
+
+                    <!-- Uncategorized -->
+                    <a
+                        href="javascript:;"
+                        class="category-item flex items-center rounded-md px-3 py-2 text-sm {{ $currentCategory === 'uncategorized' ? 'bg-primary text-white' : 'text-slate-700 hover:bg-slate-100' }}"
+                        onclick="filterByCategory('uncategorized')"
+                    >
+                        <x-base.lucide
+                            icon="FolderX"
+                            class="mr-2 h-4 w-4 {{ $currentCategory === 'uncategorized' ? 'text-white' : 'text-slate-500' }}"
+                        />
+                        <div class="flex-1">
+                            <span>Uncategorized</span>
+                            <span class="ml-1 text-[11px] text-slate-400">Files without category</span>
+                        </div>
+                    </a>
                 </div>
 
                 <!-- Categories Tree -->
-                <div class="p-2 max-h-96 overflow-y-auto">
-                    <!-- All Documents -->
-                    <div class="category-item p-3 rounded-lg mb-1 {{ !$currentCategory ? 'active' : '' }}"
-                         onclick="filterByCategory('')">
-                        <div class="flex items-center">
-                            <x-base.lucide icon="folder" class="w-5 h-5 mr-3 text-blue-600" />
-                            <div class="flex-1">
-                                <div class="font-medium">All Documents</div>
-                                <div class="text-xs text-gray-500">All files</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Categories -->
+                <div class="mt-4 border-t border-slate-200 pt-4 dark:border-darkmode-400 max-h-72 overflow-y-auto">
                     @foreach($categories as $category)
                         @include('documents.partials.category-item', ['category' => $category, 'level' => 0])
                     @endforeach
+                </div>
 
-                    <!-- Uncategorized -->
-                    <div class="category-item p-3 rounded-lg mb-1 {{ $currentCategory === 'uncategorized' ? 'active' : '' }}"
-                         onclick="filterByCategory('uncategorized')">
-                        <div class="flex items-center">
-                            <x-base.lucide icon="folder-x" class="w-5 h-5 mr-3 text-gray-600" />
-                            <div class="flex-1">
-                                <div class="font-medium">Uncategorized</div>
-                                <div class="text-xs text-gray-500">Files without category</div>
-                            </div>
-                        </div>
-                    </div>
+                <!-- Add Category Button -->
+                <div class="mt-4 pt-3 border-t border-dashed border-slate-200 dark:border-darkmode-400">
+                    <x-base.button
+                        variant="outline-primary"
+                        size="sm"
+                        class="w-full flex items-center justify-center"
+                        data-tw-toggle="modal"
+                        data-tw-target="#category-modal"
+                    >
+                        <x-base.lucide icon="Plus" class="mr-2 h-4 w-4" />
+                        Manage Categories
+                    </x-base.button>
                 </div>
             </div>
+            <!-- END: Catalog Menu -->
 
-            <!-- Quick Stats -->
-            <div class="bg-white rounded-lg shadow-sm border mt-6">
-                <div class="p-5">
-                    <h3 class="font-semibold mb-4 flex items-center">
-                        <x-base.lucide icon="bar-chart-3" class="w-5 h-5 mr-2 text-blue-600" />
-                        Quick Stats
-                    </h3>
-                    <div class="space-y-3">
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-600">Total Files</span>
-                            <span class="font-semibold text-blue-600" id="total-files">-</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-600">This Month</span>
-                            <span class="font-semibold text-green-600" id="monthly-files">-</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-600">Storage Used</span>
-                            <span class="font-semibold text-purple-600" id="storage-used">-</span>
-                        </div>
+            <!-- Quick Stats (kept but styled under catalog) -->
+            <div class="intro-y box mt-6 p-4">
+                <h3 class="mb-3 flex items-center text-sm font-semibold text-slate-800 dark:text-slate-100">
+                    <x-base.lucide icon="BarChart3" class="mr-2 h-4 w-4 text-blue-600" />
+                    Quick Stats
+                </h3>
+                <div class="space-y-2 text-xs">
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-600">Total Files</span>
+                        <span class="font-semibold text-blue-600" id="total-files">-</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-600">This Month</span>
+                        <span class="font-semibold text-emerald-600" id="monthly-files">-</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-600">Storage Used</span>
+                        <span class="font-semibold text-purple-600" id="storage-used">-</span>
                     </div>
                 </div>
             </div>
@@ -274,7 +282,29 @@
 
     @include('documents.modals.create-document')
     @include('documents.modals.create-category')
+    @include('documents.modals.edit-document')
     @include('documents.modals.view-document')
+
+    {{-- Hidden triggers so JS can open modals using the same mechanism as the Upload button --}}
+    <x-base.button
+        type="button"
+        id="open-view-document-modal-btn"
+        class="hidden"
+        data-tw-toggle="modal"
+        data-tw-target="#view-document-modal"
+    >
+        Open View Document Modal
+    </x-base.button>
+
+    <x-base.button
+        type="button"
+        id="open-edit-document-modal-btn"
+        class="hidden"
+        data-tw-toggle="modal"
+        data-tw-target="#edit-document-modal"
+    >
+        Open Edit Document Modal
+    </x-base.button>
     @stack('modals')
 @endsection
 
@@ -602,12 +632,31 @@
         }
 
         function updateStats() {
-            // This would fetch actual stats from server
-            $('#total-files').text('Loading...');
-            $('#monthly-files').text('Loading...');
-            $('#storage-used').text('Loading...');
+            const jq = window.jQuery;
+            if (!jq) {
+                console.error('jQuery is not available; cannot load stats.');
+                return;
+            }
 
-            // For demo purposes, you can implement actual stats fetching
+            jq('#total-files').text('...');
+            jq('#monthly-files').text('...');
+            jq('#storage-used').text('...');
+
+            jq.get('{{ route("documents.stats") }}')
+                .done(function (response) {
+                    if (!response.success) {
+                        return;
+                    }
+
+                    jq('#total-files').text(response.data.total_files ?? '-');
+                    jq('#monthly-files').text(response.data.monthly_files ?? '-');
+                    jq('#storage-used').text(response.data.storage_used_formatted ?? '-');
+                })
+                .fail(function () {
+                    jq('#total-files').text('-');
+                    jq('#monthly-files').text('-');
+                    jq('#storage-used').text('-');
+                });
         }
 
         // Global functions for table actions
@@ -682,11 +731,10 @@
                             }
                         });
 
-                    // Show modal (via data-tw attributes)
-                    const modalEl = document.getElementById('view-document-modal');
-                    if (modalEl) {
-                        // Trigger the same opening mechanism as other modals
-                        modalEl.classList.add('show');
+                    // Open modal via hidden trigger button (same behaviour as Upload button)
+                    const trigger = document.getElementById('open-view-document-modal-btn');
+                    if (trigger) {
+                        trigger.click();
                     }
                 })
                 .fail(function(xhr) {
@@ -696,9 +744,134 @@
         };
 
         window.editDocument = function(id) {
-            // Implement edit functionality
-            console.log('Edit document:', id);
+            const jq = window.jQuery;
+            if (!jq) {
+                console.error('jQuery is not available; cannot load document for editing.');
+                return;
+            }
+
+            jq.get('{{ route("documents.show", ":id") }}'.replace(':id', id))
+                .done(function(response) {
+                    if (!response.success) {
+                        Swal.fire('Error', response.message || 'Unable to load document details.', 'error');
+                        return;
+                    }
+
+                    const doc = response.document || {};
+
+                    // Fill edit form fields
+                    jq('#edit-document-id').val(doc.id);
+                    jq('#edit-document-title').val(doc.title || '');
+                    jq('#edit-document-description').val(doc.description || '');
+                    jq('#edit-document-type').val(doc.document_type || '');
+                    jq('#edit-document-category').val(doc.category_id || '');
+                    jq('#edit-document-access').val(doc.access_level || 'internal');
+                    jq('#edit-document-department').val(doc.department_id || '');
+                    jq('#edit-document-status').val(doc.status || 'active');
+
+                    // Expiry date: normalize to YYYY-MM-DD for nicer display with Litepicker
+                    if (doc.expiry_date) {
+                        let rawExpiry = doc.expiry_date;
+                        // If ISO string with time, cut to date part
+                        if (typeof rawExpiry === 'string') {
+                            if (rawExpiry.includes('T')) {
+                                rawExpiry = rawExpiry.split('T')[0];
+                            } else if (rawExpiry.includes(' ')) {
+                                rawExpiry = rawExpiry.split(' ')[0];
+                            }
+                        }
+                        jq('#edit-document-expiry').val(rawExpiry);
+                    } else {
+                        jq('#edit-document-expiry').val('');
+                    }
+
+                    // Tags: convert array to comma-separated string (for single-line input)
+                    if (Array.isArray(doc.tags)) {
+                        const tagsString = doc.tags
+                            .map(function (t) { return (t || '').toString().trim(); })
+                            .filter(function (t) { return t.length > 0; })
+                            .join(', ');
+                        jq('#edit-document-tags').val(tagsString);
+                    } else if (typeof doc.tags === 'string') {
+                        jq('#edit-document-tags').val(doc.tags);
+                    } else {
+                        jq('#edit-document-tags').val('');
+                    }
+
+                    const trigger = document.getElementById('open-edit-document-modal-btn');
+                    if (trigger) {
+                        trigger.click();
+                    }
+                })
+                .fail(function(xhr) {
+                    const msg = xhr.responseJSON?.message || 'Unable to load document details.';
+                    Swal.fire('Error', msg, 'error');
+                });
         };
+
+        function updateDocument() {
+            const jq = window.jQuery;
+            if (!jq) {
+                console.error('jQuery is not available; cannot update document.');
+                Swal.fire('Error', 'jQuery is not loaded; cannot update document.', 'error');
+                return;
+            }
+
+            const id = jq('#edit-document-id').val();
+            if (!id) {
+                Swal.fire('Error', 'Document ID is missing.', 'error');
+                return;
+            }
+
+            const payload = {
+                _token: '{{ csrf_token() }}',
+                _method: 'PUT',
+                title: jq('#edit-document-title').val(),
+                description: jq('#edit-document-description').val(),
+                document_type: jq('#edit-document-type').val(),
+                category_id: jq('#edit-document-category').val() || null,
+                access_level: jq('#edit-document-access').val(),
+                department_id: jq('#edit-document-department').val() || null,
+                status: jq('#edit-document-status').val() || 'active',
+                expiry_date: jq('#edit-document-expiry').val() || null,
+            };
+
+            // Tags -> array as expected by backend (tags[])
+            const rawTags = jq('#edit-document-tags').val() || '';
+            const tags = rawTags.split(',').map(t => t.trim()).filter(t => t);
+            if (tags.length) {
+                payload['tags'] = tags;
+            }
+
+            const url = '{{ route("documents.update", ":id") }}'.replace(':id', id);
+
+            jq('#edit-document-save-btn').prop('disabled', true).text('Saving...');
+
+            jq.ajax({
+                url: url,
+                type: 'POST',
+                data: payload,
+                success: function(response) {
+                    if (response.success) {
+                        closeModalById('edit-document-modal');
+                        if (documentsTable) {
+                            documentsTable.ajax.reload(null, false);
+                        }
+                        updateStats();
+                        Swal.fire('Success', response.message || 'Document updated successfully', 'success');
+                    } else {
+                        Swal.fire('Error', response.message || 'Failed to update document', 'error');
+                    }
+                },
+                error: function(xhr) {
+                    const msg = xhr.responseJSON?.message || 'Failed to update document';
+                    Swal.fire('Error', msg, 'error');
+                },
+                complete: function() {
+                    jq('#edit-document-save-btn').prop('disabled', false).text('Save Changes');
+                }
+            });
+        }
 
         window.deleteDocument = function(id, title) {
             Swal.fire({
@@ -711,7 +884,14 @@
                 confirmButtonText: 'Delete'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    $.ajax({
+                    const jq = window.jQuery;
+                    if (!jq) {
+                        console.error('jQuery is not available; cannot delete document.');
+                        Swal.fire('Error!', 'jQuery is not loaded; cannot delete document.', 'error');
+                        return;
+                    }
+
+                    jq.ajax({
                         url: '{{ route("documents.destroy", ":id") }}'.replace(':id', id),
                         type: 'DELETE',
                         headers: {

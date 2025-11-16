@@ -60,6 +60,16 @@ class SideMenu
                         'title' => 'Employees',
                         'route_name' => 'hr.employees.index'
                     ],
+                    'employee-performance' => [
+                        'icon' => 'star',
+                        'title' => 'Employee Performance',
+                        'route_name' => 'hr.employee-evaluations.index',
+                    ],
+                    'employee-rewards' => [
+                        'icon' => 'award',
+                        'title' => 'Employee Rewards',
+                        'route_name' => 'hr.employee-rewards.index',
+                    ],
                     'attendance' => [
                         'icon' => 'clock',
                         'title' => 'Attendance',

@@ -193,4 +193,122 @@
             });
         });
     </script>
+
+    <script>
+        // Simple SPA-like navigation for sidebar links (no full page reload)
+        document.addEventListener('DOMContentLoaded', function () {
+            var mainContent = document.getElementById('smart-main-content');
+            var sidebar = document.getElementById('smart-sidebar');
+
+            if (!mainContent || !sidebar) return;
+
+            // Only use SPA-like navigation for dashboard routes
+            function isDashboardUrl(url) {
+                try {
+                    var u = typeof url === 'string' ? new URL(url, window.location.origin) : url;
+                    var path = u.pathname || '';
+                    return (
+                        path === '/' ||
+                        path.indexOf('/dashboard-overview-1') === 0 ||
+                        path.indexOf('/dashboard-overview-2') === 0 ||
+                        path.indexOf('/dashboard-overview-3') === 0 ||
+                        path.indexOf('/dashboard-overview-4') === 0
+                    );
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            function loadPage(url, pushState = true) {
+                if (!url) return;
+
+                fetch(url, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'text/html,application/xhtml+xml,application/xml',
+                    },
+                    credentials: 'same-origin',
+                })
+                    .then(function (response) {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.text();
+                    })
+                    .then(function (html) {
+                        var parser = new DOMParser();
+                        var doc = parser.parseFromString(html, 'text/html');
+                        var newMain = doc.getElementById('smart-main-content');
+
+                        // If structure is not as expected, fallback to full navigation
+                        if (!newMain) {
+                            window.location.href = url;
+                            return;
+                        }
+
+                        // Replace only the inner content wrapper (card) to preserve margins
+                        var currentInner = mainContent.firstElementChild;
+                        var newInner = newMain.firstElementChild;
+
+                        if (currentInner && newInner) {
+                            currentInner.innerHTML = newInner.innerHTML;
+                        } else {
+                            // Fallback: replace entire mainContent
+                            mainContent.innerHTML = newMain.innerHTML;
+                        }
+
+                        // Update document title
+                        if (doc.title) {
+                            document.title = doc.title;
+                        }
+
+                        // Push history state
+                        if (pushState) {
+                            window.history.pushState({ url: url }, '', url);
+                        }
+
+                        // Re-run any layout-specific JS that depends on resize
+                        window.dispatchEvent(new Event('resize'));
+                    })
+                    .catch(function () {
+                        // On error, fallback to normal navigation
+                        window.location.href = url;
+                    });
+            }
+
+            // Intercept clicks on sidebar links
+            sidebar.addEventListener('click', function (event) {
+                var link = event.target.closest('a[href]');
+                if (!link) return;
+
+                var href = link.getAttribute('href');
+
+                // Ignore javascript: links or anchors or explicit opt-out
+                if (!href || href === '#' || href.startsWith('javascript:') || link.hasAttribute('data-no-spa')) {
+                    return;
+                }
+
+                // Only handle same-origin links
+                var url = new URL(href, window.location.origin);
+                if (url.origin !== window.location.origin) {
+                    return;
+                }
+
+                // Restrict SPA-like navigation to dashboard routes only
+                if (!isDashboardUrl(url)) {
+                    return;
+                }
+
+                event.preventDefault();
+                loadPage(url.toString(), true);
+            });
+
+            // Handle browser back/forward
+            window.addEventListener('popstate', function (event) {
+                if (event.state && event.state.url) {
+                    loadPage(event.state.url, false);
+                }
+            });
+        });
+    </script>
 @endPushOnce

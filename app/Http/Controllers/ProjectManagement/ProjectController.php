@@ -33,7 +33,8 @@ class ProjectController extends Controller
             $projects = Project::with(['company', 'department', 'manager'])
                 ->select(['id', 'code', 'name', 'company_id', 'department_id', 'manager_id', 'start_date', 'end_date', 'status', 'priority', 'budget', 'progress_percentage', 'is_active', 'created_at']);
 
-            Log::info('Projects query count:', $projects->count());
+            // Log the count using proper context array to avoid TypeError
+            Log::info('Projects query count:', ['count' => $projects->count()]);
 
             return \Yajra\DataTables\Facades\DataTables::of($projects)
                 ->addIndexColumn()

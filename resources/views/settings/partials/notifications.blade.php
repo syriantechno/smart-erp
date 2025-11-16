@@ -57,6 +57,7 @@
         ];
 
         $documentsExpiryReminderDays = \App\Models\Setting::get('notifications.documents.expiry_reminder_days', 30);
+        $employeeDocumentsExpiryReminderDays = \App\Models\Setting::get('notifications.employee_documents.expiry_reminder_days', 30);
     @endphp
 
     <form id="notification-settings-form" action="{{ route('settings.notifications.update') }}" method="POST" class="p-5">
@@ -99,6 +100,24 @@
                         max="365"
                         name="notifications_documents_expiry_reminder_days"
                         value="{{ $documentsExpiryReminderDays }}"
+                        class="w-32"
+                    />
+                </div>
+
+                <div class="mt-4 mb-2 border-t border-dashed border-slate-200 dark:border-darkmode-400 pt-4">
+                    <div class="font-medium text-sm text-slate-800 dark:text-slate-100 flex items-center">
+                        <x-base.lucide icon="IdCard" class="w-4 h-4 mr-2 text-primary" />
+                        Employee documents expiry (days before)
+                    </div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400 mb-2">
+                        Number of days before an employee document expiry date (passport, visa, ID, etc.) to start showing reminders.
+                    </div>
+                    <x-base.form-input
+                        type="number"
+                        min="1"
+                        max="365"
+                        name="notifications_employee_documents_expiry_reminder_days"
+                        value="{{ $employeeDocumentsExpiryReminderDays }}"
                         class="w-32"
                     />
                 </div>
