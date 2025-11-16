@@ -29,7 +29,25 @@
             };
 
             const mergedOptions = jq.extend(true, {}, defaultOptions, options);
-            return jq(selector).DataTable(mergedOptions);
+            const table = jq(selector).DataTable(mergedOptions);
+
+            // Global hook: re-init Lucide icons after every draw for all tables
+            try {
+                jq(selector).on('draw.dt', function () {
+                    if (typeof window.Lucide !== 'undefined' && typeof window.Lucide.createIcons === 'function') {
+                        window.Lucide.createIcons();
+                    }
+                });
+
+                // Initial call so icons render on first load as well
+                if (typeof window.Lucide !== 'undefined' && typeof window.Lucide.createIcons === 'function') {
+                    window.Lucide.createIcons();
+                }
+            } catch (e) {
+                console.error('Failed to attach Lucide draw hook:', e);
+            }
+
+            return table;
         };
     </script>
 @endPushOnce
