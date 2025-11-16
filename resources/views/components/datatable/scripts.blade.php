@@ -32,17 +32,27 @@
             const table = jq(selector).DataTable(mergedOptions);
 
             // Global hook: re-init Lucide icons after every draw for all tables
-            try {
-                jq(selector).on('draw.dt', function () {
+            const refreshIcons = function () {
+                try {
+                    if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+                        lucide.createIcons({ 'stroke-width': 1.5, nameAttr: 'data-lucide' });
+                        return;
+                    }
                     if (typeof window.Lucide !== 'undefined' && typeof window.Lucide.createIcons === 'function') {
                         window.Lucide.createIcons();
                     }
+                } catch (e) {
+                    console.error('Lucide icon refresh failed:', e);
+                }
+            };
+
+            try {
+                jq(selector).on('draw.dt', function () {
+                    refreshIcons();
                 });
 
                 // Initial call so icons render on first load as well
-                if (typeof window.Lucide !== 'undefined' && typeof window.Lucide.createIcons === 'function') {
-                    window.Lucide.createIcons();
-                }
+                refreshIcons();
             } catch (e) {
                 console.error('Failed to attach Lucide draw hook:', e);
             }

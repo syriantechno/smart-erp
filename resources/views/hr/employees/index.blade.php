@@ -10,94 +10,55 @@
 @push('styles')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        /* Make employees table rows more compact */
+        #employees-table tbody tr {
+            height: 2.25rem; /* ~36px */
+        }
+
+        #employees-table td {
+            padding-top: 0.375rem;  /* 6px */
+            padding-bottom: 0.375rem;
+        }
+    </style>
 @endpush
 
 @section('subcontent')
     @include('components.global-notifications')
     <div class="intro-y mt-8 flex items-center">
         <h2 class="mr-auto text-lg font-medium">Employees Management</h2>
-        <x-base.button
-            variant="primary"
-            class="w-40 sm:w-auto sm:ml-4"
-            data-tw-toggle="modal"
-            data-tw-target="#create-employee-modal"
-        >
-            <x-base.lucide icon="UserPlus" class="w-4 h-4 mr-2" />
-            Add Employee
-        </x-base.button>
-    </div>
+        <div class="flex items-center gap-2">
+            <x-base.button
+                variant="outline-secondary"
+                class="hidden sm:flex"
+                data-tw-toggle="modal"
+                data-tw-target="#employees-filters-slideover"
+            >
+                <x-base.lucide icon="Filter" class="w-4 h-4 mr-2" />
+                Filters
+                <span id="active-filters-indicator" class="hidden ml-2 px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full">Active</span>
+            </x-base.button>
 
-    <div class="mt-5 grid grid-cols-12 gap-6">
-        <div class="intro-y col-span-12">
-            <!-- Advanced Filters Section -->
-            <x-base.preview-component class="intro-y box mb-6">
-                <div class="p-5">
-                    <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                        <x-base.lucide icon="Filter" class="h-5 w-5"></x-base.lucide>
-                        Advanced Filters
-                        <span id="active-filters-indicator" class="hidden ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">Active</span>
-                    </h3>
+            <!-- Mobile filters icon -->
+            <button
+                type="button"
+                class="flex items-center justify-center rounded-full border border-slate-200 px-3 py-2 text-slate-600 hover:bg-slate-50 sm:hidden"
+                data-tw-toggle="modal"
+                data-tw-target="#employees-filters-slideover"
+                title="Filters"
+            >
+                <x-base.lucide icon="Filter" class="w-4 h-4" />
+            </button>
 
-                    <div class="grid grid-cols-12 gap-4">
-                        <!-- Company Filter -->
-                        <div class="col-span-12 md:col-span-4">
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Filter by Company
-                            </label>
-                            <x-base.form-select id="company-filter" class="w-full">
-                                <option value="">All Companies</option>
-                                @foreach($companies ?? [] as $company)
-                                    <option value="{{ $company->id }}">{{ $company->name }}</option>
-                                @endforeach
-                            </x-base.form-select>
-                        </div>
-
-                        <!-- Department Filter -->
-                        <div class="col-span-12 md:col-span-4">
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Filter by Department
-                            </label>
-                            <x-base.form-select id="department-filter" class="w-full">
-                                <option value="">All Departments</option>
-                                @foreach($departments ?? [] as $department)
-                                    <option value="{{ $department->id }}">{{ $department->name }}</option>
-                                @endforeach
-                            </x-base.form-select>
-                        </div>
-
-                        <!-- Position Filter -->
-                        <div class="col-span-12 md:col-span-4">
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Filter by Position
-                            </label>
-                            <x-base.form-select id="position-filter" class="w-full">
-                                <option value="">All Positions</option>
-                                <!-- Will be populated via JavaScript -->
-                            </x-base.form-select>
-                        </div>
-                    </div>
-
-                    <!-- Filter Results Summary -->
-                    <div class="mt-4 p-4 bg-slate-50 dark:bg-darkmode-600 rounded-lg">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-4">
-                                <div class="text-sm text-slate-600 dark:text-slate-400">
-                                    <span class="font-medium">Total Employees:</span>
-                                    <span id="total-employees-count" class="font-semibold text-slate-800 dark:text-white">0</span>
-                                </div>
-                                <div class="text-sm text-slate-600 dark:text-slate-400">
-                                    <span class="font-medium">Filtered:</span>
-                                    <span id="filtered-employees-count" class="font-semibold text-blue-600">0</span>
-                                </div>
-                            </div>
-                            <x-base.button id="advanced-filter-apply" variant="primary" size="sm">
-                                <x-base.lucide icon="Search" class="w-4 h-4 mr-1" />
-                                Apply Filters
-                            </x-base.button>
-                        </div>
-                    </div>
-                </div>
-            </x-base.preview-component>
+            <x-base.button
+                variant="primary"
+                class="w-40 sm:w-auto sm:ml-2"
+                data-tw-toggle="modal"
+                data-tw-target="#create-employee-modal"
+            >
+                <x-base.lucide icon="UserPlus" class="w-4 h-4 mr-2" />
+                Add Employee
+            </x-base.button>
         </div>
     </div>
 
@@ -190,7 +151,109 @@
         </div>
     </div>
 
+    <!-- Employees Filters Slide Over -->
+    <x-base.slideover id="employees-filters-slideover" size="md">
+        <x-base.slideover.panel>
+            <a
+                class="absolute top-0 left-0 right-auto mt-4 -ml-10 sm:-ml-12"
+                data-tw-dismiss="modal"
+                href="#"
+            >
+                <x-base.lucide class="h-8 w-8 text-slate-400" icon="X" />
+            </a>
+            <x-base.slideover.title class="border-b border-slate-200/60 p-5 dark:border-darkmode-400">
+                <h2 class="mr-auto text-base font-medium flex items-center gap-2">
+                    <x-base.lucide icon="Filter" class="h-5 w-5" />
+                    Employees Filters
+                </h2>
+            </x-base.slideover.title>
+
+            <x-base.slideover.description class="p-5">
+                <div class="mb-4 text-sm text-slate-600 dark:text-slate-400">
+                    Use these filters to narrow down the employees list. Click "Apply Filters" to update the table.
+                </div>
+
+                <div class="grid grid-cols-12 gap-4">
+                    <!-- Company Filter -->
+                    <div class="col-span-12">
+                        <label class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                            Filter by Company
+                        </label>
+                        <x-base.form-select id="company-filter" class="w-full">
+                            <option value="">All Companies</option>
+                            @foreach($companies ?? [] as $company)
+                                <option value="{{ $company->id }}">{{ $company->name }}</option>
+                            @endforeach
+                        </x-base.form-select>
+                    </div>
+
+                    <!-- Department Filter -->
+                    <div class="col-span-12">
+                        <label class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                            Filter by Department
+                        </label>
+                        <x-base.form-select id="department-filter" class="w-full">
+                            <option value="">All Departments</option>
+                            @foreach($departments ?? [] as $department)
+                                <option value="{{ $department->id }}">{{ $department->name }}</option>
+                            @endforeach
+                        </x-base.form-select>
+                    </div>
+
+                    <!-- Position Filter -->
+                    <div class="col-span-12">
+                        <label class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                            Filter by Position
+                        </label>
+                        <x-base.form-select id="position-filter" class="w-full">
+                            <option value="">All Positions</option>
+                            <!-- Will be populated via JavaScript -->
+                        </x-base.form-select>
+                    </div>
+                </div>
+
+                <!-- Filter Results Summary & Actions -->
+                <div class="mt-5 rounded-lg bg-slate-50 p-4 dark:bg-darkmode-600">
+                    <div class="flex flex-col gap-3">
+                        <div class="flex flex-wrap items-center gap-4">
+                            <div class="text-sm text-slate-600 dark:text-slate-400">
+                                <span class="font-medium">Total Employees:</span>
+                                <span id="total-employees-count" class="font-semibold text-slate-800 dark:text-white">0</span>
+                            </div>
+                            <div class="text-sm text-slate-600 dark:text-slate-400">
+                                <span class="font-medium">Filtered:</span>
+                                <span id="filtered-employees-count" class="font-semibold text-blue-600">0</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-2 flex justify-end gap-2">
+                            <x-base.button
+                                type="button"
+                                variant="secondary"
+                                class="w-24"
+                                data-tw-dismiss="modal"
+                            >
+                                <x-base.lucide icon="X" class="mr-2 h-4 w-4 animate-pulse" />
+                                Close
+                            </x-base.button>
+                            <x-base.button
+                                id="advanced-filter-apply"
+                                type="button"
+                                variant="primary"
+                                class="w-24"
+                            >
+                                <x-base.lucide icon="Search" class="mr-2 h-4 w-4 animate-pulse" />
+                                Apply
+                            </x-base.button>
+                        </div>
+                    </div>
+                </div>
+            </x-base.slideover.description>
+        </x-base.slideover.panel>
+    </x-base.slideover>
+
     @include('hr.employees.modals.create')
+    @include('hr.employees.modals.edit')
     @stack('modals')
 
     <!-- Hidden button to trigger edit modal -->
@@ -735,7 +798,15 @@
                         .then((data) => {
                             if (data.success) {
                                 showToast(data.message || 'Employee updated successfully', 'success');
-                                editModal.__tippy?.hide?.();
+
+                                // Properly close the modal using its dismiss button
+                                if (editModal) {
+                                    const dismissTrigger = editModal.querySelector('[data-tw-dismiss="modal"]');
+                                    if (dismissTrigger) {
+                                        dismissTrigger.click();
+                                    }
+                                }
+
                                 reloadTable();
                             } else {
                                 showToast(data.message || 'Failed to update employee', 'error');
