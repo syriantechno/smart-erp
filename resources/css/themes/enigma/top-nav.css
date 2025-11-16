@@ -295,11 +295,11 @@
         position: absolute;
         inset: 0;
         pointer-events: none;
-        /* Axis-aligned translucent rectangles (no rotation) layered like overlapping cards */
+        /* ثلاثة مستطيلات شفافة بسيطة بدون تدرج داخلي */
         background:
-            linear-gradient(to right, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)) 8% 20% / 260px 120px no-repeat,
-            linear-gradient(to right, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015)) 70% 18% / 280px 130px no-repeat,
-            linear-gradient(to right, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01)) 32% 65% / 300px 140px no-repeat;
+            linear-gradient(to right, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06)) 8% 20% / 260px 120px no-repeat,
+            linear-gradient(to right, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05)) 70% 18% / 280px 130px no-repeat,
+            linear-gradient(to right, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.04)) 32% 65% / 300px 140px no-repeat;
     }
 }
 
