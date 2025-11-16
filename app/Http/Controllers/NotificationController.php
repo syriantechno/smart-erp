@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Notification;
+use App\Models\Document;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -247,6 +248,37 @@ class NotificationController extends Controller
             'action_url' => $actionUrl,
             'icon' => $icon,
         ]);
+    }
+
+    /**
+     * Send notification when a document is approaching expiry.
+     */
+    public static function documentExpiring(Document $document): void
+    {
+        if (!function_exists('setting')) {
+            return;
+        }
+
+        $daysSetting = (int) setting('notifications.documents.expiry_reminder_days', 30);
+        if ($daysSetting < 1) {
+            $daysSetting = 30;
+        }
+
+        $days = $document->days_until_expiry;
+
+        // Only notify for documents that are within the configured window and not already expired too far in the past
+        if ($days === null || $days > $daysSetting || $days < 0) {
+            return;
+        }
+
+        $title = 'Document Expiring Soon';
+        $actor = auth()->user()?->name ?? 'System';
+        $expiryDate = optional($document->expiry_date)->format(setting('date_format', 'Y-m-d'));
+        $docTitle = $document->title ?: $document->file_name;
+        $message = "User {$actor} added or updated document '{$docTitle}' which will expire on {$expiryDate}.";
+        $actionUrl = route('documents.index');
+
+        self::sendToAllUsers($title, $message, 'warning', $actionUrl, 'AlertTriangle');
     }
 
     /**

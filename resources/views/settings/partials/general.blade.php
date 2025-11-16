@@ -5,10 +5,6 @@
             <x-base.lucide icon="Settings" class="w-5 h-5 mr-2 text-gray-500" />
             General Settings
         </h2>
-        <x-base.button type="submit" form="generalSettingsForm" variant="primary">
-            <x-base.lucide icon="Save" class="w-4 h-4 mr-2" />
-            Save Changes
-        </x-base.button>
     </div>
 
     <form id="generalSettingsForm" action="{{ route('settings.update') }}" method="POST" class="p-5">
@@ -39,14 +35,14 @@
                 <x-base.form-label for="default_language">
                     Default Language
                 </x-base.form-label>
-                <select
+                <x-base.form-select
                     id="default_language"
                     name="default_language"
-                    class="form-select w-full"
+                    class="w-full"
                 >
                     <option value="en" {{ old('default_language', $settings['app.locale'] ?? config('app.locale', 'en')) == 'en' ? 'selected' : '' }}>English</option>
                     <option value="ar" {{ old('default_language', $settings['app.locale'] ?? config('app.locale', 'en')) == 'ar' ? 'selected' : '' }}>العربية</option>
-                </select>
+                </x-base.form-select>
                 <div class="text-sm text-slate-500 mt-1">
                     The default language for the application interface.
                 </div>
@@ -57,15 +53,15 @@
                 <x-base.form-label for="timezone">
                     Timezone
                 </x-base.form-label>
-                <select
+                <x-base.form-select
                     id="timezone"
                     name="timezone"
-                    class="form-select w-full"
+                    class="w-full"
                 >
                     <option value="UTC" {{ old('timezone', $settings['app.timezone'] ?? config('app.timezone', 'UTC')) == 'UTC' ? 'selected' : '' }}>UTC</option>
                     <option value="Asia/Riyadh" {{ old('timezone', $settings['app.timezone'] ?? config('app.timezone', 'UTC')) == 'Asia/Riyadh' ? 'selected' : '' }}>Asia/Riyadh (Saudi Arabia)</option>
                     <option value="Asia/Dubai" {{ old('timezone', $settings['app.timezone'] ?? config('app.timezone', 'UTC')) == 'Asia/Dubai' ? 'selected' : '' }}>Asia/Dubai (UAE)</option>
-                </select>
+                </x-base.form-select>
                 <div class="text-sm text-slate-500 mt-1">
                     The timezone for date and time display.
                 </div>
@@ -76,15 +72,15 @@
                 <x-base.form-label for="date_format">
                     Date Format
                 </x-base.form-label>
-                <select
+                <x-base.form-select
                     id="date_format"
                     name="date_format"
-                    class="form-select w-full"
+                    class="w-full"
                 >
                     <option value="Y-m-d" {{ old('date_format', $settings['date_format'] ?? 'Y-m-d') == 'Y-m-d' ? 'selected' : '' }}>YYYY-MM-DD</option>
                     <option value="d/m/Y" {{ old('date_format', $settings['date_format'] ?? 'Y-m-d') == 'd/m/Y' ? 'selected' : '' }}>DD/MM/YYYY</option>
                     <option value="m/d/Y" {{ old('date_format', $settings['date_format'] ?? 'Y-m-d') == 'm/d/Y' ? 'selected' : '' }}>MM/DD/YYYY</option>
-                </select>
+                </x-base.form-select>
                 <div class="text-sm text-slate-500 mt-1">
                     How dates are displayed throughout the system.
                 </div>
@@ -92,38 +88,42 @@
 
             <!-- Enable Maintenance Mode -->
             <div class="col-span-12 md:col-span-6">
-                <label class="flex items-center">
-                    <input type="hidden" name="maintenance_mode" value="0">
-                    <input
-                        type="checkbox"
-                        name="maintenance_mode"
-                        value="1"
-                        {{ old('maintenance_mode', $settings['maintenance_mode'] ?? 0) ? 'checked' : '' }}
-                        class="form-check-input mr-3"
-                    >
+                <div class="flex items-center mt-2">
                     <div>
                         <div class="font-medium">Maintenance Mode</div>
-                        <div class="text-sm text-slate-500">Enable maintenance mode to prevent user access</div>
+                        <div class="text-sm text-slate-500">Enable maintenance mode to prevent user access.</div>
                     </div>
-                </label>
+                    <div class="ml-auto">
+                        <input type="hidden" name="maintenance_mode" value="0">
+                        <input
+                            type="checkbox"
+                            name="maintenance_mode"
+                            value="1"
+                            {{ old('maintenance_mode', $settings['maintenance_mode'] ?? 0) ? 'checked' : '' }}
+                            class="transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 dark:bg-darkmode-800 dark:border-transparent dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&[type='radio']]:checked:bg-primary [&[type='radio']]:checked:border-primary [&[type='radio']]:checked:border-opacity-10 [&[type='checkbox']]:checked:bg-primary [&[type='checkbox']]:checked:border-primary [&[type='checkbox']]:checked:border-opacity-10 [&:disabled:not(:checked)]:bg-slate-100 [&:disabled:not(:checked)]:cursor-not-allowed [&:disabled:not(:checked)]:dark:bg-darkmode-800/50 [&:disabled:checked]:opacity-70 [&:disabled:checked]:cursor-not-allowed [&:disabled:checked]:dark:bg-darkmode-800/50 w-[38px] h-[24px] p-px rounded-full relative before:w-[20px] before:h-[20px] before:shadow-[1px_1px_3px_rgba(0,0,0,0.25)] before:transition-[margin-left] before:duration-200 before:ease-in-out before:absolute before:inset-y-0 before:my-auto before:rounded-full before:dark:bg-darkmode-600 checked:bg-primary checked:border-primary checked:bg-none before:checked:ml-[14px] before:checked:bg-white"
+                        >
+                    </div>
+                </div>
             </div>
 
             <!-- Debug Mode -->
             <div class="col-span-12 md:col-span-6">
-                <label class="flex items-center">
-                    <input type="hidden" name="debug_mode" value="0">
-                    <input
-                        type="checkbox"
-                        name="debug_mode"
-                        value="1"
-                        {{ old('debug_mode', $settings['app.debug'] ?? config('app.debug', false)) ? 'checked' : '' }}
-                        class="form-check-input mr-3"
-                    >
+                <div class="flex items-center mt-2">
                     <div>
                         <div class="font-medium">Debug Mode</div>
-                        <div class="text-sm text-slate-500">Show detailed error messages (only enable in development)</div>
+                        <div class="text-sm text-slate-500">Show detailed error messages (only enable in development).</div>
                     </div>
-                </label>
+                    <div class="ml-auto">
+                        <input type="hidden" name="debug_mode" value="0">
+                        <input
+                            type="checkbox"
+                            name="debug_mode"
+                            value="1"
+                            {{ old('debug_mode', $settings['app.debug'] ?? config('app.debug', false)) ? 'checked' : '' }}
+                            class="transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 dark:bg-darkmode-800 dark:border-transparent dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&[type='radio']]:checked:bg-primary [&[type='radio']]:checked:border-primary [&[type='radio']]:checked:border-opacity-10 [&[type='checkbox']]:checked:bg-primary [&[type='checkbox']]:checked:border-primary [&[type='checkbox']]:checked:border-opacity-10 [&:disabled:not(:checked)]:bg-slate-100 [&:disabled:not(:checked)]:cursor-not-allowed [&:disabled:not(:checked)]:dark:bg-darkmode-800/50 [&:disabled:checked]:opacity-70 [&:disabled:checked]:cursor-not-allowed [&:disabled:checked]:dark:bg-darkmode-800/50 w-[38px] h-[24px] p-px rounded-full relative before:w-[20px] before:h-[20px] before:shadow-[1px_1px_3px_rgba(0,0,0,0.25)] before:transition-[margin-left] before:duration-200 before:ease-in-out before:absolute before:inset-y-0 before:my-auto before:rounded-full before:dark:bg-darkmode-600 checked:bg-primary checked:border-primary checked:bg-none before:checked:ml-[14px] before:checked:bg-white"
+                        >
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -133,7 +133,8 @@
                 variant="primary"
                 class="w-32"
             >
-                Save Settings
+                <x-base.lucide icon="Save" class="w-4 h-4 mr-2 animate-pulse" />
+                Save
             </x-base.button>
         </div>
     </form>

@@ -12,7 +12,8 @@ class PageController extends Controller
      */
     public function dashboardOverview1(): View
     {
-        return view('pages/dashboard-overview-1');
+        // General dashboard
+        return view('dashboard.general');
     }
 
     /**
@@ -21,7 +22,8 @@ class PageController extends Controller
      */
     public function dashboardOverview2(): View
     {
-        return view('pages/dashboard-overview-2');
+        // Projects dashboard
+        return view('project.dashboard');
     }
 
     /**
@@ -30,7 +32,8 @@ class PageController extends Controller
      */
     public function dashboardOverview3(): View
     {
-        return view('pages/dashboard-overview-3');
+        // Accounting dashboard
+        return view('accounting.dashboard');
     }
 
     /**
@@ -39,7 +42,23 @@ class PageController extends Controller
      */
     public function dashboardOverview4(): View
     {
-        return view('pages/dashboard-overview-4');
+        // HR dashboard
+        $days = (int) setting('notifications.documents.expiry_reminder_days', 30);
+        if ($days < 1) {
+            $days = 30;
+        }
+
+        $hrExpiringDocuments = \App\Models\Document::active()
+            ->whereNotNull('expiry_date')
+            ->expiringSoon($days)
+            ->orderBy('expiry_date')
+            ->limit(5)
+            ->get();
+
+        return view('hr.dashboard', [
+            'hrExpiringDocuments' => $hrExpiringDocuments,
+            'hrExpiryDays' => $days,
+        ]);
     }
 
     /**

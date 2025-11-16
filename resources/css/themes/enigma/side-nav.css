@@ -284,28 +284,60 @@
     .top-bar-pattern {
         position: relative;
         overflow: hidden;
-        background: linear-gradient(135deg, #0f172a 0%, #123a8a 35%, #1d4ed8 70%, #020617 100%) !important;
+        background: radial-gradient(
+                circle at 0% 0%,
+                rgba(var(--accent-rgb, 6, 182, 212), 0.35),
+                transparent 55%
+            ),
+            linear-gradient(
+                135deg,
+                rgba(var(--primary-rgb, 30, 64, 175), 1) 0%,
+                rgba(var(--primary-rgb, 30, 64, 175), 0.9) 30%,
+                rgba(var(--secondary-rgb, 124, 58, 237), 0.85) 70%,
+                #020617 100%
+            );
     }
 
     .top-bar-pattern::before {
         content: "";
         position: absolute;
-        inset: -5%;
+        inset: -10%;
         pointer-events: none;
-        /* Translucent square blocks rotated at different angles (45, 60, 30, 35 deg) */
-        background-image:
-            /* 45° square */
-            linear-gradient(45deg, rgba(255, 255, 255, 0.10) 0, rgba(255, 255, 255, 0.10) 25%, transparent 25%, transparent 100%),
-            /* 60° square */
-            linear-gradient(60deg, rgba(255, 255, 255, 0.08) 0, rgba(255, 255, 255, 0.08) 25%, transparent 25%, transparent 100%),
-            /* 30° square */
-            linear-gradient(30deg, rgba(255, 255, 255, 0.07) 0, rgba(255, 255, 255, 0.07) 25%, transparent 25%, transparent 100%),
-            /* 35° square */
-            linear-gradient(35deg, rgba(255, 255, 255, 0.06) 0, rgba(255, 255, 255, 0.06) 25%, transparent 25%, transparent 100%);
-        background-size: 18% 18%, 20% 20%, 22% 22%, 24% 24%;
-        background-position: 10% 25%, 85% 18%, 40% 80%, 70% 55%;
-        background-repeat: no-repeat;
+        background:
+            linear-gradient(
+                120deg,
+                rgba(255, 255, 255, 0.08) 0,
+                rgba(255, 255, 255, 0.08) 28%,
+                transparent 28%,
+                transparent 100%
+            ) 5% 20% / 260px 120px no-repeat,
+            linear-gradient(
+                120deg,
+                rgba(255, 255, 255, 0.06) 0,
+                rgba(255, 255, 255, 0.06) 30%,
+                transparent 30%,
+                transparent 100%
+            ) 65% 18% / 280px 130px no-repeat,
+            linear-gradient(
+                120deg,
+                rgba(255, 255, 255, 0.05) 0,
+                rgba(255, 255, 255, 0.05) 32%,
+                transparent 32%,
+                transparent 100%
+            ) 30% 70% / 300px 140px no-repeat;
         opacity: 0.9;
+    }
+
+    .top-bar-pattern::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: radial-gradient(
+            circle at 50% 40%,
+            rgba(255, 255, 255, 0.08),
+            transparent 55%
+        );
     }
 }
 

@@ -155,6 +155,12 @@ class DocumentController extends Controller
                     </div>
                 ";
             })
+            ->addColumn('file_size_formatted', function ($document) {
+                return $document->file_size_formatted;
+            })
+            ->addColumn('formatted_date', function ($document) {
+                return optional($document->created_at)->format(setting('date_format', 'Y-m-d'));
+            })
             ->addColumn('expiry_info', function ($document) {
                 if (!$document->expiry_date) return '-';
 
@@ -261,6 +267,9 @@ class DocumentController extends Controller
 
             DB::commit();
 
+            // Notify if the document is expiring within the configured window
+            \App\Http\Controllers\NotificationController::documentExpiring($document);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Document uploaded successfully',
@@ -315,6 +324,9 @@ class DocumentController extends Controller
                 'category_id', 'department_id', 'expiry_date', 'requires_signature',
                 'tags', 'status'
             ]));
+
+            // Notify if the updated document is expiring within the configured window
+            \App\Http\Controllers\NotificationController::documentExpiring($document);
 
             return response()->json([
                 'success' => true,

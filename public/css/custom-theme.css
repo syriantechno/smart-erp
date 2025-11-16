@@ -1,12 +1,12 @@
 
 /* Custom Theme Colors */
 :root {
-    --primary-color: #258598;
-    --secondary-color: #7c3aed;
-    --accent-color: #2ea3b8;
-    --primary-rgb: 37, 133, 152;
-    --secondary-rgb: 124, 58, 237;
-    --accent-rgb: 46, 163, 184;
+    --primary-color: #013846;
+    --secondary-color: #ababab;
+    --accent-color: #003d57;
+    --primary-rgb: 1, 56, 70;
+    --secondary-rgb: 171, 171, 171;
+    --accent-rgb: 0, 61, 87;
 }
 
 /* Override theme colors */
@@ -21,8 +21,8 @@
 }
 
 .btn-primary:hover {
-    background-color: #117184 !important;
-    border-color: #117184 !important;
+    background-color: #002432 !important;
+    border-color: #002432 !important;
 }
 
 /* Link overrides */

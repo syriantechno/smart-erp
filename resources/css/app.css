@@ -28,6 +28,11 @@
 @import "./components/base/_zoom-in.css";
 @import "./components/base/_intro.css";
 
+/* Prevent layout shift when modals/slideover toggle body scroll */
+html {
+    overflow-y: scroll;
+}
+
 /*
  |--------------------------------------------------------------------------
  | TailwindCSS Directives

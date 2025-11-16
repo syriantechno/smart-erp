@@ -98,10 +98,6 @@
             <x-base.lucide icon="Clock" class="w-5 h-5 mr-2 text-blue-500" />
             Attendance Settings
         </h2>
-        <x-base.button type="submit" form="attendance-settings-form" variant="primary">
-            <x-base.lucide icon="Save" class="w-4 h-4 mr-2" />
-            Save Settings
-        </x-base.button>
     </div>
 
     <form id="attendance-settings-form" action="{{ route('settings.attendance.update') }}" method="POST" class="p-5">
@@ -356,7 +352,8 @@
                 variant="primary"
                 class="w-32"
             >
-                Save Attendance
+                <x-base.lucide icon="Save" class="w-4 h-4 mr-2 animate-pulse" />
+                Save
             </x-base.button>
         </div>
     </form>

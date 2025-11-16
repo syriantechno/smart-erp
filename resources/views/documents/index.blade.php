@@ -274,6 +274,7 @@
 
     @include('documents.modals.create-document')
     @include('documents.modals.create-category')
+    @include('documents.modals.view-document')
     @stack('modals')
 @endsection
 
@@ -409,17 +410,29 @@
         }
 
         function updateFileInfo(file) {
-            $('#file-info').removeClass('hidden');
-            $('#file-name').text(file.name);
-            $('#file-details').text(`${formatFileSize(file.size)} • ${file.type || 'Unknown type'}`);
-            $('#upload-btn').prop('disabled', false);
+            const jq = window.jQuery;
+            if (!jq) {
+                console.error('jQuery is not available; cannot update file info.');
+                return;
+            }
+
+            jq('#file-info').removeClass('hidden');
+            jq('#file-name').text(file.name);
+            jq('#file-details').text(`${formatFileSize(file.size)} • ${file.type || 'Unknown type'}`);
+            jq('#upload-btn').prop('disabled', false);
         }
 
         function clearFile() {
+            const jq = window.jQuery;
+            if (!jq) {
+                console.error('jQuery is not available; cannot clear file.');
+                return;
+            }
+
             selectedFile = null;
-            $('#document-file').val('');
-            $('#file-info').addClass('hidden');
-            $('#upload-btn').prop('disabled', true);
+            jq('#document-file').val('');
+            jq('#file-info').addClass('hidden');
+            jq('#upload-btn').prop('disabled', true);
         }
 
         function formatFileSize(bytes) {
@@ -451,6 +464,13 @@
         }
 
         function uploadDocument() {
+            const jq = window.jQuery;
+            if (!jq) {
+                console.error('jQuery is not available; cannot upload document.');
+                Swal.fire('Error', 'jQuery is not loaded; cannot upload document.', 'error');
+                return;
+            }
+
             const formData = new FormData();
 
             // Add file
@@ -460,24 +480,52 @@
             }
             formData.append('file', selectedFile);
 
-            // Add form data
-            const formFields = ['title', 'description', 'document_type', 'category_id', 'access_level', 'expiry_date', 'department_id'];
-            formFields.forEach(field => {
-                const value = $(`#document-${field}`).val();
-                if (value) formData.append(field, value);
+            // Add form data (explicit mapping: field name -> DOM selector)
+            const fieldSelectors = {
+                title: '#document-title',
+                description: '#document-description',
+                document_type: '#document-type',
+                category_id: '#document-category',
+                access_level: '#document-access',
+                expiry_date: '#document-expiry',
+                department_id: '#document-department',
+            };
+
+            Object.entries(fieldSelectors).forEach(([field, selector]) => {
+                const el = jq(selector);
+                if (!el.length) return;
+                let value = el.val();
+                if (!value) return;
+
+                // Normalize expiry_date to YYYY-MM-DD for backend validation
+                if (field === 'expiry_date') {
+                    const parsed = new Date(value);
+                    if (!isNaN(parsed.getTime())) {
+                        const year = parsed.getFullYear();
+                        const month = String(parsed.getMonth() + 1).padStart(2, '0');
+                        const day = String(parsed.getDate()).padStart(2, '0');
+                        value = `${year}-${month}-${day}`;
+                    }
+                }
+
+                formData.append(field, value);
             });
 
             // Add tags
-            const tags = $('#document-tags').val().split(',').map(tag => tag.trim()).filter(tag => tag);
-            if (tags.length > 0) {
-                tags.forEach(tag => formData.append('tags[]', tag));
+            const tagsInput = jq('#document-tags');
+            if (tagsInput.length) {
+                const rawTags = tagsInput.val() || '';
+                const tags = rawTags.split(',').map(tag => tag.trim()).filter(tag => tag);
+                if (tags.length > 0) {
+                    tags.forEach(tag => formData.append('tags[]', tag));
+                }
             }
 
             formData.append('_token', '{{ csrf_token() }}');
 
-            $('#upload-btn').prop('disabled', true).text('Uploading...');
+            jq('#upload-btn').prop('disabled', true).text('Uploading...');
 
-            $.ajax({
+            jq.ajax({
                 url: '{{ route("documents.store") }}',
                 type: 'POST',
                 data: formData,
@@ -487,7 +535,9 @@
                     if (response.success) {
                         closeModalById('upload-modal');
                         clearFile();
-                        documentsTable.ajax.reload();
+                        if (documentsTable) {
+                            documentsTable.ajax.reload();
+                        }
                         updateStats();
                         Swal.fire('Success', response.message, 'success');
                     } else {
@@ -499,7 +549,7 @@
                     Swal.fire('Error', error, 'error');
                 },
                 complete: function() {
-                    $('#upload-btn').prop('disabled', false).text('Upload Document');
+                    jq('#upload-btn').prop('disabled', false).text('Upload Document');
                 }
             });
         }
@@ -562,12 +612,86 @@
 
         // Global functions for table actions
         window.viewDocument = function(id) {
-            $.get('{{ route("documents.show", ":id") }}'.replace(':id', id))
+            const jq = window.jQuery;
+            if (!jq) {
+                console.error('jQuery is not available; cannot load document.');
+                return;
+            }
+
+            jq.get('{{ route("documents.show", ":id") }}'.replace(':id', id))
                 .done(function(response) {
-                    if (response.success) {
-                        // Show document details modal or redirect
-                        console.log('Document details:', response.document);
+                    if (!response.success) {
+                        Swal.fire('Error', response.message || 'Unable to load document details.', 'error');
+                        return;
                     }
+
+                    const doc = response.document || {};
+
+                    // Fill modal fields
+                    jq('#view-doc-title').text(doc.title || doc.file_name || 'Document');
+                    jq('#view-doc-code').text(doc.code || '');
+
+                    const typeLabel = (doc.document_type || '').replace('_', ' ');
+                    jq('#view-doc-type').text(typeLabel ? typeLabel.charAt(0).toUpperCase() + typeLabel.slice(1) : '');
+
+                    // Status badge
+                    let statusClass = '';
+                    if (doc.status === 'active') {
+                        statusClass = 'bg-green-100 text-green-700';
+                    } else if (doc.status === 'archived') {
+                        statusClass = 'bg-yellow-100 text-yellow-700';
+                    }
+                    jq('#view-doc-status').attr('class', 'inline-flex items-center px-2 py-0.5 rounded-full text-[11px] ' + statusClass)
+                        .text(doc.status ? doc.status.charAt(0).toUpperCase() + doc.status.slice(1) : '');
+
+                    // Relations
+                    jq('#view-doc-uploader').text(doc.uploader?.name || 'Unknown uploader');
+                    jq('#view-doc-company').text(doc.company?.name || 'No company');
+                    jq('#view-doc-department').text(doc.department?.name || 'No department');
+
+                    // Dates
+                    jq('#view-doc-created').text(doc.created_at || '-');
+
+                    if (doc.expiry_date) {
+                        let expiryText = doc.expiry_date;
+                        if (typeof doc.days_until_expiry === 'number') {
+                            expiryText += ` (${doc.days_until_expiry <= 0 ? 'Expired' : doc.days_until_expiry + ' days left'})`;
+                        }
+                        jq('#view-doc-expiry').text(expiryText);
+                    } else {
+                        jq('#view-doc-expiry').text('No expiry date');
+                    }
+
+                    // Size
+                    jq('#view-doc-size').text(doc.file_size_formatted || '-');
+
+                    // Description
+                    jq('#view-doc-description').text(doc.description || '-');
+
+                    // Access level info
+                    let accessLabel = doc.access_level ? doc.access_level.charAt(0).toUpperCase() + doc.access_level.slice(1) : 'Unknown';
+                    jq('#view-doc-access').text('Access: ' + accessLabel);
+
+                    // Download button
+                    const downloadUrl = doc.file_url || '#';
+                    jq('#view-doc-download-btn')
+                        .off('click')
+                        .on('click', function () {
+                            if (downloadUrl && downloadUrl !== '#') {
+                                window.open(downloadUrl, '_blank');
+                            }
+                        });
+
+                    // Show modal (via data-tw attributes)
+                    const modalEl = document.getElementById('view-document-modal');
+                    if (modalEl) {
+                        // Trigger the same opening mechanism as other modals
+                        modalEl.classList.add('show');
+                    }
+                })
+                .fail(function(xhr) {
+                    const msg = xhr.responseJSON?.message || 'Unable to load document details.';
+                    Swal.fire('Error', msg, 'error');
                 });
         };
 

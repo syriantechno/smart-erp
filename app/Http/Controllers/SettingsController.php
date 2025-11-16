@@ -139,7 +139,8 @@ class SettingsController extends Controller
             'accent_color' => 'nullable|string|regex:/^#[a-fA-F0-9]{6}$/',
             'font_size' => 'nullable|string|in:small,medium,large,extra-large',
             'sidebar_collapsed' => 'nullable|boolean',
-            'animations_enabled' => 'nullable|boolean',
+            // Allow any value here; we'll normalize it via $request->boolean()
+            'animations_enabled' => 'nullable',
         ]);
 
         // حفظ إعدادات المظهر
@@ -157,11 +158,13 @@ class SettingsController extends Controller
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => 'تم حفظ إعدادات المظهر بنجاح!'
+                'message' => 'Appearance settings updated successfully!',
             ]);
         }
 
-        return redirect()->route('settings.index')->with('success', 'تم حفظ إعدادات المظهر بنجاح!');
+        return redirect()
+            ->route('settings.index')
+            ->with('success', 'Appearance settings updated successfully!');
     }
 
     public function updateAttendance(Request $request)
@@ -263,6 +266,19 @@ class SettingsController extends Controller
             $fieldName = str_replace('.', '_', $key);
             $value = $request->boolean($fieldName);
             Setting::set($key, $value, 'boolean', $description);
+        }
+
+        // Documents expiry reminder days (numeric setting)
+        if ($request->filled('notifications_documents_expiry_reminder_days')) {
+            $days = (int) $request->input('notifications_documents_expiry_reminder_days', 30);
+            // Clamp between 1 and 365 days
+            $days = max(1, min(365, $days));
+            Setting::set(
+                'notifications.documents.expiry_reminder_days',
+                $days,
+                'number',
+                'Days before a document expiry to trigger reminders'
+            );
         }
 
         if ($request->ajax() || $request->wantsJson()) {

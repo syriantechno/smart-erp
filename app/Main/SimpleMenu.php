@@ -17,22 +17,22 @@ class SimpleMenu
                     'dashboard-overview-1' => [
                         'icon' => 'activity',
                         'route_name' => 'dashboard-overview-1',
-                        'title' => 'Overview 1'
+                        'title' => 'General'
                     ],
                     'dashboard-overview-2' => [
                         'icon' => 'activity',
                         'route_name' => 'dashboard-overview-2',
-                        'title' => 'Overview 2'
+                        'title' => 'Projects'
                     ],
                     'dashboard-overview-3' => [
                         'icon' => 'activity',
                         'route_name' => 'dashboard-overview-3',
-                        'title' => 'Overview 3'
+                        'title' => 'Accounting'
                     ],
                     'dashboard-overview-4' => [
                         'icon' => 'activity',
                         'route_name' => 'dashboard-overview-4',
-                        'title' => 'Overview 4'
+                        'title' => 'HR'
                     ]
                 ]
             ],

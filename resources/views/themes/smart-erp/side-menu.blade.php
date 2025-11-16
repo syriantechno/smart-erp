@@ -124,7 +124,7 @@
             </nav>
             <!-- END: Side Menu -->
             <!-- BEGIN: Content -->
-            <div id="smart-main-content" class="flex-1 w-full flex justify-center md:justify-start -mt-20 md:-mt-24 pr-6 pl-6 md:ml-[100px] xl:ml-[260px] relative z-[70]">
+            <div id="smart-main-content" class="flex-1 w-full flex justify-center md:justify-start -mt-24 md:-mt-28 pr-6 pl-6 md:ml-[100px] xl:ml-[260px] relative z-[70]">
                 <div @class([
                     'w-full rounded-[26px] px-4 md:px-8 min-h-[calc(100vh-9rem)] bg-white/95 shadow-sm md:pt-8 pb-10 mt-6 md:mt-4 relative z-10 dark:bg-darkmode-700/95',
                     "before:content-[''] before:w-full before:h-px before:block",

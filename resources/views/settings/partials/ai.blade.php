@@ -9,10 +9,6 @@
                 <x-base.lucide icon="Activity" class="w-4 h-4 mr-2" />
                 Test AI Connection
             </x-base.button>
-            <x-base.button type="submit" form="ai-settings-form" variant="primary">
-                <x-base.lucide icon="Save" class="w-4 h-4 mr-2" />
-                Save AI Settings
-            </x-base.button>
         </div>
     </div>
 
@@ -128,6 +124,18 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <div class="mt-5 flex justify-end">
+            <x-base.button
+                type="submit"
+                form="ai-settings-form"
+                variant="primary"
+                class="w-48"
+            >
+                <x-base.lucide icon="Save" class="w-4 h-4 mr-2 animate-pulse" />
+                Save
+            </x-base.button>
         </div>
     </form>
 </div>
