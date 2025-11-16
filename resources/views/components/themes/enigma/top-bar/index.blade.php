@@ -2,10 +2,24 @@
 
 <!-- BEGIN: Top Bar -->
 <div @class([
-    'h-[200px] md:h-[220px] z-[51] border-b border-white/[0.08] -mx-5 sm:-mx-8 md:-mx-0 px-3 sm:px-8 md:px-10 md:border-b-0 relative md:fixed md:inset-x-0 md:top-0 md:pt-10 md:bg-gradient-to-b md:from-slate-100 md:to-transparent dark:md:from-darkmode-700 top-bar-pattern',
-    'dark:md:from-darkmode-800' => $layout == 'top-menu',
+    'h-[90px] md:h-[100px] z-[10] border-b border-white/[0.08] -mx-5 sm:-mx-8 md:-mx-0 px-3 sm:px-8 md:px-10 md:border-b-0 relative md:pt-6',
 ])>
     <div class="flex items-center">
+
+        {{-- Sidebar collapse toggle (for side-menu layout) --}}
+        @if ($layout === 'side-menu')
+            <button
+                id="smart-sidebar-toggle"
+                type="button"
+                class="mr-3 flex h-8 w-8 items-center justify-center text-white/80 hover:text-white/100"
+                title="Toggle sidebar"
+            >
+                <x-base.lucide
+                    icon="PanelLeft"
+                    class="h-4 w-4"
+                />
+            </button>
+        @endif
 
         <!-- BEGIN: Breadcrumb -->
         <x-base.breadcrumb
