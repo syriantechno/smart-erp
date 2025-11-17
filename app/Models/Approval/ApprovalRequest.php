@@ -1,15 +1,16 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Approval;
 
+use App\Http\Controllers\Setting\NotificationController;
+use App\Models\HR\Department;
+use App\Models\Setting\Company;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use App\Http\Controllers\NotificationController;
-use App\Models\ApprovalTemplate;
-use App\Models\Department;
 
 class ApprovalRequest extends Model
 {
