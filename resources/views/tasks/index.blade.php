@@ -366,44 +366,33 @@
 
             const initialLength = lengthSelect ? parseInt(lengthSelect.value, 10) || 10 : 10;
 
-            const table = window.initDataTable('#tasks-table', {
-                ajax: {
-                    url: '{{ route("tasks.datatable") }}',
-                    type: 'GET',
-                    data: function (d) {
-                        if (filterField) {
-                            d.filter_field = filterField.value || 'all';
-                        }
-                        if (filterType) {
-                            d.filter_type = filterType.value || 'contains';
-                        }
-                        if (filterValue) {
-                            d.filter_value = filterValue.value || '';
-                        }
-                        if (companyFilter) {
-                            d.company_id = companyFilter.value || '';
-                        }
-                        if (departmentFilter) {
-                            d.department_id = departmentFilter.value || '';
-                        }
-                        if (employeeFilter) {
-                            d.employee_id = employeeFilter.value || '';
-                        }
-                        if (statusFilter) {
-                            d.status_filter = statusFilter.value || '';
-                        }
-                        d.page_length = lengthSelect ? parseInt(lengthSelect.value, 10) || initialLength : initialLength;
-                    },
-                    error: function (xhr, textStatus, error) {
-                        console.error('DataTables AJAX error:', textStatus, error, xhr.responseText);
+            const table = window.erpCrud.initDataTable({
+                tableSelector: '#tasks-table',
+                ajaxUrl: '{{ route("tasks.datatable") }}',
+                ajaxData: function (d) {
+                    if (filterField) {
+                        d.filter_field = filterField.value || 'all';
                     }
+                    if (filterType) {
+                        d.filter_type = filterType.value || 'contains';
+                    }
+                    if (filterValue) {
+                        d.filter_value = filterValue.value || '';
+                    }
+                    if (companyFilter) {
+                        d.company_id = companyFilter.value || '';
+                    }
+                    if (departmentFilter) {
+                        d.department_id = departmentFilter.value || '';
+                    }
+                    if (employeeFilter) {
+                        d.employee_id = employeeFilter.value || '';
+                    }
+                    if (statusFilter) {
+                        d.status_filter = statusFilter.value || '';
+                    }
+                    d.page_length = lengthSelect ? parseInt(lengthSelect.value, 10) || initialLength : initialLength;
                 },
-                pageLength: initialLength,
-                lengthChange: false,
-                searching: false,
-                order: [[1, 'asc']], // Order by code column (index 1)
-                dom:
-                    "t<'datatable-footer flex flex-col md:flex-row md:items-center md:justify-between mt-5 gap-4'<'datatable-info text-slate-500'i><'datatable-pagination'p>>",
                 columns: [
                     { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center font-medium', orderable: false },
                     { data: 'code', name: 'code', className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700 whitespace-nowrap' },
@@ -440,28 +429,32 @@
                         searchable: false
                     }
                 ],
-                rawColumns: ['priority', 'status', 'actions'],
-                drawCallback: function () {
-                    if (typeof window.Lucide !== 'undefined') {
-                        window.Lucide.createIcons();
-                    }
+                pageLength: initialLength
+            });
 
-                    // Update task counts
-                    const info = table.page.info();
-                    if (totalTasksCount) {
-                        totalTasksCount.textContent = info.recordsTotal;
-                    }
-                    if (filteredTasksCount) {
-                        filteredTasksCount.textContent = info.recordsDisplay;
-                    }
+            if (!table) return;
 
-                    // Show filter summary if filters are active
-                    const hasFilters = (companyFilter && companyFilter.value) ||
-                                     (departmentFilter && departmentFilter.value) ||
-                                     (employeeFilter && employeeFilter.value) ||
-                                     (statusFilter && statusFilter.value);
+            table.on('draw', function () {
+                if (typeof window.Lucide !== 'undefined') {
+                    window.Lucide.createIcons();
+                }
 
-                    if (hasFilters && info.recordsTotal !== info.recordsDisplay) {
+                // Update task counts
+                const info = table.page.info();
+                if (totalTasksCount) {
+                    totalTasksCount.textContent = info.recordsTotal;
+                }
+                if (filteredTasksCount) {
+                    filteredTasksCount.textContent = info.recordsDisplay;
+                }
+
+                // Show filter summary if filters are active
+                const hasFilters = (companyFilter && companyFilter.value) ||
+                                 (departmentFilter && departmentFilter.value) ||
+                                 (employeeFilter && employeeFilter.value) ||
+                                 (statusFilter && statusFilter.value);
+
+                if (hasFilters && info.recordsTotal !== info.recordsDisplay) {
                         showToast(`Filtered ${info.recordsDisplay} out of ${info.recordsTotal} tasks`, 'success');
                     }
 

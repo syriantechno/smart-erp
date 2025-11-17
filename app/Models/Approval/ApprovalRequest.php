@@ -2,7 +2,7 @@
 
 namespace App\Models\Approval;
 
-use App\Http\Controllers\Setting\NotificationController;
+use App\Http\Controllers\NotificationController;
 use App\Models\HR\Department;
 use App\Models\Setting\Company;
 use App\Models\User;
@@ -129,6 +129,9 @@ class ApprovalRequest extends Model
         return match($this->type) {
             'leave_request' => 'bg-blue-100 text-blue-700',
             'purchase_request' => 'bg-green-100 text-green-700',
+            'purchase_order' => 'bg-emerald-100 text-emerald-700',
+            'invoice' => 'bg-cyan-100 text-cyan-700',
+            'expense' => 'bg-yellow-100 text-yellow-700',
             'expense_claim' => 'bg-yellow-100 text-yellow-700',
             'loan_request' => 'bg-purple-100 text-purple-700',
             'overtime_request' => 'bg-indigo-100 text-indigo-700',
@@ -163,6 +166,9 @@ class ApprovalRequest extends Model
         return match($this->type) {
             'leave_request' => 'Leave Request',
             'purchase_request' => 'Purchase Request',
+            'purchase_order' => 'Purchase Order',
+            'invoice' => 'Invoice',
+            'expense' => 'Expense',
             'expense_claim' => 'Expense Claim',
             'loan_request' => 'Loan Request',
             'overtime_request' => 'Overtime Request',
@@ -261,7 +267,7 @@ class ApprovalRequest extends Model
     protected function onFullyApproved(): void
     {
         // Handle entity-specific logic when the workflow is fully approved
-        if ($this->approvable instanceof Department) {
+        if ($this->approvable instanceof \App\Models\HR\Department) {
             $department = $this->approvable;
             $department->is_active = true;
             $department->save();

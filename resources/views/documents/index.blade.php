@@ -329,16 +329,15 @@
         });
 
         function initializeDataTable() {
-            documentsTable = window.initDataTable('#documents-table', {
-                ajax: {
-                    url: '{{ route("documents.datatable") }}',
-                    data: function(d) {
-                        d.category_id = currentCategoryId === 'uncategorized' ? null : currentCategoryId;
-                        d.type_filter = $('#type-filter').val();
-                        d.status_filter = $('#status-filter').val();
-                        d.access_filter = $('#access-filter').val();
-                        d.search = $('#document-search').val();
-                    }
+            documentsTable = window.erpCrud.initDataTable({
+                tableSelector: '#documents-table',
+                ajaxUrl: '{{ route("documents.datatable") }}',
+                ajaxData: function(d) {
+                    d.category_id = currentCategoryId === 'uncategorized' ? null : currentCategoryId;
+                    d.type_filter = $('#type-filter').val();
+                    d.status_filter = $('#status-filter').val();
+                    d.access_filter = $('#access-filter').val();
+                    d.search = $('#document-search').val();
                 },
                 columns: [
                     { data: 'file_info', name: 'file_info', orderable: false },
@@ -349,20 +348,7 @@
                     { data: 'formatted_date', name: 'formatted_date' },
                     { data: 'actions', name: 'actions', orderable: false, searchable: false }
                 ],
-                pageLength: 25,
-                lengthChange: false,
-                searching: false,
-                responsive: true,
-                dom:
-                    "t<'datatable-footer flex flex-col md:flex-row md:items-center md:justify-between mt-5 gap-4" +
-                    "'<'datatable-info text-slate-500'i><'datatable-pagination'p>>",
-                drawCallback: function () {
-                    if (typeof window.Lucide !== 'undefined') {
-                        window.Lucide.createIcons();
-                    } else if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
-                        lucide.createIcons();
-                    }
-                }
+                pageLength: 25
             });
         }
 

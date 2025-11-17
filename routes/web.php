@@ -250,6 +250,21 @@ Route::middleware('auth')->group(function () {
             Route::put('/{deliveryOrder}', [App\Http\Controllers\Warehouse\DeliveryOrderController::class, 'update'])->name('update');
             Route::delete('/{deliveryOrder}', [App\Http\Controllers\Warehouse\DeliveryOrderController::class, 'destroy'])->name('destroy');
         });
+
+        });
+
+    // Supplier Routes
+    Route::prefix('supplier')->name('supplier.')->group(function () {
+        // Vendors
+        Route::prefix('vendors')->name('vendors.')->group(function () {
+            Route::get('/', [App\Http\Controllers\Supplier\VendorController::class, 'index'])->name('index');
+            Route::get('/datatable', [App\Http\Controllers\Supplier\VendorController::class, 'datatable'])->name('datatable');
+            Route::get('/preview-code', [App\Http\Controllers\Supplier\VendorController::class, 'previewCode'])->name('preview-code');
+            Route::post('/', [App\Http\Controllers\Supplier\VendorController::class, 'store'])->name('store');
+            Route::get('/{vendor}', [App\Http\Controllers\Supplier\VendorController::class, 'show'])->name('show');
+            Route::put('/{vendor}', [App\Http\Controllers\Supplier\VendorController::class, 'update'])->name('update');
+            Route::delete('/{vendor}', [App\Http\Controllers\Supplier\VendorController::class, 'destroy'])->name('destroy');
+        });
     });
 
     // Electronic Mail Routes
@@ -274,43 +289,53 @@ Route::middleware('auth')->group(function () {
 
     // Approval System Routes
     Route::prefix('approval-system')->name('approval-system.')->group(function () {
-        Route::get('/', [App\Http\Controllers\ApprovalController::class, 'index'])->name('index');
-        Route::get('/create', [App\Http\Controllers\ApprovalController::class, 'create'])->name('create');
-        Route::get('/datatable', [App\Http\Controllers\ApprovalController::class, 'datatable'])->name('datatable');
-        Route::post('/', [App\Http\Controllers\ApprovalController::class, 'store'])->name('store');
-        Route::get('/{approvalRequest}', [App\Http\Controllers\ApprovalController::class, 'show'])->name('show');
-        Route::post('/{approvalRequest}/approve', [App\Http\Controllers\ApprovalController::class, 'approve'])->name('approve');
-        Route::post('/{approvalRequest}/reject', [App\Http\Controllers\ApprovalController::class, 'reject'])->name('reject');
-        Route::get('/stats', [App\Http\Controllers\ApprovalController::class, 'getStats'])->name('stats');
+        Route::get('/', [App\Http\Controllers\Approval\ApprovalController::class, 'index'])->name('index');
+        Route::get('/create', [App\Http\Controllers\Approval\ApprovalController::class, 'create'])->name('create');
+        Route::get('/datatable', [App\Http\Controllers\Approval\ApprovalController::class, 'datatable'])->name('datatable');
+        Route::post('/', [App\Http\Controllers\Approval\ApprovalController::class, 'store'])->name('store');
+        Route::get('/{approvalRequest}', [App\Http\Controllers\Approval\ApprovalController::class, 'show'])->name('show');
+        Route::post('/{approvalRequest}/approve', [App\Http\Controllers\Approval\ApprovalController::class, 'approve'])->name('approve');
+        Route::post('/{approvalRequest}/reject', [App\Http\Controllers\Approval\ApprovalController::class, 'reject'])->name('reject');
+        Route::get('/stats', [App\Http\Controllers\Approval\ApprovalController::class, 'getStats'])->name('stats');
+        
+        // Templates Management
+        Route::prefix('templates')->name('templates.')->group(function () {
+            Route::get('/', [App\Http\Controllers\Approval\ApprovalTemplateController::class, 'index'])->name('index');
+            Route::get('/datatable', [App\Http\Controllers\Approval\ApprovalTemplateController::class, 'datatable'])->name('datatable');
+            Route::post('/', [App\Http\Controllers\Approval\ApprovalTemplateController::class, 'store'])->name('store');
+            Route::get('/{id}', [App\Http\Controllers\Approval\ApprovalTemplateController::class, 'show'])->name('show');
+            Route::put('/{id}', [App\Http\Controllers\Approval\ApprovalTemplateController::class, 'update'])->name('update');
+            Route::delete('/{id}', [App\Http\Controllers\Approval\ApprovalTemplateController::class, 'destroy'])->name('destroy');
+        });
     });
 
     // Chat System Routes
     Route::prefix('chat')->name('chat.')->group(function () {
-        Route::get('/', [App\Http\Controllers\ChatController::class, 'index'])->name('index');
-        Route::get('/conversations', [App\Http\Controllers\ChatController::class, 'getConversations'])->name('conversations');
-        Route::get('/messages/{conversationId}', [App\Http\Controllers\ChatController::class, 'getMessages'])->name('messages');
-        Route::post('/messages', [App\Http\Controllers\ChatController::class, 'sendMessage'])->name('send-message');
-        Route::post('/conversations', [App\Http\Controllers\ChatController::class, 'startConversation'])->name('start-conversation');
-        Route::post('/mark-read/{conversationId}', [App\Http\Controllers\ChatController::class, 'markAsRead'])->name('mark-read');
-        Route::get('/unread-count', [App\Http\Controllers\ChatController::class, 'getUnreadCount'])->name('unread-count');
+        Route::get('/', [App\Http\Controllers\Chat\ChatController::class, 'index'])->name('index');
+        Route::get('/conversations', [App\Http\Controllers\Chat\ChatController::class, 'getConversations'])->name('conversations');
+        Route::get('/messages/{conversationId}', [App\Http\Controllers\Chat\ChatController::class, 'getMessages'])->name('messages');
+        Route::post('/messages', [App\Http\Controllers\Chat\ChatController::class, 'sendMessage'])->name('send-message');
+        Route::post('/conversations', [App\Http\Controllers\Chat\ChatController::class, 'startConversation'])->name('start-conversation');
+        Route::post('/mark-read/{conversationId}', [App\Http\Controllers\Chat\ChatController::class, 'markAsRead'])->name('mark-read');
+        Route::get('/unread-count', [App\Http\Controllers\Chat\ChatController::class, 'getUnreadCount'])->name('unread-count');
     });
 
     // AI System Routes
     Route::prefix('ai')->name('ai.')->group(function () {
-        Route::get('/', [App\Http\Controllers\AiController::class, 'index'])->name('index');
-        Route::get('/chat', [App\Http\Controllers\AiController::class, 'chat'])->name('chat');
-        Route::get('/datatable', [App\Http\Controllers\AiController::class, 'datatable'])->name('datatable');
-        Route::get('/admin-users', [App\Http\Controllers\AiController::class, 'adminUsers'])->name('admin-users');
-        Route::get('/admin-recent', [App\Http\Controllers\AiController::class, 'adminRecent'])->name('admin-recent');
-        Route::post('/interact', [App\Http\Controllers\AiController::class, 'interact'])->name('interact');
-        Route::get('/interactions/{aiInteraction}', [App\Http\Controllers\AiController::class, 'show'])->name('show');
-        Route::post('/interactions/{aiInteraction}/retry', [App\Http\Controllers\AiController::class, 'retry'])->name('retry');
-        Route::get('/automations', [App\Http\Controllers\AiController::class, 'automations'])->name('automations');
-        Route::post('/automations', [App\Http\Controllers\AiController::class, 'createAutomation'])->name('create-automation');
-        Route::get('/generated-content', [App\Http\Controllers\AiController::class, 'generatedContent'])->name('generated-content');
-        Route::post('/generated-content/{content}/rate', [App\Http\Controllers\AiController::class, 'rateContent'])->name('rate-content');
-        Route::get('/analytics', [App\Http\Controllers\AiController::class, 'analytics'])->name('analytics');
-        Route::get('/available', [App\Http\Controllers\AiController::class, 'isAvailable'])->name('available');
+        Route::get('/', [App\Http\Controllers\Chat\AiController::class, 'index'])->name('index');
+        Route::get('/chat', [App\Http\Controllers\Chat\AiController::class, 'chat'])->name('chat');
+        Route::get('/datatable', [App\Http\Controllers\Chat\AiController::class, 'datatable'])->name('datatable');
+        Route::get('/admin-users', [App\Http\Controllers\Chat\AiController::class, 'adminUsers'])->name('admin-users');
+        Route::get('/admin-recent', [App\Http\Controllers\Chat\AiController::class, 'adminRecent'])->name('admin-recent');
+        Route::post('/interact', [App\Http\Controllers\Chat\AiController::class, 'interact'])->name('interact');
+        Route::get('/interactions/{aiInteraction}', [App\Http\Controllers\Chat\AiController::class, 'show'])->name('show');
+        Route::post('/interactions/{aiInteraction}/retry', [App\Http\Controllers\Chat\AiController::class, 'retry'])->name('retry');
+        Route::get('/automations', [App\Http\Controllers\Chat\AiController::class, 'automations'])->name('automations');
+        Route::post('/automations', [App\Http\Controllers\Chat\AiController::class, 'createAutomation'])->name('create-automation');
+        Route::get('/generated-content', [App\Http\Controllers\Chat\AiController::class, 'generatedContent'])->name('generated-content');
+        Route::post('/generated-content/{content}/rate', [App\Http\Controllers\Chat\AiController::class, 'rateContent'])->name('rate-content');
+        Route::get('/analytics', [App\Http\Controllers\Chat\AiController::class, 'analytics'])->name('analytics');
+        Route::get('/available', [App\Http\Controllers\Chat\AiController::class, 'isAvailable'])->name('available');
     });
 
     // Accounting Routes (Chart of Accounts & Journal Entries)
@@ -352,20 +377,20 @@ Route::middleware('auth')->group(function () {
 
     // Document Management Routes
     Route::prefix('documents')->name('documents.')->group(function () {
-        Route::get('/', [App\Http\Controllers\DocumentController::class, 'index'])->name('index');
-        Route::get('/stats', [App\Http\Controllers\DocumentController::class, 'stats'])->name('stats');
-        Route::get('/categories', [App\Http\Controllers\DocumentController::class, 'categories'])->name('categories');
-        Route::get('/datatable', [App\Http\Controllers\DocumentController::class, 'datatable'])->name('datatable');
-        Route::get('/create', [App\Http\Controllers\DocumentController::class, 'create'])->name('create');
-        Route::post('/', [App\Http\Controllers\DocumentController::class, 'store'])->name('store');
-        Route::get('/{document}', [App\Http\Controllers\DocumentController::class, 'show'])->name('show');
-        Route::put('/{document}', [App\Http\Controllers\DocumentController::class, 'update'])->name('update');
-        Route::delete('/{document}', [App\Http\Controllers\DocumentController::class, 'destroy'])->name('destroy');
+        Route::get('/', [App\Http\Controllers\Document\DocumentController::class, 'index'])->name('index');
+        Route::get('/stats', [App\Http\Controllers\Document\DocumentController::class, 'stats'])->name('stats');
+        Route::get('/categories', [App\Http\Controllers\Document\DocumentController::class, 'categories'])->name('categories');
+        Route::get('/datatable', [App\Http\Controllers\Document\DocumentController::class, 'datatable'])->name('datatable');
+        Route::get('/create', [App\Http\Controllers\Document\DocumentController::class, 'create'])->name('create');
+        Route::post('/', [App\Http\Controllers\Document\DocumentController::class, 'store'])->name('store');
+        Route::get('/{document}', [App\Http\Controllers\Document\DocumentController::class, 'show'])->name('show');
+        Route::put('/{document}', [App\Http\Controllers\Document\DocumentController::class, 'update'])->name('update');
+        Route::delete('/{document}', [App\Http\Controllers\Document\DocumentController::class, 'destroy'])->name('destroy');
 
         // Category management
-        Route::post('/categories', [App\Http\Controllers\DocumentController::class, 'storeCategory'])->name('store-category');
-        Route::put('/categories/{category}', [App\Http\Controllers\DocumentController::class, 'updateCategory'])->name('update-category');
-        Route::delete('/categories/{category}', [App\Http\Controllers\DocumentController::class, 'destroyCategory'])->name('destroy-category');
+        Route::post('/categories', [App\Http\Controllers\Document\DocumentController::class, 'storeCategory'])->name('store-category');
+        Route::put('/categories/{category}', [App\Http\Controllers\Document\DocumentController::class, 'updateCategory'])->name('update-category');
+        Route::delete('/categories/{category}', [App\Http\Controllers\Document\DocumentController::class, 'destroyCategory'])->name('destroy-category');
     });
 
     // Manufacturing Routes
@@ -451,7 +476,7 @@ Route::middleware('auth')->group(function () {
         Route::get('point-of-sale-page', 'pointOfSale')->name('point-of-sale');
         Route::get('chat-page', 'chat')->name('chat');
         Route::get('post-page', 'post')->name('post');
-        Route::get('calendar-page', 'calendar')->name('calendar');
+        Route::get('calendar-page', 'calendar')->name('calendar-page');
         Route::get('crud-data-list-page', 'crudDataList')->name('crud-data-list');
         Route::get('crud-form-page', 'crudForm')->name('crud-form');
         Route::get('users-layout-1-page', 'usersLayout1')->name('users-layout-1');

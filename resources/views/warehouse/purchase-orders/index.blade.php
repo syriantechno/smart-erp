@@ -133,15 +133,25 @@
                 <div class="grid grid-cols-12 gap-4 gap-y-4">
                     <div class="col-span-12 md:col-span-6">
                         <x-base.form-label for="create-po-code">Code</x-base.form-label>
-                        <x-base.form-input
-                            id="create-po-code"
-                            name="code"
-                            type="text"
-                            class="w-full"
-                            placeholder="PO code"
-                            required
-                            readonly
-                        />
+                        <div class="flex gap-2">
+                            <x-base.form-input
+                                id="create-po-code"
+                                name="code"
+                                type="text"
+                                class="flex-1"
+                                placeholder="PO code"
+                                required
+                                readonly
+                            />
+                            <x-base.button
+                                type="button"
+                                variant="outline-secondary"
+                                onclick="refreshPurchaseOrderCode()"
+                                title="Refresh Code"
+                            >
+                                <x-base.lucide icon="refresh-cw" class="w-4 h-4" />
+                            </x-base.button>
+                        </div>
                     </div>
 
                     <div class="col-span-12 md:col-span-6">
@@ -299,8 +309,6 @@
                             if (typeof window.showError === 'function') {
                                 window.showError(errorMessage);
                             }
-                                text: errorMessage
-                            });
                         },
                         complete: function() {
                             submitBtn.prop('disabled', false).html(originalText);
@@ -313,6 +321,9 @@
             });
         </script>
     </x-modal.form>
+
+    <!-- View Purchase Order Modal -->
+    @include('warehouse.purchase-orders.modals.view')
 @endsection
 
 @include('components.datatable.scripts')
@@ -338,32 +349,41 @@
                 const openBtn = document.getElementById('open-create-po-modal');
                 if (openBtn) {
                     openBtn.addEventListener('click', function () {
-                        const $ = jq;
-                        const codeInput = document.getElementById('create-po-code');
-                        if (!codeInput) {
-                            return;
-                        }
-
-                        $.get('{{ route("warehouse.purchase-orders.preview-code") }}')
-                            .done(function (response) {
-                                if (response && response.code) {
-                                    codeInput.value = response.code;
-                                }
-                            });
+                        window.refreshPurchaseOrderCode();
                     });
                 }
             });
         });
 
-        function initializePurchaseOrdersTable() {
-            purchaseOrdersTable = window.initDataTable('#purchase-orders-table', {
-                ajax: {
-                    url: '{{ route("warehouse.purchase-orders.datatable") }}',
-                    data: function(d) {
-                        const jq = window.jQuery || window.$;
-                        d.status = jq ? jq('#po-status-filter').val() : '';
-                        d.search_value = jq ? jq('#po-search-filter').val() : '';
+        // Global function to refresh PO code
+        window.refreshPurchaseOrderCode = function() {
+            const codeInput = document.getElementById('create-po-code');
+            if (!codeInput) return;
+            
+            fetch('{{ route("warehouse.purchase-orders.preview-code") }}')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to preview PO code');
                     }
+                    return response.json();
+                })
+                .then(data => {
+                    const code = data.code || '-';
+                    codeInput.value = code;
+                })
+                .catch(() => {
+                    codeInput.value = '-';
+                });
+        };
+
+        function initializePurchaseOrdersTable() {
+            purchaseOrdersTable = window.erpCrud.initDataTable({
+                tableSelector: '#purchase-orders-table',
+                ajaxUrl: '{{ route("warehouse.purchase-orders.datatable") }}',
+                ajaxData: function(d) {
+                    const jq = window.jQuery || window.$;
+                    d.status = jq ? jq('#po-status-filter').val() : '';
+                    d.search_value = jq ? jq('#po-search-filter').val() : '';
                 },
                 columns: [
                     { data: 'code', name: 'code' },
@@ -375,19 +395,7 @@
                     { data: 'status_badge', name: 'status_badge', orderable: false },
                     { data: 'actions', name: 'actions', orderable: false, searchable: false }
                 ],
-                pageLength: 25,
-                lengthChange: false,
-                searching: false,
-                order: [[0, 'desc']],
-                responsive: true,
-                dom: "t<'datatable-footer flex flex-col md:flex-row md:items-center md:justify-between mt-5 gap-4'<'datatable-info text-slate-500'i><'datatable-pagination'p>>",
-                drawCallback: function () {
-                    if (typeof window.Lucide !== 'undefined') {
-                        window.Lucide.createIcons();
-                    } else if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
-                        lucide.createIcons();
-                    }
-                }
+                pageLength: 25
             });
         }
 
@@ -423,6 +431,53 @@
             jq('#po-status-filter').val('');
             jq('#po-search-filter').val('');
             applyPoFilters();
+        }
+
+        // viewPurchaseOrder function is now in modals/view.blade.php
+
+        function editPurchaseOrder(id) {
+            // TODO: Implement edit functionality
+            Swal.fire({
+                title: 'Edit Purchase Order',
+                text: 'Edit functionality will be implemented soon',
+                icon: 'info'
+            });
+        }
+
+        function deletePurchaseOrder(id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const jq = window.jQuery || window.$;
+                    if (!jq) return;
+
+                    jq.ajax({
+                        url: '{{ route("warehouse.purchase-orders.destroy", ":id") }}'.replace(':id', id),
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': jq('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire('Deleted!', response.message, 'success');
+                                if (purchaseOrdersTable) {
+                                    purchaseOrdersTable.ajax.reload();
+                                }
+                            }
+                        },
+                        error: function(xhr) {
+                            Swal.fire('Error!', xhr.responseJSON?.message || 'Failed to delete', 'error');
+                        }
+                    });
+                }
+            });
         }
     </script>
 @endpush

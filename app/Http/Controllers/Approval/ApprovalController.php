@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Approval;
 
 use App\Http\Controllers\Controller;
-use App\Models\ApprovalRequest;
-use App\Models\ApprovalLog;
-use App\Models\Department;
-use App\Models\Company;
+use App\Models\Approval\ApprovalRequest;
+use App\Models\Approval\ApprovalLog;
+use App\Models\HR\Department;
+use App\Models\Setting\Company;
 use App\Models\User;
 use App\Services\DocumentCodeGenerator;
 use Illuminate\Http\JsonResponse;

@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\PrefixSetting;
+use App\Models\Setting\PrefixSetting;
 
 class PrefixSettingsSeeder extends Seeder
 {
@@ -37,6 +37,7 @@ class PrefixSettingsSeeder extends Seeder
             ['document_type' => 'quotations', 'prefix' => 'QUO'],
             ['document_type' => 'receipts', 'prefix' => 'REC'],
             ['document_type' => 'projects', 'prefix' => 'PRJ'],
+            ['document_type' => 'vendors', 'prefix' => 'VND'],
         ];
 
         foreach ($documentTypes as $type) {

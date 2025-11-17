@@ -356,11 +356,9 @@
         });
 
         function initializeCategoriesDataTable() {
-            categoriesTable = window.initDataTable('#categories-table', {
-                ajax: {
-                    url: @json(route('warehouse.categories.datatable')),
-                    type: 'GET',
-                },
+            categoriesTable = window.erpCrud.initDataTable({
+                tableSelector: '#categories-table',
+                ajaxUrl: @json(route('warehouse.categories.datatable')),
                 columns: [
                     { data: 'code', name: 'code' },
                     { data: 'name', name: 'name' },
@@ -368,24 +366,10 @@
                     { data: 'status_badge', name: 'status_badge', orderable: false, searchable: false },
                     { data: 'actions', name: 'actions', orderable: false, searchable: false }
                 ],
-                pageLength: 25,
-                lengthChange: false,
-                searching: false,
-                dom:
-                    "t<'datatable-footer flex flex-col md:flex-row md:items-center md:justify-between mt-5 gap-4'<'datatable-info text-slate-500'i><'datatable-pagination'p>>",
+                pageLength: 25
             });
 
             window.categoriesTable = categoriesTable;
-
-            if (!categoriesTable) {
-                return;
-            }
-
-            categoriesTable.on('draw', function () {
-                if (typeof window.lucide !== 'undefined' && window.lucide.createIcons) {
-                    window.lucide.createIcons();
-                }
-            });
         }
 
         window.editCategory = function(id) {

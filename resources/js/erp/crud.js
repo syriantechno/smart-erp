@@ -46,6 +46,14 @@ window.erpCrud = {
             searching: false,
             dom:
                 "t<'datatable-footer flex flex-col md:flex-row md:items-center md:justify-between mt-5 gap-4'<'datatable-info text-slate-500'i><'datatable-pagination'p>>",
+            drawCallback: function () {
+                // Re-render Lucide icons after table draw
+                if (typeof window.Lucide !== 'undefined') {
+                    window.Lucide.createIcons();
+                } else if (typeof window.lucide !== 'undefined' && typeof window.lucide.createIcons === 'function') {
+                    window.lucide.createIcons();
+                }
+            }
         });
     },
 

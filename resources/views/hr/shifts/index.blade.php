@@ -132,15 +132,6 @@
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
     <script>
-    // Silence console output ONLY within this script scope
-    const console = {
-        log: () => {},
-        error: () => {},
-        warn: () => {},
-        info: () => {},
-        debug: () => {},
-    };
-
     document.addEventListener('DOMContentLoaded', function () {
         const filterField = document.getElementById('shifts-filter-field');
         const filterType = document.getElementById('shifts-filter-type');
@@ -152,272 +143,150 @@
         const refreshBtn = document.getElementById('shifts-refresh');
 
         const initialLength = lengthSelect ? parseInt(lengthSelect.value, 10) || 10 : 10;
-        let tableInstance = null;
 
-        function setupDataTable() {
-            const $ = window.jQuery;
-            if (!$ || typeof $.fn === 'undefined' || typeof $.fn.DataTable === 'undefined') {
-                setTimeout(setupDataTable, 100);
-                return;
-            }
-
-            tableInstance = $('#shifts-table').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url: '{{ route("hr.shifts.datatable") }}',
-                    type: 'GET',
-                    data: function (d) {
-                        if (filterField) {
-                            d.filter_field = filterField.value || 'all';
-                        }
-                        if (filterType) {
-                            d.filter_type = filterType.value || 'contains';
-                        }
-                        if (filterValue) {
-                            d.filter_value = filterValue.value || '';
-                        }
+        const table = window.erpCrud.initDataTable({
+            tableSelector: '#shifts-table',
+            ajaxUrl: '{{ route("hr.shifts.datatable") }}',
+            ajaxData: function (d) {
+                if (filterField) {
+                    d.filter_field = filterField.value || 'all';
+                }
+                if (filterType) {
+                    d.filter_type = filterType.value || 'contains';
+                }
+                if (filterValue) {
+                    d.filter_value = filterValue.value || '';
+                }
+            },
+            columns: [
+                { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center font-medium', orderable: false },
+                { data: 'code', name: 'code', className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700 whitespace-nowrap' },
+                { data: 'name', name: 'name', className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700' },
+                { data: 'formatted_time', name: 'formatted_time', className: 'px-5 py-3 border-b dark:border-darkmode-300 whitespace-nowrap' },
+                {
+                    data: 'color',
+                    name: 'color',
+                    className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center',
+                    render: function (data) {
+                        return '<div class="flex items-center justify-center"><div class="w-6 h-6 rounded-full border-2 border-gray-300" style="background-color: ' + data + '"></div></div>';
                     }
                 },
-                pageLength: initialLength,
-                lengthChange: false,
-                searching: false,
-                order: [[2, 'asc']],
-                dom:
-                    "t<'datatable-footer flex flex-col md:flex-row md:items-center md:justify-between mt-5 gap-4'<'datatable-info text-slate-500'i><'datatable-pagination'p>>",
-                columns: [
-                    { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center font-medium', orderable: false },
-                    { data: 'code', name: 'code', className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700 whitespace-nowrap' },
-                    { data: 'name', name: 'name', className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700' },
-                    { data: 'formatted_time', name: 'formatted_time', className: 'px-5 py-3 border-b dark:border-darkmode-300 whitespace-nowrap' },
-                    {
-                        data: 'color',
-                        name: 'color',
-                        className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center',
-                        render: function (data) {
-                            return '<div class="flex items-center justify-center"><div class="w-6 h-6 rounded-full border-2 border-gray-300" style="background-color: ' + data + '"></div></div>';
-                        }
-                    },
-                    { data: 'applicable_text', name: 'applicable_text', className: 'px-5 py-3 border-b dark:border-darkmode-300' },
-                    {
-                        data: 'is_active',
-                        name: 'is_active',
-                        className: 'text-center',
-                        render: function (value) {
-                            var status = Boolean(value);
-                            var badgeClass = status ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
-                            var label = status ? 'Active' : 'Inactive';
-                            return '<span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ' + badgeClass + '">' + label + '</span>';
-                        }
-                    },
-                    {
-                        data: 'actions',
-                        name: 'actions',
-                        className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center',
-                        orderable: false,
-                        searchable: false
+                { data: 'applicable_text', name: 'applicable_text', className: 'px-5 py-3 border-b dark:border-darkmode-300' },
+                {
+                    data: 'is_active',
+                    name: 'is_active',
+                    className: 'text-center',
+                    render: function (value) {
+                        var status = Boolean(value);
+                        var badgeClass = status ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
+                        var label = status ? 'Active' : 'Inactive';
+                        return '<span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ' + badgeClass + '">' + label + '</span>';
                     }
-                ],
-                drawCallback: function () {
-                    // Re-render Lucide icons inside the table after each draw
-                    try {
-                        if (window.lucide && typeof window.lucide.createIcons === 'function') {
-                            window.lucide.createIcons();
-                        } else if (window.Lucide && typeof window.Lucide.createIcons === 'function') {
-                            window.Lucide.createIcons();
-                        }
-                    } catch (e) {
-                        // ignore icon rendering errors to avoid breaking the table
-                    }
+                },
+                {
+                    data: 'actions',
+                    name: 'actions',
+                    className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center',
+                    orderable: false,
+                    searchable: false
+                }
+            ],
+            pageLength: initialLength
+        });
+
+        if (!table) return;
+
+        if (lengthSelect) {
+            lengthSelect.addEventListener('change', function () {
+                const newLength = parseInt(this.value, 10) || initialLength;
+                table.page.len(newLength).draw();
+            });
+        }
+
+        const reloadTable = function () {
+            table.ajax.reload(null, false);
+        };
+
+        if (filterGoBtn) {
+            filterGoBtn.addEventListener('click', reloadTable);
+        }
+
+        if (filterValue) {
+            filterValue.addEventListener('keyup', function (event) {
+                if (event.key === 'Enter') {
+                    reloadTable();
                 }
             });
-
-            bindTableEvents();
         }
 
-        function bindTableEvents() {
-            if (!tableInstance) {
-                return;
-            }
-
-            if (lengthSelect) {
-                lengthSelect.addEventListener('change', function () {
-                    const newLength = parseInt(this.value, 10) || initialLength;
-                    tableInstance.page.len(newLength).draw();
-                });
-            }
-
-            const reloadTable = function () {
-                tableInstance.ajax.reload(null, false);
-            };
-
-            window.reloadTable = reloadTable;
-
-            if (filterGoBtn) {
-                filterGoBtn.addEventListener('click', reloadTable);
-            }
-
-            if (filterValue) {
-                filterValue.addEventListener('keyup', function (event) {
-                    if (event.key === 'Enter') {
-                        reloadTable();
-                    }
-                });
-            }
-
-            if (filterResetBtn) {
-                filterResetBtn.addEventListener('click', function () {
-                    if (filterField) filterField.value = 'all';
-                    if (filterType) filterType.value = 'contains';
-                    if (filterValue) filterValue.value = '';
-                    if (lengthSelect) {
-                        lengthSelect.value = String(initialLength);
-                    }
-                    // After reset, fully reload the page to ensure actions column and icons are restored correctly
-                    window.location.reload();
-                });
-            }
-
-            if (refreshBtn) {
-                refreshBtn.addEventListener('click', reloadTable);
-            }
-
-            if (exportBtn) {
-                exportBtn.addEventListener('click', function () {
-                    try {
-                        const rows = tableInstance.rows({ search: 'applied' }).data().toArray();
-                        if (!rows.length) {
-                            showToast('No data to export', 'error');
-                            return;
-                        }
-
-                        const headers = ['#', 'Code', 'Name', 'Working Hours', 'Color', 'Apply To', 'Status'];
-                        const csvRows = [headers.join(',')];
-
-                        rows.forEach(function (row) {
-                            const csvRow = [
-                                row.DT_RowIndex,
-                                '"' + (row.code || '').replace(/"/g, '""') + '"',
-                                '"' + (row.name || '').replace(/"/g, '""') + '"',
-                                '"' + (row.formatted_time || '').replace(/"/g, '""') + '"',
-                                row.color || '',
-                                '"' + (row.applicable_text || '').replace(/"/g, '""') + '"',
-                                row.is_active ? 'Active' : 'Inactive'
-                            ];
-                            csvRows.push(csvRow.join(','));
-                        });
-
-                        const blob = new Blob(['\ufeff' + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
-                        const link = document.createElement('a');
-                        link.href = URL.createObjectURL(blob);
-                        link.download = `shifts_${new Date().toISOString().split('T')[0]}.csv`;
-                        link.click();
-                        URL.revokeObjectURL(link);
-
-                        showToast('Data exported successfully', 'success');
-                    } catch (error) {
-                        showToast('Failed to export data', 'error');
-                    }
-                });
-            }
+        if (filterResetBtn) {
+            filterResetBtn.addEventListener('click', function () {
+                if (filterField) filterField.value = 'all';
+                if (filterType) filterType.value = 'contains';
+                if (filterValue) filterValue.value = '';
+                if (lengthSelect) {
+                    lengthSelect.value = String(initialLength);
+                    table.page.len(initialLength).draw();
+                }
+                reloadTable();
+            });
         }
 
-        setupDataTable();
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', reloadTable);
+        }
+
+        if (exportBtn) {
+            exportBtn.addEventListener('click', function () {
+                try {
+                    const rows = table.rows({ search: 'applied' }).data().toArray();
+                    if (!rows.length) {
+                        showToast('No data to export', 'error');
+                        return;
+                    }
+
+                    const headers = ['#', 'Code', 'Name', 'Working Hours', 'Color', 'Apply To', 'Status'];
+                    const csvRows = [headers.join(',')];
+
+                    rows.forEach(function (row) {
+                        const csvRow = [
+                            row.DT_RowIndex,
+                            '"' + (row.code || '').replace(/"/g, '""') + '"',
+                            '"' + (row.name || '').replace(/"/g, '""') + '"',
+                            '"' + (row.formatted_time || '').replace(/"/g, '""') + '"',
+                            row.color || '',
+                            '"' + (row.applicable_text || '').replace(/"/g, '""') + '"',
+                            row.is_active ? 'Active' : 'Inactive'
+                        ];
+                        csvRows.push(csvRow.join(','));
+                    });
+
+                    const blob = new Blob(['\ufeff' + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `shifts_${new Date().toISOString().split('T')[0]}.csv`;
+                    link.click();
+                    URL.revokeObjectURL(link);
+
+                    showToast('Data exported successfully', 'success');
+                } catch (error) {
+                    showToast('Failed to export data', 'error');
+                }
+            });
+        }
+
+        window.erpCrud.handleDelete({
+            urlBuilder: function(id) {
+                return `{{ route('hr.shifts.destroy', '') }}/${id}`;
+            },
+            onSuccess: function() {
+                reloadTable();
+            }
+        });
     });
 
-    window.deleteShift = function (id, name) {
-        if (typeof Swal === 'undefined') {
-            // Fallback to native confirm if SweetAlert is not loaded for any reason
-            if (!confirm(`Are you sure you want to delete the shift "${name}"?`)) {
-                return;
-            }
-
-            fetch(`{{ route('hr.shifts.destroy', '') }}/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json',
-                },
-                credentials: 'same-origin',
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showToast(data.message || 'Shift deleted successfully', 'success');
-                        if (window.reloadTable) {
-                            window.reloadTable();
-                        } else {
-                            window.location.reload();
-                        }
-                    } else {
-                        showToast(data.message || 'Failed to delete shift', 'error');
-                    }
-                })
-                .catch(() => {
-                    showToast('An error occurred while deleting', 'error');
-                });
-
-            return;
-        }
-
-        Swal.fire({
-            title: 'Delete Shift',
-            text: `Are you sure you want to delete the shift "${name}"? This action cannot be undone.`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#e11d48',
-            cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Yes, delete',
-            cancelButtonText: 'Cancel',
-        }).then((result) => {
-            if (!result.isConfirmed) {
-                return;
-            }
-
-            fetch(`{{ route('hr.shifts.destroy', '') }}/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json',
-                },
-                credentials: 'same-origin',
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Deleted',
-                            text: data.message || 'Shift deleted successfully',
-                            timer: 1200,
-                            showConfirmButton: false,
-                        });
-                        // بعد الحذف، أعد تحميل الجدول فقط إن أمكن، وإلا أعد تحميل الصفحة
-                        setTimeout(() => {
-                            if (window.reloadTable) {
-                                window.reloadTable();
-                            } else {
-                                window.location.reload();
-                            }
-                        }, 1200);
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: data.message || 'Failed to delete shift',
-                        });
-                    }
-                })
-                .catch(() => {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'An error occurred while deleting',
-                    });
-                });
-        });
+    window.deleteShift = function(id, name) {
+        window.erpDeleteRecord(id, name);
     };
 
     // Simple view handler for now - can be extended to open a modal later
@@ -444,11 +313,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    if (window.reloadTable) {
-                        window.reloadTable();
-                    } else {
-                        location.reload();
-                    }
+                    window.location.reload();
                     showToast(data.message, 'success');
                 } else {
                     showToast(data.message || 'Failed to update shift status', 'error');

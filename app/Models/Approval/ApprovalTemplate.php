@@ -4,38 +4,61 @@ namespace App\Models\Approval;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class ApprovalTemplate extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'name',
-        'entity_type',
-        'action_type',
+        'type',
+        'description',
+        'levels',
         'is_active',
     ];
 
     protected $casts = [
+        'levels' => 'array',
         'is_active' => 'boolean',
     ];
 
-    public function steps(): HasMany
+    // Relationships
+    public function approvalRequests(): HasMany
     {
-        return $this->hasMany(ApprovalTemplateStep::class)->orderBy('step_order');
+        return $this->hasMany(ApprovalRequest::class);
     }
 
+    // Scopes
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
     }
 
-    public function buildLevels(): array
+    public function scopeByType($query, $type)
     {
-        return $this->steps->values()->map(function (ApprovalTemplateStep $step, int $index) {
-            return [
-                'level' => $index + 1,
-                'approver_id' => $step->approver_user_id,
-                'role' => 'Level ' . ($index + 1),
-            ];
-        })->all();
+        return $query->where('type', $type);
+    }
+
+    // Methods
+    public function getFirstApprover()
+    {
+        if (empty($this->levels)) {
+            return null;
+        }
+        return $this->levels[0]['approver_id'] ?? null;
+    }
+
+    public function getTotalLevels(): int
+    {
+        return count($this->levels ?? []);
+    }
+
+    public function getApproverAtLevel(int $level)
+    {
+        if (empty($this->levels) || $level < 1 || $level > count($this->levels)) {
+            return null;
+        }
+        return $this->levels[$level - 1]['approver_id'] ?? null;
     }
 }

@@ -2,10 +2,13 @@
 
 namespace App\Models\Warehouse;
 
+use App\Models\Approval\ApprovalRequest;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class PurchaseOrder extends Model
 {
@@ -50,6 +53,11 @@ class PurchaseOrder extends Model
     public function items(): HasMany
     {
         return $this->hasMany(PurchaseOrderItem::class);
+    }
+
+    public function approvalRequest(): MorphOne
+    {
+        return $this->morphOne(ApprovalRequest::class, 'approvable');
     }
 
     public function getStatusBadgeClass(): string

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Warehouse;
 
 use App\Http\Controllers\Controller;
-use App\Models\PurchaseOrder;
+use App\Models\Approval\ApprovalRequest;
+use App\Models\Approval\ApprovalTemplate;
+use App\Models\Warehouse\PurchaseOrder;
 use App\Services\DocumentCodeGenerator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -73,9 +75,47 @@ class PurchaseOrderController extends Controller
 
         try {
             DB::beginTransaction();
-            PurchaseOrder::create(array_merge($request->all(), ['created_by' => auth()->id()]));
+            
+            // Create Purchase Order
+            $purchaseOrder = PurchaseOrder::create(array_merge($request->all(), ['created_by' => auth()->id()]));
+            
+            // Create Approval Request
+            $template = ApprovalTemplate::where('type', 'purchase_order')
+                ->where('is_active', true)
+                ->first();
+            
+            if ($template) {
+                $approvalRequest = ApprovalRequest::create([
+                    'code' => 'APR-PO-' . $purchaseOrder->id . '-' . time(),
+                    'title' => 'Approval for Purchase Order: ' . $purchaseOrder->code,
+                    'description' => $purchaseOrder->description ?? 'Purchase Order: ' . $purchaseOrder->title,
+                    'type' => 'purchase_order',
+                    'status' => 'pending',
+                    'priority' => 'normal',
+                    'amount' => $purchaseOrder->total_amount,
+                    'requester_id' => auth()->id(),
+                    'approval_template_id' => $template->id,
+                    'approval_levels' => $template->levels,
+                    'current_level' => 1,
+                    'current_approver_id' => $template->getFirstApprover(),
+                    'approvable_type' => PurchaseOrder::class,
+                    'approvable_id' => $purchaseOrder->id,
+                ]);
+                
+                // Send notification to first approver
+                if ($approvalRequest->current_approver_id) {
+                    \App\Http\Controllers\NotificationController::sendToUser(
+                        $approvalRequest->current_approver_id,
+                        'New Purchase Order Approval',
+                        'You have a new purchase order pending your approval: ' . $purchaseOrder->code,
+                        'info',
+                        route('approval-system.index', ['tab' => 'pending-approval'])
+                    );
+                }
+            }
+            
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Purchase order created successfully']);
+            return response()->json(['success' => true, 'message' => 'Purchase order created successfully and sent for approval']);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => 'Failed to create purchase order: ' . $e->getMessage()], 500);
@@ -84,7 +124,12 @@ class PurchaseOrderController extends Controller
 
     public function show(PurchaseOrder $purchaseOrder): JsonResponse
     {
-        $purchaseOrder->load(['createdBy', 'approvedBy', 'items.material']);
+        $purchaseOrder->load([
+            'createdBy', 
+            'approvedBy', 
+            'items.material',
+            'approvalRequest.logs'
+        ]);
         return response()->json(['success' => true, 'purchase_order' => $purchaseOrder]);
     }
 

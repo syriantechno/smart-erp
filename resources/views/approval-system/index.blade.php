@@ -633,25 +633,24 @@
         });
 
         function initializeDataTable() {
-            if (typeof window.initDataTable !== 'function') {
-                console.error('initDataTable helper is not available.');
+            if (typeof window.erpCrud === 'undefined') {
+                console.error('erpCrud is not available.');
                 return;
             }
 
-            approvalTable = window.initDataTable('#approval-requests-table', {
-                ajax: {
-                    url: '{{ route("approval-system.datatable") }}',
-                    data: function(d) {
-                        d.tab = '{{ $currentTab }}';
+            approvalTable = window.erpCrud.initDataTable({
+                tableSelector: '#approval-requests-table',
+                ajaxUrl: '{{ route("approval-system.datatable") }}',
+                ajaxData: function(d) {
+                    d.tab = '{{ $currentTab }}';
 
-                        const typeEl = document.getElementById('type-filter');
-                        const statusEl = document.getElementById('status-filter');
-                        const priorityEl = document.getElementById('priority-filter');
+                    const typeEl = document.getElementById('type-filter');
+                    const statusEl = document.getElementById('status-filter');
+                    const priorityEl = document.getElementById('priority-filter');
 
-                        d.type_filter = typeEl ? typeEl.value : '';
-                        d.status_filter = statusEl ? statusEl.value : '';
-                        d.priority_filter = priorityEl ? priorityEl.value : '';
-                    }
+                    d.type_filter = typeEl ? typeEl.value : '';
+                    d.status_filter = statusEl ? statusEl.value : '';
+                    d.priority_filter = priorityEl ? priorityEl.value : '';
                 },
                 columns: [
                     { data: 'code', name: 'code' },
@@ -665,21 +664,7 @@
                     { data: 'date', name: 'date' },
                     { data: 'actions', name: 'actions', orderable: false, searchable: false }
                 ],
-                pageLength: 25,
-                lengthChange: false,
-                searching: false,
-                order: [[0, 'asc']],
-                dom: "t<'datatable-footer flex flex-col md:flex-row md:items-center md:justify-between mt-5 gap-4'<'datatable-info text-slate-500'i><'datatable-pagination'p>>",
-                buttons: [
-                    {
-                        extend: 'excel',
-                        text: '<i class="w-4 h-4 mr-2" data-lucide="file-spreadsheet"></i> Export Excel',
-                        className: 'btn btn-success',
-                        exportOptions: {
-                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8]
-                        }
-                    }
-                ]
+                pageLength: 25
             });
 
             if (!approvalTable) {
@@ -833,12 +818,16 @@
 
         // Global functions
         window.viewRequest = function(id) {
-            $.get('{{ route("approval-system.show", ":id") }}'.replace(':id', id))
-                .done(function(response) {
+            fetch('{{ route("approval-system.show", ":id") }}'.replace(':id', id))
+                .then(response => response.json())
+                .then(function(response) {
                     if (response.success) {
                         displayRequestDetails(response.request);
                         openModal('view-request-modal');
                     }
+                })
+                .catch(function(error) {
+                    console.error('Error loading request:', error);
                 });
         };
 
@@ -853,13 +842,18 @@
         };
 
         window.submitApproval = function() {
-            const comments = $('#approve-comments').val();
+            const comments = document.getElementById('approve-comments').value;
 
-            $.post('{{ route("approval-system.approve", ":id") }}'.replace(':id', currentRequestId), {
-                comments: comments,
-                _token: '{{ csrf_token() }}'
+            const formData = new FormData();
+            formData.append('comments', comments);
+            formData.append('_token', '{{ csrf_token() }}');
+
+            fetch('{{ route("approval-system.approve", ":id") }}'.replace(':id', currentRequestId), {
+                method: 'POST',
+                body: formData
             })
-            .done(function(response) {
+            .then(response => response.json())
+            .then(function(response) {
                 if (response.success) {
                     if (typeof window.showSuccess === 'function') {
                         window.showSuccess(response.message || 'Request approved successfully');
@@ -872,7 +866,7 @@
                     }
                 }
             })
-            .fail(function() {
+            .catch(function() {
                 if (typeof window.showError === 'function') {
                     window.showError('Failed to approve request');
                 }
@@ -880,8 +874,8 @@
         };
 
         window.submitRejection = function(requestId) {
-            const reason = $('#reject-reason').val();
-            const comments = $('#reject-comments').val();
+            const reason = document.getElementById('reject-reason').value;
+            const comments = document.getElementById('reject-comments').value;
 
             if (!reason.trim()) {
                 if (typeof window.showError === 'function') {
@@ -890,12 +884,17 @@
                 return;
             }
 
-            $.post('{{ route("approval-system.reject", ":id") }}'.replace(':id', currentRequestId), {
-                reason: reason,
-                comments: comments,
-                _token: '{{ csrf_token() }}'
+            const formData = new FormData();
+            formData.append('reason', reason);
+            formData.append('comments', comments);
+            formData.append('_token', '{{ csrf_token() }}');
+
+            fetch('{{ route("approval-system.reject", ":id") }}'.replace(':id', currentRequestId), {
+                method: 'POST',
+                body: formData
             })
-            .done(function(response) {
+            .then(response => response.json())
+            .then(function(response) {
                 if (response.success) {
                     closeModal('reject-modal');
                     approvalTable.ajax.reload();
@@ -975,3 +974,5 @@
         }
     </script>
 @endpush
+
+@include('components.datatable.scripts')

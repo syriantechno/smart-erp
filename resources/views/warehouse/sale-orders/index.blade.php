@@ -145,15 +145,14 @@
         });
 
         function initializeSaleOrdersTable() {
-            saleOrdersTable = window.initDataTable('#sale-orders-table', {
-                ajax: {
-                    url: '{{ route("warehouse.sale-orders.datatable") }}',
-                    data: function(d) {
-                        const jq = window.jQuery || window.$;
-                        d.status = jq ? jq('#so-status-filter').val() : '';
-                        d.warehouse_id = jq ? jq('#so-warehouse-filter').val() : '';
-                        d.search_value = jq ? jq('#so-search-filter').val() : '';
-                    }
+            saleOrdersTable = window.erpCrud.initDataTable({
+                tableSelector: '#sale-orders-table',
+                ajaxUrl: '{{ route("warehouse.sale-orders.datatable") }}',
+                ajaxData: function(d) {
+                    const jq = window.jQuery || window.$;
+                    d.status = jq ? jq('#so-status-filter').val() : '';
+                    d.warehouse_id = jq ? jq('#so-warehouse-filter').val() : '';
+                    d.search_value = jq ? jq('#so-search-filter').val() : '';
                 },
                 columns: [
                     { data: 'code', name: 'code' },
@@ -165,19 +164,7 @@
                     { data: 'status_badge', name: 'status_badge', orderable: false },
                     { data: 'actions', name: 'actions', orderable: false, searchable: false }
                 ],
-                pageLength: 25,
-                lengthChange: false,
-                searching: false,
-                order: [[0, 'desc']],
-                responsive: true,
-                dom: "t<'datatable-footer flex flex-col md:flex-row md:items-center md:justify-between mt-5 gap-4'<'datatable-info text-slate-500'i><'datatable-pagination'p>>",
-                drawCallback: function () {
-                    if (typeof window.Lucide !== 'undefined') {
-                        window.Lucide.createIcons();
-                    } else if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
-                        lucide.createIcons();
-                    }
-                }
+                pageLength: 25
             });
         }
 

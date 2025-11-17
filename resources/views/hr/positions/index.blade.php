@@ -252,31 +252,21 @@
 
         const initialLength = lengthSelect ? parseInt(lengthSelect.value, 10) || 25 : 25;
 
-        const table = window.initDataTable('#positions-table', {
-            ajax: {
-                url: @json(route('hr.positions.datatable')),
-                type: 'GET',
-                data: function (d) {
-                    if (filterField) {
-                        d.filter_field = filterField.value || 'all';
-                    }
-                    if (filterType) {
-                        d.filter_type = filterType.value || 'contains';
-                    }
-                    if (filterValue) {
-                        d.filter_value = filterValue.value || '';
-                    }
-                    d.page_length = lengthSelect ? parseInt(lengthSelect.value, 10) || initialLength : initialLength;
-                },
-                error: function (xhr, textStatus, error) {
-                    console.error('DataTables AJAX error:', textStatus, error, xhr.responseText);
+        const table = window.erpCrud.initDataTable({
+            tableSelector: '#positions-table',
+            ajaxUrl: @json(route('hr.positions.datatable')),
+            ajaxData: function (d) {
+                if (filterField) {
+                    d.filter_field = filterField.value || 'all';
                 }
+                if (filterType) {
+                    d.filter_type = filterType.value || 'contains';
+                }
+                if (filterValue) {
+                    d.filter_value = filterValue.value || '';
+                }
+                d.page_length = lengthSelect ? parseInt(lengthSelect.value, 10) || initialLength : initialLength;
             },
-            pageLength: initialLength,
-            lengthChange: false,
-            searching: false,
-            dom:
-                "t<'datatable-footer flex flex-col md:flex-row md:items-center md:justify-between mt-5 gap-4'<'datatable-info text-slate-500'i><'datatable-pagination'p>>",
             columns: [
                 {
                     data: 'DT_RowIndex',
@@ -334,16 +324,7 @@
                     searchable: false
                 }
             ],
-            drawCallback: function () {
-                if (typeof window.Lucide !== 'undefined') {
-                    window.Lucide.createIcons();
-                }
-
-                // Re-initialize modals after DataTable redraw
-                if (typeof window.Tw !== 'undefined' && window.Tw.createModals) {
-                    window.Tw.createModals();
-                }
-            }
+            pageLength: initialLength
         });
 
         if (!table) {
@@ -396,63 +377,14 @@
             }
         };
 
-        const createForm = document.getElementById('create-position-form');
-        const createModal = document.getElementById('create-position-modal');
-
-        if (createForm) {
-            createForm.addEventListener('submit', function (event) {
-                event.preventDefault();
-
-                const formData = new FormData(createForm);
-
-                fetch(createForm.action, {
-                    method: 'POST',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    },
-                    body: formData,
-                })
-                    .then(async (response) => {
-                        if (response.ok) {
-                            return response.json();
-                        }
-
-                        if (response.status === 422) {
-                            const data = await response.json();
-                            const errors = data.errors || {};
-                            const firstError = Object.values(errors)[0];
-                            if (firstError) {
-                                showToast(Array.isArray(firstError) ? firstError[0] : firstError, 'error');
-                            } else {
-                                showToast(data.message || 'Validation error', 'error');
-                            }
-                            throw new Error('validation');
-                        }
-
-                        throw new Error('request');
-                    })
-                    .then((data) => {
-                        if (data.success) {
-                            showToast(data.message || 'Position created successfully', 'success');
-                            createForm.reset();
-                            refreshPositionCode();
-                            closeModal(createModal);
-                            reloadTable();
-                        } else {
-                            showToast(data.message || 'Failed to create position', 'error');
-                        }
-                    })
-                    .catch((error) => {
-                        if (error.message === 'validation') {
-                            return;
-                        }
-                        console.error('Position create error:', error);
-                        showToast('An error occurred while saving the position', 'error');
-                    });
-            });
-        }
+        window.erpCrud.handleCreateForm({
+            formSelector: '#create-position-form',
+            modalSelector: '#create-position-modal',
+            onSuccess: function() {
+                refreshPositionCode();
+                reloadTable();
+            }
+        });
 
         if (filterGoBtn) {
             filterGoBtn.addEventListener('click', reloadTable);
@@ -569,110 +501,25 @@
             }
         };
 
-        const editForm = document.getElementById('edit-position-form');
-        const editModal = document.getElementById('edit-position-modal');
+        window.erpCrud.handleEditForm({
+            formSelector: '#edit-position-form',
+            modalSelector: '#edit-position-modal',
+            onSuccess: function() {
+                reloadTable();
+            }
+        });
 
-        if (editForm) {
-            editForm.addEventListener('submit', function (event) {
-                event.preventDefault();
+        window.erpCrud.handleDelete({
+            urlBuilder: function(id) {
+                return `{{ route('hr.positions.destroy', '') }}/${id}`;
+            },
+            onSuccess: function() {
+                reloadTable();
+            }
+        });
 
-                const formData = new FormData(editForm);
-
-                fetch(editForm.action, {
-                    method: 'POST',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    },
-                    body: formData,
-                })
-                    .then(async (response) => {
-                        if (response.ok) {
-                            return response.json();
-                        }
-
-                        if (response.status === 422) {
-                            const data = await response.json();
-                            const errors = data.errors || {};
-                            const firstError = Object.values(errors)[0];
-                            if (firstError) {
-                                showToast(Array.isArray(firstError) ? firstError[0] : firstError, 'error');
-                            } else {
-                                showToast(data.message || 'Validation error', 'error');
-                            }
-                            throw new Error('validation');
-                        }
-
-                        throw new Error('request');
-                    })
-                    .then((data) => {
-                        if (data.success) {
-                            showToast(data.message || 'Position updated successfully', 'success');
-                            closeModal(editModal);
-                            reloadTable();
-                        } else {
-                            showToast(data.message || 'Failed to update position', 'error');
-                        }
-                    })
-                    .catch((error) => {
-                        if (error.message === 'validation') {
-                            return;
-                        }
-                        console.error('Position update error:', error);
-                        showToast('An error occurred while updating the position', 'error');
-                    });
-            });
-        }
-
-        window.deletePosition = function (id, title) {
-            Swal.fire({
-                title: 'Delete Position?',
-                html: `Are you sure you want to delete <strong>"${title}"</strong>?<br>This action cannot be undone.`,
-                icon: 'warning',
-                iconColor: '#ef4444',
-                showCancelButton: true,
-                confirmButtonColor: '#dc2626',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'Cancel',
-                background: '#ffffff',
-                customClass: {
-                    popup: 'rounded-xl shadow-2xl',
-                    confirmButton: 'px-6 py-2 rounded-lg font-semibold',
-                    cancelButton: 'px-6 py-2 rounded-lg font-semibold'
-                },
-                showClass: {
-                    popup: 'animate__animated animate__fadeInDown animate__faster'
-                },
-                hideClass: {
-                    popup: 'animate__animated animate__fadeOutUp animate__faster'
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    fetch(`{{ route('hr.positions.destroy', '') }}/${id}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'application/json',
-                        },
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                reloadTable();
-                                showToast(data.message || 'Position deleted successfully', 'success');
-                            } else {
-                                showToast(data.message || 'Failed to delete position', 'error');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            showToast('An error occurred while deleting the position', 'error');
-                        });
-                }
-            });
+        window.deletePosition = function(id, title) {
+            window.erpDeleteRecord(id, title);
         };
     });
     </script>

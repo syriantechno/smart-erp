@@ -286,7 +286,7 @@ class NotificationController extends Controller
     /**
      * Send notification when an employee document is approaching expiry.
      */
-    public static function employeeDocumentExpiring(\App\Models\EmployeeDocument $employeeDocument): void
+    public static function employeeDocumentExpiring(\App\Models\HR\EmployeeDocument $employeeDocument): void
     {
         if (!function_exists('setting')) {
             return;
@@ -324,7 +324,7 @@ class NotificationController extends Controller
     /**
      * Send notification when position is created.
      */
-    public static function positionCreated(\App\Models\Position $position): void
+    public static function positionCreated(\App\Models\HR\Position $position): void
     {
         if (!function_exists('setting') || !setting('notifications.position.created', true)) {
             return;
@@ -341,7 +341,7 @@ class NotificationController extends Controller
     /**
      * Send notification when position is updated.
      */
-    public static function positionUpdated(\App\Models\Position $position): void
+    public static function positionUpdated(\App\Models\HR\Position $position): void
     {
         if (!function_exists('setting') || !setting('notifications.position.updated', true)) {
             return;
@@ -358,7 +358,7 @@ class NotificationController extends Controller
     /**
      * Send notification when position is deleted.
      */
-    public static function positionDeleted(\App\Models\Position $position): void
+    public static function positionDeleted(\App\Models\HR\Position $position): void
     {
         if (!function_exists('setting') || !setting('notifications.position.deleted', true)) {
             return;
@@ -375,7 +375,7 @@ class NotificationController extends Controller
     /**
      * Send notification when department is created.
      */
-    public static function departmentCreated(\App\Models\Department $department): void
+    public static function departmentCreated(\App\Models\HR\Department $department): void
     {
         if (!function_exists('setting') || !setting('notifications.department.created', true)) {
             return;
@@ -392,7 +392,7 @@ class NotificationController extends Controller
     /**
      * Send notification when department is updated.
      */
-    public static function departmentUpdated(\App\Models\Department $department): void
+    public static function departmentUpdated(\App\Models\HR\Department $department): void
     {
         if (!function_exists('setting') || !setting('notifications.department.updated', true)) {
             return;
@@ -409,7 +409,7 @@ class NotificationController extends Controller
     /**
      * Send notification when department is deleted.
      */
-    public static function departmentDeleted(\App\Models\Department $department): void
+    public static function departmentDeleted(\App\Models\HR\Department $department): void
     {
         if (!function_exists('setting') || !setting('notifications.department.deleted', true)) {
             return;

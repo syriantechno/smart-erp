@@ -221,16 +221,15 @@
         });
 
         function initializeDataTable() {
-            materialsTable = window.initDataTable('#materials-table', {
-                ajax: {
-                    url: '{{ route("warehouse.materials.datatable") }}',
-                    data: function(d) {
-                        d.category_id = $('#category-filter').val();
-                        d.status = $('#status-filter').val();
-                        d.filter_value = $('#search-filter').val();
-                        d.filter_field = 'all';
-                        d.filter_type = 'contains';
-                    }
+            materialsTable = window.erpCrud.initDataTable({
+                tableSelector: '#materials-table',
+                ajaxUrl: '{{ route("warehouse.materials.datatable") }}',
+                ajaxData: function(d) {
+                    d.category_id = $('#category-filter').val();
+                    d.status = $('#status-filter').val();
+                    d.filter_value = $('#search-filter').val();
+                    d.filter_field = 'all';
+                    d.filter_type = 'contains';
                 },
                 columns: [
                     { data: 'code', name: 'code' },
@@ -241,12 +240,7 @@
                     { data: 'status_badge', name: 'status_badge', orderable: false },
                     { data: 'actions', name: 'actions', orderable: false, searchable: false }
                 ],
-                pageLength: 25,
-                lengthChange: false,
-                searching: false,
-                order: [[0, 'asc']],
-                responsive: true,
-                dom: "t<'datatable-footer flex flex-col md:flex-row md:items-center md:justify-between mt-5 gap-4'<'datatable-info text-slate-500'i><'datatable-pagination'p>>",
+                pageLength: 25
                 drawCallback: function () {
                     if (typeof window.Lucide !== 'undefined') {
                         window.Lucide.createIcons();

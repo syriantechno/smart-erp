@@ -41,7 +41,9 @@ class PrefixSetting extends Model
 
     public function previewCode()
     {
-        $number = str_pad($this->start_number, $this->padding, '0', STR_PAD_LEFT);
+        // Preview the NEXT code that will be generated
+        $nextNumber = $this->current_number + 1;
+        $number = str_pad($nextNumber, $this->padding, '0', STR_PAD_LEFT);
         
         if ($this->include_year) {
             $year = date('Y');

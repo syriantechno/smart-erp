@@ -139,13 +139,12 @@
         });
 
         function initializePurchaseRequestsTable() {
-            purchaseRequestsTable = window.initDataTable('#purchase-requests-table', {
-                ajax: {
-                    url: '{{ route("warehouse.purchase-requests.datatable") }}',
-                    data: function(d) {
-                        d.status = $('#status-filter').val();
-                        d.search_value = $('#search-filter').val();
-                    }
+            purchaseRequestsTable = window.erpCrud.initDataTable({
+                tableSelector: '#purchase-requests-table',
+                ajaxUrl: '{{ route("warehouse.purchase-requests.datatable") }}',
+                ajaxData: function(d) {
+                    d.status = $('#status-filter').val();
+                    d.search_value = $('#search-filter').val();
                 },
                 columns: [
                     { data: 'code', name: 'code' },
@@ -156,19 +155,7 @@
                     { data: 'status_badge', name: 'status_badge', orderable: false },
                     { data: 'actions', name: 'actions', orderable: false, searchable: false }
                 ],
-                pageLength: 25,
-                lengthChange: false,
-                searching: false,
-                order: [[0, 'desc']],
-                responsive: true,
-                dom: "t<'datatable-footer flex flex-col md:flex-row md:items-center md:justify-between mt-5 gap-4'<'datatable-info text-slate-500'i><'datatable-pagination'p>>",
-                drawCallback: function () {
-                    if (typeof window.Lucide !== 'undefined') {
-                        window.Lucide.createIcons();
-                    } else if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
-                        lucide.createIcons();
-                    }
-                }
+                pageLength: 25
             });
         }
 
