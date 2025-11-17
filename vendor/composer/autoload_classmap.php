@@ -37,6 +37,7 @@ return array(
     'App\\Http\\Controllers\\HR\\PayrollController' => $baseDir . '/app/Http/Controllers/HR/PayrollController.php',
     'App\\Http\\Controllers\\HR\\PositionController' => $baseDir . '/app/Http/Controllers/HR/PositionController.php',
     'App\\Http\\Controllers\\HR\\RecruitmentController' => $baseDir . '/app/Http/Controllers/HR/RecruitmentController.php',
+    'App\\Http\\Controllers\\HR\\ShiftController' => $baseDir . '/app/Http/Controllers/HR/ShiftController.php',
     'App\\Http\\Controllers\\Mail\\ElectronicMailController' => $baseDir . '/app/Http/Controllers/Mail/ElectronicMailController.php',
     'App\\Http\\Controllers\\Mail\\UserMailAccountController' => $baseDir . '/app/Http/Controllers/Mail/UserMailAccountController.php',
     'App\\Http\\Controllers\\Manufacturing\\ManufacturingController' => $baseDir . '/app/Http/Controllers/Manufacturing/ManufacturingController.php',

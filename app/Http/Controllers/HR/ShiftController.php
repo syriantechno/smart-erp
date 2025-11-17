@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\HR;
 
-use App\Models\Shift;
-use App\Models\Company;
-use App\Models\Department;
-use App\Models\Employee;
+use App\Http\Controllers\Controller;
+use App\Models\HR\Shift;
+use App\Models\Setting\Company;
+use App\Models\HR\Department;
+use App\Models\HR\Employee;
 use App\Repositories\ShiftRepository;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;

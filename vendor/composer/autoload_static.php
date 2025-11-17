@@ -586,6 +586,7 @@ class ComposerStaticInit7e8c3c14ff33b199b4a0838993eb8423
         'App\\Http\\Controllers\\HR\\PayrollController' => __DIR__ . '/../..' . '/app/Http/Controllers/HR/PayrollController.php',
         'App\\Http\\Controllers\\HR\\PositionController' => __DIR__ . '/../..' . '/app/Http/Controllers/HR/PositionController.php',
         'App\\Http\\Controllers\\HR\\RecruitmentController' => __DIR__ . '/../..' . '/app/Http/Controllers/HR/RecruitmentController.php',
+        'App\\Http\\Controllers\\HR\\ShiftController' => __DIR__ . '/../..' . '/app/Http/Controllers/HR/ShiftController.php',
         'App\\Http\\Controllers\\Mail\\ElectronicMailController' => __DIR__ . '/../..' . '/app/Http/Controllers/Mail/ElectronicMailController.php',
         'App\\Http\\Controllers\\Mail\\UserMailAccountController' => __DIR__ . '/../..' . '/app/Http/Controllers/Mail/UserMailAccountController.php',
         'App\\Http\\Controllers\\Manufacturing\\ManufacturingController' => __DIR__ . '/../..' . '/app/Http/Controllers/Manufacturing/ManufacturingController.php',
