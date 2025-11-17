@@ -1,9 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PageController;
-use App\Http\Controllers\LayoutController;
-use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\Setting\PageController;
+use App\Http\Controllers\Setting\LayoutController;
+use App\Http\Controllers\Setting\SettingsController;
+use App\Http\Controllers\Setting\NotificationController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Mail\UserMailAccountController;
 
@@ -43,6 +45,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/settings/attendance', [SettingsController::class, 'updateAttendance'])->name('settings.attendance.update');
     Route::post('/settings/notifications', [SettingsController::class, 'updateNotifications'])->name('settings.notifications.update');
     Route::post('/settings/ai', [SettingsController::class, 'updateAiSettings'])->name('settings.ai.update');
+
+    // Notifications API
+    Route::get('notifications/recent', [NotificationController::class, 'recent'])->name('notifications.recent');
+    Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unread-count');
+
+    // Calendar
+    Route::get('calendar', [CalendarController::class, 'index'])->name('calendar');
 
     // HR Routes
     Route::prefix('hr')->name('hr.')->group(function () {
@@ -125,16 +134,17 @@ Route::middleware('auth')->group(function () {
         // Recruitment
         Route::get('recruitment', [App\Http\Controllers\HR\RecruitmentController::class, 'index'])->name('recruitment.index');
         
-        Route::get('shifts/datatable', [App\Http\Controllers\ShiftController::class, 'datatable'])->name('shifts.datatable');
-        Route::get('shifts/preview-code', [App\Http\Controllers\ShiftController::class, 'previewCode'])->name('shifts.preview-code');
-        Route::post('shifts/{shift}/toggle-status', [App\Http\Controllers\ShiftController::class, 'toggleStatus'])->name('shifts.toggle-status');
-        Route::get('shifts/departments', [App\Http\Controllers\ShiftController::class, 'getDepartments'])->name('shifts.departments');
-        Route::get('shifts/employees', [App\Http\Controllers\ShiftController::class, 'getEmployees'])->name('shifts.employees');
-        Route::get('shifts', [App\Http\Controllers\ShiftController::class, 'index'])->name('shifts.index');
-        Route::post('shifts', [App\Http\Controllers\ShiftController::class, 'store'])->name('shifts.store');
-        Route::get('shifts/{shift}', [App\Http\Controllers\ShiftController::class, 'show'])->name('shifts.show');
-        Route::put('shifts/{shift}', [App\Http\Controllers\ShiftController::class, 'update'])->name('shifts.update');
-        Route::delete('shifts/{shift}', [App\Http\Controllers\ShiftController::class, 'destroy'])->name('shifts.destroy');
+        // Shifts (under HR namespace)
+        Route::get('shifts/datatable', [App\Http\Controllers\HR\ShiftController::class, 'datatable'])->name('shifts.datatable');
+        Route::get('shifts/preview-code', [App\Http\Controllers\HR\ShiftController::class, 'previewCode'])->name('shifts.preview-code');
+        Route::post('shifts/{shift}/toggle-status', [App\Http\Controllers\HR\ShiftController::class, 'toggleStatus'])->name('shifts.toggle-status');
+        Route::get('shifts/departments', [App\Http\Controllers\HR\ShiftController::class, 'getDepartments'])->name('shifts.departments');
+        Route::get('shifts/employees', [App\Http\Controllers\HR\ShiftController::class, 'getEmployees'])->name('shifts.employees');
+        Route::get('shifts', [App\Http\Controllers\HR\ShiftController::class, 'index'])->name('shifts.index');
+        Route::post('shifts', [App\Http\Controllers\HR\ShiftController::class, 'store'])->name('shifts.store');
+        Route::get('shifts/{shift}', [App\Http\Controllers\HR\ShiftController::class, 'show'])->name('shifts.show');
+        Route::put('shifts/{shift}', [App\Http\Controllers\HR\ShiftController::class, 'update'])->name('shifts.update');
+        Route::delete('shifts/{shift}', [App\Http\Controllers\HR\ShiftController::class, 'destroy'])->name('shifts.destroy');
     });
 
     // Tasks Routes
@@ -156,13 +166,13 @@ Route::middleware('auth')->group(function () {
     Route::prefix('warehouse')->name('warehouse.')->group(function () {
         // Categories
         Route::prefix('categories')->name('categories.')->group(function () {
-            Route::get('/', [App\Http\Controllers\CategoryController::class, 'index'])->name('index');
-            Route::get('/datatable', [App\Http\Controllers\CategoryController::class, 'datatable'])->name('datatable');
-            Route::get('/preview-code', [App\Http\Controllers\CategoryController::class, 'previewCode'])->name('preview-code');
-            Route::post('/', [App\Http\Controllers\CategoryController::class, 'store'])->name('store');
-            Route::get('/{category}', [App\Http\Controllers\CategoryController::class, 'show'])->name('show');
-            Route::put('/{category}', [App\Http\Controllers\CategoryController::class, 'update'])->name('update');
-            Route::delete('/{category}', [App\Http\Controllers\CategoryController::class, 'destroy'])->name('destroy');
+            Route::get('/', [App\Http\Controllers\Warehouse\CategoryController::class, 'index'])->name('index');
+            Route::get('/datatable', [App\Http\Controllers\Warehouse\CategoryController::class, 'datatable'])->name('datatable');
+            Route::get('/preview-code', [App\Http\Controllers\Warehouse\CategoryController::class, 'previewCode'])->name('preview-code');
+            Route::post('/', [App\Http\Controllers\Warehouse\CategoryController::class, 'store'])->name('store');
+            Route::get('/{category}', [App\Http\Controllers\Warehouse\CategoryController::class, 'show'])->name('show');
+            Route::put('/{category}', [App\Http\Controllers\Warehouse\CategoryController::class, 'update'])->name('update');
+            Route::delete('/{category}', [App\Http\Controllers\Warehouse\CategoryController::class, 'destroy'])->name('destroy');
         });
 
         // Warehouses
@@ -244,16 +254,16 @@ Route::middleware('auth')->group(function () {
 
     // Electronic Mail Routes
     Route::prefix('electronic-mail')->name('electronic-mail.')->group(function () {
-        Route::get('/', [App\Http\Controllers\ElectronicMailController::class, 'index'])->name('index');
-        Route::get('/compose', [App\Http\Controllers\ElectronicMailController::class, 'compose'])->name('compose');
-        Route::get('/datatable', [App\Http\Controllers\ElectronicMailController::class, 'datatable'])->name('datatable');
-        Route::post('/sync', [App\Http\Controllers\ElectronicMailController::class, 'syncIncoming'])->name('sync');
-        Route::post('/', [App\Http\Controllers\ElectronicMailController::class, 'store'])->name('store');
-        Route::get('/{electronicMail}', [App\Http\Controllers\ElectronicMailController::class, 'show'])->name('show');
-        Route::put('/{electronicMail}', [App\Http\Controllers\ElectronicMailController::class, 'update'])->name('update');
-        Route::delete('/{electronicMail}', [App\Http\Controllers\ElectronicMailController::class, 'destroy'])->name('destroy');
-        Route::post('/{electronicMail}/toggle-star', [App\Http\Controllers\ElectronicMailController::class, 'toggleStar'])->name('toggle-star');
-        Route::post('/{electronicMail}/mark-read', [App\Http\Controllers\ElectronicMailController::class, 'markAsRead'])->name('mark-read');
+        Route::get('/', [App\Http\Controllers\Mail\ElectronicMailController::class, 'index'])->name('index');
+        Route::get('/compose', [App\Http\Controllers\Mail\ElectronicMailController::class, 'compose'])->name('compose');
+        Route::get('/datatable', [App\Http\Controllers\Mail\ElectronicMailController::class, 'datatable'])->name('datatable');
+        Route::post('/sync', [App\Http\Controllers\Mail\ElectronicMailController::class, 'syncIncoming'])->name('sync');
+        Route::post('/', [App\Http\Controllers\Mail\ElectronicMailController::class, 'store'])->name('store');
+        Route::get('/{electronicMail}', [App\Http\Controllers\Mail\ElectronicMailController::class, 'show'])->name('show');
+        Route::put('/{electronicMail}', [App\Http\Controllers\Mail\ElectronicMailController::class, 'update'])->name('update');
+        Route::delete('/{electronicMail}', [App\Http\Controllers\Mail\ElectronicMailController::class, 'destroy'])->name('destroy');
+        Route::post('/{electronicMail}/toggle-star', [App\Http\Controllers\Mail\ElectronicMailController::class, 'toggleStar'])->name('toggle-star');
+        Route::post('/{electronicMail}/mark-read', [App\Http\Controllers\Mail\ElectronicMailController::class, 'markAsRead'])->name('mark-read');
     });
 
     // User Mail Account Routes (personal email settings)
@@ -361,42 +371,42 @@ Route::middleware('auth')->group(function () {
     // Manufacturing Routes
     Route::prefix('manufacturing')->name('manufacturing.')->group(function () {
         // Main dashboard
-        Route::get('/', [App\Http\Controllers\ManufacturingController::class, 'index'])->name('index');
+        Route::get('/', [App\Http\Controllers\Manufacturing\ManufacturingController::class, 'index'])->name('index');
 
         // Production Orders
-        Route::get('/orders', [App\Http\Controllers\ManufacturingController::class, 'ordersIndex'])->name('orders.index');
-        Route::get('/orders/create', [App\Http\Controllers\ManufacturingController::class, 'createOrder'])->name('orders.create');
-        Route::post('/orders', [App\Http\Controllers\ManufacturingController::class, 'storeOrder'])->name('orders.store');
-        Route::get('/orders/{order}', [App\Http\Controllers\ManufacturingController::class, 'showOrder'])->name('orders.show');
-        Route::get('/orders/{order}/edit', [App\Http\Controllers\ManufacturingController::class, 'editOrder'])->name('orders.edit');
-        Route::put('/orders/{order}', [App\Http\Controllers\ManufacturingController::class, 'updateOrder'])->name('orders.update');
-        Route::delete('/orders/{order}', [App\Http\Controllers\ManufacturingController::class, 'destroyOrder'])->name('orders.destroy');
+        Route::get('/orders', [App\Http\Controllers\Manufacturing\ManufacturingController::class, 'ordersIndex'])->name('orders.index');
+        Route::get('/orders/create', [App\Http\Controllers\Manufacturing\ManufacturingController::class, 'createOrder'])->name('orders.create');
+        Route::post('/orders', [App\Http\Controllers\Manufacturing\ManufacturingController::class, 'storeOrder'])->name('orders.store');
+        Route::get('/orders/{order}', [App\Http\Controllers\Manufacturing\ManufacturingController::class, 'showOrder'])->name('orders.show');
+        Route::get('/orders/{order}/edit', [App\Http\Controllers\Manufacturing\ManufacturingController::class, 'editOrder'])->name('orders.edit');
+        Route::put('/orders/{order}', [App\Http\Controllers\Manufacturing\ManufacturingController::class, 'updateOrder'])->name('orders.update');
+        Route::delete('/orders/{order}', [App\Http\Controllers\Manufacturing\ManufacturingController::class, 'destroyOrder'])->name('orders.destroy');
 
         // Production Stages
-        Route::get('/stages', [App\Http\Controllers\ManufacturingController::class, 'stagesIndex'])->name('stages.index');
-        Route::post('/stages', [App\Http\Controllers\ManufacturingController::class, 'storeStage'])->name('stages.store');
-        Route::put('/stages/{stage}', [App\Http\Controllers\ManufacturingController::class, 'updateStage'])->name('stages.update');
-        Route::delete('/stages/{stage}', [App\Http\Controllers\ManufacturingController::class, 'destroyStage'])->name('stages.destroy');
+        Route::get('/stages', [App\Http\Controllers\Manufacturing\ManufacturingController::class, 'stagesIndex'])->name('stages.index');
+        Route::post('/stages', [App\Http\Controllers\Manufacturing\ManufacturingController::class, 'storeStage'])->name('stages.store');
+        Route::put('/stages/{stage}', [App\Http\Controllers\Manufacturing\ManufacturingController::class, 'updateStage'])->name('stages.update');
+        Route::delete('/stages/{stage}', [App\Http\Controllers\Manufacturing\ManufacturingController::class, 'destroyStage'])->name('stages.destroy');
 
         // Machines
-        Route::get('/machines', [App\Http\Controllers\ManufacturingController::class, 'machinesIndex'])->name('machines.index');
-        Route::post('/machines', [App\Http\Controllers\ManufacturingController::class, 'storeMachine'])->name('machines.store');
-        Route::put('/machines/{machine}', [App\Http\Controllers\ManufacturingController::class, 'updateMachine'])->name('machines.update');
-        Route::delete('/machines/{machine}', [App\Http\Controllers\ManufacturingController::class, 'destroyMachine'])->name('machines.destroy');
+        Route::get('/machines', [App\Http\Controllers\Manufacturing\ManufacturingController::class, 'machinesIndex'])->name('machines.index');
+        Route::post('/machines', [App\Http\Controllers\Manufacturing\ManufacturingController::class, 'storeMachine'])->name('machines.store');
+        Route::put('/machines/{machine}', [App\Http\Controllers\Manufacturing\ManufacturingController::class, 'updateMachine'])->name('machines.update');
+        Route::delete('/machines/{machine}', [App\Http\Controllers\Manufacturing\ManufacturingController::class, 'destroyMachine'])->name('machines.destroy');
 
         // Quality Control
-        Route::get('/quality', [App\Http\Controllers\ManufacturingController::class, 'qualityIndex'])->name('quality.index');
-        Route::post('/quality', [App\Http\Controllers\ManufacturingController::class, 'storeQualityCheck'])->name('quality.store');
-        Route::put('/quality/{check}', [App\Http\Controllers\ManufacturingController::class, 'updateQualityCheck'])->name('quality.update');
+        Route::get('/quality', [App\Http\Controllers\Manufacturing\ManufacturingController::class, 'qualityIndex'])->name('quality.index');
+        Route::post('/quality', [App\Http\Controllers\Manufacturing\ManufacturingController::class, 'storeQualityCheck'])->name('quality.store');
+        Route::put('/quality/{check}', [App\Http\Controllers\Manufacturing\ManufacturingController::class, 'updateQualityCheck'])->name('quality.update');
 
         // Reports
-        Route::get('/reports', [App\Http\Controllers\ManufacturingController::class, 'reportsIndex'])->name('reports.index');
-        Route::post('/reports', [App\Http\Controllers\ManufacturingController::class, 'generateReport'])->name('reports.generate');
+        Route::get('/reports', [App\Http\Controllers\Manufacturing\ManufacturingController::class, 'reportsIndex'])->name('reports.index');
+        Route::post('/reports', [App\Http\Controllers\Manufacturing\ManufacturingController::class, 'generateReport'])->name('reports.generate');
 
         // AJAX helpers
-        Route::get('/orders/datatable', [App\Http\Controllers\ManufacturingController::class, 'ordersDatatable'])->name('orders.datatable');
-        Route::get('/stages/active', [App\Http\Controllers\ManufacturingController::class, 'getActiveStages'])->name('stages.active');
-        Route::get('/machines/available', [App\Http\Controllers\ManufacturingController::class, 'getAvailableMachines'])->name('machines.available');
+        Route::get('/orders/datatable', [App\Http\Controllers\Manufacturing\ManufacturingController::class, 'ordersDatatable'])->name('orders.datatable');
+        Route::get('/stages/active', [App\Http\Controllers\Manufacturing\ManufacturingController::class, 'getActiveStages'])->name('stages.active');
+        Route::get('/machines/available', [App\Http\Controllers\Manufacturing\ManufacturingController::class, 'getAvailableMachines'])->name('machines.available');
     });
 
     // Project Management Routes

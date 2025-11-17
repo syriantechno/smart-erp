@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Models\Shift;
+use App\Models\HR\Shift;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -80,7 +80,7 @@ class ShiftRepository extends BaseRepository
      */
     public function getDepartmentsForCompany($companyId): Collection
     {
-        return \App\Models\Department::where('company_id', $companyId)
+        return \App\Models\HR\Department::where('company_id', $companyId)
             ->active()
             ->select('id', 'name')
             ->get();
@@ -91,7 +91,7 @@ class ShiftRepository extends BaseRepository
      */
     public function getEmployeesForDepartment($departmentId): Collection
     {
-        return \App\Models\Employee::where('department_id', $departmentId)
+        return \App\Models\HR\Employee::where('department_id', $departmentId)
             ->active()
             ->select('id', 'first_name', 'last_name', 'full_name')
             ->get();

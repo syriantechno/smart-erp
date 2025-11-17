@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\HR;
 
 use App\Http\Controllers\Controller;
-use App\Models\Department;
-use App\Models\Position;
+use App\Models\HR\Department;
+use App\Models\HR\Position;
 use App\Services\DocumentCodeGenerator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -151,7 +151,7 @@ class PositionController extends Controller
             DB::beginTransaction();
 
             // Check if position has employees by matching position string
-            $hasEmployees = \App\Models\Employee::where('position', $position->title)->exists();
+            $hasEmployees = \App\Models\HR\Employee::where('position', $position->title)->exists();
 
             if ($hasEmployees) {
                 $message = 'Cannot delete position because it has employees.';

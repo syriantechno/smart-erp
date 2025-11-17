@@ -1,7 +1,7 @@
 @php
-    $companies = $companies ?? \App\Models\Company::active()->get();
-    $managers = $managers ?? \App\Models\Employee::active()->get();
-    $departments = $departments ?? \App\Models\Department::active()->get();
+    $companies = $companies ?? \App\Models\Setting\Company::active()->get();
+    $managers = $managers ?? \App\Models\HR\Employee::active()->get();
+    $departments = $departments ?? \App\Models\HR\Department::active()->get();
 @endphp
 
 @push('modals')

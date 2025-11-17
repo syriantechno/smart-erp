@@ -1,5 +1,5 @@
 @php
-    $companies = \App\Models\Company::active()->get();
+    $companies = \App\Models\Setting\Company::active()->get();
     $codeGenerator = app(\App\Services\DocumentCodeGenerator::class);
     $previewCode = $codeGenerator->preview('employees');
     $countries = include app_path('Data/countries.php');

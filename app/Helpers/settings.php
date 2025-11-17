@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\Setting;
+use App\Models\Setting\Setting;
 
 /**
  * Get setting value by key

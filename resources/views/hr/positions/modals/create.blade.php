@@ -1,5 +1,5 @@
 @php
-    $departments = \App\Models\Department::active()->get();
+    $departments = \App\Models\HR\Department::active()->get();
 @endphp
 
 @push('modals')

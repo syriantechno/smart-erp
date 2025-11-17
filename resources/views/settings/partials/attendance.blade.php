@@ -2,7 +2,7 @@
     // Attendance Settings
     $attendanceSettings = [
         'attendance.working_hours_per_day' => [
-            'value' => \App\Models\Setting::get('attendance.working_hours_per_day', '8'),
+            'value' => \App\Models\Setting\Setting::get('attendance.working_hours_per_day', '8'),
             'type' => 'number',
             'label' => 'Working Hours Per Day',
             'description' => 'Number of working hours in a full day',
@@ -11,7 +11,7 @@
             'max' => '24'
         ],
         'attendance.half_day_hours' => [
-            'value' => \App\Models\Setting::get('attendance.half_day_hours', '4'),
+            'value' => \App\Models\Setting\Setting::get('attendance.half_day_hours', '4'),
             'type' => 'number',
             'label' => 'Half Day Hours',
             'description' => 'Number of hours required to consider the day as half day',
@@ -20,7 +20,7 @@
             'max' => '12'
         ],
         'attendance.grace_period_minutes' => [
-            'value' => \App\Models\Setting::get('attendance.grace_period_minutes', '15'),
+            'value' => \App\Models\Setting\Setting::get('attendance.grace_period_minutes', '15'),
             'type' => 'number',
             'label' => 'Grace Period (Minutes)',
             'description' => 'Allowed delay time before considering it as absence',
@@ -29,14 +29,14 @@
             'max' => '120'
         ],
         'attendance.auto_checkout_time' => [
-            'value' => \App\Models\Setting::get('attendance.auto_checkout_time', '18:00'),
+            'value' => \App\Models\Setting\Setting::get('attendance.auto_checkout_time', '18:00'),
             'type' => 'time',
             'label' => 'Auto Checkout Time',
             'description' => 'Automatic checkout time if employee doesn\'t log their checkout',
             'placeholder' => '18:00'
         ],
         'attendance.minimum_working_hours' => [
-            'value' => \App\Models\Setting::get('attendance.minimum_working_hours', '6'),
+            'value' => \App\Models\Setting\Setting::get('attendance.minimum_working_hours', '6'),
             'type' => 'number',
             'label' => 'Minimum Working Hours',
             'description' => 'Minimum hours required to consider the day as complete',
@@ -45,44 +45,44 @@
             'max' => '24'
         ],
         'attendance.enable_auto_attendance' => [
-            'value' => \App\Models\Setting::get('attendance.enable_auto_attendance', '0'),
+            'value' => \App\Models\Setting\Setting::get('attendance.enable_auto_attendance', '0'),
             'type' => 'checkbox',
             'label' => 'Enable Auto Attendance',
             'description' => 'Enable automatic attendance check-in and check-out recording'
         ],
         'attendance.allow_mobile_checkin' => [
-            'value' => \App\Models\Setting::get('attendance.allow_mobile_checkin', '1'),
+            'value' => \App\Models\Setting\Setting::get('attendance.allow_mobile_checkin', '1'),
             'type' => 'checkbox',
             'label' => 'Allow Mobile Check-in',
             'description' => 'Allow employees to check-in through mobile applications'
         ],
         'attendance.require_location' => [
-            'value' => \App\Models\Setting::get('attendance.require_location', '0'),
+            'value' => \App\Models\Setting\Setting::get('attendance.require_location', '0'),
             'type' => 'checkbox',
             'label' => 'Require Location',
             'description' => 'Require employee location verification during check-in'
         ],
         'attendance.notify_late_arrival' => [
-            'value' => \App\Models\Setting::get('attendance.notify_late_arrival', '1'),
+            'value' => \App\Models\Setting\Setting::get('attendance.notify_late_arrival', '1'),
             'type' => 'checkbox',
             'label' => 'Late Arrival Notification',
             'description' => 'Send notification when employee arrives late'
         ],
         'attendance.notify_early_departure' => [
-            'value' => \App\Models\Setting::get('attendance.notify_early_departure', '1'),
+            'value' => \App\Models\Setting\Setting::get('attendance.notify_early_departure', '1'),
             'type' => 'checkbox',
             'label' => 'Early Departure Notification',
             'description' => 'Send notification when employee leaves early'
         ],
         'attendance.weekend_days' => [
-            'value' => \App\Models\Setting::get('attendance.weekend_days', '5,6'),
+            'value' => \App\Models\Setting\Setting::get('attendance.weekend_days', '5,6'),
             'type' => 'text',
             'label' => 'Weekend Days',
             'description' => 'Weekend day numbers (0=Sunday, 1=Monday, etc). Comma separated',
             'placeholder' => '5,6'
         ],
         'attendance.holidays' => [
-            'value' => \App\Models\Setting::get('attendance.holidays', ''),
+            'value' => \App\Models\Setting\Setting::get('attendance.holidays', ''),
             'type' => 'textarea',
             'label' => 'Official Holidays',
             'description' => 'Official holiday dates (YYYY-MM-DD), each date on a separate line',

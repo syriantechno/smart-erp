@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Setting;
 
 use App\Http\Controllers\Controller;
+use App\Models\Document\Document;
+use App\Models\HR\Employee;
+use App\Models\HR\EmployeeDocument;
 use Illuminate\View\View;
 
 class PageController extends Controller
@@ -49,7 +52,7 @@ class PageController extends Controller
             $days = 30;
         }
 
-        $hrExpiringDocuments = \App\Models\Document::active()
+        $hrExpiringDocuments = Document::active()
             ->whereNotNull('expiry_date')
             ->expiringSoon($days)
             ->orderBy('expiry_date')
@@ -62,7 +65,7 @@ class PageController extends Controller
             $employeeDays = 30;
         }
 
-        $hrEmployeeExpiringDocuments = \App\Models\EmployeeDocument::active()
+        $hrEmployeeExpiringDocuments = EmployeeDocument::active()
             ->whereNotNull('expiry_date')
             ->expiringSoon()
             ->orderBy('expiry_date')
@@ -71,7 +74,7 @@ class PageController extends Controller
 
         // Top rated employees (by average evaluation)
         // Note: MySQL does not allow using the withAvg alias (avg_rating) in WHERE, so we use HAVING.
-        $topRatedEmployees = \App\Models\Employee::with(['department'])
+        $topRatedEmployees = Employee::with(['department'])
             ->withAvg('evaluations as avg_rating', 'overall_rating')
             ->havingNotNull('avg_rating')
             ->orderByDesc('avg_rating')
@@ -80,7 +83,7 @@ class PageController extends Controller
 
         // Top rewarded employees (by total points)
         // Use HAVING because total_points is an aggregate alias from withSum
-        $topRewardedEmployees = \App\Models\Employee::with(['department'])
+        $topRewardedEmployees = Employee::with(['department'])
             ->withSum('rewards as total_points', 'points')
             ->having('total_points', '>', 0)
             ->orderByDesc('total_points')

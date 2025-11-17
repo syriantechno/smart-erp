@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\HR;
 
 use App\Http\Controllers\Controller;
-use App\Models\Employee;
+use App\Models\HR\Employee;
 use App\Models\HR\EmployeeEvaluation;
 use App\Models\HR\EmployeeEvaluationItem;
 use App\Models\HR\EvaluationCriterion;

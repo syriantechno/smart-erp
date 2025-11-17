@@ -69,7 +69,7 @@ class Employee extends Model
 
     public function company(): BelongsTo
     {
-        return $this->belongsTo(Company::class);
+        return $this->belongsTo(\App\Models\Setting\Company::class, 'company_id');
     }
 
     /**

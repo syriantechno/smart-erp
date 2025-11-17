@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\HR;
 
 use App\Http\Controllers\Controller;
-use App\Models\Department;
-use App\Models\ApprovalRequest;
-use App\Models\ApprovalTemplate;
+use App\Models\HR\Department;
+use App\Models\Approval\ApprovalRequest;
+use App\Models\Approval\ApprovalTemplate;
 use App\Services\DocumentCodeGenerator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

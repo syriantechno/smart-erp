@@ -28,7 +28,7 @@ class ShiftController extends Controller
      */
     public function index(): View
     {
-        $companies = \App\Models\Company::active()->get();
+        $companies = Company::active()->get();
         return view('hr.shifts.index', compact('companies'));
     }
 

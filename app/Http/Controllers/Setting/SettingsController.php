@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Setting;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Setting;
-use App\Models\PrefixSetting;
-use App\Models\Company;
+use App\Models\Setting\Setting;
+use App\Models\Setting\PrefixSetting;
+use App\Models\Setting\Company;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Spatie\Permission\Models\Role;

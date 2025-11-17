@@ -22,22 +22,15 @@
         @endif
 
         <!-- BEGIN: Breadcrumb -->
-        <x-base.breadcrumb
+        <div 
             @class([
-                'h-[45px] md:ml-10 md:border-l border-white/[0.08] dark:border-white/[0.08] mr-auto -intro-x',
+                'h-[45px] md:ml-10 md:border-l border-white/[0.08] dark:border-white/[0.08] mr-auto -intro-x flex items-center',
                 'md:pl-6' => $layout != 'top-menu',
                 'md:pl-10' => $layout == 'top-menu',
             ])
-            light
         >
-            <x-base.breadcrumb.link :index="0">Application</x-base.breadcrumb.link>
-            <x-base.breadcrumb.link
-                :index="1"
-                :active="true"
-            >
-                Dashboard
-            </x-base.breadcrumb.link>
-        </x-base.breadcrumb>
+            <x-dynamic-breadcrumbs />
+        </div>
         <!-- END: Breadcrumb -->
         <!-- BEGIN: Search -->
         <div class="intro-x relative mr-3 sm:mr-6">

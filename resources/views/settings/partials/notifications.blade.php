@@ -13,51 +13,51 @@
             'notifications.department.created' => [
                 'label' => 'Department Created',
                 'description' => 'Send a bell notification when a new department is created.',
-                'value' => \App\Models\Setting::get('notifications.department.created', true),
+                'value' => \App\Models\Setting\Setting::get('notifications.department.created', true),
             ],
             'notifications.department.updated' => [
                 'label' => 'Department Updated',
                 'description' => 'Send a bell notification when a department is updated.',
-                'value' => \App\Models\Setting::get('notifications.department.updated', true),
+                'value' => \App\Models\Setting\Setting::get('notifications.department.updated', true),
             ],
             'notifications.department.deleted' => [
                 'label' => 'Department Deleted',
                 'description' => 'Send a bell notification when a department is deleted.',
-                'value' => \App\Models\Setting::get('notifications.department.deleted', true),
+                'value' => \App\Models\Setting\Setting::get('notifications.department.deleted', true),
             ],
 
             // Positions
             'notifications.position.created' => [
                 'label' => 'Position Created',
                 'description' => 'Send a bell notification when a new position is created.',
-                'value' => \App\Models\Setting::get('notifications.position.created', true),
+                'value' => \App\Models\Setting\Setting::get('notifications.position.created', true),
             ],
             'notifications.position.updated' => [
                 'label' => 'Position Updated',
                 'description' => 'Send a bell notification when a position is updated.',
-                'value' => \App\Models\Setting::get('notifications.position.updated', true),
+                'value' => \App\Models\Setting\Setting::get('notifications.position.updated', true),
             ],
             'notifications.position.deleted' => [
                 'label' => 'Position Deleted',
                 'description' => 'Send a bell notification when a position is deleted.',
-                'value' => \App\Models\Setting::get('notifications.position.deleted', true),
+                'value' => \App\Models\Setting\Setting::get('notifications.position.deleted', true),
             ],
 
             // Employees
             'notifications.employee.created' => [
                 'label' => 'Employee Created',
                 'description' => 'Send a bell notification when a new employee is created.',
-                'value' => \App\Models\Setting::get('notifications.employee.created', true),
+                'value' => \App\Models\Setting\Setting::get('notifications.employee.created', true),
             ],
             'notifications.employee.deleted' => [
                 'label' => 'Employee Deleted',
                 'description' => 'Send a bell notification when an employee is deleted.',
-                'value' => \App\Models\Setting::get('notifications.employee.deleted', true),
+                'value' => \App\Models\Setting\Setting::get('notifications.employee.deleted', true),
             ],
         ];
 
-        $documentsExpiryReminderDays = \App\Models\Setting::get('notifications.documents.expiry_reminder_days', 30);
-        $employeeDocumentsExpiryReminderDays = \App\Models\Setting::get('notifications.employee_documents.expiry_reminder_days', 30);
+        $documentsExpiryReminderDays = \App\Models\Setting\Setting::get('notifications.documents.expiry_reminder_days', 30);
+        $employeeDocumentsExpiryReminderDays = \App\Models\Setting\Setting::get('notifications.employee_documents.expiry_reminder_days', 30);
     @endphp
 
     <form id="notification-settings-form" action="{{ route('settings.notifications.update') }}" method="POST" class="p-5">

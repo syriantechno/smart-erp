@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Warehouse;
 
 use App\Http\Controllers\Controller;
-use App\Models\Category;
+use App\Models\Warehouse\Category;
 use App\Services\DocumentCodeGenerator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

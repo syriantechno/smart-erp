@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\HR;
 
 use App\Http\Controllers\Controller;
-use App\Models\Employee;
-use App\Models\Department;
-use App\Models\Company;
+use App\Models\HR\Employee;
+use App\Models\HR\Department;
+use App\Models\Setting\Company;
 use App\Services\DocumentCodeGenerator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

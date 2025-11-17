@@ -2,9 +2,9 @@
 
 namespace App\Models\HR;
 
-use App\Models\Company;
-use App\Models\Department;
-use App\Models\Employee;
+use App\Models\Setting\Company;
+use App\Models\HR\Department;
+use App\Models\HR\Employee;
 use App\Models\HR\Attendance;
 use App\Models\Setting\PrefixSetting;
 use Illuminate\Database\Eloquent\Model;

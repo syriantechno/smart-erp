@@ -96,7 +96,7 @@
                         <x-base.form-label for="create-category-parent">Parent Category</x-base.form-label>
                         <x-base.form-select id="create-category-parent" name="parent_id" class="w-full">
                             <option value="">Root Category</option>
-                            @foreach(\App\Models\Category::orderBy('name')->get() as $parentCategory)
+                            @foreach(\App\Models\Warehouse\Category::orderBy('name')->get() as $parentCategory)
                                 <option value="{{ $parentCategory->id }}">{{ $parentCategory->name }}</option>
                             @endforeach
                         </x-base.form-select>
@@ -226,6 +226,99 @@
             });
         </script>
     </x-modal.form>
+
+    <!-- Edit Category Modal -->
+    <x-modal.form id="edit-category-modal" title="Edit Category" size="xl">
+        <form id="edit-category-form">
+            @csrf
+            @method('PUT')
+            <input type="hidden" id="edit-category-id" name="id">
+
+            <div class="mb-6">
+                <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                    <x-base.lucide icon="Edit" class="h-5 w-5"></x-base.lucide>
+                    Category Details
+                </h4>
+                <div class="grid grid-cols-12 gap-4 gap-y-4">
+                    <div class="col-span-12 md:col-span-6">
+                        <x-base.form-label for="edit-category-code">Code</x-base.form-label>
+                        <x-base.form-input
+                            id="edit-category-code"
+                            name="code"
+                            type="text"
+                            class="w-full"
+                            placeholder="Category code"
+                            required
+                        />
+                    </div>
+
+                    <div class="col-span-12 md:col-span-6">
+                        <x-base.form-label for="edit-category-name">Name</x-base.form-label>
+                        <x-base.form-input
+                            id="edit-category-name"
+                            name="name"
+                            type="text"
+                            class="w-full"
+                            placeholder="Category name"
+                            required
+                        />
+                    </div>
+
+                    <div class="col-span-12 md:col-span-6">
+                        <x-base.form-label for="edit-category-parent">Parent Category</x-base.form-label>
+                        <x-base.form-select id="edit-category-parent" name="parent_id" class="w-full">
+                            <option value="">Root Category</option>
+                            @foreach(\App\Models\Warehouse\Category::orderBy('name')->get() as $parentCategory)
+                                <option value="{{ $parentCategory->id }}">{{ $parentCategory->name }}</option>
+                            @endforeach
+                        </x-base.form-select>
+                    </div>
+
+                    <div class="col-span-12 md:col-span-6">
+                        <x-base.form-label for="edit-category-status">Status</x-base.form-label>
+                        <x-base.form-select id="edit-category-status" name="is_active" class="w-full" required>
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </x-base.form-select>
+                    </div>
+
+                    <div class="col-span-12">
+                        <x-base.form-label for="edit-category-description">Description</x-base.form-label>
+                        <x-base.form-textarea
+                            id="edit-category-description"
+                            name="description"
+                            class="w-full"
+                            rows="3"
+                            placeholder="Category description"
+                        ></x-base.form-textarea>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        @slot('footer')
+            <div class="flex justify-end gap-2 w-full">
+                <x-base.button
+                    class="w-24"
+                    data-tw-dismiss="modal"
+                    type="button"
+                    variant="outline-secondary"
+                >
+                    Cancel
+                </x-base.button>
+                <x-base.button
+                    class="w-32"
+                    type="submit"
+                    form="edit-category-form"
+                    id="edit-category-btn"
+                    variant="primary"
+                >
+                    <x-base.lucide icon="Save" class="w-4 h-4 mr-2" />
+                    Update Category
+                </x-base.button>
+            </div>
+        @endslot
+    </x-modal.form>
 @endsection
 
 @include('components.datatable.scripts')
@@ -307,12 +400,26 @@
 
             jq.get('{{ route("warehouse.categories.show", ":id") }}'.replace(':id', id))
                 .done(function(response) {
-                    if (response.success && typeof window.populateEditWarehouseModal === 'function') {
-                        window.populateEditWarehouseModal(response.category);
-                        jq('#edit-warehouse-modal').modal('show');
+                    if (response.success) {
+                        populateEditCategoryModal(response.category);
+                        jq('#edit-category-modal').modal('show');
                     }
                 });
         };
+
+        function populateEditCategoryModal(category) {
+            const jq = window.jQuery || window.$;
+            if (!jq) {
+                return;
+            }
+
+            jq('#edit-category-id').val(category.id);
+            jq('#edit-category-code').val(category.code);
+            jq('#edit-category-name').val(category.name);
+            jq('#edit-category-description').val(category.description || '');
+            jq('#edit-category-status').val(category.is_active ? '1' : '0');
+            jq('#edit-category-parent').val(category.parent_id || '');
+        }
 
         window.deleteCategory = function(id, name) {
             const jq = window.jQuery || window.$;
@@ -353,5 +460,61 @@
                 }
             });
         };
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const jq = window.jQuery || window.$;
+            if (!jq) {
+                return;
+            }
+
+            jq('#edit-category-form').on('submit', function (e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+                const categoryId = jq('#edit-category-id').val();
+                const submitBtn = jq('#edit-category-btn');
+                const originalText = submitBtn.html();
+
+                submitBtn.prop('disabled', true).html('<i class="w-4 h-4 mr-2 animate-spin" data-lucide="loader"></i> Updating...');
+
+                jq.ajax({
+                    url: '{{ route("warehouse.categories.update", ":id") }}'.replace(':id', categoryId),
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector("meta[name='csrf-token']").getAttribute('content')
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            jq('#edit-category-modal').modal('hide');
+                            if (categoriesTable) {
+                                categoriesTable.ajax.reload();
+                            }
+                            Swal.fire('Success!', response.message, 'success');
+                        } else {
+                            Swal.fire('Error!', response.message || 'Failed to update category.', 'error');
+                        }
+                    },
+                    error: function (xhr) {
+                        const errors = xhr.responseJSON?.errors || {};
+                        let errorMessage = xhr.responseJSON?.message || 'An error occurred';
+
+                        if (Object.keys(errors).length > 0) {
+                            errorMessage = Object.values(errors).flat().join('\n');
+                        }
+
+                        Swal.fire('Error!', errorMessage, 'error');
+                    },
+                    complete: function () {
+                        submitBtn.prop('disabled', false).html(originalText);
+                        if (typeof window.lucide !== 'undefined' && window.lucide.createIcons) {
+                            window.lucide.createIcons();
+                        }
+                    }
+                });
+            });
+        });
     </script>
 @endpush

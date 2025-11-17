@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\HR;
 
 use App\Http\Controllers\Controller;
-use App\Models\Attendance;
-use App\Models\Employee;
-use App\Models\Shift;
+use App\Models\HR\Attendance;
+use App\Models\HR\Employee;
+use App\Models\HR\Shift;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -86,7 +86,7 @@ class AttendanceController extends Controller
                 }
 
                 // Get working hours from shift or use default from attendance settings
-                $shift = $shiftId ? \App\Models\Shift::find($shiftId) : null;
+                $shift = $shiftId ? Shift::find($shiftId) : null;
                 $requiredHours = $shift ? (float) $shift->working_hours : (float) setting('attendance.working_hours_per_day', 8.0);
 
                 $workingHours = $this->calculateWorkingHours($request->check_in, $request->check_out, $request->status);

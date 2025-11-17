@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\PrefixSetting;
+use App\Models\Setting\PrefixSetting;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 

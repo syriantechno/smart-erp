@@ -171,7 +171,7 @@
                     <x-base.form-label for="edit-department_id">Department <span class="text-danger">*</span></x-base.form-label>
                     <x-base.form-select id="edit-department_id" name="department_id" class="w-full" required>
                         <option value="">Select Department</option>
-                        @foreach(\App\Models\Department::active()->get() as $department)
+                        @foreach(\App\Models\HR\Department::active()->get() as $department)
                             <option value="{{ $department->id }}">{{ $department->name }}</option>
                         @endforeach
                     </x-base.form-select>

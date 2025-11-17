@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Manufacturing;
 
 use App\Http\Controllers\Controller;
-use App\Models\ProductionOrder;
-use App\Models\ProductionMachine;
+use App\Models\Manufacturing\ProductionOrder;
+use App\Models\Manufacturing\ProductionMachine;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
