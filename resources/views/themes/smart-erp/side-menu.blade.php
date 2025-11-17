@@ -22,7 +22,7 @@
 
         <div class="flex mt-0">
             <!-- BEGIN: Side Menu -->
-            <nav id="smart-sidebar" class="side-nav z-[80] mt-0 hidden w-[100px] xl:w-[260px] overflow-y-auto overflow-x-hidden px-5 pb-16 pt-12 md:fixed md:top-2 md:left-2 md:h-screen md:block bg-white/95 rounded-[26px] shadow-lg dark:bg-darkmode-700/80">
+            <nav id="smart-sidebar" class="side-nav z-[80] mt-0 hidden w-[100px] xl:w-[260px] overflow-y-auto overflow-x-hidden px-5 pb-16 pt-12 md:fixed md:top-2 md:left-2 md:h-screen md:block bg-white/95 rounded-[8px] shadow-lg dark:bg-darkmode-700/80">
                 {{-- Brand / logo --}}
                 <div class="mb-6 flex items-center justify-center">
                     <div class="flex flex-col items-center gap-2">
@@ -126,7 +126,7 @@
             <!-- BEGIN: Content -->
             <div id="smart-main-content" class="flex-1 w-full flex justify-center md:justify-start -mt-24 md:-mt-28 pr-6 pl-6 md:ml-[100px] xl:ml-[260px] relative z-[70]">
                 <div @class([
-                    'w-full rounded-[26px] px-4 md:px-8 min-h-[calc(100vh-9rem)] bg-white/95 shadow-sm md:pt-8 pb-10 mt-6 md:mt-4 relative z-10 dark:bg-darkmode-700/95',
+                    'w-full rounded-[8px] px-4 md:px-8 min-h-[calc(100vh-9rem)] bg-white/95 shadow-sm md:pt-8 pb-10 mt-6 md:mt-4 relative z-10 dark:bg-darkmode-700/95',
                     "before:content-[''] before:w-full before:h-px before:block",
                 ])>
                     @yield('subcontent')

@@ -79,6 +79,21 @@
         });
     </script>
 
+    <!-- Fix: prevent layout shift when modals/slideover adjust body padding-right -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var resetBodyPadding = function () {
+                if (document && document.body) {
+                    document.body.style.paddingRight = '0px';
+                }
+            };
+
+            ['show.tw.modal', 'shown.tw.modal', 'hide.tw.modal', 'hidden.tw.modal'].forEach(function (eventName) {
+                document.addEventListener(eventName, resetBodyPadding, true);
+            });
+        });
+    </script>
+
     <!-- Lucide Icons Local JavaScript -->
     <script src="{{ asset('vendor/lucide/lucide.umd.min.js') }}"></script>
     <script>

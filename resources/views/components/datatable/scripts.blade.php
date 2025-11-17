@@ -17,9 +17,16 @@
             const defaultOptions = {
                 processing: true,
                 serverSide: true,
+                pagingType: 'full_numbers',
                 language: {
                     emptyTable: 'No data available in table',
-                    processing: 'Loading...'
+                    processing: 'Loading...',
+                    paginate: {
+                        first: '«',
+                        previous: '‹',
+                        next: '›',
+                        last: '»'
+                    }
                 },
                 responsive: true,
                 stripeClasses: ['odd:bg-white', 'even:bg-slate-50/60'],

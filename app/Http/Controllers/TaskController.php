@@ -262,4 +262,106 @@ class TaskController extends Controller
             return back()->with('error', 'Error deleting task: ' . $e->getMessage());
         }
     }
+
+    public function kanbanData(Request $request): JsonResponse
+    {
+        $query = Task::query()
+            ->with(['employee:id,first_name,last_name', 'department:id,name', 'company:id,name']);
+
+        if ($request->filled('company_id') && $request->company_id !== '') {
+            $query->where('company_id', $request->company_id);
+        }
+
+        if ($request->filled('department_id') && $request->department_id !== '') {
+            $query->where('department_id', $request->department_id);
+        }
+
+        if ($request->filled('employee_id') && $request->employee_id !== '') {
+            $query->where('employee_id', $request->employee_id);
+        }
+
+        if ($request->filled('status_filter') && $request->status_filter !== '') {
+            $query->where('status', $request->status_filter);
+        }
+
+        $tasks = $query
+            ->orderByRaw("FIELD(status, 'pending', 'in_progress', 'completed', 'cancelled')")
+            ->orderBy('priority', 'desc')
+            ->orderBy('due_date', 'asc')
+            ->get();
+
+        $grouped = [
+            'pending' => [],
+            'in_progress' => [],
+            'completed' => [],
+            'cancelled' => [],
+        ];
+
+        foreach ($tasks as $task) {
+            $status = $task->status ?? 'pending';
+            if (! isset($grouped[$status])) {
+                $grouped[$status] = [];
+            }
+
+            $grouped[$status][] = [
+                'id' => $task->id,
+                'code' => $task->code,
+                'title' => $task->title,
+                'description' => $task->description,
+                'priority' => $task->priority,
+                'status' => $task->status,
+                'color' => $task->color,
+                'due_date' => $task->due_date ? $task->due_date->format('Y-m-d') : null,
+                'due_date_formatted' => $task->due_date ? $task->due_date->format('M d, Y') : null,
+                'employee_name' => $task->employee ? $task->employee->full_name : null,
+                'department_name' => $task->department ? $task->department->name : null,
+                'company_name' => $task->company ? $task->company->name : null,
+            ];
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $grouped,
+        ]);
+    }
+
+    public function updateStatus(Request $request, Task $task): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'status' => ['required', Rule::in(['pending', 'in_progress', 'completed', 'cancelled'])],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid status value',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $task->status = $request->input('status');
+            $task->save();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Task status updated successfully',
+                'task' => [
+                    'id' => $task->id,
+                    'status' => $task->status,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating task status: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
 }

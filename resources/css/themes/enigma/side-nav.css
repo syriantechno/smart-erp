@@ -139,7 +139,7 @@
                             bottom: 0;
                             border-radius: theme("borderRadius.xl");
                             position: absolute;
-                            border-bottom: 3px solid theme("colors.black" / 8%);
+                            border-left: 3px solid theme("colors.primary");
                         }
                         &:after {
                             content: "";
@@ -161,11 +161,11 @@
                             animation-fill-mode: forwards;
                         }
                         .side-menu__icon {
-                            color: theme("colors.theme.1");
+                            color: theme("colors.primary");
                             z-index: 10;
                         }
                         .side-menu__title {
-                            color: theme("colors.theme.1");
+                            color: theme("colors.primary");
                             font-weight: theme("fontWeight.medium");
                             z-index: 10;
                         }
@@ -183,8 +183,15 @@
                                 border-radius: theme("borderRadius.xl");
                                 position: absolute;
                                 z-index: -1;
-                                border-bottom: 3px solid
-                                    theme("colors.black" / 8%);
+                                border-left: 3px solid
+                                    theme("colors.theme.1");
+                            }
+                            .side-menu__icon {
+                                color: theme("colors.theme.1");
+                            }
+                            .side-menu__title {
+                                color: theme("colors.theme.1");
+                                font-weight: theme("fontWeight.medium");
                             }
                         }
                     }
@@ -193,6 +200,8 @@
                     background-color: theme("colors.white" / 4%);
                     border-radius: theme("borderRadius.xl");
                     position: relative;
+                    border: 1px solid theme("colors.slate.200" / 70%);
+                    margin-left: theme("spacing.4");
                     &:before {
                         content: "";
                         display: block;
@@ -211,6 +220,7 @@
                     & > li {
                         /* Second level */
                         & > .side-menu {
+                            padding-left: theme("spacing.7");
                             &.side-menu--active {
                                 .side-menu__icon {
                                     color: theme("colors.slate.700");
@@ -224,6 +234,15 @@
                                 color: theme("colors.slate.600");
                             }
                             &:hover {
+                                &:not(.side-menu--active) {
+                                    .side-menu__icon {
+                                        color: theme("colors.theme.1");
+                                    }
+                                    .side-menu__title {
+                                        color: theme("colors.theme.1");
+                                        font-weight: theme("fontWeight.medium");
+                                    }
+                                }
                             }
                             .side-menu__icon {
                             }

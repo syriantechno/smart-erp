@@ -69,18 +69,20 @@ class PageController extends Controller
             ->get();
 
         // Top rated employees (by average evaluation)
+        // Note: MySQL does not allow using the withAvg alias (avg_rating) in WHERE, so we use HAVING.
         $topRatedEmployees = \App\Models\Employee::with(['department'])
             ->withAvg('evaluations as avg_rating', 'overall_rating')
+            ->havingNotNull('avg_rating')
             ->orderByDesc('avg_rating')
-            ->whereNotNull('avg_rating')
             ->limit(5)
             ->get();
 
         // Top rewarded employees (by total points)
+        // Use HAVING because total_points is an aggregate alias from withSum
         $topRewardedEmployees = \App\Models\Employee::with(['department'])
             ->withSum('rewards as total_points', 'points')
+            ->having('total_points', '>', 0)
             ->orderByDesc('total_points')
-            ->where('total_points', '>', 0)
             ->limit(5)
             ->get();
 

@@ -140,6 +140,8 @@ Route::middleware('auth')->group(function () {
     Route::prefix('tasks')->name('tasks.')->group(function () {
         Route::get('/', [App\Http\Controllers\TaskController::class, 'index'])->name('index');
         Route::get('/datatable', [App\Http\Controllers\TaskController::class, 'datatable'])->name('datatable');
+        Route::get('/kanban-data', [App\Http\Controllers\TaskController::class, 'kanbanData'])->name('kanban-data');
+        Route::post('/{task}/update-status', [App\Http\Controllers\TaskController::class, 'updateStatus'])->name('update-status');
         Route::get('/preview-code', [App\Http\Controllers\TaskController::class, 'previewCode'])->name('preview-code');
         Route::get('/create', [App\Http\Controllers\TaskController::class, 'create'])->name('create');
         Route::post('/', [App\Http\Controllers\TaskController::class, 'store'])->name('store');
