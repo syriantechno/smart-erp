@@ -117,6 +117,11 @@ class SideMenu
                 'route_name' => 'project-management.projects.index',
                 'title' => 'Projects Manager'
             ],
+            'work-projects' => [
+                'icon' => 'briefcase',
+                'route_name' => 'work.projects.index',
+                'title' => 'Work Projects'
+            ],
             'warehouse' => [
                 'icon' => 'package',
                 'title' => 'Warehouse',

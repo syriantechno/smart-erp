@@ -519,9 +519,16 @@ Route::middleware('auth')->group(function () {
         Route::post('/send-to-users', [App\Http\Controllers\NotificationController::class, 'sendToUsers'])->name('send-to-users');
     });
 
-    // Notification Page Route
-    Route::get('/notifications-page', function () {
-        return view('notifications.index');
-    })->name('notifications.page');
-});
+    // Work/Projects Routes
+    Route::prefix('work')->name('work.')->group(function () {
+        Route::resource('projects', App\Http\Controllers\Work\ProjectController::class);
+        Route::get('projects/datatable/data', [App\Http\Controllers\Work\ProjectController::class, 'datatable'])->name('projects.datatable');
+        Route::put('projects/{project}/status', [App\Http\Controllers\Work\ProjectController::class, 'updateStatus'])->name('projects.update-status');
+        Route::get('projects/stats/data', [App\Http\Controllers\Work\ProjectController::class, 'stats'])->name('projects.stats');
+        Route::get('projects/export/data', [App\Http\Controllers\Work\ProjectController::class, 'export'])->name('projects.export');
+        Route::get('projects/preview-code', [App\Http\Controllers\Work\ProjectController::class, 'previewCode'])->name('projects.preview-code');
+        Route::get('projects/debug-prefix', [App\Http\Controllers\Work\ProjectController::class, 'debugPrefix'])->name('projects.debug-prefix');
+    });
     // Manufacturing Routes
+
+});

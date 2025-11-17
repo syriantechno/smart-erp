@@ -5,6 +5,13 @@ namespace App\Models\HR;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use App\Models\Setting\Company;
+use App\Models\HR\Employee;
+use App\Models\Approval\ApprovalRequest;
+use App\Models\DocumentManagement\Document;
+use App\Models\Mail\ElectronicMail;
+use App\Models\User;
 
 class Department extends Model
 {

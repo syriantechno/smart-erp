@@ -110,7 +110,7 @@
             }
         });
     </script>
-
+    @vite('resources/js/app.js')
     @stack('scripts')
     <!-- END: Pages, layouts, components JS Assets-->
 </body>

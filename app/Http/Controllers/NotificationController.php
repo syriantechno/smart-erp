@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Notification;
 use App\Models\Document;
+use App\Models\HR\Employee as HREmployee;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -425,7 +426,7 @@ class NotificationController extends Controller
     /**
      * Send notification when employee is created.
      */
-    public static function employeeCreated(\App\Models\Employee $employee): void
+    public static function employeeCreated(HREmployee $employee): void
     {
         if (!function_exists('setting') || !setting('notifications.employee.created', true)) {
             return;
@@ -442,7 +443,7 @@ class NotificationController extends Controller
     /**
      * Send notification when employee is deleted.
      */
-    public static function employeeDeleted(\App\Models\Employee $employee): void
+    public static function employeeDeleted(HREmployee $employee): void
     {
         if (!function_exists('setting') || !setting('notifications.employee.deleted', true)) {
             return;

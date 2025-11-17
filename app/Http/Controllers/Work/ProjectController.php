@@ -4,6 +4,10 @@ namespace App\Http\Controllers\Work;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project;
+use App\Models\Setting\Company;
+use App\Models\HR\Department;
+use App\Models\HR\Employee;
+use App\Services\DocumentCodeGenerator;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
@@ -11,15 +15,125 @@ use Illuminate\Support\Facades\Log;
 
 class ProjectController extends Controller
 {
+    public function __construct(private DocumentCodeGenerator $codeGenerator)
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(): View
     {
-        $companies = \App\Models\Company::active()->get();
-        $employees = \App\Models\Employee::active()->get();
+        $companies = Company::active()->get();
+        $departments = Department::all();
+        $employees = Employee::active()->get();
 
-        return view('project-management.projects.index', compact('companies', 'employees'));
+        // Get some basic stats for the dashboard
+        $projects = Project::active()->latest()->get();
+        $stats = [
+            'total' => $projects->count(),
+            'active' => $projects->where('status', 'active')->count(),
+            'completed' => $projects->where('status', 'completed')->count(),
+            'overdue' => $projects->where('end_date', '<', now())->whereNotIn('status', ['completed'])->count(),
+        ];
+
+        return view('work.projects.index', compact('companies', 'departments', 'employees', 'projects', 'stats'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create(): View
+    {
+        $companies = Company::active()->get();
+        $departments = Department::all();
+        $employees = Employee::active()->get();
+
+        if (request()->ajax()) {
+            return view('work.projects.partials.create-modal', compact('companies', 'departments', 'employees'));
+        }
+
+        return view('work.projects.create', compact('companies', 'departments', 'employees'));
+    }
+
+    public function show(Project $project): View
+    {
+        $project->load(['company', 'department', 'manager', 'tasks']);
+
+        return view('work.projects.show', compact('project'));
+    }
+
+    public function edit(Project $project): View
+    {
+        $companies = Company::active()->get();
+        $departments = Department::all();
+        $employees = Employee::active()->get();
+
+        return view('work.projects.edit', compact('project', 'companies', 'departments', 'employees'));
+    }
+
+    public function update(Request $request, Project $project): JsonResponse
+    {
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'code' => 'required|string|unique:projects,code,' . $project->id,
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'company_id' => 'required|exists:companies,id',
+            'department_id' => 'nullable|exists:departments,id',
+            'manager_id' => 'nullable|exists:employees,id',
+            'start_date' => 'required|date',
+            'end_date' => 'nullable|date|after:start_date',
+            'actual_end_date' => 'nullable|date',
+            'status' => 'required|in:planning,active,on_hold,completed,cancelled',
+            'priority' => 'required|in:low,medium,high,critical',
+            'budget' => 'nullable|numeric|min:0',
+            'actual_cost' => 'nullable|numeric|min:0',
+            'progress_percentage' => 'required|integer|min:0|max:100',
+            'objectives' => 'nullable|string',
+            'deliverables' => 'nullable|string',
+            'risks' => 'nullable|string',
+            'notes' => 'nullable|string',
+            'is_active' => 'boolean',
+        ]);
+
+        if ($validator->fails()) {
+            Log::warning('Project update validation failed:', $validator->errors()->toArray());
+            notify_error('يرجى تصحيح الأخطاء في البيانات المدخلة', 'خطأ في البيانات');
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            $project->update($request->validated());
+
+            Log::info('Project updated successfully:', $project->toArray());
+
+            notify_updated('المشروع');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Project updated successfully',
+                'data' => $project
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Project update failed:', [
+                'project_id' => $project->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all()
+            ]);
+
+            notify_error_code(1001, 'فشل في تحديث المشروع');
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update project',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -71,7 +185,7 @@ class ProjectController extends Controller
                 })
                 ->addColumn('actions', function ($project) {
                     try {
-                        return view('project-management.projects.partials.actions', compact('project'))->render();
+                        return view('work.projects.partials.actions', compact('project'))->render();
                     } catch (\Exception $e) {
                         Log::error('Error rendering actions view:', $e->getMessage());
                         return 'Error: ' . $e->getMessage();
@@ -87,6 +201,73 @@ class ProjectController extends Controller
 
             return response()->json([
                 'error' => 'Database error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Preview project code
+     */
+    public function previewCode(): JsonResponse
+    {
+        Log::info('=== PREVIEW CODE START ===');
+        Log::info('Preview code called for projects');
+        
+        try {
+            // Check existing settings
+            $allSettings = \App\Models\Setting\PrefixSetting::all();
+            Log::info('All prefix settings count: ' . $allSettings->count());
+            foreach($allSettings as $setting) {
+                Log::info('Setting: ' . $setting->document_type . ' -> ' . $setting->prefix . ' (active: ' . ($setting->is_active ? 'yes' : 'no') . ')');
+            }
+            
+            // Ensure projects prefix setting exists
+            $setting = \App\Models\Setting\PrefixSetting::where('document_type', 'projects')->first();
+            Log::info('Projects setting found: ' . ($setting ? 'YES' : 'NO'));
+            
+            if (!$setting) {
+                Log::info('Creating projects prefix setting...');
+                $setting = \App\Models\Setting\PrefixSetting::create([
+                    'document_type' => 'projects',
+                    'prefix' => 'PRJ',
+                    'padding' => 4,
+                    'start_number' => 1,
+                    'current_number' => 1,
+                    'include_year' => false,
+                    'is_active' => true,
+                ]);
+                Log::info('Projects prefix setting created successfully with ID: ' . $setting->id);
+                
+                // Verify creation
+                $verifySetting = \App\Models\Setting\PrefixSetting::where('document_type', 'projects')->first();
+                Log::info('Verification after creation: ' . ($verifySetting ? 'SUCCESS' : 'FAILED'));
+            } else {
+                Log::info('Using existing setting - ID: ' . $setting->id . ', Current: ' . $setting->current_number);
+            }
+            
+            $code = $this->codeGenerator->preview('projects');
+            Log::info('Generated preview code:', ['code' => $code]);
+            
+            Log::info('=== PREVIEW CODE END ===');
+            
+            return response()->json([
+                'success' => true,
+                'code' => $code,
+                'debug' => [
+                    'setting_created' => !$setting->wasRecentlyCreated ?? false,
+                    'current_number' => $setting->current_number ?? null
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('=== PREVIEW CODE ERROR ===');
+            Log::error('Error generating preview code:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to generate preview code: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -109,7 +290,7 @@ class ProjectController extends Controller
             'status' => 'required|in:planning,active,on_hold,completed,cancelled',
             'priority' => 'required|in:low,medium,high,critical',
             'budget' => 'nullable|numeric|min:0',
-            'progress_percentage' => 'required|integer|min:0|max:100',
+            'progress_percentage' => 'nullable|integer|min:0|max:100',
             'objectives' => 'nullable|string',
             'deliverables' => 'nullable|string',
             'risks' => 'nullable|string',
@@ -127,8 +308,23 @@ class ProjectController extends Controller
         }
 
         try {
+            // Ensure projects prefix setting exists
+            $setting = \App\Models\Setting\PrefixSetting::where('document_type', 'projects')->first();
+            
+            if (!$setting) {
+                $setting = \App\Models\Setting\PrefixSetting::create([
+                    'document_type' => 'projects',
+                    'prefix' => 'PRJ',
+                    'padding' => 4,
+                    'start_number' => 1,
+                    'current_number' => 1,
+                    'include_year' => false,
+                    'is_active' => true,
+                ]);
+            }
+            
             $project = Project::create([
-                'code' => Project::generateUniqueCode(),
+                'code' => $this->codeGenerator->generate('projects'),
                 'name' => $request->name,
                 'description' => $request->description,
                 'company_id' => $request->company_id,
@@ -321,8 +517,42 @@ class ProjectController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Debug prefix settings
      */
+    public function debugPrefix(): JsonResponse
+    {
+        try {
+            $allSettings = \App\Models\Setting\PrefixSetting::all();
+            $projectsSetting = \App\Models\Setting\PrefixSetting::where('document_type', 'projects')->first();
+            
+            return response()->json([
+                'success' => true,
+                'total_settings' => $allSettings->count(),
+                'all_settings' => $allSettings->map(function($setting) {
+                    return [
+                        'id' => $setting->id,
+                        'document_type' => $setting->document_type,
+                        'prefix' => $setting->prefix,
+                        'current_number' => $setting->current_number,
+                        'is_active' => $setting->is_active,
+                    ];
+                }),
+                'projects_setting' => $projectsSetting ? [
+                    'id' => $projectsSetting->id,
+                    'document_type' => $projectsSetting->document_type,
+                    'prefix' => $projectsSetting->prefix,
+                    'current_number' => $projectsSetting->current_number,
+                    'is_active' => $projectsSetting->is_active,
+                ] : null,
+                'projects_setting_exists' => $projectsSetting ? true : false
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
     public function destroy(Project $project): JsonResponse
     {
         try {

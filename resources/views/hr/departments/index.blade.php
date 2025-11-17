@@ -188,31 +188,22 @@
 
         const initialLength = lengthSelect ? parseInt(lengthSelect.value, 10) || 25 : 25;
 
-        const table = window.initDataTable('#departments-table', {
-            ajax: {
-                url: @json(route('hr.departments.datatable')),
-                type: 'GET',
-                data: function (d) {
-                    if (filterField) {
-                        d.filter_field = filterField.value || 'all';
-                    }
-                    if (filterType) {
-                        d.filter_type = filterType.value || 'contains';
-                    }
-                    if (filterValue) {
-                        d.filter_value = filterValue.value || '';
-                    }
-                    d.page_length = lengthSelect ? parseInt(lengthSelect.value, 10) || initialLength : initialLength;
-                },
-                error: function (xhr, textStatus, error) {
-                    console.error('DataTables AJAX error:', textStatus, error, xhr.responseText);
+        const table = (window.erpCrud && window.erpCrud.initDataTable) ? window.erpCrud.initDataTable({
+            tableSelector: '#departments-table',
+            ajaxUrl: @json(route('hr.departments.datatable')),
+            ajaxData: function (d) {
+                if (filterField) {
+                    d.filter_field = filterField.value || 'all';
                 }
+                if (filterType) {
+                    d.filter_type = filterType.value || 'contains';
+                }
+                if (filterValue) {
+                    d.filter_value = filterValue.value || '';
+                }
+                d.page_length = lengthSelect ? parseInt(lengthSelect.value, 10) || initialLength : initialLength;
             },
             pageLength: initialLength,
-            lengthChange: false,
-            searching: false,
-            dom:
-                "t<'datatable-footer flex flex-col md:flex-row md:items-center md:justify-between mt-5 gap-4'<'datatable-info text-slate-500'i><'datatable-pagination'p>>",
             columns: [
                 {
                     data: 'DT_RowIndex',
@@ -280,12 +271,12 @@
                     searchable: false
                 }
             ],
-            drawCallback: function () {
+            drawCallback: function (settings) {
                 if (typeof window.Lucide !== 'undefined') {
                     window.Lucide.createIcons();
                 }
             }
-        });
+        }) : null;
 
         if (!table) {
             return;
@@ -337,61 +328,15 @@
             }
         };
 
-        const createForm = document.getElementById('create-department-form');
-        const createModal = document.getElementById('create-department-modal');
-
-        if (createForm) {
-            createForm.addEventListener('submit', function (event) {
-                event.preventDefault();
-
-                const formData = new FormData(createForm);
-
-                fetch(createForm.action, {
-                    method: 'POST',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    },
-                    body: formData,
-                })
-                    .then(async (response) => {
-                        if (response.ok) {
-                            return response.json();
-                        }
-
-                        if (response.status === 422) {
-                            const data = await response.json();
-                            const errors = data.errors || {};
-                            const firstError = Object.values(errors)[0];
-                            if (firstError) {
-                                showToast(Array.isArray(firstError) ? firstError[0] : firstError, 'error');
-                            } else {
-                                showToast(data.message || 'Validation error', 'error');
-                            }
-                            throw new Error('validation');
-                        }
-
-                        throw new Error('request');
-                    })
-                    .then((data) => {
-                        if (data.success) {
-                            showToast(data.message || 'Department created successfully', 'success');
-                            createForm.reset();
-                            refreshDepartmentCode();
-                            closeModal(createModal);
-                            reloadTable();
-                        } else {
-                            showToast(data.message || 'Failed to create department', 'error');
-                        }
-                    })
-                    .catch((error) => {
-                        if (error.message === 'validation') {
-                            return;
-                        }
-                        console.error('Department create error:', error);
-                        showToast('An error occurred while saving the department', 'error');
-                    });
+        // Use shared CRUD helper for department create form
+        if (window.erpCrud) {
+            window.erpCrud.handleCreateForm({
+                formSelector: '#create-department-form',
+                modalSelector: '#create-department-modal',
+                onSuccess: function () {
+                    refreshDepartmentCode();
+                    reloadTable();
+                }
             });
         }
 
@@ -484,31 +429,23 @@
             table.ajax.reload(null, false);
         });
 
-        window.deleteDepartment = function (id, name) {
-            confirmDelete(name, function() {
-                fetch(`{{ route('hr.departments.destroy', '') }}/${id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json',
-                    },
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        reloadTable();
-                        showToast(data.message || 'Department deleted successfully', 'delete');
-                    } else {
-                        showToast(data.message || 'Failed to delete department', 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showToast('An error occurred while deleting the department', 'error');
-                });
+        // Use shared CRUD helper for delete
+        if (window.erpCrud) {
+            window.erpCrud.handleDelete({
+                urlBuilder: function (id) {
+                    return `{{ route('hr.departments.destroy', '') }}/${id}`;
+                },
+                onSuccess: function () {
+                    reloadTable();
+                }
             });
-        };
+
+            window.deleteDepartment = function (id, name) {
+                if (typeof window.erpDeleteRecord === 'function') {
+                    window.erpDeleteRecord(id, name);
+                }
+            };
+        }
     });
     </script>
 @endpush

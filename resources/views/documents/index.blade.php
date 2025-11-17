@@ -502,7 +502,9 @@
             const jq = window.jQuery;
             if (!jq) {
                 console.error('jQuery is not available; cannot upload document.');
-                Swal.fire('Error', 'jQuery is not loaded; cannot upload document.', 'error');
+                if (typeof window.showError === 'function') {
+                    window.showError('jQuery is not loaded; cannot upload document.');
+                }
                 return;
             }
 
@@ -510,7 +512,9 @@
 
             // Add file
             if (!selectedFile) {
-                Swal.fire('Error', 'Please select a file to upload', 'error');
+                if (typeof window.showError === 'function') {
+                    window.showError('Please select a file to upload');
+                }
                 return;
             }
             formData.append('file', selectedFile);
@@ -570,18 +574,22 @@
                     if (response.success) {
                         closeModalById('upload-modal');
                         clearFile();
-                        if (documentsTable) {
+                        if (response.success) {
                             documentsTable.ajax.reload();
+                            updateStats();
+                            if (typeof window.showSuccess === 'function') {
+                                window.showSuccess(response.message || 'Document uploaded successfully');
+                            }
+                        } else if (typeof window.showError === 'function') {
+                            window.showError(response.message || 'Failed to upload document');
                         }
-                        updateStats();
-                        Swal.fire('Success', response.message, 'success');
-                    } else {
-                        Swal.fire('Error', response.message, 'error');
-                    }
+                    },
                 },
                 error: function(xhr) {
                     const error = xhr.responseJSON?.message || 'Upload failed';
-                    Swal.fire('Error', error, 'error');
+                    if (typeof window.showError === 'function') {
+                        window.showError(error);
+                    }
                 },
                 complete: function() {
                     jq('#upload-btn').prop('disabled', false).text('Upload Document');
@@ -599,7 +607,9 @@
             const jq = window.jQuery;
             if (!jq) {
                 console.error('jQuery is not available; cannot save category.');
-                Swal.fire('Error', 'jQuery is not loaded; cannot save category.', 'error');
+                if (typeof window.showError === 'function') {
+                    window.showError('jQuery is not loaded; cannot save category.');
+                }
                 return;
             }
 
@@ -613,7 +623,9 @@
             };
 
             if (!formData.name) {
-                Swal.fire('Error', 'Category name is required', 'error');
+                if (typeof window.showError === 'function') {
+                    window.showError('Category name is required');
+                }
                 return;
             }
 
@@ -625,13 +637,17 @@
                     if (response.success) {
                         closeModalById('category-modal');
                         location.reload(); // Reload to show new category
-                        Swal.fire('Success', response.message, 'success');
-                    } else {
-                        Swal.fire('Error', response.message, 'error');
+                        if (typeof window.showSuccess === 'function') {
+                            window.showSuccess(response.message || 'Category saved successfully');
+                        }
+                    } else if (typeof window.showError === 'function') {
+                        window.showError(response.message || 'Failed to save category');
                     }
                 },
                 error: function() {
-                    Swal.fire('Error', 'Failed to save category', 'error');
+                    if (typeof window.showError === 'function') {
+                        window.showError('Failed to save category');
+                    }
                 }
             });
         }
@@ -675,7 +691,9 @@
             jq.get('{{ route("documents.show", ":id") }}'.replace(':id', id))
                 .done(function(response) {
                     if (!response.success) {
-                        Swal.fire('Error', response.message || 'Unable to load document details.', 'error');
+                        if (typeof window.showError === 'function') {
+                            window.showError(response.message || 'Unable to load document details.');
+                        }
                         return;
                     }
 
@@ -744,7 +762,9 @@
                 })
                 .fail(function(xhr) {
                     const msg = xhr.responseJSON?.message || 'Unable to load document details.';
-                    Swal.fire('Error', msg, 'error');
+                    if (typeof window.showError === 'function') {
+                        window.showError(msg);
+                    }
                 });
         };
 
@@ -818,13 +838,17 @@
             const jq = window.jQuery;
             if (!jq) {
                 console.error('jQuery is not available; cannot update document.');
-                Swal.fire('Error', 'jQuery is not loaded; cannot update document.', 'error');
+                if (typeof window.showError === 'function') {
+                    window.showError('jQuery is not loaded; cannot update document.');
+                }
                 return;
             }
 
             const id = jq('#edit-document-id').val();
             if (!id) {
-                Swal.fire('Error', 'Document ID is missing.', 'error');
+                if (typeof window.showError === 'function') {
+                    window.showError('Document ID is missing.');
+                }
                 return;
             }
 
@@ -863,14 +887,18 @@
                             documentsTable.ajax.reload(null, false);
                         }
                         updateStats();
-                        Swal.fire('Success', response.message || 'Document updated successfully', 'success');
-                    } else {
-                        Swal.fire('Error', response.message || 'Failed to update document', 'error');
+                        if (typeof window.showSuccess === 'function') {
+                            window.showSuccess(response.message || 'Document updated successfully');
+                        }
+                    } else if (typeof window.showError === 'function') {
+                        window.showError(response.message || 'Failed to update document');
                     }
                 },
                 error: function(xhr) {
                     const msg = xhr.responseJSON?.message || 'Failed to update document';
-                    Swal.fire('Error', msg, 'error');
+                    if (typeof window.showError === 'function') {
+                        window.showError(msg);
+                    }
                 },
                 complete: function() {
                     jq('#edit-document-save-btn').prop('disabled', false).text('Save Changes');
@@ -879,23 +907,17 @@
         }
 
         window.deleteDocument = function(id, title) {
-            Swal.fire({
-                title: 'Delete Document',
-                text: `Are you sure you want to delete "${title}"?`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Delete'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const jq = window.jQuery;
-                    if (!jq) {
-                        console.error('jQuery is not available; cannot delete document.');
-                        Swal.fire('Error!', 'jQuery is not loaded; cannot delete document.', 'error');
-                        return;
-                    }
+            const jq = window.jQuery;
+            if (!jq) {
+                console.error('jQuery is not available; cannot delete document.');
+                if (typeof window.showError === 'function') {
+                    window.showError('jQuery is not loaded; cannot delete document.');
+                }
+                return;
+            }
 
+            if (typeof window.confirmDelete === 'function') {
+                window.confirmDelete(title, function() {
                     jq.ajax({
                         url: '{{ route("documents.destroy", ":id") }}'.replace(':id', id),
                         type: 'DELETE',
@@ -906,15 +928,20 @@
                             if (response.success) {
                                 documentsTable.ajax.reload();
                                 updateStats();
-                                Swal.fire('Deleted!', response.message, 'success');
+                                if (typeof window.showSuccess === 'function') {
+                                    window.showSuccess(response.message || 'Document deleted successfully');
+                                }
                             }
                         },
                         error: function(xhr) {
-                            Swal.fire('Error!', 'Failed to delete document.', 'error');
+                            if (typeof window.showError === 'function') {
+                                window.showError('Failed to delete document.');
+                            }
                         }
                     });
-                }
-            });
-        };
+                });
+            }
+        }
+;
     </script>
 @endpush

@@ -529,10 +529,5 @@
 
         return toast;
     };
-
-    // Auto-initialize on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('🎉 Global Notification System Initialized');
-    });
 </script>
 @endPushOnce

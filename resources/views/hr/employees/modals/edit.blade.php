@@ -50,6 +50,7 @@
                         name="hire_date"
                         class="pl-12 w-full"
                         data-single-mode="true"
+                        data-format="YYYY-MM-DD"
                         required
                     />
                 </div>
@@ -67,6 +68,7 @@
                         name="birth_date"
                         class="pl-12 w-full"
                         data-single-mode="true"
+                        data-format="YYYY-MM-DD"
                     />
                 </div>
             </div>

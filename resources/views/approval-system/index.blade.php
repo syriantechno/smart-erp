@@ -796,40 +796,28 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Success!',
-                                text: 'Approval request submitted successfully',
-                                timer: 3000,
-                                showConfirmButton: false
-                            }).then(() => {
-                                closeModal('create-request-modal');
-                                if (approvalTable) {
-                                    approvalTable.ajax.reload();
-                                }
-                            });
+                            if (typeof window.showSuccess === 'function') {
+                                window.showSuccess('Approval request submitted successfully');
+                            }
+                            approvalTable.ajax.reload();
                         } else {
-                            let errorMessage = 'Failed to submit request';
+                            let errorMessage = 'Failed to submit approval request.';
                             if (data.errors) {
                                 errorMessage = Object.values(data.errors).flat().join('\n');
                             } else if (data.message) {
                                 errorMessage = data.message;
                             }
 
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error!',
-                                text: errorMessage
-                            });
+                            if (typeof window.showError === 'function') {
+                                window.showError(errorMessage);
+                            }
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error!',
-                            text: 'An error occurred while submitting the request'
-                        });
+                        if (typeof window.showError === 'function') {
+                            window.showError('An error occurred while submitting the request');
+                        }
                     })
                     .finally(() => {
                         submitBtn.disabled = false;
@@ -873,24 +861,32 @@
             })
             .done(function(response) {
                 if (response.success) {
+                    if (typeof window.showSuccess === 'function') {
+                        window.showSuccess(response.message || 'Request approved successfully');
+                    }
                     closeModal('approve-modal');
                     approvalTable.ajax.reload();
-                    Swal.fire('Success!', response.message, 'success');
                 } else {
-                    Swal.fire('Error!', response.message, 'error');
+                    if (typeof window.showError === 'function') {
+                        window.showError(response.message || 'Failed to approve request');
+                    }
                 }
             })
             .fail(function() {
-                Swal.fire('Error!', 'Failed to approve request', 'error');
+                if (typeof window.showError === 'function') {
+                    window.showError('Failed to approve request');
+                }
             });
         };
 
-        window.submitRejection = function() {
+        window.submitRejection = function(requestId) {
             const reason = $('#reject-reason').val();
             const comments = $('#reject-comments').val();
 
             if (!reason.trim()) {
-                Swal.fire('Error!', 'Please provide a rejection reason', 'error');
+                if (typeof window.showError === 'function') {
+                    window.showError('Please provide a rejection reason');
+                }
                 return;
             }
 
@@ -903,13 +899,17 @@
                 if (response.success) {
                     closeModal('reject-modal');
                     approvalTable.ajax.reload();
-                    Swal.fire('Success!', response.message, 'success');
-                } else {
-                    Swal.fire('Error!', response.message, 'error');
+                    if (typeof window.showSuccess === 'function') {
+                        window.showSuccess(response.message || 'Request rejected successfully');
+                    }
+                } else if (typeof window.showError === 'function') {
+                    window.showError(response.message || 'Failed to reject request');
                 }
             })
             .fail(function() {
-                Swal.fire('Error!', 'Failed to reject request', 'error');
+                if (typeof window.showError === 'function') {
+                    window.showError('Failed to reject request');
+                }
             });
         };
 

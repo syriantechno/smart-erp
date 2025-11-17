@@ -18,3 +18,5 @@ if (token) {
 } else {
     console.error('CSRF token not found');
 }
+
+import './erp/crud';

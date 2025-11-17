@@ -285,39 +285,33 @@
 
             const initialLength = lengthSelect ? parseInt(lengthSelect.value, 10) || 10 : 10;
 
-            const table = window.initDataTable('#employees-table', {
-                ajax: {
-                    url: '{{ route("hr.employees.datatable") }}',
-                    type: 'GET',
-                    data: function (d) {
-                        if (filterField) {
-                            d.filter_field = filterField.value || 'all';
-                        }
-                        if (filterType) {
-                            d.filter_type = filterType.value || 'contains';
-                        }
-                        if (filterValue) {
-                            d.filter_value = filterValue.value || '';
-                        }
-                        if (companyFilter) {
-                            d.company_id = companyFilter.value || '';
-                        }
-                        if (departmentFilter) {
-                            d.department_id = departmentFilter.value || '';
-                        }
-                        if (positionFilter) {
-                            d.position_filter = positionFilter.value || '';
-                        }
-                        d.page_length = lengthSelect ? parseInt(lengthSelect.value, 10) || initialLength : initialLength;
-                    },
-                    error: function () {}
+            const table = (window.erpCrud && window.erpCrud.initDataTable) ? window.erpCrud.initDataTable({
+                tableSelector: '#employees-table',
+                ajaxUrl: '{{ route("hr.employees.datatable") }}',
+                ajaxData: function (d) {
+                    if (filterField) {
+                        d.filter_field = filterField.value || 'all';
+                    }
+                    if (filterType) {
+                        d.filter_type = filterType.value || 'contains';
+                    }
+                    if (filterValue) {
+                        d.filter_value = filterValue.value || '';
+                    }
+                    if (companyFilter) {
+                        d.company_id = companyFilter.value || '';
+                    }
+                    if (departmentFilter) {
+                        d.department_id = departmentFilter.value || '';
+                    }
+                    if (positionFilter) {
+                        d.position_filter = positionFilter.value || '';
+                    }
+                    d.page_length = lengthSelect ? parseInt(lengthSelect.value, 10) || initialLength : initialLength;
                 },
                 pageLength: initialLength,
-                lengthChange: false,
-                searching: false,
-                order: [[1, 'asc']], // Order by code column (index 1)
-                dom:
-                    "t<'datatable-footer flex flex-col md:flex-row md:items-center md:justify-between mt-5 gap-4'<'datatable-info text-slate-500'i><'datatable-pagination'p>>",
+                order: [[1, 'asc']],
+                dom: "t<'datatable-footer flex flex-col md:flex-row md:items-center md:justify-between mt-5 gap-4'<'datatable-info text-slate-500'i><'datatable-pagination'p>>",
                 columns: [
                     { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center font-medium', orderable: false },
                     { data: 'code', name: 'code', className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700 whitespace-nowrap' },
@@ -346,14 +340,12 @@
                         searchable: false
                     }
                 ],
-                rawColumns: ['status', 'profile_picture', 'actions'],
-                drawCallback: function () {
+                drawCallback: function (settings) {
                     if (typeof window.Lucide !== 'undefined') {
                         window.Lucide.createIcons();
                     }
 
-                    // Update employee counts
-                    const info = table.page.info();
+                    const info = settings.api().page.info();
                     if (totalEmployeesCount) {
                         totalEmployeesCount.textContent = info.recordsTotal;
                     }
@@ -361,26 +353,20 @@
                         filteredEmployeesCount.textContent = info.recordsDisplay;
                     }
 
-                    // Show filter summary if filters are active
                     const hasFilters = (companyFilter && companyFilter.value) ||
-                                     (departmentFilter && departmentFilter.value) ||
-                                     (positionFilter && positionFilter.value);
+                                      (departmentFilter && departmentFilter.value) ||
+                                      (positionFilter && positionFilter.value);
 
-                    if (hasFilters && info.recordsTotal !== info.recordsDisplay) {
-                        showToast(`Filtered ${info.recordsDisplay} out of ${info.recordsTotal} employees`, 'success');
+                    if (hasFilters && info.recordsTotal !== info.recordsDisplay && typeof window.showToast === 'function') {
+                        window.showToast(`Filtered ${info.recordsDisplay} out of ${info.recordsTotal} employees`, 'success');
                     }
 
-                    // Update active filters indicator
                     const activeFiltersIndicator = document.getElementById('active-filters-indicator');
                     if (activeFiltersIndicator) {
-                        if (hasFilters) {
-                            activeFiltersIndicator.classList.remove('hidden');
-                        } else {
-                            activeFiltersIndicator.classList.add('hidden');
-                        }
+                        activeFiltersIndicator.classList.toggle('hidden', !hasFilters);
                     }
                 }
-            });
+            }) : null;
 
             if (!table) {
                 return;
@@ -620,60 +606,14 @@
             // Dynamic department and position loading - handled in modal
             // Removed to avoid conflicts with modal's own JavaScript
 
-            const createForm = document.getElementById('create-employee-form');
-            const createModal = document.getElementById('create-employee-modal');
-
-            if (createForm) {
-                createForm.addEventListener('submit', function (event) {
-                    event.preventDefault();
-
-                    const formData = new FormData(createForm);
-
-                    fetch(createForm.action, {
-                        method: 'POST',
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        },
-                        body: formData,
-                    })
-                        .then(async (response) => {
-                            if (response.ok) {
-                                return response.json();
-                            }
-
-                            if (response.status === 422) {
-                                const data = await response.json();
-                                const errors = data.errors || {};
-                                const firstError = Object.values(errors)[0];
-                                if (firstError) {
-                                    showToast(Array.isArray(firstError) ? firstError[0] : firstError, 'error');
-                                } else {
-                                    showToast(data.message || 'Validation error', 'error');
-                                }
-                                throw new Error('validation');
-                            }
-
-                            throw new Error('request');
-                        })
-                        .then((data) => {
-                            if (data.success) {
-                                showToast(data.message || 'Employee created successfully', 'success');
-                                createForm.reset();
-                                // Reset selects - handled in modal
-                                createModal.__tippy?.hide?.();
-                                reloadTable();
-                            } else {
-                                showToast(data.message || 'Failed to create employee', 'error');
-                            }
-                        })
-                        .catch((error) => {
-                            if (error.message === 'validation') {
-                                return;
-                            }
-                            showToast('An error occurred while saving the employee', 'error');
-                        });
+            // Use shared CRUD helper for create form
+            if (window.erpCrud) {
+                window.erpCrud.handleCreateForm({
+                    formSelector: '#create-employee-form',
+                    modalSelector: '#create-employee-modal',
+                    onSuccess: function () {
+                        reloadTable();
+                    },
                 });
             }
 
@@ -758,117 +698,35 @@
                 }
             };
 
-            const editForm = document.getElementById('edit-employee-form');
-            const editModal = document.getElementById('edit-employee-modal');
-
-            if (editForm) {
-                editForm.addEventListener('submit', function (event) {
-                    event.preventDefault();
-
-                    const formData = new FormData(editForm);
-
-                    fetch(editForm.action, {
-                        method: 'POST',
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        },
-                        body: formData,
-                    })
-                        .then(async (response) => {
-                            if (response.ok) {
-                                return response.json();
-                            }
-
-                            if (response.status === 422) {
-                                const data = await response.json();
-                                const errors = data.errors || {};
-                                const firstError = Object.values(errors)[0];
-                                if (firstError) {
-                                    showToast(Array.isArray(firstError) ? firstError[0] : firstError, 'error');
-                                } else {
-                                    showToast(data.message || 'Validation error', 'error');
-                                }
-                                throw new Error('validation');
-                            }
-
-                            throw new Error('request');
-                        })
-                        .then((data) => {
-                            if (data.success) {
-                                showToast(data.message || 'Employee updated successfully', 'success');
-
-                                // Properly close the modal using its dismiss button
-                                if (editModal) {
-                                    const dismissTrigger = editModal.querySelector('[data-tw-dismiss="modal"]');
-                                    if (dismissTrigger) {
-                                        dismissTrigger.click();
-                                    }
-                                }
-
-                                reloadTable();
-                            } else {
-                                showToast(data.message || 'Failed to update employee', 'error');
-                            }
-                        })
-                        .catch((error) => {
-                            if (error.message === 'validation') {
-                                return;
-                            }
-                            showToast('An error occurred while updating the employee', 'error');
-                        });
+            // Use shared CRUD helper for edit form
+            if (window.erpCrud) {
+                window.erpCrud.handleEditForm({
+                    formSelector: '#edit-employee-form',
+                    modalSelector: '#edit-employee-modal',
+                    onSuccess: function () {
+                        reloadTable();
+                    },
                 });
             }
 
-            window.deleteEmployee = function (id, name) {
-                Swal.fire({
-                    title: 'Delete Employee?',
-                    html: `Are you sure you want to delete <strong>"${name}"</strong>?<br>This action cannot be undone.`,
-                    icon: 'warning',
-                    iconColor: '#ef4444',
-                    showCancelButton: true,
-                    confirmButtonColor: '#dc2626',
-                    cancelButtonColor: '#6b7280',
-                    confirmButtonText: 'Yes, delete it!',
-                    cancelButtonText: 'Cancel',
-                    background: '#ffffff',
-                    customClass: {
-                        popup: 'rounded-xl shadow-2xl',
-                        confirmButton: 'px-6 py-2 rounded-lg font-semibold',
-                        cancelButton: 'px-6 py-2 rounded-lg font-semibold'
+            // Use shared CRUD helper for delete, but expose as deleteEmployee
+            if (window.erpCrud) {
+                window.erpCrud.handleDelete({
+                    urlBuilder: function (id) {
+                        return `{{ route('hr.employees.destroy', '') }}/${id}`;
                     },
-                    showClass: {
-                        popup: 'animate__animated animate__fadeInDown animate__faster'
+                    onSuccess: function () {
+                        reloadTable();
                     },
-                    hideClass: {
-                        popup: 'animate__animated animate__fadeOutUp animate__faster'
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        fetch(`{{ route('hr.employees.destroy', '') }}/${id}`, {
-                            method: 'DELETE',
-                            headers: {
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                'X-Requested-With': 'XMLHttpRequest',
-                                'Accept': 'application/json',
-                            },
-                        })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    reloadTable();
-                                    showToast(data.message || 'Employee deleted successfully', 'success');
-                                } else {
-                                    showToast(data.message || 'Failed to delete employee', 'error');
-                                }
-                            })
-                            .catch(() => {
-                                showToast('An error occurred while deleting the employee', 'error');
-                            });
-                    }
                 });
-            };
+
+                // Keep backwards-compatible function name used in Blade actions
+                window.deleteEmployee = function (id, name) {
+                    if (typeof window.erpDeleteRecord === 'function') {
+                        window.erpDeleteRecord(id, name);
+                    }
+                };
+            }
         });
     </script>
 @endpush

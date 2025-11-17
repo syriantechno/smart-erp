@@ -58,6 +58,7 @@
                             name="birth_date"
                             class="pl-12"
                             data-single-mode="true"
+                            data-format="YYYY-MM-DD"
                         />
                     </div>
                 </div>
@@ -117,6 +118,7 @@
                             name="hire_date"
                             class="pl-12"
                             data-single-mode="true"
+                            data-format="YYYY-MM-DD"
                             required
                         />
                     </div>
@@ -224,143 +226,16 @@
     // Countries data from PHP
     const countriesData = {!! $countriesJson !!};
 
-    // Silence console output in this modal to avoid cluttering the browser console
-    const console = {
-        log: () => {},
-        error: () => {},
-        warn: () => {},
-        info: () => {},
-        debug: () => {},
-    };
-
-    console.log('🔧 Script starting, countriesData:', typeof countriesData, countriesData ? countriesData.length : 'undefined');
-
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('🚀 Employee modal script loaded at:', new Date().toISOString());
-
         let modalInitialized = false;
-        let codeGenerated = false;
-
-        // Try to load countries immediately if modal exists
-        const existingModal = document.getElementById('create-employee-modal');
-        if (existingModal) {
-            console.log('🎯 Modal already exists on page load, loading countries...');
-            loadCountries();
-        }
-
-        // Use MutationObserver to watch for modal being added to DOM
-        const observer = new MutationObserver(function(mutations) {
-            console.log('👀 MutationObserver triggered, mutations:', mutations.length);
-            mutations.forEach(function(mutation) {
-                if (mutation.type === 'childList') {
-                    const modal = document.getElementById('create-employee-modal');
-                    console.log('🔍 Looking for modal, found:', modal ? 'YES' : 'NO');
-                    if (modal && !modalInitialized) {
-                        console.log('🎯 Modal found in DOM via MutationObserver, initializing...');
-                        initializeModal();
-                    }
-                }
-            });
-        });
-
-        // Start observing
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
-
-        // Fallback: check for modal every second for 10 seconds
-        let checkCount = 0;
-        const checkInterval = setInterval(() => {
-            checkCount++;
-            console.log('⏱️ Interval check #' + checkCount);
-            const modal = document.getElementById('create-employee-modal');
-            console.log('🔍 Modal in interval check:', modal ? 'YES' : 'NO');
-            if (modal && !modalInitialized) {
-                console.log('🎯 Modal found via interval check #' + checkCount + ', initializing...');
-                initializeModal();
-                clearInterval(checkInterval);
-            }
-            if (checkCount >= 10) {
-                console.log('⏰ Stopped checking for modal after 10 attempts');
-                clearInterval(checkInterval);
-            }
-        }, 1000);
-
-        // Also listen for modal events (in case they work)
-        document.addEventListener('show.tw.modal', function(event) {
-            console.log('📂 Modal show event detected');
-            if (event.target && event.target.id === 'create-employee-modal') {
-                console.log('📂 Modal show event for create-employee-modal');
-                if (!modalInitialized) {
-                    setTimeout(() => initializeModal(), 100);
-                }
-            }
-        });
-
-        document.addEventListener('shown.tw.modal', function(event) {
-            console.log('🎯 Modal shown event detected');
-            if (event.target && event.target.id === 'create-employee-modal') {
-                console.log('🎯 Modal shown event for create-employee-modal');
-                if (!modalInitialized) {
-                    setTimeout(() => initializeModal(), 200);
-                }
-            }
-        });
 
         function initializeModal() {
             if (modalInitialized) return;
 
-            console.log('🔄 Initializing modal functionality...');
-
-            // Generate code if not already done
-            if (!codeGenerated) {
-                generateEmployeeCode();
-            }
-
-            // Load countries - make sure this happens
-            console.log('🚀 About to call loadCountries...');
             loadCountries();
-
-            // Setup event listeners
             setupEventListeners();
 
             modalInitialized = true;
-            console.log('✅ Modal initialized successfully');
-        }
-
-        function generateEmployeeCode() {
-            if (codeGenerated) return;
-
-            const codeInput = document.getElementById('code');
-            if (!codeInput || codeInput.value) {
-                codeGenerated = true;
-                return;
-            }
-
-            console.log('🔢 Generating employee code...');
-            fetch('{{ route("hr.employees.preview-code") }}', {
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                }
-            })
-            .then(r => {
-                console.log('📡 Code API response:', r.status);
-                return r.json();
-            })
-            .then(d => {
-                console.log('🔢 Code data received:', d);
-                if (d.code && codeInput) {
-                    codeInput.value = d.code;
-                    console.log('✅ Code set to:', d.code);
-                    codeGenerated = true;
-                }
-            })
-            .catch(e => {
-                console.error('❌ Code generation error:', e);
-                codeGenerated = true; // Don't try again
-            });
         }
 
         function setupEventListeners() {
@@ -383,17 +258,14 @@
         }
 
         function handleCompanyChange() {
-            console.log('🏢 Company changed to:', this.value);
             const dept = document.getElementById('department_id');
             const pos = document.getElementById('position');
 
             if (!dept || !pos) {
-                console.error('❌ Select elements not found');
                 return;
             }
 
             // Complete clearing
-            console.log('🧹 Clearing department and position options completely');
             dept.innerHTML = '';
             pos.innerHTML = '';
 
@@ -411,20 +283,14 @@
             dept.disabled = true;
             pos.disabled = true;
 
-            console.log('📊 After clearing - department options:', dept.options.length, ', position options:', pos.options.length);
-
             if (this.value) {
-                console.log('🌐 Fetching departments for company:', this.value);
                 fetch(`/hr/departments/api/company/${this.value}`, {
                     headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
                 })
                 .then(r => {
-                    console.log('📡 Departments response status:', r.status);
                     return r.json();
                 })
                 .then(d => {
-                    console.log('📦 Departments data received:', d);
-
                     // Clear again and add default
                     dept.innerHTML = '';
                     const newDeptDefault = document.createElement('option');
@@ -433,10 +299,7 @@
                     dept.appendChild(newDeptDefault);
 
                     if (d && Array.isArray(d) && d.length > 0) {
-                        console.log('✅ Adding', d.length, 'departments');
-
                         d.forEach((x, index) => {
-                            console.log('  ', index + 1, ':', x.name, '(ID:', x.id + ')');
                             const o = document.createElement('option');
                             o.value = x.id;
                             o.textContent = x.name;
@@ -444,9 +307,7 @@
                         });
 
                         dept.disabled = false;
-                        console.log('✅ Departments loaded, total options:', dept.options.length);
                     } else {
-                        console.log('⚠️ No departments found');
                         const noDept = document.createElement('option');
                         noDept.value = '';
                         noDept.textContent = 'No departments found';
@@ -454,7 +315,6 @@
                     }
                 })
                 .catch(e => {
-                    console.error('❌ Departments error:', e);
                     dept.innerHTML = '';
                     const errorDept = document.createElement('option');
                     errorDept.value = '';
@@ -465,16 +325,12 @@
         }
 
         function handleDepartmentChange() {
-            console.log('🏢 Department changed to:', this.value);
             const pos = document.getElementById('position');
 
             if (!pos) {
-                console.error('❌ Position select not found');
                 return;
             }
 
-            // Clear position options
-            console.log('🧹 Clearing position options');
             pos.innerHTML = '';
 
             // Add default option
@@ -486,17 +342,13 @@
             pos.disabled = true;
 
             if (this.value) {
-                console.log('🌐 Fetching positions for department:', this.value);
                 fetch(`/hr/positions/api/department/${this.value}`, {
                     headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
                 })
                 .then(r => {
-                    console.log('📡 Positions response status:', r.status);
                     return r.json();
                 })
                 .then(d => {
-                    console.log('📦 Positions data received:', d);
-
                     // Clear again and add default
                     pos.innerHTML = '';
                     const newPosDefault = document.createElement('option');
@@ -505,10 +357,7 @@
                     pos.appendChild(newPosDefault);
 
                     if (d && Array.isArray(d) && d.length > 0) {
-                        console.log('✅ Adding', d.length, 'positions');
-
                         d.forEach((x, index) => {
-                            console.log('  ', index + 1, ':', x.title, '(ID:', x.id + ')');
                             const o = document.createElement('option');
                             o.value = x.title; // Changed from x.name to x.title
                             o.textContent = x.title; // Changed from x.name to x.title
@@ -516,9 +365,7 @@
                         });
 
                         pos.disabled = false;
-                        console.log('✅ Positions loaded, total options:', pos.options.length);
                     } else {
-                        console.log('⚠️ No positions found');
                         const noPos = document.createElement('option');
                         noPos.value = '';
                         noPos.textContent = 'No positions found';
@@ -526,7 +373,6 @@
                     }
                 })
                 .catch(e => {
-                    console.error('❌ Positions error:', e);
                     pos.innerHTML = '';
                     const errorPos = document.createElement('option');
                     errorPos.value = '';
@@ -534,24 +380,17 @@
                     pos.appendChild(errorPos);
                 });
             } else {
-                console.log('ℹ️ No department selected');
             }
         }
 
         function loadCountries() {
-            console.log('🌍 Loading countries...');
-            console.log('📊 countriesData type:', typeof countriesData);
-            console.log('📊 countriesData length:', countriesData ? countriesData.length : 'undefined');
-
             const countrySelect = document.getElementById('country');
 
             if (!countrySelect) {
-                console.error('❌ Country select not found');
                 return;
             }
 
             if (!countriesData || !Array.isArray(countriesData) || countriesData.length === 0) {
-                console.error('❌ Countries data is invalid or empty');
                 const errorOption = document.createElement('option');
                 errorOption.value = '';
                 errorOption.textContent = 'Error loading data';
@@ -578,9 +417,10 @@
                 option.textContent = `${country.flag} ${country.name}`;
                 countrySelect.appendChild(option);
             });
-
-            console.log('✅ Countries loaded successfully, total options:', countrySelect.options.length);
         }
+
+        // Initialize immediately since modal is rendered in DOM
+        initializeModal();
     });
     </script>
 </x-modal.form>
