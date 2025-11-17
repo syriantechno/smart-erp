@@ -174,8 +174,8 @@ class EmployeeController extends Controller
             'phone' => 'nullable|string|max:20',
             'position' => 'required|string|max:255',
             'salary' => 'required|numeric|min:0',
-            'hire_date' => 'required|date',
-            'birth_date' => 'nullable|date',
+            'hire_date' => 'required|date_format:Y-m-d',
+            'birth_date' => 'nullable|date_format:Y-m-d',
             'gender' => 'nullable|in:male,female,other',
             'address' => 'nullable|string',
             'city' => 'nullable|string|max:100',
@@ -241,6 +241,78 @@ class EmployeeController extends Controller
         $departments = Department::where('is_active', true)->get();
         $companies = Company::where('is_active', true)->get();
         return view('hr.employees.edit', compact('employee', 'departments', 'companies'));
+    }
+
+    public function update(Request $request, Employee $employee)
+    {
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'middle_name' => 'nullable|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('employees', 'email')->ignore($employee->id),
+            ],
+            'phone' => 'nullable|string|max:20',
+            'position' => 'required|string|max:255',
+            'salary' => 'required|numeric|min:0',
+            'hire_date' => 'required|date_format:Y-m-d',
+            'birth_date' => 'nullable|date_format:Y-m-d',
+            'gender' => 'nullable|in:male,female,other',
+            'address' => 'nullable|string',
+            'city' => 'nullable|string|max:100',
+            'country' => 'nullable|string|max:100',
+            'postal_code' => 'nullable|string|max:20',
+            'department_id' => 'required|exists:departments,id',
+            'company_id' => 'required|exists:companies,id',
+            'is_active' => 'nullable|boolean',
+            // In edit form the input name is `photo`, but the column is `profile_picture`
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $validated['is_active'] = $request->boolean('is_active', false);
+
+            // Map photo input to profile_picture column
+            if ($request->hasFile('photo')) {
+                $file = $request->file('photo');
+                $filename = time() . '_' . ($employee->employee_id ?? ('EMP' . strtoupper(Str::random(8)))) . '.' . $file->getClientOriginalExtension();
+                $path = $file->storeAs('employees/profile_pictures', $filename, 'public');
+                $validated['profile_picture'] = $path;
+            }
+
+            // Do not allow changing code or employee_id from this form even if present
+            unset($validated['code'], $validated['employee_id']);
+
+            $employee->update($validated);
+
+            DB::commit();
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Employee updated successfully',
+                ]);
+            }
+
+            return redirect()
+                ->route('hr.employees.show', $employee)
+                ->with('success', 'Employee updated successfully');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error updating employee: ' . $e->getMessage(),
+                ], 500);
+            }
+
+            return back()->with('error', 'Error updating employee: ' . $e->getMessage());
+        }
     }
 
     public function destroy(Employee $employee, Request $request)

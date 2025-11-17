@@ -50,12 +50,15 @@
                     @include('settings.partials.email')
                 </div>
 
+                <!-- Appearance Settings Tab -->
+                <div class="settings-content hidden" id="appearance-content">
+                    @include('settings.partials.appearance')
+                </div>
+
                 <!-- Attendance Settings Tab -->
                 <div class="settings-content hidden" id="attendance-content">
                     @include('settings.partials.attendance')
                 </div>
-
-               
             </div>
         </div>
     </div>

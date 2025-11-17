@@ -5,10 +5,6 @@
             <x-base.lucide icon="Hash" class="w-5 h-5 mr-2 text-purple-500" />
             Prefix Settings
         </h2>
-        <x-base.button type="submit" form="prefixForm" variant="primary">
-            <x-base.lucide icon="Save" class="w-4 h-4 mr-2" />
-            Save Changes
-        </x-base.button>
     </div>
 
     <form id="prefixForm" action="{{ route('settings.prefix.update') }}" method="POST" class="p-5">
@@ -96,7 +92,8 @@
                 variant="primary"
                 class="w-32"
             >
-                Save Prefixes
+                <x-base.lucide icon="Save" class="w-4 h-4 mr-2 animate-pulse" />
+                Save
             </x-base.button>
         </div>
     </form>

@@ -40,15 +40,15 @@
 
             <div class="col-span-12 md:col-span-6">
                 <x-base.form-label for="edit-hire-date">Hire Date <span class="text-danger">*</span></x-base.form-label>
-                <div class="relative mx-auto w-56">
+                <div class="relative w-full">
                     <div
-                        class="absolute flex h-full w-10 items-center justify-center rounded-l border bg-slate-100 text-slate-500 dark:border-darkmode-800 dark:bg-darkmode-700 dark:text-slate-400">
-                        <x-base.lucide icon="calendar" class="stroke-1.5 w-5 h-5"></x-base.lucide>
+                        class="absolute inset-y-0 left-0 flex w-10 items-center justify-center rounded-l border bg-slate-100 text-slate-500 dark:border-darkmode-800 dark:bg-darkmode-700 dark:text-slate-400">
+                        <x-base.lucide icon="calendar" class="h-5 w-5 stroke-1.5"></x-base.lucide>
                     </div>
                     <x-base.litepicker
                         id="edit-hire-date"
                         name="hire_date"
-                        class="pl-12"
+                        class="pl-12 w-full"
                         data-single-mode="true"
                         required
                     />
@@ -57,15 +57,15 @@
 
             <div class="col-span-12 md:col-span-6">
                 <x-base.form-label for="edit-birth-date">Birth Date</x-base.form-label>
-                <div class="relative mx-auto w-56">
+                <div class="relative w-full">
                     <div
-                        class="absolute flex h-full w-10 items-center justify-center rounded-l border bg-slate-100 text-slate-500 dark:border-darkmode-800 dark:bg-darkmode-700 dark:text-slate-400">
-                        <x-base.lucide icon="calendar" class="stroke-1.5 w-5 h-5"></x-base.lucide>
+                        class="absolute inset-y-0 left-0 flex w-10 items-center justify-center rounded-l border bg-slate-100 text-slate-500 dark:border-darkmode-800 dark:bg-darkmode-700 dark:text-slate-400">
+                        <x-base.lucide icon="calendar" class="h-5 w-5 stroke-1.5"></x-base.lucide>
                     </div>
                     <x-base.litepicker
                         id="edit-birth-date"
                         name="birth_date"
-                        class="pl-12"
+                        class="pl-12 w-full"
                         data-single-mode="true"
                     />
                 </div>
@@ -121,13 +121,22 @@
                 <x-base.form-input id="edit-postal-code" name="postal_code" type="text" placeholder="Enter postal code" class="w-full" />
             </div>
 
-            <div class="col-span-12">
-                <x-base.form-check
-                    id="edit-is_active"
-                    name="is_active"
-                    label="Active"
-                    type="checkbox"
-                />
+            <div class="col-span-12 mt-2">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="font-medium text-sm">Active Account</div>
+                        <div class="text-xs text-slate-500">Toggle to activate or deactivate this employee.</div>
+                    </div>
+                    <div class="ml-4">
+                        <input
+                            type="checkbox"
+                            id="edit-is_active"
+                            name="is_active"
+                            value="1"
+                            class="transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 dark:bg-darkmode-800 dark:border-transparent dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&[type='radio']]:checked:bg-primary [&[type='radio']]:checked:border-primary [&[type='radio']]:checked:border-opacity-10 [&[type='checkbox']]:checked:bg-primary [&[type='checkbox']]:checked:border-primary [&[type='checkbox']]:checked:border-opacity-10 [&:disabled:not(:checked)]:bg-slate-100 [&:disabled:not(:checked)]:cursor-not-allowed [&:disabled:not(:checked)]:dark:bg-darkmode-800/50 [&:disabled:checked]:opacity-70 [&:disabled:checked]:cursor-not-allowed [&:disabled:checked]:dark:bg-darkmode-800/50 w-[38px] h-[24px] p-px rounded-full relative before:w-[20px] before:h-[20px] before:shadow-[1px_1px_3px_rgba(0,0,0,0.25)] before:transition-[margin-left] before:duration-200 before:ease-in-out before:absolute before:inset-y-0 before:my-auto before:rounded-full before:dark:bg-darkmode-600 checked:bg-primary checked:border-primary checked:bg-none before:checked:ml-[14px] before:checked:bg-white"
+                        >
+                    </div>
+                </div>
             </div>
         </div>
     </form>

@@ -70,32 +70,31 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-width: 40px;
-            height: 40px;
-            padding: 0 14px;
-            border: 1px solid rgba(var(--color-primary), 0.18);
-            border-radius: 12px;
-            font-size: 0.875rem;
+            min-width: 32px;
+            height: 32px;
+            padding: 0 12px;
+            border-radius: 0.375rem;
+            border: 1px solid transparent;
+            font-size: 0.95rem;
             font-weight: 500;
-            color: var(--dt-text-color);
-            background-color: #ffffff;
+            color: #0f172a;
+            background-color: transparent;
             text-decoration: none;
-            transition: all 0.2s ease;
-            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+            transition: all 150ms ease;
         }
 
         [data-erp-table-wrapper] .datatable-pagination ul.pagination li a:hover {
-            background-color: rgba(var(--color-primary), 0.08);
-            border-color: rgba(var(--color-primary), 0.32);
-            color: rgb(var(--color-primary));
-            box-shadow: 0 10px 24px rgba(var(--color-primary), 0.15);
+            background-color: rgba(148, 163, 184, 0.08);
+            border-color: rgba(148, 163, 184, 0.45);
+            color: #020617;
         }
 
         [data-erp-table-wrapper] .datatable-pagination ul.pagination li.active a {
-            background-color: rgb(var(--color-primary));
-            border-color: rgb(var(--color-primary));
-            color: #ffffff;
-            box-shadow: 0 16px 30px rgba(var(--color-primary), 0.35);
+            background-color: #ffffff;
+            border-color: rgba(148, 163, 184, 0.45);
+            color: #020617;
+            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.16);
+            font-weight: 500;
         }
 
         [data-erp-table-wrapper] .datatable-pagination ul.pagination li.disabled a {
@@ -108,34 +107,15 @@
         [data-erp-table-wrapper] .datatable-pagination ul.pagination li.paginate_button.previous a,
         [data-erp-table-wrapper] .datatable-pagination ul.pagination li.paginate_button.next a,
         [data-erp-table-wrapper] .datatable-pagination ul.pagination li.paginate_button.last a {
-            width: 36px;
-            height: 36px;
-            padding: 0;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-size: 56%;
-            text-indent: -9999px;
-            overflow: hidden;
-            font-size: 0;
-            line-height: 0;
-            background-color: rgba(var(--color-primary), 0.08);
-            border-color: rgba(var(--color-primary), 0.18);
-        }
-
-        [data-erp-table-wrapper] .datatable-pagination ul.pagination li.paginate_button.first a {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24' stroke='%230f172a' stroke-width='1.15' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='11 17 6 12 11 7'%3E%3C/polyline%3E%3Cpolyline points='18 17 13 12 18 7'%3E%3C/polyline%3E%3C/svg%3E");
-        }
-
-        [data-erp-table-wrapper] .datatable-pagination ul.pagination li.paginate_button.previous a {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24' stroke='%230f172a' stroke-width='1.15' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='15 18 9 12 15 6'%3E%3C/polyline%3E%3C/svg%3E");
-        }
-
-        [data-erp-table-wrapper] .datatable-pagination ul.pagination li.paginate_button.next a {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24' stroke='%230f172a' stroke-width='1.15' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='9 18 15 12 9 6'%3E%3C/polyline%3E%3C/svg%3E");
-        }
-
-        [data-erp-table-wrapper] .datatable-pagination ul.pagination li.paginate_button.last a {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24' stroke='%230f172a' stroke-width='1.15' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='13 17 18 12 13 7'%3E%3C/polyline%3E%3Cpolyline points='6 17 11 12 6 7'%3E%3C/polyline%3E%3C/svg%3E");
+            min-width: 32px;
+            height: 32px;
+            padding: 0 10px;
+            border-radius: 9999px;
+            border-color: transparent;
+            background-color: transparent;
+            font-size: 1.6rem; /* larger arrows (~3-4x) */
+            line-height: 1;
+            text-indent: 0;
         }
 
         @media (max-width: 768px) {

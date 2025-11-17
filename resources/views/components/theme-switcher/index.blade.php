@@ -14,31 +14,27 @@
             <x-base.slideover.description class="p-0">
                 <div class="flex flex-col">
                     <div class="px-8 pt-6 pb-8">
-                        <div class="text-base font-medium">Themes</div>
-                        <div class="mt-0.5 text-slate-500">Choose your theme</div>
-                        <div class="mt-5 grid grid-cols-2 gap-x-5 gap-y-3.5">
-                            @foreach (['rubick', 'icewall', 'tinker', 'enigma'] as $themeKey => $theme)
-                                <div>
-                                    <a
-                                        href="{{ route('theme-switcher', ['activeTheme' => $theme]) }}"
-                                        @class([
-                                            'h-28 cursor-pointer bg-slate-50 box p-1 block',
-                                            'border-2 border-theme-1/60' => $activeTheme == $theme,
-                                        ])
-                                    >
-                                        <div class="w-full h-full overflow-hidden rounded-md image-fit">
-                                            <img
-                                                class="w-full h-full"
-                                                src="{{ Vite::asset('resources/images/themes/' . $theme . '.png') }}"
-                                                alt="Midone - Admin Dashboard Template"
-                                            >
-                                        </div>
-                                    </a>
-                                    <div class="mt-2.5 text-center text-xs capitalize">
-                                        {{ $theme }}
+                        <div class="text-base font-medium">Theme</div>
+                        <div class="mt-0.5 text-slate-500">Fixed to Smart ERP</div>
+                        <div class="mt-5 grid grid-cols-1 gap-x-5 gap-y-3.5">
+                            <div>
+                                <div
+                                    @class([
+                                        'h-28 bg-slate-50 box p-1 block border-2 border-theme-1/60 cursor-default',
+                                    ])
+                                >
+                                    <div class="w-full h-full overflow-hidden rounded-md image-fit">
+                                        <img
+                                            class="w-full h-full"
+                                            src="{{ Vite::asset('resources/images/themes/enigma.png') }}"
+                                            alt="Smart ERP Theme"
+                                        >
                                     </div>
                                 </div>
-                            @endforeach
+                                <div class="mt-2.5 text-center text-xs capitalize">
+                                    smart-erp (active)
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="border-b border-dashed"></div>

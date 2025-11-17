@@ -5,10 +5,6 @@
             <x-base.lucide icon="Building" class="w-5 h-5 mr-2 text-green-500" />
             Company Settings
         </h2>
-        <x-base.button type="submit" form="companySettingsForm" variant="primary">
-            <x-base.lucide icon="Save" class="w-4 h-4 mr-2" />
-            Save Changes
-        </x-base.button>
     </div>
 
     <form id="companySettingsForm" action="{{ route('settings.company.update') }}" method="POST" enctype="multipart/form-data" class="p-5">
@@ -189,7 +185,8 @@
                     variant="primary"
                     class="w-32"
                 >
-                    Save Company
+                    <x-base.lucide icon="Save" class="w-4 h-4 mr-2 animate-pulse" />
+                    Save
                 </x-base.button>
             </div>
         </form>

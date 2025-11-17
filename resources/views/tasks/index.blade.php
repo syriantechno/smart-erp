@@ -16,104 +16,60 @@
     @include('components.global-notifications')
     <div class="intro-y mt-8 flex items-center">
         <h2 class="mr-auto text-lg font-medium">Tasks Management</h2>
-        <x-base.button
-            variant="primary"
-            class="w-32 sm:w-auto sm:ml-4"
-            data-tw-toggle="modal"
-            data-tw-target="#create-task-modal"
-        >
-            <x-base.lucide icon="Plus" class="w-4 h-4 mr-2" />
-            Add Task
-        </x-base.button>
-    </div>
 
-    <div class="mt-5 grid grid-cols-12 gap-6">
-        <div class="intro-y col-span-12">
-            <!-- Advanced Filters Section -->
-            <x-base.preview-component class="intro-y box mb-6">
-                <div class="p-5">
-                    <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                        <x-base.lucide icon="Filter" class="h-5 w-5"></x-base.lucide>
-                        Advanced Filters
-                        <span id="active-filters-indicator" class="hidden ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">Active</span>
-                    </h3>
+        <div class="flex items-center gap-2">
+            <x-base.button
+                variant="outline-secondary"
+                class="hidden sm:flex"
+                data-tw-toggle="modal"
+                data-tw-target="#tasks-filters-slideover"
+            >
+                <x-base.lucide icon="Filter" class="w-4 h-4 mr-2" />
+                Filters
+                <span id="active-filters-indicator" class="hidden ml-2 px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full">Active</span>
+            </x-base.button>
 
-                    <div class="grid grid-cols-12 gap-4">
-                        <!-- Company Filter -->
-                        <div class="col-span-12 md:col-span-3">
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Filter by Company
-                            </label>
-                            <x-base.form-select id="company-filter" class="w-full">
-                                <option value="">All Companies</option>
-                                @foreach($companies ?? [] as $company)
-                                    <option value="{{ $company->id }}">{{ $company->name }}</option>
-                                @endforeach
-                            </x-base.form-select>
-                        </div>
+            <!-- Mobile filters icon -->
+            <button
+                type="button"
+                class="flex items-center justify-center rounded-full border border-slate-200 px-3 py-2 text-slate-600 hover:bg-slate-50 sm:hidden"
+                data-tw-toggle="modal"
+                data-tw-target="#tasks-filters-slideover"
+                title="Filters"
+            >
+                <x-base.lucide icon="Filter" class="w-4 h-4" />
+            </button>
 
-                        <!-- Department Filter -->
-                        <div class="col-span-12 md:col-span-3">
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Filter by Department
-                            </label>
-                            <x-base.form-select id="department-filter" class="w-full">
-                                <option value="">All Departments</option>
-                                @foreach($departments ?? [] as $department)
-                                    <option value="{{ $department->id }}">{{ $department->name }}</option>
-                                @endforeach
-                            </x-base.form-select>
-                        </div>
+            <div class="hidden sm:flex items-center rounded-full bg-slate-100 dark:bg-darkmode-700 px-1 py-1 ml-2">
+                <button
+                    type="button"
+                    id="tasks-view-toggle-list"
+                    class="tasks-view-toggle-button inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold bg-white text-slate-700 shadow-sm transition-all"
+                    data-view="list"
+                >
+                    <x-base.lucide icon="List" class="w-3 h-3 mr-1" />
+                    List
+                </button>
+                <button
+                    type="button"
+                    id="tasks-view-toggle-kanban"
+                    class="tasks-view-toggle-button inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-all"
+                    data-view="kanban"
+                >
+                    <x-base.lucide icon="Layout" class="w-3 h-3 mr-1" />
+                    Kanban
+                </button>
+            </div>
 
-                        <!-- Employee Filter -->
-                        <div class="col-span-12 md:col-span-3">
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Filter by Employee
-                            </label>
-                            <x-base.form-select id="employee-filter" class="w-full">
-                                <option value="">All Employees</option>
-                                @foreach($employees ?? [] as $employee)
-                                    <option value="{{ $employee->id }}">{{ $employee->full_name }}</option>
-                                @endforeach
-                            </x-base.form-select>
-                        </div>
-
-                        <!-- Status Filter -->
-                        <div class="col-span-12 md:col-span-3">
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Filter by Status
-                            </label>
-                            <x-base.form-select id="status-filter" class="w-full">
-                                <option value="">All Statuses</option>
-                                <option value="pending">Pending</option>
-                                <option value="in_progress">In Progress</option>
-                                <option value="completed">Completed</option>
-                                <option value="cancelled">Cancelled</option>
-                            </x-base.form-select>
-                        </div>
-                    </div>
-
-                    <!-- Filter Results Summary -->
-                    <div class="mt-4 p-4 bg-slate-50 dark:bg-darkmode-600 rounded-lg">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-4">
-                                <div class="text-sm text-slate-600 dark:text-slate-400">
-                                    <span class="font-medium">Total Tasks:</span>
-                                    <span id="total-tasks-count" class="font-semibold text-slate-800 dark:text-white">0</span>
-                                </div>
-                                <div class="text-sm text-slate-600 dark:text-slate-400">
-                                    <span class="font-medium">Filtered:</span>
-                                    <span id="filtered-tasks-count" class="font-semibold text-blue-600">0</span>
-                                </div>
-                            </div>
-                            <x-base.button id="advanced-filter-apply" variant="primary" size="sm">
-                                <x-base.lucide icon="Search" class="w-4 h-4 mr-1" />
-                                Apply Filters
-                            </x-base.button>
-                        </div>
-                    </div>
-                </div>
-            </x-base.preview-component>
+            <x-base.button
+                variant="primary"
+                class="w-32 sm:w-auto sm:ml-2"
+                data-tw-toggle="modal"
+                data-tw-target="#create-task-modal"
+            >
+                <x-base.lucide icon="Plus" class="w-4 h-4 mr-2" />
+                Add Task
+            </x-base.button>
         </div>
     </div>
 
@@ -182,7 +138,7 @@
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto sm:overflow-visible" data-erp-table-wrapper>
+                    <div id="tasks-list-view" class="overflow-x-auto sm:overflow-visible" data-erp-table-wrapper>
                         <table id="tasks-table" data-tw-merge data-erp-table class="datatable-default w-full min-w-full table-auto text-left text-sm">
                             <thead>
                                 <tr>
@@ -199,11 +155,181 @@
                             <tbody></tbody>
                         </table>
                     </div>
+
+                    <div id="tasks-kanban-view" class="hidden mt-6">
+                        <div class="mb-4 flex items-center justify-between">
+                            <div class="text-sm text-slate-500 dark:text-slate-400">
+                                Drag & drop tasks between columns to update their status.
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4" id="tasks-kanban-columns">
+                            <div class="tasks-kanban-column flex flex-col rounded-xl bg-slate-50/80 p-3 dark:bg-darkmode-600/90 border border-slate-100 dark:border-darkmode-500" data-status="pending">
+                                <div class="mb-3 flex items-center justify-between">
+                                    <div class="inline-flex items-center gap-2 rounded-full bg-yellow-100/80 px-3 py-1 text-xs font-semibold text-yellow-700">
+                                        <span class="h-2 w-2 rounded-full bg-yellow-500 animate-pulse"></span>
+                                        Pending
+                                    </div>
+                                    <span class="tasks-kanban-count text-xs text-slate-500" data-status-count="pending">0</span>
+                                </div>
+                                <div class="tasks-kanban-dropzone flex-1 space-y-3" data-status="pending"></div>
+                            </div>
+
+                            <div class="tasks-kanban-column flex flex-col rounded-xl bg-slate-50/80 p-3 dark:bg-darkmode-600/90 border border-slate-100 dark:border-darkmode-500" data-status="in_progress">
+                                <div class="mb-3 flex items-center justify-between">
+                                    <div class="inline-flex items-center gap-2 rounded-full bg-blue-100/80 px-3 py-1 text-xs font-semibold text-blue-700">
+                                        <span class="h-2 w-2 rounded-full bg-blue-500 animate-pulse"></span>
+                                        In Progress
+                                    </div>
+                                    <span class="tasks-kanban-count text-xs text-slate-500" data-status-count="in_progress">0</span>
+                                </div>
+                                <div class="tasks-kanban-dropzone flex-1 space-y-3" data-status="in_progress"></div>
+                            </div>
+
+                            <div class="tasks-kanban-column flex flex-col rounded-xl bg-slate-50/80 p-3 dark:bg-darkmode-600/90 border border-slate-100 dark:border-darkmode-500" data-status="completed">
+                                <div class="mb-3 flex items-center justify-between">
+                                    <div class="inline-flex items-center gap-2 rounded-full bg-green-100/80 px-3 py-1 text-xs font-semibold text-green-700">
+                                        <span class="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
+                                        Completed
+                                    </div>
+                                    <span class="tasks-kanban-count text-xs text-slate-500" data-status-count="completed">0</span>
+                                </div>
+                                <div class="tasks-kanban-dropzone flex-1 space-y-3" data-status="completed"></div>
+                            </div>
+
+                            <div class="tasks-kanban-column flex flex-col rounded-xl bg-slate-50/80 p-3 dark:bg-darkmode-600/90 border border-slate-100 dark:border-darkmode-500" data-status="cancelled">
+                                <div class="mb-3 flex items-center justify-between">
+                                    <div class="inline-flex items-center gap-2 rounded-full bg-rose-100/80 px-3 py-1 text-xs font-semibold text-rose-700">
+                                        <span class="h-2 w-2 rounded-full bg-rose-500 animate-pulse"></span>
+                                        Cancelled
+                                    </div>
+                                    <span class="tasks-kanban-count text-xs text-slate-500" data-status-count="cancelled">0</span>
+                                </div>
+                                <div class="tasks-kanban-dropzone flex-1 space-y-3" data-status="cancelled"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
             </x-base.preview-component>
         </div>
     </div>
+
+    <!-- Tasks Filters Slide Over -->
+    <x-base.slideover id="tasks-filters-slideover" size="md">
+        <x-base.slideover.panel>
+            <a
+                class="absolute top-0 left-0 right-auto mt-4 -ml-10 sm:-ml-12"
+                data-tw-dismiss="modal"
+                href="#"
+            >
+                <x-base.lucide class="h-8 w-8 text-slate-400" icon="X" />
+            </a>
+            <x-base.slideover.title class="border-b border-slate-200/60 p-5 dark:border-darkmode-400">
+                <h2 class="mr-auto text-base font-medium flex items-center gap-2">
+                    <x-base.lucide icon="Filter" class="h-5 w-5" />
+                    Tasks Filters
+                </h2>
+            </x-base.slideover.title>
+
+            <x-base.slideover.description class="p-5">
+                <div class="mb-4 text-sm text-slate-600 dark:text-slate-400">
+                    Use these filters to narrow down the tasks list. Click "Apply Filters" to update the table.
+                </div>
+
+                <div class="grid grid-cols-12 gap-4">
+                    <!-- Company Filter -->
+                    <div class="col-span-12">
+                        <label class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                            Filter by Company
+                        </label>
+                        <x-base.form-select id="company-filter" class="w-full">
+                            <option value="">All Companies</option>
+                            @foreach($companies ?? [] as $company)
+                                <option value="{{ $company->id }}">{{ $company->name }}</option>
+                            @endforeach
+                        </x-base.form-select>
+                    </div>
+
+                    <!-- Department Filter -->
+                    <div class="col-span-12">
+                        <label class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                            Filter by Department
+                        </label>
+                        <x-base.form-select id="department-filter" class="w-full">
+                            <option value="">All Departments</option>
+                            @foreach($departments ?? [] as $department)
+                                <option value="{{ $department->id }}">{{ $department->name }}</option>
+                            @endforeach
+                        </x-base.form-select>
+                    </div>
+
+                    <!-- Employee Filter -->
+                    <div class="col-span-12">
+                        <label class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                            Filter by Employee
+                        </label>
+                        <x-base.form-select id="employee-filter" class="w-full">
+                            <option value="">All Employees</option>
+                            @foreach($employees ?? [] as $employee)
+                                <option value="{{ $employee->id }}">{{ $employee->full_name }}</option>
+                            @endforeach
+                        </x-base.form-select>
+                    </div>
+
+                    <!-- Status Filter -->
+                    <div class="col-span-12">
+                        <label class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                            Filter by Status
+                        </label>
+                        <x-base.form-select id="status-filter" class="w-full">
+                            <option value="">All Statuses</option>
+                            <option value="pending">Pending</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </x-base.form-select>
+                    </div>
+                </div>
+
+                <!-- Filter Results Summary & Actions -->
+                <div class="mt-5 rounded-lg bg-slate-50 p-4 dark:bg-darkmode-600">
+                    <div class="flex flex-col gap-3">
+                        <div class="flex flex-wrap items-center gap-4">
+                            <div class="text-sm text-slate-600 dark:text-slate-400">
+                                <span class="font-medium">Total Tasks:</span>
+                                <span id="total-tasks-count" class="font-semibold text-slate-800 dark:text-white">0</span>
+                            </div>
+                            <div class="text-sm text-slate-600 dark:text-slate-400">
+                                <span class="font-medium">Filtered:</span>
+                                <span id="filtered-tasks-count" class="font-semibold text-blue-600">0</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-2 flex justify-end gap-2">
+                            <x-base.button
+                                type="button"
+                                variant="secondary"
+                                class="w-24"
+                                data-tw-dismiss="modal"
+                            >
+                                <x-base.lucide icon="X" class="mr-2 h-4 w-4 animate-pulse" />
+                                Close
+                            </x-base.button>
+                            <x-base.button
+                                id="advanced-filter-apply"
+                                type="button"
+                                variant="primary"
+                                class="w-24"
+                            >
+                                <x-base.lucide icon="Search" class="mr-2 h-4 w-4 animate-pulse" />
+                                Apply
+                            </x-base.button>
+                        </div>
+                    </div>
+                </div>
+            </x-base.slideover.description>
+        </x-base.slideover.panel>
+    </x-base.slideover>
 
     @include('tasks.modals.create')
     @include('tasks.modals.edit')
@@ -444,8 +570,387 @@
 
             if (statusFilter) {
                 statusFilter.addEventListener('change', function() {
-                    setTimeout(reloadTable, 300);
+                    setTimeout(function () {
+                        reloadTable();
+                        fetchKanbanData();
+                    }, 300);
                 });
+            }
+
+            const listView = document.getElementById('tasks-list-view');
+            const kanbanView = document.getElementById('tasks-kanban-view');
+            const toggleListBtn = document.getElementById('tasks-view-toggle-list');
+            const toggleKanbanBtn = document.getElementById('tasks-view-toggle-kanban');
+            const kanbanColumnsWrapper = document.getElementById('tasks-kanban-columns');
+
+            const kanbanDropzones = kanbanColumnsWrapper
+                ? kanbanColumnsWrapper.querySelectorAll('.tasks-kanban-dropzone')
+                : [];
+
+            let kanbanInitialized = false;
+
+            function setTasksView(view) {
+                if (!listView || !kanbanView || !toggleListBtn || !toggleKanbanBtn) {
+                    return;
+                }
+
+                if (view === 'kanban') {
+                    listView.classList.add('hidden');
+                    kanbanView.classList.remove('hidden');
+
+                    toggleListBtn.classList.remove('bg-white', 'text-slate-700', 'shadow-sm');
+                    toggleListBtn.classList.add('text-slate-500');
+                    toggleKanbanBtn.classList.add('bg-white', 'text-slate-700', 'shadow-sm');
+                    toggleKanbanBtn.classList.remove('text-slate-500');
+
+                    if (!kanbanInitialized) {
+                        fetchKanbanData();
+                        kanbanInitialized = true;
+                    } else {
+                        fetchKanbanData();
+                    }
+                } else {
+                    listView.classList.remove('hidden');
+                    kanbanView.classList.add('hidden');
+
+                    toggleKanbanBtn.classList.remove('bg-white', 'text-slate-700', 'shadow-sm');
+                    toggleKanbanBtn.classList.add('text-slate-500');
+                    toggleListBtn.classList.add('bg-white', 'text-slate-700', 'shadow-sm');
+                    toggleListBtn.classList.remove('text-slate-500');
+                }
+            }
+
+            if (toggleListBtn) {
+                toggleListBtn.addEventListener('click', function () {
+                    setTasksView('list');
+                });
+            }
+
+            if (toggleKanbanBtn) {
+                toggleKanbanBtn.addEventListener('click', function () {
+                    setTasksView('kanban');
+                });
+            }
+
+            function buildKanbanCard(task) {
+                const card = document.createElement('div');
+                card.className = 'tasks-kanban-card group rounded-xl border border-slate-200/80 bg-white/90 px-3 py-3 text-xs shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-md dark:border-darkmode-500 dark:bg-darkmode-600/95';
+                card.setAttribute('draggable', 'true');
+                card.dataset.taskId = task.id;
+                card.dataset.status = task.status;
+
+                const priorityClass = task.priority === 'high'
+                    ? 'bg-red-100 text-red-700'
+                    : task.priority === 'medium'
+                        ? 'bg-yellow-100 text-yellow-700'
+                        : task.priority === 'low'
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-slate-100 text-slate-700';
+
+                const statusClass = task.status === 'completed'
+                    ? 'bg-green-100 text-green-700'
+                    : task.status === 'in_progress'
+                        ? 'bg-blue-100 text-blue-700'
+                        : task.status === 'pending'
+                            ? 'bg-yellow-100 text-yellow-700'
+                            : task.status === 'cancelled'
+                                ? 'bg-rose-100 text-rose-700'
+                                : 'bg-slate-100 text-slate-700';
+
+                const statusLabel = (task.status || '')
+                    .replace('_', ' ');
+
+                const colorDot = task.color
+                    ? `<span class="mr-1 inline-block h-2.5 w-2.5 rounded-full border border-white shadow-sm" style="background-color: ${task.color}"></span>`
+                    : '';
+
+                const employee = task.employee_name || '-';
+                const dueDate = task.due_date_formatted || '-';
+
+                card.innerHTML = `
+                    <div class="mb-2 flex items-start justify-between gap-2">
+                        <div class="flex flex-col gap-1">
+                            <div class="flex items-center gap-1.5">
+                                ${colorDot}
+                                <span class="max-w-[180px] truncate font-semibold text-slate-800 dark:text-slate-50">${task.title || 'Untitled Task'}</span>
+                            </div>
+                            <div class="text-[10px] font-medium uppercase tracking-wide text-slate-400">${task.code || ''}</div>
+                        </div>
+                        <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${priorityClass}">
+                            ${task.priority || '-'}
+                        </span>
+                    </div>
+                    <div class="mb-2 line-clamp-2 text-[11px] text-slate-500 dark:text-slate-300">
+                        ${task.description ? task.description : ''}
+                    </div>
+                    <div class="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-300">
+                        <div class="flex items-center gap-1.5">
+                            <x-base.lucide icon="User" class="h-3 w-3"></x-base.lucide>
+                            <span class="max-w-[120px] truncate">${employee}</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <x-base.lucide icon="Calendar" class="h-3 w-3"></x-base.lucide>
+                            <span>${dueDate}</span>
+                        </div>
+                    </div>
+                    <div class="mt-2 flex items-center justify-between text-[10px]">
+                        <span class="inline-flex items-center rounded-full px-2 py-0.5 font-medium ${statusClass}">
+                            ${statusLabel}
+                        </span>
+                    </div>
+                `;
+
+                return card;
+            }
+
+            function clearKanbanColumns() {
+                if (!kanbanColumnsWrapper) {
+                    return;
+                }
+
+                kanbanColumnsWrapper.querySelectorAll('.tasks-kanban-dropzone').forEach(function (zone) {
+                    zone.innerHTML = '';
+                });
+
+                kanbanColumnsWrapper.querySelectorAll('.tasks-kanban-count').forEach(function (el) {
+                    el.textContent = '0';
+                });
+            }
+
+            function setupKanbanDragAndDrop() {
+                if (!kanbanColumnsWrapper) {
+                    return;
+                }
+
+                const cards = kanbanColumnsWrapper.querySelectorAll('.tasks-kanban-card');
+
+                cards.forEach(function (card) {
+                    card.addEventListener('dragstart', function (event) {
+                        card.classList.add('ring-2', 'ring-primary/70', 'shadow-lg', 'scale-[1.02]');
+                        event.dataTransfer.effectAllowed = 'move';
+                        event.dataTransfer.setData('text/plain', card.dataset.taskId || '');
+                        event.dataTransfer.setData('text/status', card.dataset.status || '');
+                    });
+
+                    card.addEventListener('dragend', function () {
+                        card.classList.remove('ring-2', 'ring-primary/70', 'shadow-lg', 'scale-[1.02]');
+                    });
+                });
+
+                kanbanDropzones.forEach(function (zone) {
+                    zone.addEventListener('dragover', function (event) {
+                        event.preventDefault();
+                        event.dataTransfer.dropEffect = 'move';
+                        zone.classList.add('bg-slate-100/70', 'dark:bg-darkmode-500/70');
+                    });
+
+                    zone.addEventListener('dragleave', function () {
+                        zone.classList.remove('bg-slate-100/70', 'dark:bg-darkmode-500/70');
+                    });
+
+                    zone.addEventListener('drop', function (event) {
+                        event.preventDefault();
+                        zone.classList.remove('bg-slate-100/70', 'dark:bg-darkmode-500/70');
+
+                        const taskId = event.dataTransfer.getData('text/plain');
+                        const previousStatus = event.dataTransfer.getData('text/status');
+                        const newStatus = zone.dataset.status;
+
+                        if (!taskId || !newStatus || previousStatus === newStatus) {
+                            return;
+                        }
+
+                        const card = kanbanColumnsWrapper.querySelector('.tasks-kanban-card[data-task-id="' + taskId + '"]');
+                        if (!card) {
+                            return;
+                        }
+
+                        const previousZone = kanbanColumnsWrapper.querySelector('.tasks-kanban-dropzone[data-status="' + previousStatus + '"]');
+
+                        zone.appendChild(card);
+                        card.dataset.status = newStatus;
+
+                        updateKanbanCounters();
+                        animateCardDrop(card);
+
+                        updateTaskStatus(taskId, newStatus, function (success) {
+                            if (!success && previousZone) {
+                                previousZone.appendChild(card);
+                                card.dataset.status = previousStatus;
+                                updateKanbanCounters();
+                            }
+                        });
+                    });
+                });
+            }
+
+            function animateCardDrop(card) {
+                card.classList.add('animate-[pulse_0.35s_ease-out_1]');
+                setTimeout(function () {
+                    card.classList.remove('animate-[pulse_0.35s_ease-out_1]');
+                }, 400);
+            }
+
+            function updateKanbanCounters() {
+                if (!kanbanColumnsWrapper) {
+                    return;
+                }
+
+                const counts = {
+                    pending: 0,
+                    in_progress: 0,
+                    completed: 0,
+                    cancelled: 0,
+                };
+
+                kanbanColumnsWrapper.querySelectorAll('.tasks-kanban-card').forEach(function (card) {
+                    const status = card.dataset.status || 'pending';
+                    if (typeof counts[status] === 'number') {
+                        counts[status] += 1;
+                    }
+                });
+
+                kanbanColumnsWrapper.querySelectorAll('.tasks-kanban-count').forEach(function (el) {
+                    const status = el.getAttribute('data-status-count');
+                    if (status && typeof counts[status] === 'number') {
+                        el.textContent = String(counts[status]);
+                    }
+                });
+            }
+
+            function buildKanbanQueryString() {
+                const params = new URLSearchParams();
+
+                if (companyFilter && companyFilter.value) {
+                    params.append('company_id', companyFilter.value);
+                }
+                if (departmentFilter && departmentFilter.value) {
+                    params.append('department_id', departmentFilter.value);
+                }
+                if (employeeFilter && employeeFilter.value) {
+                    params.append('employee_id', employeeFilter.value);
+                }
+                if (statusFilter && statusFilter.value) {
+                    params.append('status_filter', statusFilter.value);
+                }
+
+                return params.toString();
+            }
+
+            function fetchKanbanData() {
+                if (!kanbanView) {
+                    return;
+                }
+
+                const baseUrl = '{{ route("tasks.kanban-data") }}';
+                const queryString = buildKanbanQueryString();
+                const url = queryString ? baseUrl + '?' + queryString : baseUrl;
+
+                clearKanbanColumns();
+
+                fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                    },
+                })
+                    .then(function (response) {
+                        if (!response.ok) {
+                            throw new Error('Failed to load kanban data');
+                        }
+                        return response.json();
+                    })
+                    .then(function (data) {
+                        if (!data || !data.success || !data.data) {
+                            return;
+                        }
+
+                        const grouped = data.data || {};
+
+                        Object.keys(grouped).forEach(function (statusKey) {
+                            const zone = kanbanColumnsWrapper
+                                ? kanbanColumnsWrapper.querySelector('.tasks-kanban-dropzone[data-status="' + statusKey + '"]')
+                                : null;
+
+                            if (!zone) {
+                                return;
+                            }
+
+                            const tasks = grouped[statusKey] || [];
+
+                            tasks.forEach(function (task) {
+                                const card = buildKanbanCard(task);
+                                zone.appendChild(card);
+                            });
+                        });
+
+                        updateKanbanCounters();
+                        setupKanbanDragAndDrop();
+                    })
+                    .catch(function (error) {
+                        console.error('Kanban data error:', error);
+                        showToast('Failed to load kanban view.', 'error');
+                    });
+            }
+
+            function updateTaskStatus(taskId, newStatus, callback) {
+                const url = '/tasks/' + taskId + '/update-status';
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    },
+                    body: JSON.stringify({ status: newStatus }),
+                })
+                    .then(async function (response) {
+                        if (response.ok) {
+                            return response.json();
+                        }
+
+                        if (response.status === 422) {
+                            const data = await response.json();
+                            const errors = data.errors || {};
+                            const firstError = Object.values(errors)[0];
+                            if (firstError) {
+                                showToast(Array.isArray(firstError) ? firstError[0] : firstError, 'error');
+                            } else {
+                                showToast(data.message || 'Validation error', 'error');
+                            }
+                            throw new Error('validation');
+                        }
+
+                        throw new Error('request');
+                    })
+                    .then(function (data) {
+                        if (data && data.success) {
+                            showToast(data.message || 'Task status updated successfully', 'success');
+                            if (typeof callback === 'function') {
+                                callback(true);
+                            }
+                        } else {
+                            showToast((data && data.message) || 'Failed to update task status', 'error');
+                            if (typeof callback === 'function') {
+                                callback(false);
+                            }
+                        }
+                    })
+                    .catch(function (error) {
+                        if (error.message === 'validation') {
+                            if (typeof callback === 'function') {
+                                callback(false);
+                            }
+                            return;
+                        }
+                        console.error('Task status update error:', error);
+                        showToast('An error occurred while updating task status', 'error');
+                        if (typeof callback === 'function') {
+                            callback(false);
+                        }
+                    });
             }
 
             // Edit form handler

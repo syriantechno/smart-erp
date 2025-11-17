@@ -55,6 +55,9 @@
                 'value' => \App\Models\Setting::get('notifications.employee.deleted', true),
             ],
         ];
+
+        $documentsExpiryReminderDays = \App\Models\Setting::get('notifications.documents.expiry_reminder_days', 30);
+        $employeeDocumentsExpiryReminderDays = \App\Models\Setting::get('notifications.employee_documents.expiry_reminder_days', 30);
     @endphp
 
     <form id="notification-settings-form" action="{{ route('settings.notifications.update') }}" method="POST" class="p-5">
@@ -76,6 +79,49 @@
                             <div class="font-medium text-sm text-slate-800 dark:text-slate-100">{{ $field['label'] }}</div>
                             <div class="text-xs text-slate-500 dark:text-slate-400">{{ $field['description'] }}</div>
                         </div>
+            
+            <!-- Documents expiry reminder -->
+            <div class="col-span-12 md:col-span-6 lg:col-span-4">
+                <h3 class="mb-3 flex items-center text-sm font-semibold text-slate-800 dark:text-slate-100">
+                    <x-base.lucide icon="FileWarning" class="w-4 h-4 mr-2 text-primary" />
+                    Documents
+                </h3>
+
+                <div class="mb-4">
+                    <div class="font-medium text-sm text-slate-800 dark:text-slate-100">
+                        Expiry reminder (days before)
+                    </div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400 mb-2">
+                        Number of days before a document's expiry date to start showing reminders.
+                    </div>
+                    <x-base.form-input
+                        type="number"
+                        min="1"
+                        max="365"
+                        name="notifications_documents_expiry_reminder_days"
+                        value="{{ $documentsExpiryReminderDays }}"
+                        class="w-32"
+                    />
+                </div>
+
+                <div class="mt-4 mb-2 border-t border-dashed border-slate-200 dark:border-darkmode-400 pt-4">
+                    <div class="font-medium text-sm text-slate-800 dark:text-slate-100 flex items-center">
+                        <x-base.lucide icon="IdCard" class="w-4 h-4 mr-2 text-primary" />
+                        Employee documents expiry (days before)
+                    </div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400 mb-2">
+                        Number of days before an employee document expiry date (passport, visa, ID, etc.) to start showing reminders.
+                    </div>
+                    <x-base.form-input
+                        type="number"
+                        min="1"
+                        max="365"
+                        name="notifications_employee_documents_expiry_reminder_days"
+                        value="{{ $employeeDocumentsExpiryReminderDays }}"
+                        class="w-32"
+                    />
+                </div>
+            </div>
                         <input type="hidden" name="{{ $fieldName }}" value="0">
                         <input
                             id="{{ $fieldName }}"
@@ -148,7 +194,12 @@
             </div>
         </div>
         <div class="mt-5 flex justify-end">
-            <x-base.button type="submit" variant="primary" class="w-32">
+            <x-base.button
+                type="submit"
+                variant="primary"
+                class="w-48"
+            >
+                <x-base.lucide icon="Save" class="w-4 h-4 mr-2 animate-pulse" />
                 Save Notifications
             </x-base.button>
         </div>

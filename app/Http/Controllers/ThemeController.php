@@ -14,9 +14,9 @@ class ThemeController extends Controller
      */
     public function switch(Request $request): RedirectResponse
     {
-        // Always set theme to 'enigma' regardless of the request
+        // Always set theme to 'smart-erp' regardless of the request
         session([
-            'activeTheme' => 'enigma'
+            'activeTheme' => 'smart-erp'
         ]);
 
         return redirect("/");

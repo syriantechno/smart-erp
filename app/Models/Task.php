@@ -3,10 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Task extends Model
+class Task extends BaseModel
 {
     use HasFactory;
 
@@ -20,6 +19,7 @@ class Task extends Model
         'title',
         'description',
         'priority',
+        'color',
         'status',
         'due_date',
         'assigned_to',
@@ -27,6 +27,7 @@ class Task extends Model
         'employee_id',
         'department_id',
         'company_id',
+        'project_id',
         'is_active'
     ];
 
@@ -73,6 +74,11 @@ class Task extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+
+    public function project(): BelongsTo
+    {
+        return $this->belongsTo(Project::class);
     }
 
     /**

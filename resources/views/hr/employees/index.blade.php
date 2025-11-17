@@ -10,94 +10,55 @@
 @push('styles')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        /* Make employees table rows more compact */
+        #employees-table tbody tr {
+            height: 2.25rem; /* ~36px */
+        }
+
+        #employees-table td {
+            padding-top: 0.375rem;  /* 6px */
+            padding-bottom: 0.375rem;
+        }
+    </style>
 @endpush
 
 @section('subcontent')
     @include('components.global-notifications')
     <div class="intro-y mt-8 flex items-center">
         <h2 class="mr-auto text-lg font-medium">Employees Management</h2>
-        <x-base.button
-            variant="primary"
-            class="w-40 sm:w-auto sm:ml-4"
-            data-tw-toggle="modal"
-            data-tw-target="#create-employee-modal"
-        >
-            <x-base.lucide icon="UserPlus" class="w-4 h-4 mr-2" />
-            Add Employee
-        </x-base.button>
-    </div>
+        <div class="flex items-center gap-2">
+            <x-base.button
+                variant="outline-secondary"
+                class="hidden sm:flex"
+                data-tw-toggle="modal"
+                data-tw-target="#employees-filters-slideover"
+            >
+                <x-base.lucide icon="Filter" class="w-4 h-4 mr-2" />
+                Filters
+                <span id="active-filters-indicator" class="hidden ml-2 px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full">Active</span>
+            </x-base.button>
 
-    <div class="mt-5 grid grid-cols-12 gap-6">
-        <div class="intro-y col-span-12">
-            <!-- Advanced Filters Section -->
-            <x-base.preview-component class="intro-y box mb-6">
-                <div class="p-5">
-                    <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                        <x-base.lucide icon="Filter" class="h-5 w-5"></x-base.lucide>
-                        Advanced Filters
-                        <span id="active-filters-indicator" class="hidden ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">Active</span>
-                    </h3>
+            <!-- Mobile filters icon -->
+            <button
+                type="button"
+                class="flex items-center justify-center rounded-full border border-slate-200 px-3 py-2 text-slate-600 hover:bg-slate-50 sm:hidden"
+                data-tw-toggle="modal"
+                data-tw-target="#employees-filters-slideover"
+                title="Filters"
+            >
+                <x-base.lucide icon="Filter" class="w-4 h-4" />
+            </button>
 
-                    <div class="grid grid-cols-12 gap-4">
-                        <!-- Company Filter -->
-                        <div class="col-span-12 md:col-span-4">
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Filter by Company
-                            </label>
-                            <x-base.form-select id="company-filter" class="w-full">
-                                <option value="">All Companies</option>
-                                @foreach($companies ?? [] as $company)
-                                    <option value="{{ $company->id }}">{{ $company->name }}</option>
-                                @endforeach
-                            </x-base.form-select>
-                        </div>
-
-                        <!-- Department Filter -->
-                        <div class="col-span-12 md:col-span-4">
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Filter by Department
-                            </label>
-                            <x-base.form-select id="department-filter" class="w-full">
-                                <option value="">All Departments</option>
-                                @foreach($departments ?? [] as $department)
-                                    <option value="{{ $department->id }}">{{ $department->name }}</option>
-                                @endforeach
-                            </x-base.form-select>
-                        </div>
-
-                        <!-- Position Filter -->
-                        <div class="col-span-12 md:col-span-4">
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Filter by Position
-                            </label>
-                            <x-base.form-select id="position-filter" class="w-full">
-                                <option value="">All Positions</option>
-                                <!-- Will be populated via JavaScript -->
-                            </x-base.form-select>
-                        </div>
-                    </div>
-
-                    <!-- Filter Results Summary -->
-                    <div class="mt-4 p-4 bg-slate-50 dark:bg-darkmode-600 rounded-lg">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-4">
-                                <div class="text-sm text-slate-600 dark:text-slate-400">
-                                    <span class="font-medium">Total Employees:</span>
-                                    <span id="total-employees-count" class="font-semibold text-slate-800 dark:text-white">0</span>
-                                </div>
-                                <div class="text-sm text-slate-600 dark:text-slate-400">
-                                    <span class="font-medium">Filtered:</span>
-                                    <span id="filtered-employees-count" class="font-semibold text-blue-600">0</span>
-                                </div>
-                            </div>
-                            <x-base.button id="advanced-filter-apply" variant="primary" size="sm">
-                                <x-base.lucide icon="Search" class="w-4 h-4 mr-1" />
-                                Apply Filters
-                            </x-base.button>
-                        </div>
-                    </div>
-                </div>
-            </x-base.preview-component>
+            <x-base.button
+                variant="primary"
+                class="w-40 sm:w-auto sm:ml-2"
+                data-tw-toggle="modal"
+                data-tw-target="#create-employee-modal"
+            >
+                <x-base.lucide icon="UserPlus" class="w-4 h-4 mr-2" />
+                Add Employee
+            </x-base.button>
         </div>
     </div>
 
@@ -114,7 +75,6 @@
                                 <x-base.form-select id="employees-filter-field" class="mt-2 w-full sm:mt-0 sm:w-auto 2xl:w-full">
                                     <option value="all">All Fields</option>
                                     <option value="code">Code</option>
-                                    <option value="employee_id">Employee ID</option>
                                     <option value="first_name">First Name</option>
                                     <option value="last_name">Last Name</option>
                                     <option value="email">Email</option>
@@ -172,14 +132,12 @@
                             <thead>
                                 <tr>
                                     <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">#</th>
-                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Photo</th>
                                     <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Code</th>
-                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Employee ID</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Photo</th>
                                     <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Full Name</th>
-                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Email</th>
-                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Position</th>
                                     <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Department</th>
-                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Hire Date</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Position</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Email</th>
                                     <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Status</th>
                                     <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Actions</th>
                                 </tr>
@@ -193,7 +151,109 @@
         </div>
     </div>
 
+    <!-- Employees Filters Slide Over -->
+    <x-base.slideover id="employees-filters-slideover" size="md">
+        <x-base.slideover.panel>
+            <a
+                class="absolute top-0 left-0 right-auto mt-4 -ml-10 sm:-ml-12"
+                data-tw-dismiss="modal"
+                href="#"
+            >
+                <x-base.lucide class="h-8 w-8 text-slate-400" icon="X" />
+            </a>
+            <x-base.slideover.title class="border-b border-slate-200/60 p-5 dark:border-darkmode-400">
+                <h2 class="mr-auto text-base font-medium flex items-center gap-2">
+                    <x-base.lucide icon="Filter" class="h-5 w-5" />
+                    Employees Filters
+                </h2>
+            </x-base.slideover.title>
+
+            <x-base.slideover.description class="p-5">
+                <div class="mb-4 text-sm text-slate-600 dark:text-slate-400">
+                    Use these filters to narrow down the employees list. Click "Apply Filters" to update the table.
+                </div>
+
+                <div class="grid grid-cols-12 gap-4">
+                    <!-- Company Filter -->
+                    <div class="col-span-12">
+                        <label class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                            Filter by Company
+                        </label>
+                        <x-base.form-select id="company-filter" class="w-full">
+                            <option value="">All Companies</option>
+                            @foreach($companies ?? [] as $company)
+                                <option value="{{ $company->id }}">{{ $company->name }}</option>
+                            @endforeach
+                        </x-base.form-select>
+                    </div>
+
+                    <!-- Department Filter -->
+                    <div class="col-span-12">
+                        <label class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                            Filter by Department
+                        </label>
+                        <x-base.form-select id="department-filter" class="w-full">
+                            <option value="">All Departments</option>
+                            @foreach($departments ?? [] as $department)
+                                <option value="{{ $department->id }}">{{ $department->name }}</option>
+                            @endforeach
+                        </x-base.form-select>
+                    </div>
+
+                    <!-- Position Filter -->
+                    <div class="col-span-12">
+                        <label class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                            Filter by Position
+                        </label>
+                        <x-base.form-select id="position-filter" class="w-full">
+                            <option value="">All Positions</option>
+                            <!-- Will be populated via JavaScript -->
+                        </x-base.form-select>
+                    </div>
+                </div>
+
+                <!-- Filter Results Summary & Actions -->
+                <div class="mt-5 rounded-lg bg-slate-50 p-4 dark:bg-darkmode-600">
+                    <div class="flex flex-col gap-3">
+                        <div class="flex flex-wrap items-center gap-4">
+                            <div class="text-sm text-slate-600 dark:text-slate-400">
+                                <span class="font-medium">Total Employees:</span>
+                                <span id="total-employees-count" class="font-semibold text-slate-800 dark:text-white">0</span>
+                            </div>
+                            <div class="text-sm text-slate-600 dark:text-slate-400">
+                                <span class="font-medium">Filtered:</span>
+                                <span id="filtered-employees-count" class="font-semibold text-blue-600">0</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-2 flex justify-end gap-2">
+                            <x-base.button
+                                type="button"
+                                variant="secondary"
+                                class="w-24"
+                                data-tw-dismiss="modal"
+                            >
+                                <x-base.lucide icon="X" class="mr-2 h-4 w-4 animate-pulse" />
+                                Close
+                            </x-base.button>
+                            <x-base.button
+                                id="advanced-filter-apply"
+                                type="button"
+                                variant="primary"
+                                class="w-24"
+                            >
+                                <x-base.lucide icon="Search" class="mr-2 h-4 w-4 animate-pulse" />
+                                Apply
+                            </x-base.button>
+                        </div>
+                    </div>
+                </div>
+            </x-base.slideover.description>
+        </x-base.slideover.panel>
+    </x-base.slideover>
+
     @include('hr.employees.modals.create')
+    @include('hr.employees.modals.edit')
     @stack('modals')
 
     <!-- Hidden button to trigger edit modal -->
@@ -205,8 +265,7 @@
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
     <script>
-    try {
-        document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function () {
             const filterField = document.getElementById('employees-filter-field');
             const filterType = document.getElementById('employees-filter-type');
             const filterValue = document.getElementById('employees-filter-value');
@@ -251,26 +310,22 @@
                         }
                         d.page_length = lengthSelect ? parseInt(lengthSelect.value, 10) || initialLength : initialLength;
                     },
-                    error: function (xhr, textStatus, error) {
-                        console.error('DataTables AJAX error:', textStatus, error, xhr.responseText);
-                    }
+                    error: function () {}
                 },
                 pageLength: initialLength,
                 lengthChange: false,
                 searching: false,
-                order: [[2, 'asc']], // Order by code column (index 2)
+                order: [[1, 'asc']], // Order by code column (index 1)
                 dom:
                     "t<'datatable-footer flex flex-col md:flex-row md:items-center md:justify-between mt-5 gap-4'<'datatable-info text-slate-500'i><'datatable-pagination'p>>",
                 columns: [
                     { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center font-medium', orderable: false },
-                    { data: 'profile_picture', name: 'profile_picture', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center', orderable: false },
                     { data: 'code', name: 'code', className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700 whitespace-nowrap' },
-                    { data: 'employee_id', name: 'employee_id', className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700 whitespace-nowrap' },
+                    { data: 'profile_picture', name: 'profile_picture', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center', orderable: false },
                     { data: 'full_name', name: 'full_name', className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700 datatable-cell-wrap' },
-                    { data: 'email', name: 'email', className: 'px-5 py-3 border-b dark:border-darkmode-300 datatable-cell-wrap' },
-                    { data: 'position', name: 'position', className: 'px-5 py-3 border-b dark:border-darkmode-300 datatable-cell-wrap' },
                     { data: 'department_name', name: 'department_name', className: 'px-5 py-3 border-b dark:border-darkmode-300 datatable-cell-wrap' },
-                    { data: 'hire_date_formatted', name: 'hire_date_formatted', className: 'px-5 py-3 border-b dark:border-darkmode-300 whitespace-nowrap' },
+                    { data: 'position', name: 'position', className: 'px-5 py-3 border-b dark:border-darkmode-300 datatable-cell-wrap' },
+                    { data: 'email', name: 'email', className: 'px-5 py-3 border-b dark:border-darkmode-300 datatable-cell-wrap' },
                     {
                         data: 'is_active',
                         name: 'is_active',
@@ -461,8 +516,7 @@
                         }
                         loadPositionsForDepartment(''); // Reset positions when company changes
                     })
-                    .catch(error => {
-                        console.error('Error loading departments:', error);
+                    .catch(() => {
                         departmentFilter.innerHTML = '<option value="">Error loading departments</option>';
                     });
             }
@@ -502,8 +556,7 @@
                             });
                         }
                     })
-                    .catch(error => {
-                        console.error('Error loading positions:', error);
+                    .catch(() => {
                         positionFilter.innerHTML = '<option value="">Error loading positions</option>';
                     });
             }
@@ -529,8 +582,7 @@
                             codeInput.value = code;
                         }
                     })
-                    .catch(error => {
-                        console.error(error);
+                    .catch(() => {
                         codePreview.textContent = '-';
                         if (codeInput) {
                             codeInput.value = '-';
@@ -620,7 +672,6 @@
                             if (error.message === 'validation') {
                                 return;
                             }
-                            console.error('Employee create error:', error);
                             showToast('An error occurred while saving the employee', 'error');
                         });
                 });
@@ -635,20 +686,18 @@
                             return;
                         }
 
-                        const headers = ['#', 'Photo', 'Code', 'Employee ID', 'Full Name', 'Email', 'Position', 'Department', 'Hire Date', 'Status'];
+                        const headers = ['#', 'Code', 'Photo', 'Full Name', 'Department', 'Position', 'Email', 'Status'];
                         const csvRows = [headers.join(',')];
 
                         rows.forEach(function (row) {
                             const csvRow = [
                                 row.DT_RowIndex,
-                                row.profile_picture ? 'Yes' : 'No', // Photo indicator
                                 '"' + (row.code || '').replace(/"/g, '""') + '"',
-                                '"' + (row.employee_id || '').replace(/"/g, '""') + '"',
+                                row.profile_picture ? 'Yes' : 'No', // Photo indicator
                                 '"' + (row.full_name || '').replace(/"/g, '""') + '"',
-                                '"' + (row.email || '').replace(/"/g, '""') + '"',
-                                '"' + (row.position || '').replace(/"/g, '""') + '"',
                                 '"' + (row.department_name || '').replace(/"/g, '""') + '"',
-                                '"' + (row.hire_date_formatted || '').replace(/"/g, '""') + '"',
+                                '"' + (row.position || '').replace(/"/g, '""') + '"',
+                                '"' + (row.email || '').replace(/"/g, '""') + '"',
                                 row.is_active ? 'Active' : 'Inactive'
                             ];
                             csvRows.push(csvRow.join(','));
@@ -663,7 +712,6 @@
                         URL.revokeObjectURL(url);
                         showToast('Export completed successfully.', 'success');
                     } catch (error) {
-                        console.error('Export error:', error);
                         showToast('Failed to export data.', 'error');
                     }
                 });
@@ -680,8 +728,6 @@
             loadPositionsForDepartment('');
 
             window.openEditModal = function(id, employeeId, firstName, lastName, email, phone, position, salary, hireDate, birthDate, gender, address, city, country, postalCode, departmentId, companyId, isActive) {
-                console.log('Opening edit modal for employee:', id, employeeId);
-
                 // Populate form fields
                 document.getElementById('edit-employee-id').value = employeeId || '';
                 document.getElementById('edit-first-name').value = firstName || '';
@@ -709,8 +755,6 @@
                 const modalTrigger = document.getElementById('edit-employee-trigger');
                 if (modalTrigger) {
                     modalTrigger.click();
-                } else {
-                    console.error('Edit employee modal trigger not found');
                 }
             };
 
@@ -754,7 +798,15 @@
                         .then((data) => {
                             if (data.success) {
                                 showToast(data.message || 'Employee updated successfully', 'success');
-                                editModal.__tippy?.hide?.();
+
+                                // Properly close the modal using its dismiss button
+                                if (editModal) {
+                                    const dismissTrigger = editModal.querySelector('[data-tw-dismiss="modal"]');
+                                    if (dismissTrigger) {
+                                        dismissTrigger.click();
+                                    }
+                                }
+
                                 reloadTable();
                             } else {
                                 showToast(data.message || 'Failed to update employee', 'error');
@@ -764,7 +816,6 @@
                             if (error.message === 'validation') {
                                 return;
                             }
-                            console.error('Employee update error:', error);
                             showToast('An error occurred while updating the employee', 'error');
                         });
                 });
@@ -812,72 +863,12 @@
                                     showToast(data.message || 'Failed to delete employee', 'error');
                                 }
                             })
-                            .catch(error => {
-                                console.error('Error:', error);
+                            .catch(() => {
                                 showToast('An error occurred while deleting the employee', 'error');
                             });
                     }
                 });
             };
-
-            // Test function for debugging
-            window.forceLoadEmployeeData = function() {
-                console.log('🧪 Manual test: forcing employee data load...');
-                
-                // Test companies API
-                fetch('{{ route("hr.employees.companies") }}', {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    credentials: 'same-origin'
-                })
-                .then(response => {
-                    console.log('🧪 Companies API Status:', response.status);
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('🧪 Companies Data:', data);
-                    showToast('Companies loaded: ' + (data.length || 0), 'success');
-                })
-                .catch(error => {
-                    console.error('🧪 Companies API Error:', error);
-                    showToast('Failed to load companies', 'error');
-                });
-
-                // Test code API
-                fetch('{{ route("hr.employees.preview-code") }}', {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    credentials: 'same-origin'
-                })
-                .then(response => {
-                    console.log('🧪 Code API Status:', response.status);
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('🧪 Code Data:', data);
-                    showToast('Code generated: ' + (data.code || 'N/A'), 'success');
-                })
-                .catch(error => {
-                    console.error('🧪 Code API Error:', error);
-                    showToast('Failed to generate code', 'error');
-                });
-            };
         });
-    } catch (error) {
-        console.error('❌ JavaScript error in employees index:', error);
-        console.error('Error details:', error.message);
-        console.error('Error stack:', error.stack);
-        
-        // Try to continue with basic functionality
-        console.log('🔄 Attempting to continue with limited functionality...');
-    }
     </script>
 @endpush

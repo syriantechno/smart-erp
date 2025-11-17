@@ -3,10 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Shift;
+use App\Models\Company;
+use App\Models\Department;
+use App\Models\Employee;
 use App\Repositories\ShiftRepository;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class ShiftController extends Controller
 {
@@ -32,9 +37,57 @@ class ShiftController extends Controller
     public function datatable(Request $request): JsonResponse
     {
         try {
-            $shifts = $this->shiftRepository->getForDataTable();
+            $baseQuery = $this->shiftRepository->getForDataTable();
 
-            return \Yajra\DataTables\Facades\DataTables::of($shifts)
+            // Custom filtering similar to other HR tables
+            $filterField = $request->get('filter_field', 'all');
+            $filterType = $request->get('filter_type', 'contains');
+            $filterValue = $request->get('filter_value');
+
+            if ($filterValue !== null && $filterValue !== '') {
+                $comparison = $filterType === 'equals' ? '=' : 'like';
+                $value = $filterType === 'equals' ? $filterValue : "%{$filterValue}%";
+
+                $baseQuery->where(function ($query) use ($filterField, $comparison, $value, $filterValue) {
+                    switch ($filterField) {
+                        case 'code':
+                            $query->where('code', $comparison, $value);
+                            break;
+
+                        case 'name':
+                            $query->where('name', $comparison, $value);
+                            break;
+
+                        case 'company':
+                            $query->whereHas('company', function ($companyQuery) use ($comparison, $value) {
+                                $companyQuery->where('name', $comparison, $value);
+                            });
+                            break;
+
+                        case 'status':
+                            $normalized = strtolower(trim($filterValue));
+                            if (in_array($normalized, ['active', '1', 'true', 'enabled'])) {
+                                $query->where('is_active', true);
+                            } elseif (in_array($normalized, ['inactive', '0', 'false', 'disabled'])) {
+                                $query->where('is_active', false);
+                            }
+                            break;
+
+                        case 'all':
+                        default:
+                            $query->where(function ($sub) use ($comparison, $value) {
+                                $sub->where('code', $comparison, $value)
+                                    ->orWhere('name', $comparison, $value)
+                                    ->orWhereHas('company', function ($companyQuery) use ($comparison, $value) {
+                                        $companyQuery->where('name', $comparison, $value);
+                                    });
+                            });
+                            break;
+                    }
+                });
+            }
+
+            return \Yajra\DataTables\Facades\DataTables::of($baseQuery)
                 ->addIndexColumn()
                 ->orderColumn('DT_RowIndex', 'id $1')
                 ->addColumn('formatted_time', function ($shift) {
@@ -52,7 +105,7 @@ class ShiftController extends Controller
                     try {
                         return view('hr.shifts.partials.actions', compact('shift'))->render();
                     } catch (\Exception $e) {
-                        \Log::info('Error rendering actions view:', [
+                        Log::info('Error rendering actions view:', [
                             'shift_id' => $shift->id,
                             'error' => $e->getMessage(),
                         ]);
@@ -94,9 +147,10 @@ class ShiftController extends Controller
             'color' => 'required|string|regex:/^#[a-fA-F0-9]{6}$/',
             'is_active' => 'boolean',
             'applicable_to' => 'required|in:company,department,employee',
-            'company_id' => 'required_if:applicable_to,company|required_if:applicable_to,department|required_if:applicable_to,employee|exists:companies,id',
-            'department_id' => 'nullable|required_if:applicable_to,department|required_if:applicable_to,employee|exists:departments,id',
-            'employee_id' => 'nullable|required_if:applicable_to,employee|exists:employees,id',
+            // IDs are validated for existence; required combinations are enforced on the frontend
+            'company_id' => 'nullable|exists:companies,id',
+            'department_id' => 'nullable|exists:departments,id',
+            'employee_id' => 'nullable|exists:employees,id',
             'work_days' => 'nullable|array',
             'work_days.*' => 'in:monday,tuesday,wednesday,thursday,friday,saturday,sunday',
             'break_start' => 'nullable|date_format:H:i',
@@ -184,9 +238,9 @@ class ShiftController extends Controller
             'color' => 'required|string|regex:/^#[a-fA-F0-9]{6}$/',
             'is_active' => 'boolean',
             'applicable_to' => 'required|in:company,department,employee',
-            'company_id' => 'required_if:applicable_to,company|required_if:applicable_to,department|required_if:applicable_to,employee|exists:companies,id',
-            'department_id' => 'nullable|required_if:applicable_to,department|required_if:applicable_to,employee|exists:departments,id',
-            'employee_id' => 'nullable|required_if:applicable_to,employee|exists:employees,id',
+            'company_id' => 'nullable|exists:companies,id',
+            'department_id' => 'nullable|exists:departments,id',
+            'employee_id' => 'nullable|exists:employees,id',
             'work_days' => 'nullable|array',
             'work_days.*' => 'in:monday,tuesday,wednesday,thursday,friday,saturday,sunday',
             'break_start' => 'nullable|date_format:H:i',
@@ -310,7 +364,9 @@ class ShiftController extends Controller
         try {
             $employees = Employee::where('department_id', $request->department_id)
                 ->active()
-                ->select('id', 'first_name', 'last_name', 'full_name')
+                ->selectRaw(
+                    "id, first_name, middle_name, last_name, CONCAT(IFNULL(first_name, ''), ' ', IFNULL(middle_name, ''), ' ', IFNULL(last_name, '')) as full_name"
+                )
                 ->get();
 
             return response()->json([

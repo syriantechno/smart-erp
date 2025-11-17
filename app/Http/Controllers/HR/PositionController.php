@@ -233,6 +233,42 @@ class PositionController extends Controller
             });
         }
 
+        $filterField = $request->input('filter_field', 'all');
+        $filterType = $request->input('filter_type', 'contains');
+        $filterValue = $request->input('filter_value');
+
+        if ($filterValue !== null && $filterValue !== '') {
+            $comparison = $filterType === 'equals' ? '=' : 'like';
+            $value = $filterType === 'equals' ? $filterValue : "%{$filterValue}%";
+
+            switch ($filterField) {
+                case 'title':
+                    $baseQuery->where('title', $comparison, $value);
+                    break;
+
+                case 'code':
+                    $baseQuery->where('code', $comparison, $value);
+                    break;
+
+                case 'department':
+                    $baseQuery->whereHas('department', function ($departmentQuery) use ($comparison, $value) {
+                        $departmentQuery->where('name', $comparison, $value);
+                    });
+                    break;
+
+                case 'all':
+                default:
+                    $baseQuery->where(function ($query) use ($comparison, $value) {
+                        $query->where('title', $comparison, $value)
+                            ->orWhere('code', $comparison, $value)
+                            ->orWhereHas('department', function ($departmentQuery) use ($comparison, $value) {
+                                $departmentQuery->where('name', $comparison, $value);
+                            });
+                    });
+                    break;
+            }
+        }
+
         $recordsFiltered = (clone $baseQuery)->count();
 
         $orderColumnIndex = $request->input('order.0.column', 1);

@@ -48,7 +48,7 @@
 
                 <div class="col-span-12 md:col-span-3">
                     <x-base.form-label for="birth_date">Date of Birth</x-base.form-label>
-                    <div class="relative mx-auto w-56">
+                    <div class="relative w-full">
                         <div
                             class="absolute flex h-full w-10 items-center justify-center rounded-l border bg-slate-100 text-slate-500 dark:border-darkmode-800 dark:bg-darkmode-700 dark:text-slate-400">
                             <x-base.lucide icon="calendar" class="stroke-1.5 w-5 h-5"></x-base.lucide>
@@ -107,7 +107,7 @@
 
                 <div class="col-span-12 md:col-span-4">
                     <x-base.form-label for="hire_date">Hire Date <span class="text-danger">*</span></x-base.form-label>
-                    <div class="relative mx-auto w-56">
+                    <div class="relative w-full">
                         <div
                             class="absolute flex h-full w-10 items-center justify-center rounded-l border bg-slate-100 text-slate-500 dark:border-darkmode-800 dark:bg-darkmode-700 dark:text-slate-400">
                             <x-base.lucide icon="calendar" class="stroke-1.5 w-5 h-5"></x-base.lucide>
@@ -223,6 +223,15 @@
     <script>
     // Countries data from PHP
     const countriesData = {!! $countriesJson !!};
+
+    // Silence console output in this modal to avoid cluttering the browser console
+    const console = {
+        log: () => {},
+        error: () => {},
+        warn: () => {},
+        info: () => {},
+        debug: () => {},
+    };
 
     console.log('🔧 Script starting, countriesData:', typeof countriesData, countriesData ? countriesData.length : 'undefined');
 

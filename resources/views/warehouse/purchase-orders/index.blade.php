@@ -16,6 +16,16 @@
 
     <div class="intro-y mt-8 flex items-center">
         <h2 class="mr-auto text-lg font-medium">Purchase Orders</h2>
+        <x-base.button
+            id="open-create-po-modal"
+            variant="primary"
+            class="w-40 sm:w-auto sm:ml-4"
+            data-tw-toggle="modal"
+            data-tw-target="#create-po-modal"
+        >
+            <x-base.lucide icon="Plus" class="w-4 h-4 mr-2" />
+            Add Purchase Order
+        </x-base.button>
     </div>
 
     <div class="mt-5 grid grid-cols-12 gap-6">
@@ -108,6 +118,203 @@
             </x-base.preview-component>
         </div>
     </div>
+
+    <!-- Create Purchase Order Modal (unified design) -->
+    <x-modal.form id="create-po-modal" title="Add New Purchase Order" size="xl">
+        <form id="create-po-form">
+            @csrf
+
+            <div class="mb-6">
+                <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                    <x-base.lucide icon="ClipboardList" class="h-5 w-5"></x-base.lucide>
+                    Purchase Order Information
+                </h4>
+
+                <div class="grid grid-cols-12 gap-4 gap-y-4">
+                    <div class="col-span-12 md:col-span-6">
+                        <x-base.form-label for="create-po-code">Code</x-base.form-label>
+                        <x-base.form-input
+                            id="create-po-code"
+                            name="code"
+                            type="text"
+                            class="w-full"
+                            placeholder="PO code"
+                            required
+                            readonly
+                        />
+                    </div>
+
+                    <div class="col-span-12 md:col-span-6">
+                        <x-base.form-label for="create-po-title">Title</x-base.form-label>
+                        <x-base.form-input
+                            id="create-po-title"
+                            name="title"
+                            type="text"
+                            class="w-full"
+                            placeholder="Purchase order title"
+                            required
+                        />
+                    </div>
+
+                    <div class="col-span-12 md:col-span-6">
+                        <x-base.form-label for="create-po-order-date">Order Date</x-base.form-label>
+                        <x-base.form-input
+                            id="create-po-order-date"
+                            name="order_date"
+                            type="date"
+                            class="w-full"
+                            required
+                        />
+                    </div>
+
+                    <div class="col-span-12 md:col-span-6">
+                        <x-base.form-label for="create-po-expected-delivery-date">Expected Delivery Date</x-base.form-label>
+                        <x-base.form-input
+                            id="create-po-expected-delivery-date"
+                            name="expected_delivery_date"
+                            type="date"
+                            class="w-full"
+                        />
+                    </div>
+
+                    <div class="col-span-12 md:col-span-6">
+                        <x-base.form-label for="create-po-total-amount">Total Amount</x-base.form-label>
+                        <x-base.form-input
+                            id="create-po-total-amount"
+                            name="total_amount"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            class="w-full"
+                            placeholder="0.00"
+                            required
+                        />
+                    </div>
+
+                    <div class="col-span-12 md:col-span-6">
+                        <x-base.form-label for="create-po-status">Active</x-base.form-label>
+                        <x-base.form-select id="create-po-status" name="is_active" class="w-full" required>
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </x-base.form-select>
+                    </div>
+
+                    <div class="col-span-12">
+                        <x-base.form-label for="create-po-description">Description</x-base.form-label>
+                        <x-base.form-textarea
+                            id="create-po-description"
+                            name="description"
+                            class="w-full"
+                            rows="3"
+                            placeholder="Purchase order description"
+                        ></x-base.form-textarea>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        @slot('footer')
+            <div class="flex justify-end gap-2 w-full">
+                <x-base.button
+                    class="w-24"
+                    data-tw-dismiss="modal"
+                    type="button"
+                    variant="outline-secondary"
+                >
+                    Cancel
+                </x-base.button>
+                <x-base.button
+                    class="w-32"
+                    type="submit"
+                    form="create-po-form"
+                    id="create-po-btn"
+                    variant="primary"
+                >
+                    <x-base.lucide icon="Save" class="w-4 h-4 mr-2" />
+                    Save Purchase Order
+                </x-base.button>
+            </div>
+        @endslot
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const jq = window.jQuery || window.$;
+                if (!jq) {
+                    console.error('jQuery not available for create purchase order modal.');
+                    return;
+                }
+
+                const $ = jq;
+                const form = document.getElementById('create-po-form');
+                const submitBtn = $('#create-po-btn');
+
+                if (!form) {
+                    return;
+                }
+
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+
+                    const formData = new FormData(form);
+                    const originalText = submitBtn.html();
+
+                    submitBtn.prop('disabled', true).html('<i class="w-4 h-4 mr-2 animate-spin" data-lucide="loader"></i> Saving...');
+
+                    $.ajax({
+                        url: '{{ route("warehouse.purchase-orders.store") }}',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                const modalEl = document.getElementById('create-po-modal');
+                                if (modalEl && modalEl.__tippy?.hide) {
+                                    modalEl.__tippy.hide();
+                                }
+
+                                form.reset();
+                                if (window.purchaseOrdersTable) {
+                                    window.purchaseOrdersTable.ajax.reload();
+                                }
+
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Success!',
+                                    text: response.message,
+                                    timer: 3000,
+                                    showConfirmButton: false
+                                });
+                            }
+                        },
+                        error: function(xhr) {
+                            let errors = xhr.responseJSON?.errors || {};
+                            let errorMessage = xhr.responseJSON?.message || 'An error occurred';
+
+                            if (Object.keys(errors).length > 0) {
+                                errorMessage = Object.values(errors).flat().join('\n');
+                            }
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: errorMessage
+                            });
+                        },
+                        complete: function() {
+                            submitBtn.prop('disabled', false).html(originalText);
+                            if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+                                lucide.createIcons();
+                            }
+                        }
+                    });
+                });
+            });
+        </script>
+    </x-modal.form>
 @endsection
 
 @include('components.datatable.scripts')
@@ -128,6 +335,25 @@
             jq(function () {
                 initializePurchaseOrdersTable();
                 setupPurchaseOrdersFilters();
+
+                // Auto-generate PO code when opening create modal
+                const openBtn = document.getElementById('open-create-po-modal');
+                if (openBtn) {
+                    openBtn.addEventListener('click', function () {
+                        const $ = jq;
+                        const codeInput = document.getElementById('create-po-code');
+                        if (!codeInput) {
+                            return;
+                        }
+
+                        $.get('{{ route("warehouse.purchase-orders.preview-code") }}')
+                            .done(function (response) {
+                                if (response && response.code) {
+                                    codeInput.value = response.code;
+                                }
+                            });
+                    });
+                }
             });
         });
 

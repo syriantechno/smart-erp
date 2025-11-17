@@ -1,13 +1,5 @@
 <!DOCTYPE html>
-<!--
-Template Name: Midone - Admin Dashboard Template
-Author: Left4code
-Website: http://www.left4code.com/
-Contact: muhammadrizki@left4code.com
-Purchase: https://themeforest.net/user/left4code/portfolio
-Renew Support: https://themeforest.net/user/left4code/portfolio
-License: You must have a valid license purchased only from themeforest(the above link) in order to legally use the theme for your project.
--->
+
 <html
     lang="{{ str_replace('_', '-', app()->getLocale()) }}"
 >
@@ -84,6 +76,21 @@ License: You must have a valid license purchased only from themeforest(the above
             } else {
                 console.error('❌ Alpine.js not loaded');
             }
+        });
+    </script>
+
+    <!-- Fix: prevent layout shift when modals/slideover adjust body padding-right -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var resetBodyPadding = function () {
+                if (document && document.body) {
+                    document.body.style.paddingRight = '0px';
+                }
+            };
+
+            ['show.tw.modal', 'shown.tw.modal', 'hide.tw.modal', 'hidden.tw.modal'].forEach(function (eventName) {
+                document.addEventListener(eventName, resetBodyPadding, true);
+            });
         });
     </script>
 

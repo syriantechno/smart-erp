@@ -12,7 +12,8 @@ class PageController extends Controller
      */
     public function dashboardOverview1(): View
     {
-        return view('pages/dashboard-overview-1');
+        // General dashboard
+        return view('dashboard.general');
     }
 
     /**
@@ -21,7 +22,8 @@ class PageController extends Controller
      */
     public function dashboardOverview2(): View
     {
-        return view('pages/dashboard-overview-2');
+        // Projects dashboard
+        return view('project.dashboard');
     }
 
     /**
@@ -30,7 +32,8 @@ class PageController extends Controller
      */
     public function dashboardOverview3(): View
     {
-        return view('pages/dashboard-overview-3');
+        // Accounting dashboard
+        return view('accounting.dashboard');
     }
 
     /**
@@ -39,7 +42,58 @@ class PageController extends Controller
      */
     public function dashboardOverview4(): View
     {
-        return view('pages/dashboard-overview-4');
+        // HR dashboard
+        $days = (int) setting('notifications.documents.expiry_reminder_days', 30);
+        if ($days < 1) {
+            $days = 30;
+        }
+
+        $hrExpiringDocuments = \App\Models\Document::active()
+            ->whereNotNull('expiry_date')
+            ->expiringSoon($days)
+            ->orderBy('expiry_date')
+            ->limit(5)
+            ->get();
+
+        // Employee documents expiring soon
+        $employeeDays = (int) setting('notifications.employee_documents.expiry_reminder_days', 30);
+        if ($employeeDays < 1) {
+            $employeeDays = 30;
+        }
+
+        $hrEmployeeExpiringDocuments = \App\Models\EmployeeDocument::active()
+            ->whereNotNull('expiry_date')
+            ->expiringSoon()
+            ->orderBy('expiry_date')
+            ->limit(5)
+            ->get();
+
+        // Top rated employees (by average evaluation)
+        // Note: MySQL does not allow using the withAvg alias (avg_rating) in WHERE, so we use HAVING.
+        $topRatedEmployees = \App\Models\Employee::with(['department'])
+            ->withAvg('evaluations as avg_rating', 'overall_rating')
+            ->havingNotNull('avg_rating')
+            ->orderByDesc('avg_rating')
+            ->limit(5)
+            ->get();
+
+        // Top rewarded employees (by total points)
+        // Use HAVING because total_points is an aggregate alias from withSum
+        $topRewardedEmployees = \App\Models\Employee::with(['department'])
+            ->withSum('rewards as total_points', 'points')
+            ->having('total_points', '>', 0)
+            ->orderByDesc('total_points')
+            ->limit(5)
+            ->get();
+
+        return view('hr.dashboard', [
+            'hrExpiringDocuments' => $hrExpiringDocuments,
+            'hrExpiryDays' => $days,
+            'hrEmployeeExpiringDocuments' => $hrEmployeeExpiringDocuments,
+            'hrEmployeeExpiryDays' => $employeeDays,
+            'topRatedEmployees' => $topRatedEmployees,
+            'topRewardedEmployees' => $topRewardedEmployees,
+        ]);
     }
 
     /**

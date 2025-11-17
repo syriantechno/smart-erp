@@ -91,15 +91,7 @@
                 >{{ old('requirements', $position->requirements) }}</x-base.form-textarea>
             </div>
 
-            <div class="col-span-12">
-                <x-base.form-check
-                    id="position_is_active_{{ $position->id }}"
-                    name="is_active"
-                    label="Active"
-                    :checked="old('is_active', $position->is_active)"
-                    type="checkbox"
-                />
-            </div>
+            
         </div>
     </form>
 

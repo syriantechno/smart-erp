@@ -17,9 +17,16 @@
             const defaultOptions = {
                 processing: true,
                 serverSide: true,
+                pagingType: 'full_numbers',
                 language: {
                     emptyTable: 'No data available in table',
-                    processing: 'Loading...'
+                    processing: 'Loading...',
+                    paginate: {
+                        first: '«',
+                        previous: '‹',
+                        next: '›',
+                        last: '»'
+                    }
                 },
                 responsive: true,
                 stripeClasses: ['odd:bg-white', 'even:bg-slate-50/60'],
@@ -29,7 +36,35 @@
             };
 
             const mergedOptions = jq.extend(true, {}, defaultOptions, options);
-            return jq(selector).DataTable(mergedOptions);
+            const table = jq(selector).DataTable(mergedOptions);
+
+            // Global hook: re-init Lucide icons after every draw for all tables
+            const refreshIcons = function () {
+                try {
+                    if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+                        lucide.createIcons({ 'stroke-width': 1.5, nameAttr: 'data-lucide' });
+                        return;
+                    }
+                    if (typeof window.Lucide !== 'undefined' && typeof window.Lucide.createIcons === 'function') {
+                        window.Lucide.createIcons();
+                    }
+                } catch (e) {
+                    console.error('Lucide icon refresh failed:', e);
+                }
+            };
+
+            try {
+                jq(selector).on('draw.dt', function () {
+                    refreshIcons();
+                });
+
+                // Initial call so icons render on first load as well
+                refreshIcons();
+            } catch (e) {
+                console.error('Failed to attach Lucide draw hook:', e);
+            }
+
+            return table;
         };
     </script>
 @endPushOnce

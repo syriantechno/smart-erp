@@ -96,30 +96,41 @@
                         <div class="flex gap-2">
                             <!-- Month/Year Selector -->
                             <div class="flex gap-2">
-                                <select class="form-select w-20" id="year-select">
+                                <select
+                                    id="year-select"
+                                    class="disabled:bg-slate-100 disabled:cursor-not-allowed disabled:dark:bg-darkmode-800/50 [&[readonly]]:bg-slate-100 [&[readonly]]:cursor-not-allowed [&[readonly]]:dark:bg-darkmode-800/50 transition duration-200 ease-in-out text-sm border-slate-200 shadow-sm rounded-md py-2 px-3 pr-8 focus:ring-4 focus:ring-primary focus:ring-opacity-20 focus:border-primary focus:border-opacity-40 dark:bg-darkmode-800 dark:border-transparent dark:focus:ring-slate-700 dark:focus:ring-opacity-50 group-[.form-inline]:flex-1 mt-2 w-full sm:mt-0 sm:w-auto 2xl:w-full"
+                                >
                                     @for($y = 2024; $y <= 2026; $y++)
                                         <option value="{{ $y }}" {{ $y == $year ? 'selected' : '' }}>{{ $y }}</option>
                                     @endfor
                                 </select>
-                                <select class="form-select w-24" id="month-select">
+
+                                <select
+                                    id="month-select"
+                                    class="disabled:bg-slate-100 disabled:cursor-not-allowed disabled:dark:bg-darkmode-800/50 [&[readonly]]:bg-slate-100 [&[readonly]]:cursor-not-allowed [&[readonly]]:dark:bg-darkmode-800/50 transition duration-200 ease-in-out text-sm border-slate-200 shadow-sm rounded-md py-2 px-3 pr-8 focus:ring-4 focus:ring-primary focus:ring-opacity-20 focus:border-primary focus:border-opacity-40 dark:bg-darkmode-800 dark:border-transparent dark:focus:ring-slate-700 dark:focus:ring-opacity-50 group-[.form-inline]:flex-1 mt-2 w-full sm:mt-0 sm:w-auto 2xl:w-full"
+                                >
                                     @for($m = 1; $m <= 12; $m++)
                                         <option value="{{ $m }}" {{ $m == $month ? 'selected' : '' }}>
                                             {{ \Carbon\Carbon::create()->month($m)->locale('ar')->monthName }}
                                         </option>
                                     @endfor
                                 </select>
-                                <x-base.button variant="primary" size="sm" id="load-month-btn">
-                                    <x-base.lucide icon="RefreshCw" class="w-4 h-4 mr-1" />
-                                    Refresh
-                                </x-base.button>
                             </div>
+
+                            {{-- Adjusted order so they render correctly with the layout --}}
+                            <x-base.button variant="primary" size="sm" id="export-btn">
+                                <x-base.lucide icon="Download" class="w-4 h-4 mr-1" />
+                                Export
+                            </x-base.button>
+
+                            <x-base.button variant="primary" size="sm" id="load-month-btn">
+                                <x-base.lucide icon="RefreshCw" class="w-4 h-4 mr-1" />
+                                Refresh
+                            </x-base.button>
+
                             <x-base.button variant="primary" size="sm" id="add-attendance-btn">
                                 <x-base.lucide icon="Plus" class="w-4 h-4 mr-1" />
                                 Add Attendance
-                            </x-base.button>
-                            <x-base.button variant="outline-primary" size="sm" id="export-btn">
-                                <x-base.lucide icon="Download" class="w-4 h-4 mr-1" />
-                                Export
                             </x-base.button>
                         </div>
                     </div>
@@ -313,7 +324,19 @@
                     <!-- Date -->
                     <div class="col-span-12 md:col-span-6">
                         <x-base.form-label for="attendance_date">Date <span class="text-danger">*</span></x-base.form-label>
-                        <x-base.form-input id="attendance_date" name="attendance_date" type="date" class="w-full" required />
+                        <div class="relative w-full">
+                            <div
+                                class="absolute flex h-full w-10 items-center justify-center rounded-l border bg-slate-100 text-slate-500 dark:border-darkmode-800 dark:bg-darkmode-700 dark:text-slate-400">
+                                <x-base.lucide icon="Calendar" class="stroke-1.5 w-5 h-5"></x-base.lucide>
+                            </div>
+                            <x-base.litepicker
+                                id="attendance_date"
+                                name="attendance_date"
+                                class="pl-12 w-full"
+                                data-single-mode="true"
+                                required
+                            />
+                        </div>
                     </div>
 
                     <!-- Status -->
@@ -332,13 +355,25 @@
                     <!-- Check In Time -->
                     <div class="col-span-12 md:col-span-6">
                         <x-base.form-label for="check_in">Check In Time</x-base.form-label>
-                        <x-base.form-input id="check_in" name="check_in" type="time" class="w-full" />
+                        <div class="relative w-full">
+                            <div
+                                class="absolute flex h-full w-10 items-center justify-center rounded-l border bg-slate-100 text-slate-500 dark:border-darkmode-800 dark:bg-darkmode-700 dark:text-slate-400">
+                                <x-base.lucide icon="Clock" class="stroke-1.5 w-5 h-5"></x-base.lucide>
+                            </div>
+                            <x-base.form-input id="check_in" name="check_in" type="time" class="w-full pl-12" />
+                        </div>
                     </div>
 
                     <!-- Check Out Time -->
                     <div class="col-span-12 md:col-span-6">
                         <x-base.form-label for="check_out">Check Out Time</x-base.form-label>
-                        <x-base.form-input id="check_out" name="check_out" type="time" class="w-full" />
+                        <div class="relative w-full">
+                            <div
+                                class="absolute flex h-full w-10 items-center justify-center rounded-l border bg-slate-100 text-slate-500 dark:border-darkmode-800 dark:bg-darkmode-700 dark:text-slate-400">
+                                <x-base.lucide icon="Clock" class="stroke-1.5 w-5 h-5"></x-base.lucide>
+                            </div>
+                            <x-base.form-input id="check_out" name="check_out" type="time" class="w-full pl-12" />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -482,9 +517,17 @@
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
     <script>
+// Silence console output for this page only
+const console = {
+    log: () => {},
+    error: () => {},
+    warn: () => {},
+    info: () => {},
+    debug: () => {},
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     try {
-        console.log('🚀 Loading attendance page...');
 
         // Attendance status display click handler
         document.querySelectorAll('.attendance-status-display').forEach(span => {
@@ -776,6 +819,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = new FormData(form);
         const data = Object.fromEntries(formData);
 
+        // Normalize attendance_date from litepicker to Y-m-d format for backend validation
+        if (data.attendance_date) {
+            const parsedDate = new Date(data.attendance_date);
+            if (!isNaN(parsedDate.getTime())) {
+                const year = parsedDate.getFullYear();
+                const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
+                const day = String(parsedDate.getDate()).padStart(2, '0');
+                data.attendance_date = `${year}-${month}-${day}`;
+            }
+        }
+
         console.log('📤 Data being sent:', data);
         console.log('📊 Data details:');
         console.log('- entry_type:', data.entry_type);
@@ -831,49 +885,64 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         console.log('✅ Data validation completed, sending...');
-
         fetch('{{ route('hr.attendance.store') }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Accept': 'application/json'
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json',
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
         })
-        .then(response => {
-            console.log('📡 Server response:', response.status, response.statusText);
-            return response.json();
-        })
-        .then(data => {
-            console.log('📨 Response data:', data);
-            if (data.success) {
-                console.log('✅ Data saved successfully');
-                showToast(data.message || 'Attendance saved successfully', 'success');
-                // Close modal using tw-starter API
-                const modal = document.getElementById('attendanceEntryModal');
-                if (window.twModal) {
-                    window.twModal.hide(modal);
-                } else {
-                    // Fallback
-                    modal.classList.remove('show');
-                    modal.style.display = 'none';
-                    document.body.classList.remove('modal-open');
+            .then(async (response) => {
+                console.log('📡 Server response:', response.status, response.statusText);
+
+                let payload = null;
+                try {
+                    payload = await response.json();
+                } catch (e) {
+                    // Non‑JSON response (e.g. HTML) – keep payload as null
                 }
-                // Reload page to refresh data
-                setTimeout(() => location.reload(), 1000);
-            } else {
-                console.error('❌ Failed to save data:', data);
-                showToast(data.message || 'Failed to save attendance', 'error');
-                if (data.errors) {
-                    console.error('Error details:', data.errors);
+
+                console.log('📨 Parsed response data:', payload);
+
+                const isHttpSuccess = response.ok; // 2xx
+                const isExplicitFailure = payload && payload.success === false;
+
+                if (isHttpSuccess && !isExplicitFailure) {
+                    const message = payload?.message || 'Attendance saved successfully';
+                    console.log('✅ Data saved successfully');
+                    showToast(message, 'success');
+
+                    const modal = document.getElementById('attendanceEntryModal');
+                    if (modal) {
+                        const dismissTrigger = modal.querySelector('[data-tw-dismiss="modal"]');
+                        if (dismissTrigger) {
+                            dismissTrigger.click();
+                        } else if (window.twModal && typeof window.twModal.hide === 'function') {
+                            window.twModal.hide(modal);
+                        } else {
+                            modal.classList.remove('show');
+                            modal.style.display = 'none';
+                            document.body.classList.remove('modal-open');
+                        }
+                    }
+
+                    setTimeout(() => window.location.reload(), 1000);
+                    return;
                 }
-            }
-        })
-        .catch(error => {
-            console.error('💥 Network error:', error);
-            showToast('Error occurred while saving', 'error');
-        });
+
+                // Explicit failure from backend
+                console.error('❌ Failed to save data:', payload);
+                showToast(payload?.message || 'Failed to save attendance', 'error');
+                if (payload?.errors) {
+                    console.error('Error details:', payload.errors);
+                }
+            })
+            .catch((error) => {
+                console.error('💥 Network error:', error);
+                showToast('Error occurred while saving', 'error');
+            });
     }
 
     // Remove statistics functions since columns are removed

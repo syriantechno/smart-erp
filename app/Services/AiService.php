@@ -130,27 +130,93 @@ class AiService
      */
     public function executeCommand(string $command, array $context = []): array
     {
-        // Parse the command and determine what to do
-        $command = strtolower(trim($command));
+        // Parse the command and determine what to do (support English & Arabic)
+        $normalized = mb_strtolower(trim($command), 'UTF-8');
 
-        if (str_contains($command, 'create task') || str_contains($command, 'add task')) {
-            return $this->createTaskFromCommand($command, $context);
+        // Task-related commands
+        $taskKeywords = [
+            'create task',
+            'add task',
+            'new task',
+            'انشئ مهمة',
+            'أنشئ مهمة',
+            'اضف مهمة',
+            'أضف مهمة',
+            'مهمة جديدة',
+        ];
+        foreach ($taskKeywords as $keyword) {
+            if (str_contains($normalized, $keyword)) {
+                return $this->createTaskFromCommand($command, $context);
+            }
         }
 
-        if (str_contains($command, 'create material') || str_contains($command, 'add material')) {
-            return $this->createMaterialFromCommand($command, $context);
+        // Material-related commands
+        $materialKeywords = [
+            'create material',
+            'add material',
+            'new material',
+            'انشئ مادة',
+            'أنشئ مادة',
+            'اضف مادة',
+            'أضف مادة',
+            'مادة جديدة',
+        ];
+        foreach ($materialKeywords as $keyword) {
+            if (str_contains($normalized, $keyword)) {
+                return $this->createMaterialFromCommand($command, $context);
+            }
         }
 
-        if (str_contains($command, 'generate report') || str_contains($command, 'create report')) {
-            return $this->generateReportFromCommand($command, $context);
+        // Report-related commands
+        $reportKeywords = [
+            'generate report',
+            'create report',
+            'make report',
+            'انشئ تقرير',
+            'أنشئ تقرير',
+            'تقرير جديد',
+            'تقرير مبيعات',
+            'تقرير شهري',
+        ];
+        foreach ($reportKeywords as $keyword) {
+            if (str_contains($normalized, $keyword)) {
+                return $this->generateReportFromCommand($command, $context);
+            }
         }
 
-        if (str_contains($command, 'send email') || str_contains($command, 'create email')) {
-            return $this->createEmailFromCommand($command, $context);
+        // Email-related commands
+        $emailKeywords = [
+            'send email',
+            'create email',
+            'write email',
+            'ارسل بريد',
+            'أرسل بريد',
+            'ارسل ايميل',
+            'أرسل ايميل',
+            'اكتب بريد',
+            'اكتب ايميل',
+        ];
+        foreach ($emailKeywords as $keyword) {
+            if (str_contains($normalized, $keyword)) {
+                return $this->createEmailFromCommand($command, $context);
+            }
         }
 
-        if (str_contains($command, 'analyze') || str_contains($command, 'analysis')) {
-            return $this->performAnalysisFromCommand($command, $context);
+        // Analysis-related commands
+        $analysisKeywords = [
+            'analyze',
+            'analysis',
+            'analyze data',
+            'تحليل',
+            'حلل',
+            'حلل البيانات',
+            'اعطني تحليل',
+            'أعطني تحليل',
+        ];
+        foreach ($analysisKeywords as $keyword) {
+            if (str_contains($normalized, $keyword)) {
+                return $this->performAnalysisFromCommand($command, $context);
+            }
         }
 
         // Default to general AI response

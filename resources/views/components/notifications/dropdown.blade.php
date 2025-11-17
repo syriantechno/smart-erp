@@ -1,11 +1,12 @@
-{{-- Vanilla JavaScript Notification Dropdown --}}
+{{-- Notification Bell + Slide Over (medium) --}}
 @props(['unreadCount' => 0])
 
-<div class="dropdown relative" id="notification-dropdown">
+<div class="relative" id="notification-dropdown">
     {{-- Notification Bell Button --}}
     <button
-        onclick="toggleNotificationDropdown()"
-        class="relative dropdown-toggle notification-bell text-slate-500 hover:text-slate-600 focus:outline-none"
+        class="relative notification-bell text-slate-500 hover:text-slate-600 focus:outline-none"
+        data-tw-toggle="modal"
+        data-tw-target="#notifications-slideover"
         :class="{ 'text-blue-600': unreadCount > 0 }"
     >
         <x-base.lucide icon="Bell" class="h-5 w-5" />
@@ -19,17 +20,18 @@
             {{ $unreadCount > 99 ? '99+' : $unreadCount }}
         </div>
     </button>
+</div>
 
-    {{-- Notification Dropdown Menu --}}
-    <div
-        id="notification-menu"
-        class="absolute right-0 mt-2 w-80 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
-        style="display: none;"
-    >
+{{-- Slide Over for Notifications --}}
+<x-base.slideover id="notifications-slideover" size="md">
+    <x-base.slideover.panel>
         {{-- Header --}}
-        <div class="px-4 py-3">
-            <div class="flex items-center justify-between">
-                <h3 class="text-sm font-medium text-gray-900">Notifications</h3>
+        <x-base.slideover.title class="p-5 border-b border-slate-200/60">
+            <div class="flex items-center justify-between w-full">
+                <div class="flex items-center gap-2">
+                    <x-base.lucide icon="Bell" class="h-5 w-5 text-yellow-500" />
+                    <h3 class="text-base font-medium text-slate-800">Notifications</h3>
+                </div>
                 <div class="flex space-x-2">
                     <button
                         onclick="markAllNotificationsAsRead()"
@@ -46,20 +48,22 @@
                     </button>
                 </div>
             </div>
-        </div>
+        </x-base.slideover.title>
 
-        {{-- Notifications List --}}
-        <div class="max-h-96 overflow-y-auto">
-            <div id="notifications-list" class="divide-y divide-gray-100">
-                <!-- Notifications will be loaded here -->
-                <div class="px-4 py-8 text-center text-sm text-gray-500">
-                    Loading notifications...
+        {{-- Body: Notifications List --}}
+        <x-base.slideover.description class="px-0 py-0">
+            <div class="max-h-[420px] overflow-y-auto">
+                <div id="notifications-list" class="divide-y divide-gray-100">
+                    <!-- Notifications will be loaded here -->
+                    <div class="px-4 py-8 text-center text-sm text-gray-500">
+                        Loading notifications...
+                    </div>
                 </div>
             </div>
-        </div>
+        </x-base.slideover.description>
 
         {{-- Footer --}}
-        <div id="notifications-footer" class="px-4 py-3 bg-gray-50" style="display: none;">
+        <div id="notifications-footer" class="px-5 py-3 border-t border-slate-200/60 bg-slate-50" style="display: none;">
             <a
                 href="{{ route('notifications.index') }}"
                 class="text-sm text-blue-600 hover:text-blue-800 font-medium"
@@ -67,8 +71,8 @@
                 View all notifications →
             </a>
         </div>
-    </div>
-</div>
+    </x-base.slideover.panel>
+</x-base.slideover>
 
 {{-- Vanilla JavaScript for Notification Dropdown --}}
 <script>
@@ -81,36 +85,6 @@ function initNotifications() {
     startPolling();
     updateBadge();
 }
-
-function toggleNotificationDropdown() {
-    const menu = document.getElementById('notification-menu');
-    const isVisible = menu.style.display !== 'none';
-
-    if (isVisible) {
-        closeNotificationDropdown();
-    } else {
-        openNotificationDropdown();
-    }
-}
-
-function openNotificationDropdown() {
-    const menu = document.getElementById('notification-menu');
-    menu.style.display = 'block';
-    loadRecentNotifications();
-}
-
-function closeNotificationDropdown() {
-    const menu = document.getElementById('notification-menu');
-    menu.style.display = 'none';
-}
-
-// Close dropdown when clicking outside
-document.addEventListener('click', function(event) {
-    const dropdown = document.getElementById('notification-dropdown');
-    if (dropdown && !dropdown.contains(event.target)) {
-        closeNotificationDropdown();
-    }
-});
 
 function loadRecentNotifications() {
     fetch('{{ route("notifications.recent") }}?limit=10', {

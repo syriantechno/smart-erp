@@ -6,29 +6,19 @@
 
 @section('content')
     <div @class([
-        'rubick px-5 sm:px-8 py-5',
-        "before:content-[''] before:bg-gradient-to-b before:from-theme-1 before:to-theme-2 dark:before:from-darkmode-800 dark:before:to-darkmode-800 before:fixed before:inset-0 before:z-[-1]",
+        'enigma py-5 px-5 md:py-0 sm:px-8 md:px-0 bg-slate-100 dark:bg-darkmode-800',
     ])>
         <x-mobile-menu />
-        <div class="mt-[4.7rem] flex md:mt-0">
-            <!-- BEGIN: Side Menu -->
-            <nav class="side-nav hidden w-[80px] overflow-x-hidden pb-16 pr-5 md:block xl:w-[230px]">
-                <a
-                    class="flex items-center pt-4 pl-5 intro-x"
-                    href=""
-                >
-                    <img
-                        class="w-6"
-                        src="{{ Vite::asset('resources/images/logo.svg') }}"
-                        alt="Midone - Tailwind Admin Dashboard Template"
-                    />
-                    <span class="hidden ml-3 text-lg text-white xl:block"> Rubick </span>
-                </a>
-                <div class="my-6 side-nav__divider"></div>
+        <div class="relative z-10 py-8 md:py-10">
+            <x-themes.enigma.top-bar layout="simple-menu" />
+        </div>
+        <div class="flex overflow-hidden mt-10">
+            <!-- BEGIN: Simple Menu -->
+            <nav class="side-nav side-nav--simple z-50 -mt-4 hidden w-[100px] overflow-x-hidden px-5 pb-16 pt-32 md:block bg-white/60 rounded-2xl shadow-lg dark:bg-darkmode-700/70">
                 <ul>
                     @foreach ($mainMenu as $menuKey => $menu)
                         @if ($menu == 'divider')
-                            <li class="my-6 side-nav__divider"></li>
+                            <li class="side-nav__divider my-6"></li>
                         @else
                             <li>
                                 <a
@@ -110,11 +100,12 @@
                     @endforeach
                 </ul>
             </nav>
-            <!-- END: Side Menu -->
+            <!-- END: Simple Menu -->
             <!-- BEGIN: Content -->
-            <div
-                class="md:max-w-auto min-h-screen min-w-0 max-w-full flex-1 rounded-[30px] bg-slate-100 px-4 pb-10 before:block before:h-px before:w-full before:content-[''] dark:bg-darkmode-700 md:px-[22px]">
-                <x-themes.rubick.top-bar />
+            <div @class([
+                'max-w-full md:max-w-none rounded-[30px] md:rounded-none px-4 md:px-[22px] min-w-0 min-h-screen bg-slate-100 flex-1 md:pt-20 pb-10 mt-5 md:mt-1 relative dark:bg-darkmode-700',
+                "before:content-[''] before:w-full before:h-px before:block",
+            ])>
                 @yield('subcontent')
             </div>
             <!-- END: Content -->
@@ -124,7 +115,7 @@
 
 @pushOnce('styles')
     @vite('resources/css/vendors/tippy.css')
-    @vite('resources/css/themes/rubick/side-nav.css')
+    @vite('resources/css/themes/enigma/side-nav.css')
 @endPushOnce
 
 @pushOnce('vendors')
@@ -132,5 +123,5 @@
 @endPushOnce
 
 @pushOnce('scripts')
-    @vite('resources/js/themes/rubick.js')
+    @vite('resources/js/themes/enigma.js')
 @endPushOnce

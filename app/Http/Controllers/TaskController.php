@@ -11,9 +11,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use App\Exports\TasksExport;
 use Yajra\DataTables\Facades\DataTables;
+use App\Helpers\Reply;
+use Carbon\Carbon;
 
 class TaskController extends Controller
 {
@@ -33,7 +36,7 @@ class TaskController extends Controller
     public function previewCode()
     {
         $code = $this->codeGenerator->preview('tasks');
-        return response()->json(['code' => $code]);
+        return Reply::success('', ['code' => $code]);
     }
 
     public function datatable(Request $request): JsonResponse
@@ -124,46 +127,59 @@ class TaskController extends Controller
 
     public function store(Request $request)
     {
+        Log::info('TASK_STORE_ENTER', [
+            'url' => $request->fullUrl(),
+            'method' => $request->method(),
+        ]);
+
+        Log::info('TASK_STORE_RAW', $request->all());
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'priority' => 'required|in:low,medium,high',
+            'color' => 'nullable|string|max:32',
             'status' => 'required|in:pending,in_progress,completed,cancelled',
-            'due_date' => 'nullable|date',
+            'due_date' => 'nullable|date_format:d M, Y',
             'employee_id' => 'nullable|exists:employees,id',
             'department_id' => 'nullable|exists:departments,id',
             'company_id' => 'nullable|exists:companies,id',
+            'project_id' => 'nullable|exists:projects,id',
             'is_active' => 'nullable|boolean',
         ]);
 
         try {
             DB::beginTransaction();
 
+            if (!empty($validated['due_date'])) {
+                $validated['due_date'] = Carbon::createFromFormat('d M, Y', $validated['due_date'])->format('Y-m-d');
+            }
+
             $validated['code'] = $this->codeGenerator->generate('tasks');
             $validated['assigned_by'] = auth()->id();
             $validated['is_active'] = $request->boolean('is_active', true);
+
+            Log::info('TASK_STORE_ATTEMPT', $validated);
 
             Task::create($validated);
 
             DB::commit();
 
             if ($request->ajax()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Task created successfully',
-                ]);
+                return Reply::success('Task created successfully');
             }
 
             return redirect()->route('tasks.index')
                 ->with('success', 'تم إضافة المهمة بنجاح');
         } catch (\Exception $e) {
+            Log::error('TASK_STORE_EXCEPTION', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
             DB::rollBack();
 
             if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Error creating task: ' . $e->getMessage(),
-                ], 500);
+                return Reply::error('Error creating task: ' . $e->getMessage(), [], 500);
             }
 
             return back()->with('error', 'Error creating task: ' . $e->getMessage());
@@ -190,7 +206,7 @@ class TaskController extends Controller
             'description' => 'nullable|string',
             'priority' => 'required|in:low,medium,high',
             'status' => 'required|in:pending,in_progress,completed,cancelled',
-            'due_date' => 'nullable|date',
+            'due_date' => 'nullable|date_format:d M, Y',
             'employee_id' => 'nullable|exists:employees,id',
             'department_id' => 'nullable|exists:departments,id',
             'company_id' => 'nullable|exists:companies,id',
@@ -200,6 +216,10 @@ class TaskController extends Controller
         try {
             DB::beginTransaction();
 
+            if (!empty($validated['due_date'])) {
+                $validated['due_date'] = Carbon::createFromFormat('d M, Y', $validated['due_date'])->format('Y-m-d');
+            }
+
             $validated['is_active'] = $request->boolean('is_active', true);
 
             $task->update($validated);
@@ -207,10 +227,7 @@ class TaskController extends Controller
             DB::commit();
 
             if ($request->ajax()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Task updated successfully',
-                ]);
+                return Reply::success('Task updated successfully');
             }
 
             return redirect()->route('tasks.index')
@@ -219,10 +236,7 @@ class TaskController extends Controller
             DB::rollBack();
 
             if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Error updating task: ' . $e->getMessage(),
-                ], 500);
+                return Reply::error('Error updating task: ' . $e->getMessage(), [], 500);
             }
 
             return back()->with('error', 'Error updating task: ' . $e->getMessage());
@@ -239,10 +253,7 @@ class TaskController extends Controller
             DB::commit();
 
             if ($request->ajax()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Task deleted successfully',
-                ]);
+                return Reply::success('Task deleted successfully');
             }
 
             return redirect()->route('tasks.index')
@@ -251,13 +262,100 @@ class TaskController extends Controller
             DB::rollBack();
 
             if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Error deleting task: ' . $e->getMessage(),
-                ], 500);
+                return Reply::error('Error deleting task: ' . $e->getMessage(), [], 500);
             }
 
             return back()->with('error', 'Error deleting task: ' . $e->getMessage());
+        }
+    }
+
+    public function kanbanData(Request $request): JsonResponse
+    {
+        $query = Task::query()
+            ->with(['employee:id,first_name,last_name', 'department:id,name', 'company:id,name']);
+
+        if ($request->filled('company_id') && $request->company_id !== '') {
+            $query->where('company_id', $request->company_id);
+        }
+
+        if ($request->filled('department_id') && $request->department_id !== '') {
+            $query->where('department_id', $request->department_id);
+        }
+
+        if ($request->filled('employee_id') && $request->employee_id !== '') {
+            $query->where('employee_id', $request->employee_id);
+        }
+
+        if ($request->filled('status_filter') && $request->status_filter !== '') {
+            $query->where('status', $request->status_filter);
+        }
+
+        $tasks = $query
+            ->orderByRaw("FIELD(status, 'pending', 'in_progress', 'completed', 'cancelled')")
+            ->orderBy('priority', 'desc')
+            ->orderBy('due_date', 'asc')
+            ->get();
+
+        $grouped = [
+            'pending' => [],
+            'in_progress' => [],
+            'completed' => [],
+            'cancelled' => [],
+        ];
+
+        foreach ($tasks as $task) {
+            $status = $task->status ?? 'pending';
+            if (! isset($grouped[$status])) {
+                $grouped[$status] = [];
+            }
+
+            $grouped[$status][] = [
+                'id' => $task->id,
+                'code' => $task->code,
+                'title' => $task->title,
+                'description' => $task->description,
+                'priority' => $task->priority,
+                'status' => $task->status,
+                'color' => $task->color,
+                'due_date' => $task->due_date ? $task->due_date->format('Y-m-d') : null,
+                'due_date_formatted' => $task->due_date ? $task->due_date->format('M d, Y') : null,
+                'employee_name' => $task->employee ? $task->employee->full_name : null,
+                'department_name' => $task->department ? $task->department->name : null,
+                'company_name' => $task->company ? $task->company->name : null,
+            ];
+        }
+
+        return Reply::success('', ['data' => $grouped]);
+    }
+
+    public function updateStatus(Request $request, Task $task): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'status' => ['required', Rule::in(['pending', 'in_progress', 'completed', 'cancelled'])],
+        ]);
+
+        if ($validator->fails()) {
+            return Reply::error('Invalid status value', ['errors' => $validator->errors()], 422);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $task->status = $request->input('status');
+            $task->save();
+
+            DB::commit();
+
+            return Reply::success('Task status updated successfully', [
+                'task' => [
+                    'id' => $task->id,
+                    'status' => $task->status,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return Reply::error('Error updating task status: ' . $e->getMessage(), [], 500);
         }
     }
 }

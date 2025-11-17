@@ -155,6 +155,12 @@ class DocumentController extends Controller
                     </div>
                 ";
             })
+            ->addColumn('file_size_formatted', function ($document) {
+                return $document->file_size_formatted;
+            })
+            ->addColumn('formatted_date', function ($document) {
+                return optional($document->created_at)->format(setting('date_format', 'Y-m-d'));
+            })
             ->addColumn('expiry_info', function ($document) {
                 if (!$document->expiry_date) return '-';
 
@@ -261,6 +267,9 @@ class DocumentController extends Controller
 
             DB::commit();
 
+            // Notify if the document is expiring within the configured window
+            \App\Http\Controllers\NotificationController::documentExpiring($document);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Document uploaded successfully',
@@ -316,6 +325,9 @@ class DocumentController extends Controller
                 'tags', 'status'
             ]));
 
+            // Notify if the updated document is expiring within the configured window
+            \App\Http\Controllers\NotificationController::documentExpiring($document);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Document updated successfully',
@@ -351,6 +363,45 @@ class DocumentController extends Controller
                 'message' => 'Failed to delete document: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * Get simple statistics for documents page.
+     */
+    public function stats(Request $request): JsonResponse
+    {
+        $user = auth()->user();
+
+        $baseQuery = Document::query();
+
+        if ($user->company_id) {
+            $baseQuery->where('company_id', $user->company_id);
+        }
+
+        $totalFiles = (clone $baseQuery)->count();
+
+        $monthlyFiles = (clone $baseQuery)
+            ->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])
+            ->count();
+
+        $totalSizeBytes = (clone $baseQuery)->sum('file_size');
+
+        $k = 1024;
+        $sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+        $sizeIndex = $totalSizeBytes > 0 ? (int) floor(log($totalSizeBytes, $k)) : 0;
+        $sizeIndex = max(0, min($sizeIndex, count($sizes) - 1));
+        $sizeValue = $totalSizeBytes > 0 ? $totalSizeBytes / pow($k, $sizeIndex) : 0;
+        $storageFormatted = number_format($sizeValue, 2) . ' ' . $sizes[$sizeIndex];
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'total_files' => $totalFiles,
+                'monthly_files' => $monthlyFiles,
+                'storage_used' => $totalSizeBytes,
+                'storage_used_formatted' => $storageFormatted,
+            ],
+        ]);
     }
 
     // Categories Management

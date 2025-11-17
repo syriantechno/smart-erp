@@ -32,12 +32,8 @@ class AiController extends Controller
 
     public function chat()
     {
-        $recentInteractions = AiInteraction::forUser(auth()->id())
-                                         ->latest()
-                                         ->take(10)
-                                         ->get();
-
-        return view('ai.chat', compact('recentInteractions'));
+        // Redirect to main AI page where the chat is handled via modal
+        return redirect()->route('ai.index');
     }
 
     public function interact(Request $request): JsonResponse
@@ -158,6 +154,72 @@ class AiController extends Controller
             })
             ->rawColumns(['type_badge', 'status_badge', 'actions'])
             ->make(true);
+    }
+
+    public function adminUsers(): JsonResponse
+    {
+        // Admin-only: list users who have AI interactions
+        $user = auth()->user();
+
+        if (!$user || !$user->hasRole('admin')) {
+            return response()->json(['success' => false, 'message' => 'Access denied'], 403);
+        }
+
+        $users = AiInteraction::with('user')
+            ->select('user_id')
+            ->whereNotNull('user_id')
+            ->distinct()
+            ->get()
+            ->map(function (AiInteraction $interaction) {
+                return [
+                    'id' => $interaction->user?->id,
+                    'name' => $interaction->user?->name ?? 'Unknown',
+                    'email' => $interaction->user?->email ?? null,
+                ];
+            })
+            ->filter(fn ($u) => !empty($u['id']))
+            ->values();
+
+        return response()->json([
+            'success' => true,
+            'data' => $users,
+        ]);
+    }
+
+    public function adminRecent(Request $request): JsonResponse
+    {
+        // Admin-only: get recent interactions, optionally filtered by user_id
+        $user = auth()->user();
+
+        if (!$user || !$user->hasRole('admin')) {
+            return response()->json(['success' => false, 'message' => 'Access denied'], 403);
+        }
+
+        $query = AiInteraction::with('user')->latest();
+
+        if ($request->filled('user_id')) {
+            $query->where('user_id', $request->user_id);
+        }
+
+        $interactions = $query
+            ->limit(20)
+            ->get()
+            ->map(function (AiInteraction $interaction) {
+                return [
+                    'id' => $interaction->id,
+                    'user_name' => $interaction->user?->name ?? 'Unknown',
+                    'user_email' => $interaction->user?->email ?? null,
+                    'interaction_type' => $interaction->interaction_type,
+                    'status' => $interaction->status,
+                    'user_input' => $interaction->user_input,
+                    'formatted_date' => $interaction->formatted_date,
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'data' => $interactions,
+        ]);
     }
 
     public function show(AiInteraction $aiInteraction): JsonResponse

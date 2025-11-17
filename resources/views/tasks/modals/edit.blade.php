@@ -2,6 +2,7 @@
     $companies = \App\Models\Company::active()->get();
     $departments = \App\Models\Department::active()->get();
     $employees = \App\Models\Employee::active()->get();
+    $projects = \App\Models\Project::active()->get();
 @endphp
 <x-modal.form id="edit-task-modal" title="Edit Task" size="xl">
     <form id="edit-task-form" method="POST" enctype="multipart/form-data">
@@ -40,6 +41,11 @@
                         <option value="medium">Medium</option>
                         <option value="high">High</option>
                     </x-base.form-select>
+                </div>
+
+                <div class="col-span-12 md:col-span-4">
+                    <x-base.form-label for="edit-color">Task Color</x-base.form-label>
+                    <x-base.form-input id="edit-color" name="color" type="color" class="w-full h-10 p-1" />
                 </div>
 
                 <div class="col-span-12 md:col-span-4">
@@ -108,7 +114,17 @@
                     </x-base.form-select>
                 </div>
 
-                <div class="col-span-12 md:col-span-6">
+                <div class="col-span-12 md:col-span-4">
+                    <x-base.form-label for="edit-project-id">Project (Optional)</x-base.form-label>
+                    <x-base.form-select id="edit-project-id" name="project_id" class="w-full">
+                        <option value="">General / No Project</option>
+                        @foreach($projects as $project)
+                            <option value="{{ $project->id }}">{{ $project->name ?? $project->code ?? ('Project #' . $project->id) }}</option>
+                        @endforeach
+                    </x-base.form-select>
+                </div>
+
+                <div class="col-span-12 md:col-span-4">
                     <x-base.form-label for="edit-is-active">Active Status</x-base.form-label>
                     <x-base.form-select id="edit-is-active" name="is_active" class="w-full">
                         <option value="1">Active</option>

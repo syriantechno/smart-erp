@@ -175,9 +175,91 @@ class DepartmentController extends Controller
                         $companyQuery->where('name', 'like', "%{$searchValue}%");
                     })
                     ->orWhereHas('manager', function ($managerQuery) use ($searchValue) {
-                        $managerQuery->where('full_name', 'like', "%{$searchValue}%");
+                        $managerQuery->whereRaw(
+                            "CONCAT(IFNULL(first_name, ''), ' ', IFNULL(middle_name, ''), ' ', IFNULL(last_name, '')) LIKE ?",
+                            ["%{$searchValue}%"]
+                        );
                     });
             });
+        }
+
+        $filterField = $request->input('filter_field', 'all');
+        $filterType = $request->input('filter_type', 'contains');
+        $filterValue = $request->input('filter_value');
+
+        if ($filterValue !== null && $filterValue !== '') {
+            $comparison = $filterType === 'equals' ? '=' : 'like';
+            $value = $filterType === 'equals' ? $filterValue : "%{$filterValue}%";
+
+            switch ($filterField) {
+                case 'name':
+                    $baseQuery->where('name', $comparison, $value);
+                    break;
+
+                case 'company':
+                    $baseQuery->whereHas('company', function ($companyQuery) use ($comparison, $value) {
+                        $companyQuery->where('name', $comparison, $value);
+                    });
+                    break;
+
+                case 'manager':
+                    $baseQuery->whereHas('manager', function ($managerQuery) use ($filterType, $filterValue) {
+                        if ($filterType === 'equals') {
+                            $managerQuery->whereRaw(
+                                "TRIM(CONCAT(IFNULL(first_name, ''), ' ', IFNULL(middle_name, ''), ' ', IFNULL(last_name, ''))) = ?",
+                                [$filterValue]
+                            );
+                        } else {
+                            $managerQuery->whereRaw(
+                                "CONCAT(IFNULL(first_name, ''), ' ', IFNULL(middle_name, ''), ' ', IFNULL(last_name, '')) LIKE ?",
+                                ["%{$filterValue}%"]
+                            );
+                        }
+                    });
+                    break;
+
+                case 'employees_count':
+                    if (is_numeric($filterValue)) {
+                        if ($filterType === 'equals') {
+                            $baseQuery->having('employees_count', '=', (int) $filterValue);
+                        } else {
+                            $baseQuery->having('employees_count', '>=', (int) $filterValue);
+                        }
+                    }
+                    break;
+
+                case 'status':
+                    $normalized = strtolower(trim($filterValue));
+                    if (in_array($normalized, ['active', '1', 'true', 'enabled'])) {
+                        $baseQuery->where('is_active', true);
+                    } elseif (in_array($normalized, ['inactive', '0', 'false', 'disabled'])) {
+                        $baseQuery->where('is_active', false);
+                    }
+                    break;
+
+                case 'all':
+                default:
+                    $baseQuery->where(function ($query) use ($comparison, $value, $filterType, $filterValue) {
+                        $query->where('name', $comparison, $value)
+                            ->orWhereHas('company', function ($companyQuery) use ($comparison, $value) {
+                                $companyQuery->where('name', $comparison, $value);
+                            })
+                            ->orWhereHas('manager', function ($managerQuery) use ($filterType, $filterValue) {
+                                if ($filterType === 'equals') {
+                                    $managerQuery->whereRaw(
+                                        "TRIM(CONCAT(IFNULL(first_name, ''), ' ', IFNULL(middle_name, ''), ' ', IFNULL(last_name, ''))) = ?",
+                                        [$filterValue]
+                                    );
+                                } else {
+                                    $managerQuery->whereRaw(
+                                        "CONCAT(IFNULL(first_name, ''), ' ', IFNULL(middle_name, ''), ' ', IFNULL(last_name, '')) LIKE ?",
+                                        ["%{$filterValue}%"]
+                                    );
+                                }
+                            });
+                    });
+                    break;
+            }
         }
 
         $recordsFiltered = (clone $baseQuery)->count();
