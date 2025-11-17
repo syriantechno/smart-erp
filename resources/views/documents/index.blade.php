@@ -8,6 +8,7 @@
 @include('components.datatable.theme')
 
 @push('styles')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.min.css">
     <style>
         .category-item {
             transition: all 0.2s ease;
@@ -309,6 +310,10 @@
 @endsection
 
 @include('components.datatable.scripts')
+
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
+@endpush
 
 @push('scripts')
     <script>

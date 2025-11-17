@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Yajra\DataTables\Facades\DataTables;
 use App\Helpers\NotificationHelper;
+use App\Helpers\Reply;
 
 class DepartmentController extends Controller
 {
@@ -323,9 +324,7 @@ class DepartmentController extends Controller
     {
         $code = $this->codeGenerator->preview('department');
 
-        return response()->json([
-            'code' => $code,
-        ]);
+        return Reply::success('', ['code' => $code]);
     }
 
     public function update(Request $request, Department $department)
@@ -361,10 +360,7 @@ class DepartmentController extends Controller
                 $message = 'Cannot delete department because it has sub-departments.';
                 if (request()->ajax()) {
                     notify_error_code(6001, 'Cannot delete department with sub-departments');
-                    return response()->json([
-                        'success' => false,
-                        'message' => $message
-                    ], 400);
+                    return Reply::error($message, [], 400);
                 }
                 notify_error_code(6001, 'Cannot delete department with sub-departments');
                 return back();
@@ -374,10 +370,7 @@ class DepartmentController extends Controller
                 $message = 'Cannot delete department because it has employees.';
                 if (request()->ajax()) {
                     notify_error_code(6001, 'Cannot delete department with employees');
-                    return response()->json([
-                        'success' => false,
-                        'message' => $message
-                    ], 400);
+                    return Reply::error($message, [], 400);
                 }
                 notify_error_code(6001, 'Cannot delete department with employees');
                 return back();
@@ -390,10 +383,7 @@ class DepartmentController extends Controller
 
             if (request()->ajax()) {
                 \App\Http\Controllers\NotificationController::departmentDeleted($department);
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Department deleted successfully'
-                ]);
+                return Reply::success('Department deleted successfully');
             }
 
             \App\Http\Controllers\NotificationController::departmentDeleted($department);
@@ -405,10 +395,7 @@ class DepartmentController extends Controller
             
             if (request()->ajax()) {
                 notify_error_code(1004, 'Failed to delete department');
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Error deleting department: ' . $e->getMessage()
-                ], 500);
+                return Reply::error('Error deleting department: ' . $e->getMessage(), [], 500);
             }
             
             notify_error_code(1004, 'Failed to delete department');

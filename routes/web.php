@@ -5,7 +5,7 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\LayoutController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\UserMailAccountController;
+use App\Http\Controllers\Mail\UserMailAccountController;
 
 /*
 |--------------------------------------------------------------------------

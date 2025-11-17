@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Yajra\DataTables\Facades\DataTables;
+use App\Helpers\Reply;
 
 class PositionController extends Controller
 {
@@ -41,11 +42,7 @@ class PositionController extends Controller
 
         if ($validator->fails()) {
             if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Validation failed',
-                    'errors' => $validator->errors(),
-                ], 422);
+                return Reply::error('Validation failed', ['errors' => $validator->errors()], 422);
             }
 
             return back()->withErrors($validator)->withInput();
@@ -67,10 +64,7 @@ class PositionController extends Controller
             DB::commit();
 
             if ($request->ajax()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Position created successfully',
-                ]);
+                return Reply::success('Position created successfully');
             }
 
             return redirect()->route('hr.positions.index')
@@ -80,10 +74,7 @@ class PositionController extends Controller
             DB::rollBack();
 
             if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Error creating position: ' . $e->getMessage(),
-                ], 500);
+                return Reply::error('Error creating position: ' . $e->getMessage(), [], 500);
             }
 
             return back()->with('error', 'Error creating position: ' . $e->getMessage());
@@ -135,10 +126,7 @@ class PositionController extends Controller
             DB::commit();
 
             if ($request->ajax()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Position updated successfully',
-                ]);
+                return Reply::success('Position updated successfully');
             }
 
             \App\Http\Controllers\NotificationController::positionUpdated($position);
@@ -150,10 +138,7 @@ class PositionController extends Controller
             DB::rollBack();
 
             if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Error updating position: ' . $e->getMessage(),
-                ], 500);
+                return Reply::error('Error updating position: ' . $e->getMessage(), [], 500);
             }
 
             return back()->with('error', 'Error updating position: ' . $e->getMessage());
@@ -171,10 +156,7 @@ class PositionController extends Controller
             if ($hasEmployees) {
                 $message = 'Cannot delete position because it has employees.';
                 if ($request->ajax()) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => $message,
-                    ], 400);
+                    return Reply::error($message, [], 400);
                 }
 
                 return back()->with('error', $message);
@@ -186,10 +168,7 @@ class PositionController extends Controller
 
             if ($request->ajax()) {
                 \App\Http\Controllers\NotificationController::positionDeleted($position);
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Position deleted successfully',
-                ]);
+                return Reply::success('Position deleted successfully');
             }
 
             \App\Http\Controllers\NotificationController::positionDeleted($position);
@@ -201,10 +180,7 @@ class PositionController extends Controller
             DB::rollBack();
 
             if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Error deleting position: ' . $e->getMessage(),
-                ], 500);
+                return Reply::error('Error deleting position: ' . $e->getMessage(), [], 500);
             }
 
             return back()->with('error', 'Error deleting position: ' . $e->getMessage());

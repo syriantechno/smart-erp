@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use App\Exports\EmployeesExport;
 use Yajra\DataTables\Facades\DataTables;
+use App\Helpers\Reply;
 
 class EmployeeController extends Controller
 {
@@ -33,7 +34,7 @@ class EmployeeController extends Controller
     public function previewCode()
     {
         $code = $this->codeGenerator->preview('employees');
-        return response()->json(['code' => $code]);
+        return Reply::success('', ['code' => $code]);
     }
     
     public function datatable(Request $request): JsonResponse
@@ -117,7 +118,7 @@ class EmployeeController extends Controller
         $companies = Company::where('is_active', true)->get();
         $departments = Department::where('is_active', true)->get();
         
-        return response()->json([
+        return Reply::successWithData('', [
             'companies_count' => $companies->count(),
             'departments_count' => $departments->count(),
             'companies' => $companies->pluck('name'),
@@ -209,10 +210,7 @@ class EmployeeController extends Controller
             \App\Http\Controllers\NotificationController::employeeCreated($employee);
 
             if ($request->ajax()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Employee created successfully',
-                ]);
+                return Reply::success('Employee created successfully');
             }
 
             return redirect()->route('hr.employees.index')
@@ -221,10 +219,7 @@ class EmployeeController extends Controller
             DB::rollBack();
 
             if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Error creating employee: ' . $e->getMessage(),
-                ], 500);
+                return Reply::error('Error creating employee: ' . $e->getMessage(), [], 500);
             }
 
             return back()->with('error', 'Error creating employee: ' . $e->getMessage());
@@ -292,10 +287,7 @@ class EmployeeController extends Controller
             DB::commit();
 
             if ($request->ajax()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Employee updated successfully',
-                ]);
+                return Reply::success('Employee updated successfully');
             }
 
             return redirect()
@@ -305,10 +297,7 @@ class EmployeeController extends Controller
             DB::rollBack();
 
             if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Error updating employee: ' . $e->getMessage(),
-                ], 500);
+                return Reply::error('Error updating employee: ' . $e->getMessage(), [], 500);
             }
 
             return back()->with('error', 'Error updating employee: ' . $e->getMessage());
@@ -326,10 +315,7 @@ class EmployeeController extends Controller
 
             if ($request->ajax()) {
                 \App\Http\Controllers\NotificationController::employeeDeleted($employee);
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Employee deleted successfully',
-                ]);
+                return Reply::success('Employee deleted successfully');
             }
 
             \App\Http\Controllers\NotificationController::employeeDeleted($employee);
@@ -339,10 +325,7 @@ class EmployeeController extends Controller
             DB::rollBack();
 
             if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Error deleting employee: ' . $e->getMessage(),
-                ], 500);
+                return Reply::error('Error deleting employee: ' . $e->getMessage(), [], 500);
             }
 
             return back()->with('error', 'Error deleting employee: ' . $e->getMessage());

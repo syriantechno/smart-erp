@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
+use App\Helpers\Reply;
 
 class AttendanceController extends Controller
 {
@@ -58,11 +59,7 @@ class AttendanceController extends Controller
         $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation error',
-                'errors' => $validator->errors()
-            ], 422);
+            return Reply::error('Validation error', ['errors' => $validator->errors()], 422);
         }
 
         try {
@@ -118,17 +115,11 @@ class AttendanceController extends Controller
                 $savedRecords++;
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => "تم حفظ الحضور لـ {$savedRecords} موظف بنجاح",
-                'data' => $savedRecords
+            return Reply::success("تم حفظ الحضور لـ {$savedRecords} موظف بنجاح", [
+                'data' => $savedRecords,
             ]);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to save attendance record',
-                'error' => $e->getMessage()
-            ], 500);
+            return Reply::error('Failed to save attendance record', ['error' => $e->getMessage()], 500);
         }
     }
 
@@ -164,17 +155,11 @@ class AttendanceController extends Controller
                 'overtime_hours' => max(0, $workingHours - $requiredHours),
             ]);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Attendance record updated successfully',
-                'data' => $attendance
+            return Reply::success('Attendance record updated successfully', [
+                'data' => $attendance,
             ]);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to update attendance record',
-                'error' => $e->getMessage()
-            ], 500);
+            return Reply::error('Failed to update attendance record', ['error' => $e->getMessage()], 500);
         }
     }
 
@@ -213,17 +198,10 @@ class AttendanceController extends Controller
 
             DB::commit();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Attendance records updated successfully'
-            ]);
+            return Reply::success('Attendance records updated successfully');
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to update attendance records',
-                'error' => $e->getMessage()
-            ], 500);
+            return Reply::error('Failed to update attendance records', ['error' => $e->getMessage()], 500);
         }
     }
 
@@ -249,9 +227,8 @@ class AttendanceController extends Controller
             $request->month
         );
 
-        return response()->json([
-            'success' => true,
-            'data' => $stats
+        return Reply::successWithData('', [
+            'data' => $stats,
         ]);
     }
 
@@ -261,16 +238,9 @@ class AttendanceController extends Controller
             $attendance = Attendance::findOrFail($id);
             $attendance->delete();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Attendance record deleted successfully'
-            ]);
+            return Reply::success('Attendance record deleted successfully');
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to delete attendance record',
-                'error' => $e->getMessage()
-            ], 500);
+            return Reply::error('Failed to delete attendance record', ['error' => $e->getMessage()], 500);
         }
     }
 
