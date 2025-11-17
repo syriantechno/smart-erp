@@ -402,7 +402,11 @@
                 .done(function(response) {
                     if (response.success) {
                         populateEditCategoryModal(response.category);
-                        jq('#edit-category-modal').modal('show');
+                        const modalEl = document.getElementById('edit-category-modal');
+                        if (modalEl) {
+                            const instance = tailwind.Modal.getOrCreateInstance(modalEl);
+                            instance.show();
+                        }
                     }
                 });
         };
@@ -488,7 +492,11 @@
                     },
                     success: function (response) {
                         if (response.success) {
-                            jq('#edit-category-modal').modal('hide');
+                            const modalEl = document.getElementById('edit-category-modal');
+                            if (modalEl) {
+                                const instance = tailwind.Modal.getOrCreateInstance(modalEl);
+                                instance.hide();
+                            }
                             if (categoriesTable) {
                                 categoriesTable.ajax.reload();
                             }

@@ -149,17 +149,17 @@ Route::middleware('auth')->group(function () {
 
     // Tasks Routes
     Route::prefix('tasks')->name('tasks.')->group(function () {
-        Route::get('/', [App\Http\Controllers\TaskController::class, 'index'])->name('index');
-        Route::get('/datatable', [App\Http\Controllers\TaskController::class, 'datatable'])->name('datatable');
-        Route::get('/kanban-data', [App\Http\Controllers\TaskController::class, 'kanbanData'])->name('kanban-data');
-        Route::post('/{task}/update-status', [App\Http\Controllers\TaskController::class, 'updateStatus'])->name('update-status');
-        Route::get('/preview-code', [App\Http\Controllers\TaskController::class, 'previewCode'])->name('preview-code');
-        Route::get('/create', [App\Http\Controllers\TaskController::class, 'create'])->name('create');
-        Route::post('/', [App\Http\Controllers\TaskController::class, 'store'])->name('store');
-        Route::get('/{task}', [App\Http\Controllers\TaskController::class, 'show'])->name('show');
-        Route::get('/{task}/edit', [App\Http\Controllers\TaskController::class, 'edit'])->name('edit');
-        Route::put('/{task}', [App\Http\Controllers\TaskController::class, 'update'])->name('update');
-        Route::delete('/{task}', [App\Http\Controllers\TaskController::class, 'destroy'])->name('destroy');
+        Route::get('/', [App\Http\Controllers\Work\TaskController::class, 'index'])->name('index');
+        Route::get('/datatable', [App\Http\Controllers\Work\TaskController::class, 'datatable'])->name('datatable');
+        Route::get('/kanban-data', [App\Http\Controllers\Work\TaskController::class, 'kanbanData'])->name('kanban-data');
+        Route::post('/{task}/update-status', [App\Http\Controllers\Work\TaskController::class, 'updateStatus'])->name('update-status');
+        Route::get('/preview-code', [App\Http\Controllers\Work\TaskController::class, 'previewCode'])->name('preview-code');
+        Route::get('/create', [App\Http\Controllers\Work\TaskController::class, 'create'])->name('create');
+        Route::post('/', [App\Http\Controllers\Work\TaskController::class, 'store'])->name('store');
+        Route::get('/{task}', [App\Http\Controllers\Work\TaskController::class, 'show'])->name('show');
+        Route::get('/{task}/edit', [App\Http\Controllers\Work\TaskController::class, 'edit'])->name('edit');
+        Route::put('/{task}', [App\Http\Controllers\Work\TaskController::class, 'update'])->name('update');
+        Route::delete('/{task}', [App\Http\Controllers\Work\TaskController::class, 'destroy'])->name('destroy');
     });
 
     // Warehouse Routes
@@ -177,78 +177,78 @@ Route::middleware('auth')->group(function () {
 
         // Warehouses
         Route::prefix('warehouses')->name('warehouses.')->group(function () {
-            Route::get('/', [App\Http\Controllers\WarehouseController::class, 'index'])->name('index');
-            Route::get('/datatable', [App\Http\Controllers\WarehouseController::class, 'datatable'])->name('datatable');
-            Route::get('/preview-code', [App\Http\Controllers\WarehouseController::class, 'previewCode'])->name('preview-code');
-            Route::post('/', [App\Http\Controllers\WarehouseController::class, 'store'])->name('store');
-            Route::get('/{warehouse}', [App\Http\Controllers\WarehouseController::class, 'show'])->name('show');
-            Route::put('/{warehouse}', [App\Http\Controllers\WarehouseController::class, 'update'])->name('update');
-            Route::delete('/{warehouse}', [App\Http\Controllers\WarehouseController::class, 'destroy'])->name('destroy');
+            Route::get('/', [App\Http\Controllers\Warehouse\WarehouseController::class, 'index'])->name('index');
+            Route::get('/datatable', [App\Http\Controllers\Warehouse\WarehouseController::class, 'datatable'])->name('datatable');
+            Route::get('/preview-code', [App\Http\Controllers\Warehouse\WarehouseController::class, 'previewCode'])->name('preview-code');
+            Route::post('/', [App\Http\Controllers\Warehouse\WarehouseController::class, 'store'])->name('store');
+            Route::get('/{warehouse}', [App\Http\Controllers\Warehouse\WarehouseController::class, 'show'])->name('show');
+            Route::put('/{warehouse}', [App\Http\Controllers\Warehouse\WarehouseController::class, 'update'])->name('update');
+            Route::delete('/{warehouse}', [App\Http\Controllers\Warehouse\WarehouseController::class, 'destroy'])->name('destroy');
         });
 
         // Materials
         Route::prefix('materials')->name('materials.')->group(function () {
-            Route::get('/', [App\Http\Controllers\MaterialController::class, 'index'])->name('index');
-            Route::get('/datatable', [App\Http\Controllers\MaterialController::class, 'datatable'])->name('datatable');
-            Route::get('/preview-code', [App\Http\Controllers\MaterialController::class, 'previewCode'])->name('preview-code');
-            Route::post('/', [App\Http\Controllers\MaterialController::class, 'store'])->name('store');
-            Route::get('/{material}', [App\Http\Controllers\MaterialController::class, 'show'])->name('show');
-            Route::put('/{material}', [App\Http\Controllers\MaterialController::class, 'update'])->name('update');
-            Route::delete('/{material}', [App\Http\Controllers\MaterialController::class, 'destroy'])->name('destroy');
+            Route::get('/', [App\Http\Controllers\Warehouse\MaterialController::class, 'index'])->name('index');
+            Route::get('/datatable', [App\Http\Controllers\Warehouse\MaterialController::class, 'datatable'])->name('datatable');
+            Route::get('/preview-code', [App\Http\Controllers\Warehouse\MaterialController::class, 'previewCode'])->name('preview-code');
+            Route::post('/', [App\Http\Controllers\Warehouse\MaterialController::class, 'store'])->name('store');
+            Route::get('/{material}', [App\Http\Controllers\Warehouse\MaterialController::class, 'show'])->name('show');
+            Route::put('/{material}', [App\Http\Controllers\Warehouse\MaterialController::class, 'update'])->name('update');
+            Route::delete('/{material}', [App\Http\Controllers\Warehouse\MaterialController::class, 'destroy'])->name('destroy');
         });
 
         // Inventory
         Route::prefix('inventory')->name('inventory.')->group(function () {
-            Route::get('/', [App\Http\Controllers\InventoryController::class, 'index'])->name('index');
-            Route::get('/datatable', [App\Http\Controllers\InventoryController::class, 'datatable'])->name('datatable');
-            Route::post('/', [App\Http\Controllers\InventoryController::class, 'store'])->name('store');
-            Route::get('/{inventory}', [App\Http\Controllers\InventoryController::class, 'show'])->name('show');
-            Route::put('/{inventory}', [App\Http\Controllers\InventoryController::class, 'update'])->name('update');
-            Route::delete('/{inventory}', [App\Http\Controllers\InventoryController::class, 'destroy'])->name('destroy');
+            Route::get('/', [App\Http\Controllers\Warehouse\InventoryController::class, 'index'])->name('index');
+            Route::get('/datatable', [App\Http\Controllers\Warehouse\InventoryController::class, 'datatable'])->name('datatable');
+            Route::post('/', [App\Http\Controllers\Warehouse\InventoryController::class, 'store'])->name('store');
+            Route::get('/{inventory}', [App\Http\Controllers\Warehouse\InventoryController::class, 'show'])->name('show');
+            Route::put('/{inventory}', [App\Http\Controllers\Warehouse\InventoryController::class, 'update'])->name('update');
+            Route::delete('/{inventory}', [App\Http\Controllers\Warehouse\InventoryController::class, 'destroy'])->name('destroy');
         });
 
         // Purchase Requests
         Route::prefix('purchase-requests')->name('purchase-requests.')->group(function () {
-            Route::get('/', [App\Http\Controllers\PurchaseRequestController::class, 'index'])->name('index');
-            Route::get('/datatable', [App\Http\Controllers\PurchaseRequestController::class, 'datatable'])->name('datatable');
-            Route::get('/preview-code', [App\Http\Controllers\PurchaseRequestController::class, 'previewCode'])->name('preview-code');
-            Route::post('/', [App\Http\Controllers\PurchaseRequestController::class, 'store'])->name('store');
-            Route::get('/{purchaseRequest}', [App\Http\Controllers\PurchaseRequestController::class, 'show'])->name('show');
-            Route::put('/{purchaseRequest}', [App\Http\Controllers\PurchaseRequestController::class, 'update'])->name('update');
-            Route::delete('/{purchaseRequest}', [App\Http\Controllers\PurchaseRequestController::class, 'destroy'])->name('destroy');
+            Route::get('/', [App\Http\Controllers\Warehouse\PurchaseRequestController::class, 'index'])->name('index');
+            Route::get('/datatable', [App\Http\Controllers\Warehouse\PurchaseRequestController::class, 'datatable'])->name('datatable');
+            Route::get('/preview-code', [App\Http\Controllers\Warehouse\PurchaseRequestController::class, 'previewCode'])->name('preview-code');
+            Route::post('/', [App\Http\Controllers\Warehouse\PurchaseRequestController::class, 'store'])->name('store');
+            Route::get('/{purchaseRequest}', [App\Http\Controllers\Warehouse\PurchaseRequestController::class, 'show'])->name('show');
+            Route::put('/{purchaseRequest}', [App\Http\Controllers\Warehouse\PurchaseRequestController::class, 'update'])->name('update');
+            Route::delete('/{purchaseRequest}', [App\Http\Controllers\Warehouse\PurchaseRequestController::class, 'destroy'])->name('destroy');
         });
 
         // Purchase Orders
         Route::prefix('purchase-orders')->name('purchase-orders.')->group(function () {
-            Route::get('/', [App\Http\Controllers\PurchaseOrderController::class, 'index'])->name('index');
-            Route::get('/datatable', [App\Http\Controllers\PurchaseOrderController::class, 'datatable'])->name('datatable');
-            Route::get('/preview-code', [App\Http\Controllers\PurchaseOrderController::class, 'previewCode'])->name('preview-code');
-            Route::post('/', [App\Http\Controllers\PurchaseOrderController::class, 'store'])->name('store');
-            Route::get('/{purchaseOrder}', [App\Http\Controllers\PurchaseOrderController::class, 'show'])->name('show');
-            Route::put('/{purchaseOrder}', [App\Http\Controllers\PurchaseOrderController::class, 'update'])->name('update');
-            Route::delete('/{purchaseOrder}', [App\Http\Controllers\PurchaseOrderController::class, 'destroy'])->name('destroy');
+            Route::get('/', [App\Http\Controllers\Warehouse\PurchaseOrderController::class, 'index'])->name('index');
+            Route::get('/datatable', [App\Http\Controllers\Warehouse\PurchaseOrderController::class, 'datatable'])->name('datatable');
+            Route::get('/preview-code', [App\Http\Controllers\Warehouse\PurchaseOrderController::class, 'previewCode'])->name('preview-code');
+            Route::post('/', [App\Http\Controllers\Warehouse\PurchaseOrderController::class, 'store'])->name('store');
+            Route::get('/{purchaseOrder}', [App\Http\Controllers\Warehouse\PurchaseOrderController::class, 'show'])->name('show');
+            Route::put('/{purchaseOrder}', [App\Http\Controllers\Warehouse\PurchaseOrderController::class, 'update'])->name('update');
+            Route::delete('/{purchaseOrder}', [App\Http\Controllers\Warehouse\PurchaseOrderController::class, 'destroy'])->name('destroy');
         });
 
         // Sale Orders
         Route::prefix('sale-orders')->name('sale-orders.')->group(function () {
-            Route::get('/', [App\Http\Controllers\SaleOrderController::class, 'index'])->name('index');
-            Route::get('/datatable', [App\Http\Controllers\SaleOrderController::class, 'datatable'])->name('datatable');
-            Route::get('/preview-code', [App\Http\Controllers\SaleOrderController::class, 'previewCode'])->name('preview-code');
-            Route::post('/', [App\Http\Controllers\SaleOrderController::class, 'store'])->name('store');
-            Route::get('/{saleOrder}', [App\Http\Controllers\SaleOrderController::class, 'show'])->name('show');
-            Route::put('/{saleOrder}', [App\Http\Controllers\SaleOrderController::class, 'update'])->name('update');
-            Route::delete('/{saleOrder}', [App\Http\Controllers\SaleOrderController::class, 'destroy'])->name('destroy');
+            Route::get('/', [App\Http\Controllers\Warehouse\SaleOrderController::class, 'index'])->name('index');
+            Route::get('/datatable', [App\Http\Controllers\Warehouse\SaleOrderController::class, 'datatable'])->name('datatable');
+            Route::get('/preview-code', [App\Http\Controllers\Warehouse\SaleOrderController::class, 'previewCode'])->name('preview-code');
+            Route::post('/', [App\Http\Controllers\Warehouse\SaleOrderController::class, 'store'])->name('store');
+            Route::get('/{saleOrder}', [App\Http\Controllers\Warehouse\SaleOrderController::class, 'show'])->name('show');
+            Route::put('/{saleOrder}', [App\Http\Controllers\Warehouse\SaleOrderController::class, 'update'])->name('update');
+            Route::delete('/{saleOrder}', [App\Http\Controllers\Warehouse\SaleOrderController::class, 'destroy'])->name('destroy');
         });
 
         // Delivery Orders
         Route::prefix('delivery-orders')->name('delivery-orders.')->group(function () {
-            Route::get('/', [App\Http\Controllers\DeliveryOrderController::class, 'index'])->name('index');
-            Route::get('/datatable', [App\Http\Controllers\DeliveryOrderController::class, 'datatable'])->name('datatable');
-            Route::get('/preview-code', [App\Http\Controllers\DeliveryOrderController::class, 'previewCode'])->name('preview-code');
-            Route::post('/', [App\Http\Controllers\DeliveryOrderController::class, 'store'])->name('store');
-            Route::get('/{deliveryOrder}', [App\Http\Controllers\DeliveryOrderController::class, 'show'])->name('show');
-            Route::put('/{deliveryOrder}', [App\Http\Controllers\DeliveryOrderController::class, 'update'])->name('update');
-            Route::delete('/{deliveryOrder}', [App\Http\Controllers\DeliveryOrderController::class, 'destroy'])->name('destroy');
+            Route::get('/', [App\Http\Controllers\Warehouse\DeliveryOrderController::class, 'index'])->name('index');
+            Route::get('/datatable', [App\Http\Controllers\Warehouse\DeliveryOrderController::class, 'datatable'])->name('datatable');
+            Route::get('/preview-code', [App\Http\Controllers\Warehouse\DeliveryOrderController::class, 'previewCode'])->name('preview-code');
+            Route::post('/', [App\Http\Controllers\Warehouse\DeliveryOrderController::class, 'store'])->name('store');
+            Route::get('/{deliveryOrder}', [App\Http\Controllers\Warehouse\DeliveryOrderController::class, 'show'])->name('show');
+            Route::put('/{deliveryOrder}', [App\Http\Controllers\Warehouse\DeliveryOrderController::class, 'update'])->name('update');
+            Route::delete('/{deliveryOrder}', [App\Http\Controllers\Warehouse\DeliveryOrderController::class, 'destroy'])->name('destroy');
         });
     });
 
