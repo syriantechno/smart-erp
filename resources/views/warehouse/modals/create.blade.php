@@ -121,44 +121,39 @@
                     },
                     success: function (response) {
                         if (response.success) {
-                            jq('#create-warehouse-modal').modal('hide');
-                            const formEl = document.getElementById('create-warehouse-form');
-                            if (formEl) {
-                                formEl.reset();
+                            const modalEl = document.getElementById('create-warehouse-modal');
+                            if (modalEl && typeof tailwind !== 'undefined' && tailwind.Modal) {
+                                const instance = tailwind.Modal.getOrCreateInstance(modalEl);
+                                instance.hide();
                             }
 
-                            if (typeof window.warehousesTable !== 'undefined' && window.warehousesTable) {
+                            const form = document.getElementById('create-warehouse-form');
+                            if (form) {
+                                form.reset();
+                            }
+
+                            if (window.warehousesTable) {
                                 window.warehousesTable.ajax.reload();
                             }
 
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Success!',
-                                text: response.message,
-                                timer: 3000,
-                                showConfirmButton: false
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error!',
-                                text: response.message || 'Failed to create warehouse.'
-                            });
+                            if (typeof window.showSuccess === 'function') {
+                                window.showSuccess(response.message || 'Warehouse created successfully');
+                            }
+                        } else if (typeof window.showError === 'function') {
+                            window.showError(response.message || 'Failed to create warehouse.');
                         }
                     },
                     error: function (xhr) {
-                        const errors = xhr.responseJSON?.errors || {};
+                        let errors = xhr.responseJSON?.errors || {};
                         let errorMessage = xhr.responseJSON?.message || 'An error occurred';
 
                         if (Object.keys(errors).length > 0) {
                             errorMessage = Object.values(errors).flat().join('\n');
                         }
 
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error!',
-                            text: errorMessage
-                        });
+                        if (typeof window.showError === 'function') {
+                            window.showError(errorMessage);
+                        }
                     },
                     complete: function () {
                         submitBtn.prop('disabled', false).html(originalText);

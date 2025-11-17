@@ -192,13 +192,11 @@
                                     window.categoriesTable.ajax.reload();
                                 }
 
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Success!',
-                                    text: response.message,
-                                    timer: 3000,
-                                    showConfirmButton: false
-                                });
+                                if (typeof window.showSuccess === 'function') {
+                                    window.showSuccess(response.message || 'Category created successfully');
+                                }
+                            } else if (typeof window.showError === 'function') {
+                                window.showError(response.message || 'Failed to create category.');
                             }
                         },
                         error: function(xhr) {
@@ -209,11 +207,9 @@
                                 errorMessage = Object.values(errors).flat().join('\n');
                             }
 
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error!',
-                                text: errorMessage
-                            });
+                            if (typeof window.showError === 'function') {
+                                window.showError(errorMessage);
+                            }
                         },
                         complete: function() {
                             submitBtn.prop('disabled', false).html(originalText);
@@ -431,16 +427,8 @@
                 return;
             }
 
-            Swal.fire({
-                title: 'Are you sure?',
-                text: `Delete category "${name}"?`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
+            if (typeof window.confirmDelete === 'function') {
+                window.confirmDelete(name, function() {
                     jq.ajax({
                         url: '{{ route("warehouse.categories.destroy", ":id") }}'.replace(':id', id),
                         type: 'DELETE',
@@ -452,17 +440,36 @@
                                 if (categoriesTable) {
                                     categoriesTable.ajax.reload();
                                 }
-                                Swal.fire('Deleted!', response.message, 'success');
-                            } else {
-                                Swal.fire('Error!', response.message || 'Failed to delete category.', 'error');
+                                if (typeof window.showSuccess === 'function') {
+                                    window.showSuccess(response.message || 'Category deleted successfully');
+                                }
+                            } else if (typeof window.showError === 'function') {
+                                window.showError(response.message || 'Failed to delete category.');
                             }
                         },
                         error: function() {
-                            Swal.fire('Error!', 'Failed to delete category.', 'error');
+                            if (typeof window.showError === 'function') {
+                                window.showError('Failed to delete category.');
+                            }
+                        }
+                    });
+                });
+            } else {
+                if (window.confirm(`Delete category "${name}"?`)) {
+                    jq.ajax({
+                        url: '{{ route("warehouse.categories.destroy", ":id") }}'.replace(':id', id),
+                        type: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector("meta[name='csrf-token']").getAttribute('content')
+                        },
+                        success: function(response) {
+                            if (response.success && categoriesTable) {
+                                categoriesTable.ajax.reload();
+                            }
                         }
                     });
                 }
-            });
+            }
         };
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -500,9 +507,11 @@
                             if (categoriesTable) {
                                 categoriesTable.ajax.reload();
                             }
-                            Swal.fire('Success!', response.message, 'success');
-                        } else {
-                            Swal.fire('Error!', response.message || 'Failed to update category.', 'error');
+                            if (typeof window.showSuccess === 'function') {
+                                window.showSuccess(response.message || 'Category updated successfully');
+                            }
+                        } else if (typeof window.showError === 'function') {
+                            window.showError(response.message || 'Failed to update category.');
                         }
                     },
                     error: function (xhr) {
@@ -513,7 +522,9 @@
                             errorMessage = Object.values(errors).flat().join('\n');
                         }
 
-                        Swal.fire('Error!', errorMessage, 'error');
+                        if (typeof window.showError === 'function') {
+                            window.showError(errorMessage);
+                        }
                     },
                     complete: function () {
                         submitBtn.prop('disabled', false).html(originalText);

@@ -369,26 +369,46 @@
     window.confirmDelete = function(itemName = 'this item', onConfirm = () => {}) {
         if (typeof Swal !== 'undefined') {
             return Swal.fire({
-                title: 'Delete Item?',
-                html: `Are you sure you want to delete <strong>"${itemName}"</strong>?<br>This action cannot be undone.`,
+                title: 'Delete this item?',
+                html: `
+                    <div class="flex flex-col items-center gap-3">
+                        <div class="flex h-16 w-16 items-center justify-center rounded-full bg-red-50 text-red-500 shadow-sm">
+                            <i class="fa fa-trash text-3xl"></i>
+                        </div>
+                        <div class="text-slate-700 dark:text-slate-200 text-sm leading-relaxed">
+                            Are you sure you want to delete<br>
+                            <span class="font-semibold text-red-600 dark:text-red-400">"${itemName}"</span>?<br>
+                            This action cannot be undone.
+                        </div>
+                    </div>
+                `,
                 icon: 'warning',
                 iconColor: '#ef4444',
                 showCancelButton: true,
-                confirmButtonColor: '#dc2626',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Yes, delete it!',
+                reverseButtons: true,
+                focusCancel: true,
+                confirmButtonText: 'Yes, delete',
                 cancelButtonText: 'Cancel',
+                buttonsStyling: false,
                 background: '#ffffff',
+                color: '#0f172a',
+                padding: '1.5rem 1.75rem 1.75rem',
                 customClass: {
-                    popup: 'rounded-xl shadow-2xl',
-                    confirmButton: 'px-6 py-2 rounded-lg font-semibold',
-                    cancelButton: 'px-6 py-2 rounded-lg font-semibold',
+                    popup: 'rounded-2xl shadow-2xl border border-slate-200/60 dark:border-slate-700/60',
+                    title: 'text-base font-semibold text-slate-900 dark:text-slate-100 mb-1',
+                    htmlContainer: 'mt-1',
+                    actions: 'mt-6 flex justify-center gap-3',
+                    confirmButton: 'px-5 py-2.5 rounded-full font-semibold text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 text-sm',
+                    cancelButton: 'px-5 py-2.5 rounded-full font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-1 text-sm',
                 },
+                backdrop: 'rgba(15,23,42,0.55)',
                 showClass: {
                     popup: 'animate__animated animate__fadeInDown animate__faster',
+                    backdrop: 'animate__animated animate__fadeIn animate__faster',
                 },
                 hideClass: {
                     popup: 'animate__animated animate__fadeOutUp animate__faster',
+                    backdrop: 'animate__animated animate__fadeOut animate__faster',
                 },
             }).then((result) => {
                 if (result.isConfirmed) {

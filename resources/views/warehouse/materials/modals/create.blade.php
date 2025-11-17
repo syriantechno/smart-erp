@@ -18,6 +18,7 @@
                         class="w-full"
                         placeholder="Material code"
                         required
+                        readonly
                     />
                 </div>
 
@@ -148,8 +149,9 @@
                     success: function(response) {
                         if (response.success) {
                             const modalEl = document.getElementById('create-material-modal');
-                            if (modalEl && modalEl.__tippy?.hide) {
-                                modalEl.__tippy.hide();
+                            if (modalEl && typeof tailwind !== 'undefined' && tailwind.Modal) {
+                                const instance = tailwind.Modal.getOrCreateInstance(modalEl);
+                                instance.hide();
                             }
 
                             form.reset();
@@ -157,13 +159,9 @@
                                 window.materialsTable.ajax.reload();
                             }
 
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Success!',
-                                text: response.message,
-                                timer: 3000,
-                                showConfirmButton: false
-                            });
+                            if (typeof window.showSuccess === 'function') {
+                                window.showSuccess(response.message || 'Material created successfully');
+                            }
                         }
                     },
                     error: function(xhr) {
@@ -174,11 +172,9 @@
                             errorMessage = Object.values(errors).flat().join('\n');
                         }
 
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error!',
-                            text: errorMessage
-                        });
+                        if (typeof window.showError === 'function') {
+                            window.showError(errorMessage);
+                        }
                     },
                     complete: function() {
                         submitBtn.prop('disabled', false).html(originalText);

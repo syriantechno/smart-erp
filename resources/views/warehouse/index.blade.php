@@ -309,16 +309,8 @@
                 return;
             }
 
-            Swal.fire({
-                title: 'Are you sure?',
-                text: `Delete warehouse "${name}"?`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
+            if (typeof window.confirmDelete === 'function') {
+                window.confirmDelete(name, function() {
                     jq.ajax({
                         url: '{{ route("warehouse.warehouses.destroy", ":id") }}'.replace(':id', id),
                         type: 'DELETE',
@@ -330,17 +322,36 @@
                                 if (warehousesTable) {
                                     warehousesTable.ajax.reload();
                                 }
-                                Swal.fire('Deleted!', response.message, 'success');
-                            } else {
-                                Swal.fire('Error!', response.message || 'Failed to delete warehouse.', 'error');
+                                if (typeof window.showSuccess === 'function') {
+                                    window.showSuccess(response.message || 'Warehouse deleted successfully');
+                                }
+                            } else if (typeof window.showError === 'function') {
+                                window.showError(response.message || 'Failed to delete warehouse.');
                             }
                         },
                         error: function() {
-                            Swal.fire('Error!', 'Failed to delete warehouse.', 'error');
+                            if (typeof window.showError === 'function') {
+                                window.showError('Failed to delete warehouse.');
+                            }
+                        }
+                    });
+                });
+            } else {
+                if (window.confirm(`Delete warehouse "${name}"?`)) {
+                    jq.ajax({
+                        url: '{{ route("warehouse.warehouses.destroy", ":id") }}'.replace(':id', id),
+                        type: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector("meta[name='csrf-token']").getAttribute('content')
+                        },
+                        success: function(response) {
+                            if (response.success && warehousesTable) {
+                                warehousesTable.ajax.reload();
+                            }
                         }
                     });
                 }
-            });
+            }
         };
     </script>
 @endpush

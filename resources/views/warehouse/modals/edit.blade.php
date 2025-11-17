@@ -139,40 +139,34 @@
                     },
                     success: function (response) {
                         if (response.success) {
-                            jq('#edit-warehouse-modal').modal('hide');
+                            const modalEl = document.getElementById('edit-warehouse-modal');
+                            if (modalEl && typeof tailwind !== 'undefined' && tailwind.Modal) {
+                                const instance = tailwind.Modal.getOrCreateInstance(modalEl);
+                                instance.hide();
+                            }
 
-                            if (typeof window.warehousesTable !== 'undefined' && window.warehousesTable) {
+                            if (window.warehousesTable) {
                                 window.warehousesTable.ajax.reload();
                             }
 
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Success!',
-                                text: response.message,
-                                timer: 3000,
-                                showConfirmButton: false
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error!',
-                                text: response.message || 'Failed to update warehouse.'
-                            });
+                            if (typeof window.showSuccess === 'function') {
+                                window.showSuccess(response.message || 'Warehouse updated successfully');
+                            }
+                        } else if (typeof window.showError === 'function') {
+                            window.showError(response.message || 'Failed to update warehouse.');
                         }
                     },
-                    error: function (xhr) {
-                        const errors = xhr.responseJSON?.errors || {};
+                    error: function(xhr) {
+                        let errors = xhr.responseJSON?.errors || {};
                         let errorMessage = xhr.responseJSON?.message || 'An error occurred';
 
                         if (Object.keys(errors).length > 0) {
                             errorMessage = Object.values(errors).flat().join('\n');
                         }
 
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error!',
-                            text: errorMessage
-                        });
+                        if (typeof window.showError === 'function') {
+                            window.showError(errorMessage);
+                        }
                     },
                     complete: function () {
                         submitBtn.prop('disabled', false).html(originalText);

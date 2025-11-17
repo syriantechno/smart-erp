@@ -16,90 +16,44 @@
     @include('components.global-notifications')
     <div class="intro-y mt-8 flex items-center">
         <h2 class="mr-auto text-lg font-medium">Materials Management</h2>
-        <x-base.button
-            variant="primary"
-            class="w-32 sm:w-auto sm:ml-4"
-            data-tw-toggle="modal"
-            data-tw-target="#create-material-modal"
-        >
-            <x-base.lucide icon="Plus" class="w-4 h-4 mr-2" />
-            Add Material
-        </x-base.button>
+        <div class="flex items-center gap-2">
+            <x-base.button
+                variant="outline-secondary"
+                class="hidden sm:flex"
+                data-tw-toggle="modal"
+                data-tw-target="#materials-filters-slideover"
+            >
+                <x-base.lucide icon="Filter" class="w-4 h-4 mr-2" />
+                Filters
+                <span id="active-filters-indicator" class="hidden ml-2 px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full">Active</span>
+            </x-base.button>
+
+            <!-- Mobile filters icon -->
+            <button
+                type="button"
+                class="flex items-center justify-center rounded-full border border-slate-200 px-3 py-2 text-slate-600 hover:bg-slate-50 sm:hidden"
+                data-tw-toggle="modal"
+                data-tw-target="#materials-filters-slideover"
+                title="Filters"
+            >
+                <x-base.lucide icon="Filter" class="w-4 h-4" />
+            </button>
+
+            <x-base.button
+                id="open-create-material-modal"
+                variant="primary"
+                class="w-32 sm:w-auto sm:ml-2"
+                data-tw-toggle="modal"
+                data-tw-target="#create-material-modal"
+            >
+                <x-base.lucide icon="Plus" class="w-4 h-4 mr-2" />
+                Add Material
+            </x-base.button>
+        </div>
     </div>
 
     <div class="mt-5 grid grid-cols-12 gap-6">
         <div class="intro-y col-span-12">
-            <!-- Advanced Filters Section -->
-            <x-base.preview-component class="intro-y box mb-6">
-                <div class="p-5">
-                    <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                        <x-base.lucide icon="Filter" class="h-5 w-5"></x-base.lucide>
-                        Advanced Filters
-                        <span id="active-filters-indicator" class="hidden ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">Active</span>
-                    </h3>
-
-                    <div class="grid grid-cols-12 gap-4">
-                        <!-- Category Filter -->
-                        <div class="col-span-12 md:col-span-3">
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Filter by Category
-                            </label>
-                            <x-base.form-select id="category-filter" class="w-full">
-                                <option value="">All Categories</option>
-                                @foreach($categories ?? [] as $category)
-                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                @endforeach
-                            </x-base.form-select>
-                        </div>
-
-                        <!-- Status Filter -->
-                        <div class="col-span-12 md:col-span-3">
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Status
-                            </label>
-                            <x-base.form-select id="status-filter" class="w-full">
-                                <option value="">All Status</option>
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                            </x-base.form-select>
-                        </div>
-
-                        <!-- Search Filter -->
-                        <div class="col-span-12 md:col-span-3">
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Search
-                            </label>
-                            <x-base.form-input
-                                id="search-filter"
-                                type="text"
-                                placeholder="Search materials..."
-                                class="w-full"
-                            />
-                        </div>
-
-                        <!-- Filter Actions -->
-                        <div class="col-span-12 md:col-span-3 flex items-end gap-2">
-                            <x-base.button
-                                variant="secondary"
-                                class="flex-1"
-                                onclick="clearFilters()"
-                            >
-                                <x-base.lucide icon="X" class="w-4 h-4 mr-2" />
-                                Clear
-                            </x-base.button>
-                            <x-base.button
-                                variant="primary"
-                                class="flex-1"
-                                onclick="applyFilters()"
-                            >
-                                <x-base.lucide icon="Filter" class="w-4 h-4 mr-2" />
-                                Apply
-                            </x-base.button>
-                        </div>
-                    </div>
-                </div>
-            </x-base.preview-component>
-
             <!-- Materials Table -->
             <x-base.preview-component class="intro-y box">
                 <div class="p-5">
@@ -129,6 +83,93 @@
         </div>
     </div>
 
+    <!-- Materials Filters Slide Over -->
+    <x-base.slideover id="materials-filters-slideover" size="md">
+        <x-base.slideover.panel>
+            <a
+                class="absolute top-0 left-0 right-auto mt-4 -ml-10 sm:-ml-12"
+                data-tw-dismiss="modal"
+                href="#"
+            >
+                <x-base.lucide class="h-8 w-8 text-slate-400" icon="X" />
+            </a>
+            <x-base.slideover.title class="border-b border-slate-200/60 p-5 dark:border-darkmode-400">
+                <h2 class="mr-auto text-base font-medium flex items-center gap-2">
+                    <x-base.lucide icon="Filter" class="h-5 w-5" />
+                    Materials Filters
+                </h2>
+            </x-base.slideover.title>
+
+            <x-base.slideover.description class="p-5">
+                <div class="mb-4 text-sm text-slate-600 dark:text-slate-400">
+                    Use these filters to narrow down the materials list. Click "Apply" to update the table.
+                </div>
+
+                <div class="grid grid-cols-12 gap-4">
+                    <!-- Category Filter -->
+                    <div class="col-span-12">
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                            Filter by Category
+                        </label>
+                        <x-base.form-select id="category-filter" class="w-full">
+                            <option value="">All Categories</option>
+                            @foreach($categories ?? [] as $category)
+                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            @endforeach
+                        </x-base.form-select>
+                    </div>
+
+                    <!-- Status Filter -->
+                    <div class="col-span-12">
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                            Status
+                        </label>
+                        <x-base.form-select id="status-filter" class="w-full">
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </x-base.form-select>
+                    </div>
+
+                    <!-- Search Filter -->
+                    <div class="col-span-12">
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                            Search
+                        </label>
+                        <x-base.form-input
+                            id="search-filter"
+                            type="text"
+                            placeholder="Search materials..."
+                            class="w-full"
+                        />
+                    </div>
+                </div>
+
+                <div class="mt-5 flex justify-end gap-2">
+                    <x-base.button
+                        type="button"
+                        variant="secondary"
+                        class="w-24"
+                        onclick="clearFilters()"
+                    >
+                        <x-base.lucide icon="X" class="mr-2 h-4 w-4" />
+                        Clear
+                    </x-base.button>
+                    <x-base.button
+                        id="materials-filter-apply"
+                        type="button"
+                        variant="primary"
+                        class="w-24"
+                        onclick="applyFilters()"
+                    >
+                        <x-base.lucide icon="Search" class="mr-2 h-4 w-4" />
+                        Apply
+                    </x-base.button>
+                </div>
+            </x-base.slideover.description>
+        </x-base.slideover.panel>
+    </x-base.slideover>
+
     <!-- Create Material Modal -->
     @include('warehouse.materials.modals.create')
 
@@ -157,6 +198,25 @@
             jq(function () {
                 initializeDataTable();
                 setupEventListeners();
+
+                // Auto-generate material code when opening create modal (unified code system)
+                const openBtn = document.getElementById('open-create-material-modal');
+                if (openBtn) {
+                    openBtn.addEventListener('click', function () {
+                        const $ = jq;
+                        const codeInput = document.getElementById('create-code');
+                        if (!codeInput) {
+                            return;
+                        }
+
+                        $.get('{{ route("warehouse.materials.preview-code") }}')
+                            .done(function (response) {
+                                if (response && response.code) {
+                                    codeInput.value = response.code;
+                                }
+                            });
+                    });
+                }
             });
         });
 
@@ -195,6 +255,9 @@
                     }
                 }
             });
+
+            // Make table instance globally accessible for modals
+            window.materialsTable = materialsTable;
         }
 
         function setupEventListeners() {
@@ -231,7 +294,13 @@
 
         // Global functions for modal interactions
         window.editMaterial = function(id) {
-            $.get('{{ route("warehouse.materials.show", ":id") }}'.replace(':id', id))
+            const jq = window.jQuery || window.$;
+            if (!jq) {
+                console.error('jQuery not available for editMaterial.');
+                return;
+            }
+
+            jq.get('{{ route("warehouse.materials.show", ":id") }}'.replace(':id', id))
                 .done(function(response) {
                     if (response.success) {
                         populateEditModal(response.material);
@@ -244,34 +313,57 @@
         };
 
         window.deleteMaterial = function(id, name) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: `You won't be able to revert this! Delete material "${name}"?`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
+            const jq = window.jQuery || window.$;
+            if (!jq) {
+                console.error('jQuery not available for deleteMaterial.');
+                return;
+            }
+
+            if (typeof window.confirmDelete === 'function') {
+                window.confirmDelete(name, function() {
+                    jq.ajax({
                         url: '{{ route("warehouse.materials.destroy", ":id") }}'.replace(':id', id),
                         type: 'DELETE',
                         headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            'X-CSRF-TOKEN': document.querySelector("meta[name='csrf-token']").getAttribute('content')
                         },
                         success: function(response) {
                             if (response.success) {
-                                materialsTable.ajax.reload();
-                                Swal.fire('Deleted!', response.message, 'success');
+                                if (materialsTable) {
+                                    materialsTable.ajax.reload();
+                                }
+
+                                if (typeof window.showSuccess === 'function') {
+                                    window.showSuccess(response.message || 'Material has been deleted');
+                                }
+                            } else if (typeof window.showError === 'function') {
+                                window.showError(response.message || 'Failed to delete material.');
                             }
                         },
                         error: function(xhr) {
-                            Swal.fire('Error!', 'Failed to delete material.', 'error');
+                            if (typeof window.showError === 'function') {
+                                window.showError('An error occurred while deleting the material.');
+                            }
+                        }
+                    });
+                });
+            } else {
+                // Fallback simple confirm if confirmDelete is not available
+                if (window.confirm(`Delete material "${name}"?`)) {
+                    jq.ajax({
+                        url: '{{ route("warehouse.materials.destroy", ":id") }}'.replace(':id', id),
+                        type: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector("meta[name='csrf-token']").getAttribute('content')
+                        },
+                        success: function(response) {
+                            if (response.success && materialsTable) {
+                                materialsTable.ajax.reload();
+                            }
                         }
                     });
                 }
-            });
+            }
         };
     </script>
 @endpush

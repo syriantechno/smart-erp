@@ -281,13 +281,11 @@
                                     window.purchaseOrdersTable.ajax.reload();
                                 }
 
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Success!',
-                                    text: response.message,
-                                    timer: 3000,
-                                    showConfirmButton: false
-                                });
+                                if (typeof window.showSuccess === 'function') {
+                                    window.showSuccess(response.message || 'Purchase order created successfully');
+                                }
+                            } else if (typeof window.showError === 'function') {
+                                window.showError(response.message || 'Failed to create purchase order.');
                             }
                         },
                         error: function(xhr) {
@@ -298,9 +296,9 @@
                                 errorMessage = Object.values(errors).flat().join('\n');
                             }
 
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error!',
+                            if (typeof window.showError === 'function') {
+                                window.showError(errorMessage);
+                            }
                                 text: errorMessage
                             });
                         },
