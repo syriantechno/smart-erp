@@ -157,6 +157,34 @@
                 </div>
             </div>
         </div>
+
+        <!-- Task Steps -->
+        <div class="mb-6">
+            <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                <x-base.lucide icon="List" class="h-5 w-5 text-primary"></x-base.lucide>
+                Task Timeline Steps
+            </h4>
+            <div class="bg-slate-50 dark:bg-darkmode-600 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-4">
+                    <p class="text-sm text-slate-600 dark:text-slate-400">
+                        Add steps to create a timeline for this task. Each step can be marked as completed individually.
+                    </p>
+                    <x-base.button type="button" id="add-step-btn" variant="outline-primary" size="sm">
+                        <x-base.lucide icon="Plus" class="w-4 h-4 mr-1" />
+                        Add Step
+                    </x-base.button>
+                </div>
+                
+                <div id="task-steps-container" class="space-y-3">
+                    <!-- Steps will be added here dynamically -->
+                </div>
+                
+                <div id="no-steps-message" class="text-center py-8 text-slate-500">
+                    <x-base.lucide icon="ListChecks" class="w-12 h-12 mx-auto mb-2 text-slate-300" />
+                    <p>No steps added yet. Click "Add Step" to create your first timeline step.</p>
+                </div>
+            </div>
+        </div>
     </form>
 
     @slot('footer')
@@ -242,8 +270,26 @@
     </style>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🎯 Task modal script loaded');
+        // Wrap everything in try-catch to prevent errors from stopping execution
+        try {
+            console.log('🎯 Task modal script starting...');
+            
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('🎯 Task modal DOM loaded');
+            
+            // Also check when modal is shown
+            const modal = document.getElementById('create-task-modal');
+            if (modal) {
+                modal.addEventListener('shown.tw.modal', function() {
+                    console.log('📋 Create task modal opened');
+                    
+                    // Re-check elements when modal is shown
+                    const stepsContainer = document.getElementById('task-steps-container');
+                    const addStepBtn = document.getElementById('add-step-btn');
+                    console.log('Modal opened - stepsContainer:', stepsContainer);
+                    console.log('Modal opened - addStepBtn:', addStepBtn);
+                });
+            }
 
             // Color preset handler
             const colorInput = document.getElementById('color');
@@ -261,6 +307,160 @@
                 });
             }
 
+            // Task Steps Management
+            let stepCounter = 0;
+            const stepsContainer = document.getElementById('task-steps-container');
+            const noStepsMessage = document.getElementById('no-steps-message');
+            const addStepBtn = document.getElementById('add-step-btn');
+
+            console.log('🔍 Task Steps Elements Check:');
+            console.log('stepsContainer:', stepsContainer);
+            console.log('noStepsMessage:', noStepsMessage);
+            console.log('addStepBtn:', addStepBtn);
+
+            function updateStepNumbers() {
+                const stepItems = stepsContainer.querySelectorAll('.step-item');
+                stepItems.forEach((item, index) => {
+                    const numberSpan = item.querySelector('.step-number');
+                    const orderInput = item.querySelector('input[name$="[step_order]"]');
+                    if (numberSpan) numberSpan.textContent = index + 1;
+                    if (orderInput) orderInput.value = index + 1;
+                });
+                
+                // Update step name attributes
+                stepItems.forEach((item, index) => {
+                    const titleInput = item.querySelector('input[name*="[title]"]');
+                    const descInput = item.querySelector('textarea[name*="[description]"]');
+                    const orderInput = item.querySelector('input[name*="[step_order]"]');
+                    
+                    if (titleInput) titleInput.name = `steps[${index}][title]`;
+                    if (descInput) descInput.name = `steps[${index}][description]`;
+                    if (orderInput) orderInput.name = `steps[${index}][step_order]`;
+                });
+            }
+
+            function toggleNoStepsMessage() {
+                const hasSteps = stepsContainer.children.length > 0;
+                noStepsMessage.style.display = hasSteps ? 'none' : 'block';
+            }
+
+            function createStepItem() {
+                stepCounter++;
+                const stepDiv = document.createElement('div');
+                stepDiv.className = 'step-item bg-white dark:bg-darkmode-700 border border-slate-200 dark:border-darkmode-400 rounded-lg p-4';
+                stepDiv.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <div class="flex-shrink-0 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-sm font-semibold">
+                            <span class="step-number">${stepCounter}</span>
+                        </div>
+                        <div class="flex-1 space-y-3">
+                            <div>
+                                <label class="inline-block mb-2 text-slate-600 dark:text-slate-300">Step Title <span class="text-red-500">*</span></label>
+                                <input 
+                                    name="steps[${stepCounter-1}][title]" 
+                                    type="text" 
+                                    placeholder="e.g., Contact the client" 
+                                    class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder-slate-400 shadow-sm transition duration-200 ease-in-out focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/20 dark:border-darkmode-300 dark:bg-darkmode-800 dark:text-white dark:placeholder-slate-500 dark:focus:border-primary" 
+                                    required 
+                                />
+                            </div>
+                            <div>
+                                <label class="inline-block mb-2 text-slate-600 dark:text-slate-300">Step Description (Optional)</label>
+                                <textarea 
+                                    name="steps[${stepCounter-1}][description]" 
+                                    rows="2" 
+                                    placeholder="Additional details about this step..." 
+                                    class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder-slate-400 shadow-sm transition duration-200 ease-in-out focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/20 dark:border-darkmode-300 dark:bg-darkmode-800 dark:text-white dark:placeholder-slate-500 dark:focus:border-primary resize-none"
+                                ></textarea>
+                            </div>
+                            <input type="hidden" name="steps[${stepCounter-1}][step_order]" value="${stepCounter}" />
+                        </div>
+                        <div class="flex-shrink-0 flex gap-2">
+                            <button type="button" class="move-up-btn inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-medium text-slate-700 shadow-sm transition duration-200 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-darkmode-300 dark:bg-darkmode-600 dark:text-slate-300 dark:hover:bg-darkmode-500" title="Move Up">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15L12 8L19 15"></path></svg>
+                            </button>
+                            <button type="button" class="move-down-btn inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-medium text-slate-700 shadow-sm transition duration-200 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-darkmode-300 dark:bg-darkmode-600 dark:text-slate-300 dark:hover:bg-darkmode-500" title="Move Down">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9L12 16L5 9"></path></svg>
+                            </button>
+                            <button type="button" class="remove-step-btn inline-flex items-center justify-center rounded-md border border-red-300 bg-white px-2 py-1 text-xs font-medium text-red-700 shadow-sm transition duration-200 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500/20 dark:border-red-600 dark:bg-darkmode-600 dark:text-red-400 dark:hover:bg-red-900/20" title="Remove Step">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7L5 7M19 7L17.133 19.142A2 2 0 0115.138 21H8.862A2 2 0 016.867 19.142L5 7M10 11V17M14 11V17M15 7V4A1 1 0 0014 3H10A1 1 0 009 4V7"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                return stepDiv;
+            }
+
+            if (addStepBtn) {
+                console.log('✅ Add Step button found and event listener attached');
+                addStepBtn.addEventListener('click', function() {
+                    console.log('🔥 Add Step button clicked!');
+                    const stepItem = createStepItem();
+                    stepsContainer.appendChild(stepItem);
+                    updateStepNumbers();
+                    toggleNoStepsMessage();
+                    
+                    // Focus on the title input
+                    const titleInput = stepItem.querySelector('input[name*="[title]"]');
+                    if (titleInput) titleInput.focus();
+                    
+                    console.log('✅ Step added successfully');
+                });
+            } else {
+                console.error('❌ Add Step button not found!');
+            }
+
+            // Event delegation for step actions
+            if (stepsContainer) {
+                stepsContainer.addEventListener('click', function(e) {
+                    const stepItem = e.target.closest('.step-item');
+                    if (!stepItem) return;
+
+                    if (e.target.closest('.remove-step-btn')) {
+                        stepItem.remove();
+                        updateStepNumbers();
+                        toggleNoStepsMessage();
+                    } else if (e.target.closest('.move-up-btn')) {
+                        const prevSibling = stepItem.previousElementSibling;
+                        if (prevSibling) {
+                            stepsContainer.insertBefore(stepItem, prevSibling);
+                            updateStepNumbers();
+                        }
+                    } else if (e.target.closest('.move-down-btn')) {
+                        const nextSibling = stepItem.nextElementSibling;
+                        if (nextSibling) {
+                            stepsContainer.insertBefore(nextSibling, stepItem);
+                            updateStepNumbers();
+                        }
+                    }
+                });
+            }
+
+            // Initialize
+            toggleNoStepsMessage();
+
+            // Alternative event listener using document delegation
+            document.addEventListener('click', function(e) {
+                if (e.target && e.target.id === 'add-step-btn') {
+                    console.log('🔥 Add Step button clicked via delegation!');
+                    e.preventDefault();
+                    
+                    const stepItem = createStepItem();
+                    const container = document.getElementById('task-steps-container');
+                    if (container) {
+                        container.appendChild(stepItem);
+                        updateStepNumbers();
+                        toggleNoStepsMessage();
+                        
+                        // Focus on the title input
+                        const titleInput = stepItem.querySelector('input[name*="[title]"]');
+                        if (titleInput) titleInput.focus();
+                        
+                        console.log('✅ Step added via delegation');
+                    }
+                }
+            });
+
             // Company change handler
             const companySelect = document.getElementById('company_id');
             const departmentSelect = document.getElementById('department_id');
@@ -272,7 +472,7 @@
                     if (departmentSelect) {
                         departmentSelect.innerHTML = '<option value="">Select Department</option>';
                         @foreach($departments as $department)
-                            if ({{ $department->company_id }} == this.value || this.value === '') {
+                            if ('{{ $department->company_id }}' == this.value || this.value === '') {
                                 departmentSelect.innerHTML += '<option value="{{ $department->id }}">{{ $department->name }}</option>';
                             }
                         @endforeach
@@ -290,7 +490,7 @@
                     if (employeeSelect) {
                         employeeSelect.innerHTML = '<option value="">Select Employee</option>';
                         @foreach($employees as $employee)
-                            if ({{ $employee->department_id ?? 'null' }} == this.value || this.value === '') {
+                            if ('{{ $employee->department_id ?? "" }}' == this.value || this.value === '') {
                                 employeeSelect.innerHTML += '<option value="{{ $employee->id }}">{{ $employee->full_name }}</option>';
                             }
                         @endforeach
@@ -298,5 +498,74 @@
                 });
             }
         });
+        
+        } catch (error) {
+            console.error('❌ Task modal script error:', error);
+        }
+    </script>
+
+    <!-- Simple fallback script for Add Step button -->
+    <script>
+        console.log('🔧 Fallback script loaded');
+        
+        // Simple click handler that should always work
+        setTimeout(function() {
+            const btn = document.getElementById('add-step-btn');
+            console.log('🔍 Fallback check - Add Step button:', btn);
+            
+            if (btn) {
+                btn.onclick = function(e) {
+                    console.log('🚀 Fallback: Add Step clicked!');
+                    e.preventDefault();
+                    
+                    // Simple step creation
+                    const container = document.getElementById('task-steps-container');
+                    const noMsg = document.getElementById('no-steps-message');
+                    
+                    if (container) {
+                        const stepCount = container.children.length + 1;
+                        const stepHTML = `
+                            <div class="step-item bg-white dark:bg-darkmode-700 border border-slate-200 dark:border-darkmode-400 rounded-lg p-4 mb-3">
+                                <div class="flex items-start gap-3">
+                                    <div class="flex-shrink-0 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-sm font-semibold">
+                                        ${stepCount}
+                                    </div>
+                                    <div class="flex-1 space-y-3">
+                                        <div>
+                                            <label class="inline-block mb-2 text-slate-600 dark:text-slate-300">Step Title <span class="text-red-500">*</span></label>
+                                            <input name="steps[${stepCount-1}][title]" type="text" placeholder="e.g., Contact the client" class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm" required />
+                                        </div>
+                                        <div>
+                                            <label class="inline-block mb-2 text-slate-600 dark:text-slate-300">Step Description (Optional)</label>
+                                            <textarea name="steps[${stepCount-1}][description]" rows="2" placeholder="Additional details..." class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm resize-none"></textarea>
+                                        </div>
+                                        <input type="hidden" name="steps[${stepCount-1}][step_order]" value="${stepCount}" />
+                                    </div>
+                                    <div class="flex-shrink-0">
+                                        <button type="button" onclick="this.closest('.step-item').remove()" class="text-red-600 hover:text-red-800 p-1">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7L5 7M19 7L17.133 19.142A2 2 0 0115.138 21H8.862A2 2 0 016.867 19.142L5 7M10 11V17M14 11V17M15 7V4A1 1 0 0014 3H10A1 1 0 009 4V7"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        
+                        container.insertAdjacentHTML('beforeend', stepHTML);
+                        
+                        if (noMsg) {
+                            noMsg.style.display = 'none';
+                        }
+                        
+                        console.log('✅ Fallback: Step added successfully');
+                        
+                        // Focus on the new input
+                        const newInput = container.lastElementChild.querySelector('input[type="text"]');
+                        if (newInput) newInput.focus();
+                    }
+                };
+            }
+        }, 1000);
     </script>
 </x-modal.form>

@@ -7,7 +7,7 @@ use App\Models\User;
 use App\Models\Company;
 use App\Models\Department;
 use App\Models\Task;
-use App\Models\Project;
+use App\Models\Work\Project;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;

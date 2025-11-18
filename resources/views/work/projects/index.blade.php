@@ -4,12 +4,102 @@
     <title>Projects Management - {{ config('app.name') }}</title>
 @endsection
 
-@push('styles')
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.tailwindcss.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.min.css">
+@include('components.datatable.styles')
+@include('components.datatable.theme')
 
-    <!-- Custom Modal Styles -->
+@push('styles')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <style>
+        /* Make projects table rows more compact */
+        #projects-table tbody tr {
+            height: 2.25rem; /* ~36px */
+        }
+
+        #projects-table td {
+            padding-top: 0.375rem;  /* 6px */
+            padding-bottom: 0.375rem;
+        }
+        /* CRUD Table Styles */
+        #projects-table tbody tr {
+            background: transparent !important;
+        }
+        
+        #projects-table tbody tr td {
+            vertical-align: middle;
+            position: relative;
+        }
+        
+        #projects-table tbody tr:hover td {
+            transform: translateY(-1px);
+            transition: transform 0.2s ease;
+        }
+        
+        /* Box shadows for table cells */
+        .table-cell-box {
+            box-shadow: 5px 3px 5px rgba(0,0,0,0.02);
+            background: white;
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            transition: all 0.2s ease;
+        }
+        
+        .table-cell-box:hover {
+            box-shadow: 5px 3px 15px rgba(0,0,0,0.1);
+        }
+        
+        /* Dark mode support */
+        .dark .table-cell-box {
+            background: rgb(var(--color-darkmode-600));
+            border-color: rgba(var(--color-darkmode-400), 0.6);
+        }
+        
+        /* DataTable search styling */
+        .dataTables_filter input {
+            border-radius: 0.375rem !important;
+            border: 1px solid #e2e8f0 !important;
+            padding: 0.5rem 1rem !important;
+            background: white !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+        }
+        
+        .dataTables_filter input:focus {
+            border-color: var(--color-primary) !important;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+        }
+        
+        /* DataTable length select styling */
+        .dataTables_length select {
+            border-radius: 0.375rem !important;
+            border: 1px solid #e2e8f0 !important;
+            padding: 0.375rem 2rem 0.375rem 0.75rem !important;
+            background: white !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+        }
+        
+        /* Pagination styling */
+        .dataTables_paginate .paginate_button {
+            border-radius: 0.375rem !important;
+            margin: 0 2px !important;
+            padding: 0.5rem 0.75rem !important;
+            border: 1px solid #e2e8f0 !important;
+            background: white !important;
+            color: #64748b !important;
+            transition: all 0.2s ease !important;
+        }
+        
+        .dataTables_paginate .paginate_button:hover {
+            background: var(--color-primary) !important;
+            color: white !important;
+            border-color: var(--color-primary) !important;
+            transform: translateY(-1px) !important;
+        }
+        
+        .dataTables_paginate .paginate_button.current {
+            background: var(--color-primary) !important;
+            color: white !important;
+            border-color: var(--color-primary) !important;
+        }
+        
         .custom-modal {
             position: fixed;
             inset: 0;
@@ -102,62 +192,38 @@
                     <!-- Stats Cards -->
                     <div class="grid grid-cols-12 gap-6 mb-6">
                         <div class="col-span-12 sm:col-span-6 xl:col-span-3">
-                            <div class="report-box zoom-in">
-                                <div class="box p-5">
-                                    <div class="flex items-center">
-                                    <div class="text-2xl font-bold leading-8">{{ $stats['total'] }}</div>
-                                        <div class="ml-auto">
-                                            <div class="flex items-center text-success">
-                                                <x-base.lucide icon="TrendingUp" class="w-4 h-4 mr-1" />
-                                                Total Projects
-                                            </div>
-                                        </div>
-                                    </div>
+                            <div class="stats-card-info p-5 text-center">
+                                <div class="text-3xl font-bold mb-2">{{ $stats['total'] }}</div>
+                                <div class="flex items-center justify-center gap-2 text-sm opacity-80">
+                                    <x-base.lucide icon="TrendingUp" class="w-4 h-4" />
+                                    Total Projects
                                 </div>
                             </div>
                         </div>
                         <div class="col-span-12 sm:col-span-6 xl:col-span-3">
-                            <div class="report-box zoom-in">
-                                <div class="box p-5">
-                                    <div class="flex items-center">
-                                        <div class="text-2xl font-bold leading-8">{{ $stats['active'] }}</div>
-                                        <div class="ml-auto">
-                                            <div class="flex items-center text-primary">
-                                                <x-base.lucide icon="Activity" class="w-4 h-4 mr-1" />
-                                                Active
-                                            </div>
-                                        </div>
-                                    </div>
+                            <div class="stats-card-warning p-5 text-center">
+                                <div class="text-3xl font-bold mb-2">{{ $stats['active'] }}</div>
+                                <div class="flex items-center justify-center gap-2 text-sm opacity-80">
+                                    <x-base.lucide icon="Activity" class="w-4 h-4" />
+                                    Active Projects
                                 </div>
                             </div>
                         </div>
                         <div class="col-span-12 sm:col-span-6 xl:col-span-3">
-                            <div class="report-box zoom-in">
-                                <div class="box p-5">
-                                    <div class="flex items-center">
-                                        <div class="text-2xl font-bold leading-8">{{ $stats['completed'] }}</div>
-                                        <div class="ml-auto">
-                                            <div class="flex items-center text-success">
-                                                <x-base.lucide icon="CheckCircle" class="w-4 h-4 mr-1" />
-                                                Completed
-                                            </div>
-                                        </div>
-                                    </div>
+                            <div class="stats-card-success p-5 text-center">
+                                <div class="text-3xl font-bold mb-2">{{ $stats['completed'] }}</div>
+                                <div class="flex items-center justify-center gap-2 text-sm opacity-80">
+                                    <x-base.lucide icon="CheckCircle" class="w-4 h-4" />
+                                    Completed
                                 </div>
                             </div>
                         </div>
                         <div class="col-span-12 sm:col-span-6 xl:col-span-3">
-                            <div class="report-box zoom-in">
-                                <div class="box p-5">
-                                    <div class="flex items-center">
-                                        <div class="text-2xl font-bold leading-8">{{ $stats['overdue'] }}</div>
-                                        <div class="ml-auto">
-                                            <div class="flex items-center text-danger">
-                                                <x-base.lucide icon="AlertTriangle" class="w-4 h-4 mr-1" />
-                                                Overdue
-                                            </div>
-                                        </div>
-                                    </div>
+                            <div class="stats-card-danger p-5 text-center">
+                                <div class="text-3xl font-bold mb-2">{{ $stats['overdue'] }}</div>
+                                <div class="flex items-center justify-center gap-2 text-sm opacity-80">
+                                    <x-base.lucide icon="AlertTriangle" class="w-4 h-4" />
+                                    Overdue
                                 </div>
                             </div>
                         </div>
@@ -194,27 +260,40 @@
                     </div>
 
                     <!-- Projects Table -->
-                    <div class="overflow-x-auto">
-                        <table id="projects-table" class="table table-report -mt-2">
-                            <thead>
-                                <tr>
-                                    <th class="whitespace-nowrap">Code</th>
-                                    <th class="whitespace-nowrap">Name</th>
-                                    <th class="whitespace-nowrap">Company</th>
-                                    <th class="whitespace-nowrap">Department</th>
-                                    <th class="whitespace-nowrap">Manager</th>
-                                    <th class="whitespace-nowrap">Status</th>
-                                    <th class="whitespace-nowrap">Priority</th>
-                                    <th class="whitespace-nowrap">Progress</th>
-                                    <th class="whitespace-nowrap">Start Date</th>
-                                    <th class="whitespace-nowrap">End Date</th>
-                                    <th class="whitespace-nowrap">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+                    <div class="intro-y col-span-12 overflow-auto lg:overflow-visible">
+                        <x-base.table id="projects-table" class="-mt-2 border-separate border-spacing-y-[10px]">
+                            <x-base.table.thead>
+                                <x-base.table.tr>
+                                    <x-base.table.th class="whitespace-nowrap border-b-0">
+                                        PROJECT CODE
+                                    </x-base.table.th>
+                                    <x-base.table.th class="whitespace-nowrap border-b-0">
+                                        PROJECT NAME
+                                    </x-base.table.th>
+                                    <x-base.table.th class="whitespace-nowrap border-b-0">
+                                        COMPANY
+                                    </x-base.table.th>
+                                    <x-base.table.th class="whitespace-nowrap border-b-0">
+                                        MANAGER
+                                    </x-base.table.th>
+                                    <x-base.table.th class="whitespace-nowrap border-b-0 text-center">
+                                        STATUS
+                                    </x-base.table.th>
+                                    <x-base.table.th class="whitespace-nowrap border-b-0 text-center">
+                                        PRIORITY
+                                    </x-base.table.th>
+                                    <x-base.table.th class="whitespace-nowrap border-b-0 text-center">
+                                        PROGRESS
+                                    </x-base.table.th>
+                                    <x-base.table.th class="whitespace-nowrap border-b-0 text-center">
+                                        ACTIONS
+                                    </x-base.table.th>
+                                </x-base.table.tr>
+                            </x-base.table.thead>
+                            <x-base.table.tbody>
                                 <!-- Data will be loaded via AJAX -->
-                            </tbody>
-                        </table>
+                            </x-base.table.tbody>
+                        </x-base.table>
                     </div>
                 </div>
             </x-base.preview-component>
@@ -240,56 +319,171 @@
                     type: 'GET'
                 },
                 columns: [
-                    { data: 'code', orderable: true },
-                    { data: 'name', orderable: true },
-                    { data: 'company', orderable: false },
-                    { data: 'department', orderable: false },
-                    { data: 'manager', orderable: false },
+                    { 
+                        data: 'code', 
+                        orderable: true,
+                        render: function(data, type, row) {
+                            return `
+                                <div class="box rounded-l-none rounded-r-none border-x-0 shadow-[5px_3px_5px_#00000005] first:rounded-l-[0.6rem] first:border-l last:rounded-r-[0.6rem] last:border-r dark:bg-darkmode-600 p-4">
+                                    <a href="/work/projects/${row.id}" class="font-medium text-primary hover:underline">${data}</a>
+                                </div>
+                            `;
+                        }
+                    },
+                    { 
+                        data: 'name', 
+                        orderable: true,
+                        render: function(data, type, row) {
+                            return `
+                                <div class="box rounded-l-none rounded-r-none border-x-0 shadow-[5px_3px_5px_#00000005] first:rounded-l-[0.6rem] first:border-l last:rounded-r-[0.6rem] last:border-r dark:bg-darkmode-600 p-4">
+                                    <a href="/work/projects/${row.id}" class="whitespace-nowrap font-medium">${data}</a>
+                                    <div class="mt-0.5 whitespace-nowrap text-xs text-slate-500">${row.department || 'No Department'}</div>
+                                </div>
+                            `;
+                        }
+                    },
+                    { 
+                        data: 'company', 
+                        orderable: false,
+                        render: function(data) {
+                            return `
+                                <div class="box rounded-l-none rounded-r-none border-x-0 shadow-[5px_3px_5px_#00000005] first:rounded-l-[0.6rem] first:border-l last:rounded-r-[0.6rem] last:border-r dark:bg-darkmode-600 p-4">
+                                    ${data || 'N/A'}
+                                </div>
+                            `;
+                        }
+                    },
+                    { 
+                        data: 'manager', 
+                        orderable: false,
+                        render: function(data) {
+                            return `
+                                <div class="box rounded-l-none rounded-r-none border-x-0 shadow-[5px_3px_5px_#00000005] first:rounded-l-[0.6rem] first:border-l last:rounded-r-[0.6rem] last:border-r dark:bg-darkmode-600 p-4">
+                                    ${data || 'Unassigned'}
+                                </div>
+                            `;
+                        }
+                    },
                     {
                         data: 'status',
                         orderable: false,
                         render: function(data) {
-                            const colors = {
-                                'planning': 'bg-blue-100 text-blue-700',
-                                'active': 'bg-green-100 text-green-700',
-                                'on_hold': 'bg-yellow-100 text-yellow-700',
-                                'completed': 'bg-gray-100 text-gray-700',
-                                'cancelled': 'bg-red-100 text-red-700'
+                            const statusClasses = {
+                                'planning': 'stats-card-info',
+                                'active': 'stats-card-warning', 
+                                'on_hold': 'stats-card-neutral',
+                                'completed': 'stats-card-success',
+                                'cancelled': 'stats-card-danger'
                             };
-                            return `<span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${colors[data] || 'bg-gray-100 text-gray-700'}">${data.charAt(0).toUpperCase() + data.slice(1)}</span>`;
+                            const statusClass = statusClasses[data] || 'stats-card-neutral';
+                            return `
+                                <div class="box w-40 rounded-l-none rounded-r-none border-x-0 shadow-[5px_3px_5px_#00000005] first:rounded-l-[0.6rem] first:border-l last:rounded-r-[0.6rem] last:border-r dark:bg-darkmode-600 p-4">
+                                    <div class="flex items-center justify-center">
+                                        <span class="${statusClass} px-3 py-1 rounded-full text-xs font-medium">
+                                            ${data.charAt(0).toUpperCase() + data.slice(1).replace('_', ' ')}
+                                        </span>
+                                    </div>
+                                </div>
+                            `;
                         }
                     },
                     {
                         data: 'priority',
                         orderable: false,
                         render: function(data) {
-                            const colors = {
-                                'low': 'bg-gray-100 text-gray-700',
-                                'medium': 'bg-blue-100 text-blue-700',
-                                'high': 'bg-orange-100 text-orange-700',
-                                'critical': 'bg-red-100 text-red-700'
+                            const priorityClasses = {
+                                'low': 'stats-card-neutral',
+                                'medium': 'stats-card-info',
+                                'high': 'stats-card-warning',
+                                'critical': 'stats-card-danger'
                             };
-                            return `<span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${colors[data] || 'bg-gray-100 text-gray-700'}">${data.charAt(0).toUpperCase() + data.slice(1)}</span>`;
+                            const priorityClass = priorityClasses[data] || 'stats-card-neutral';
+                            return `
+                                <div class="box w-32 rounded-l-none rounded-r-none border-x-0 shadow-[5px_3px_5px_#00000005] first:rounded-l-[0.6rem] first:border-l last:rounded-r-[0.6rem] last:border-r dark:bg-darkmode-600 p-4">
+                                    <div class="flex items-center justify-center">
+                                        <span class="${priorityClass} px-2 py-1 rounded-full text-xs font-medium">
+                                            ${data.charAt(0).toUpperCase() + data.slice(1)}
+                                        </span>
+                                    </div>
+                                </div>
+                            `;
                         }
                     },
                     {
                         data: 'progress_percentage',
                         orderable: false,
                         render: function(data) {
-                            const color = data >= 75 ? 'bg-green-500' : (data >= 50 ? 'bg-yellow-500' : 'bg-red-500');
-                            return `<div class="w-full bg-gray-200 rounded-full h-2"><div class="${color} h-2 rounded-full" style="width: ${data}%"></div></div><span class="text-xs text-gray-600">${data}%</span>`;
+                            const progressColor = data >= 75 ? '#1b7a4a' : (data >= 50 ? '#c98028' : '#b21a50');
+                            return `
+                                <div class="box w-40 rounded-l-none rounded-r-none border-x-0 shadow-[5px_3px_5px_#00000005] first:rounded-l-[0.6rem] first:border-l last:rounded-r-[0.6rem] last:border-r dark:bg-darkmode-600 p-4">
+                                    <div class="flex flex-col items-center">
+                                        <div class="w-full bg-slate-200 rounded-full h-2 mb-2">
+                                            <div class="h-2 rounded-full transition-all duration-300" 
+                                                 style="width: ${data}%; background: linear-gradient(90deg, color-mix(in oklch, ${progressColor} 70%, #ffffff), color-mix(in oklch, ${progressColor} 90%, #ffffff));"></div>
+                                        </div>
+                                        <span class="text-xs font-medium">${data}%</span>
+                                    </div>
+                                </div>
+                            `;
                         }
                     },
-                    { data: 'start_date', orderable: true },
-                    { data: 'end_date', orderable: true },
-                    { data: 'actions', orderable: false, searchable: false }
+                    { 
+                        data: 'actions', 
+                        orderable: false, 
+                        searchable: false,
+                        render: function(data, type, row) {
+                            return `
+                                <div class="box w-56 rounded-l-none rounded-r-none border-x-0 shadow-[5px_3px_5px_#00000005] first:rounded-l-[0.6rem] first:border-l last:rounded-r-[0.6rem] last:border-r dark:bg-darkmode-600 p-4 before:absolute before:inset-y-0 before:left-0 before:my-auto before:block before:h-8 before:w-px before:bg-slate-200 before:dark:bg-darkmode-400">
+                                    <div class="flex items-center justify-center gap-3">
+                                        <a href="/work/projects/${row.id}" class="flex items-center text-primary hover:text-primary/80">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                            </svg>
+                                            View
+                                        </a>
+                                        <a href="/work/projects/${row.id}/edit" class="flex items-center text-warning hover:text-warning/80">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                            </svg>
+                                            Edit
+                                        </a>
+                                        <a href="#" onclick="deleteProject(${row.id}, '${row.name}')" class="flex items-center text-danger hover:text-danger/80">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                            </svg>
+                                            Delete
+                                        </a>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    }
                 ],
                 order: [[0, 'asc']],
-                pageLength: 15,
+                pageLength: 10,
                 responsive: true,
+                dom: '<"flex flex-col sm:flex-row gap-4 mb-6"<"flex-1"f><"flex-shrink-0"l>>rtip',
                 language: {
-                    emptyTable: "No projects found"
-                }
+                    emptyTable: "No projects found",
+                    search: "",
+                    searchPlaceholder: "Search projects...",
+                    lengthMenu: "Show _MENU_ projects",
+                    info: "Showing _START_ to _END_ of _TOTAL_ projects",
+                    paginate: {
+                        first: "First",
+                        last: "Last", 
+                        next: "Next",
+                        previous: "Previous"
+                    }
+                },
+                drawCallback: function() {
+                    // Add intro-x animation to new rows
+                    $('#projects-table tbody tr').addClass('intro-x');
+                },
+                columnDefs: [
+                    { targets: '_all', className: 'align-middle' }
+                ]
             });
 
             // Apply filters

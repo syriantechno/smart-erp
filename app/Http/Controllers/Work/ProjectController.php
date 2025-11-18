@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Work;
 
 use App\Http\Controllers\Controller;
-use App\Models\Project;
+use App\Models\Work\Project;
 use App\Models\Setting\Company;
 use App\Models\HR\Department;
 use App\Models\HR\Employee;

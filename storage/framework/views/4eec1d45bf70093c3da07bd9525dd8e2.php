@@ -1,4 +1,4 @@
-<?php if (! $__env->hasRenderedOnce('672e4bc8-fa0a-4238-a0a6-4dbaa55b2ad1')): $__env->markAsRenderedOnce('672e4bc8-fa0a-4238-a0a6-4dbaa55b2ad1');
+<?php if (! $__env->hasRenderedOnce('ebb06086-63d2-4470-8118-113d11581358')): $__env->markAsRenderedOnce('ebb06086-63d2-4470-8118-113d11581358');
 $__env->startPush('scripts'); ?>
     <!-- DataTables JS is now loaded globally in base.blade.php -->
     <script>

@@ -532,12 +532,10 @@
                 <div class="intro-y box col-span-12" id="assigned-tasks">
                     <div class="flex items-center border-b border-slate-200/60 px-5 py-5 dark:border-darkmode-400 sm:py-3">
                         <h2 class="mr-auto text-base font-medium">Assigned Tasks</h2>
-                        @if(Route::has('tasks.index'))
-                            <x-base.button as="a" href="{{ route('tasks.index', ['employee_id' => $employee->id]) }}" variant="outline-secondary">
-                                <x-base.lucide class="mr-2 h-4 w-4" icon="ExternalLink" />
-                                View All
-                            </x-base.button>
-                        @endif
+                        <x-base.button as="a" href="{{ route('tasks.index', ['employee_id' => $employee->id]) }}" variant="outline-secondary">
+                            <x-base.lucide class="mr-2 h-4 w-4" icon="ExternalLink" />
+                            View All
+                        </x-base.button>
                     </div>
                     <div class="p-5">
                         @php
@@ -547,7 +545,7 @@
                         @if($assignedTasks->count() > 0)
                             <div class="space-y-3">
                                 @foreach($assignedTasks as $task)
-                                    <div class="flex items-center justify-between p-4 border border-slate-200/60 rounded-lg dark:border-darkmode-400 hover:bg-slate-50 dark:hover:bg-darkmode-600 transition-colors">
+                                    <a href="{{ route('tasks.show', $task) }}" class="flex items-center justify-between p-4 border border-slate-200/60 rounded-lg dark:border-darkmode-400 hover:bg-slate-50 dark:hover:bg-darkmode-600 transition-colors cursor-pointer hover:border-primary/30 group">
                                         <div class="flex items-center flex-1">
                                             @if($task->color)
                                                 <div class="w-3 h-3 rounded-full mr-3 border border-white shadow-sm" style="background-color: {{ $task->color }}"></div>
@@ -555,7 +553,7 @@
                                                 <x-base.lucide class="h-4 w-4 text-slate-400 mr-3" icon="CheckSquare" />
                                             @endif
                                             <div class="flex-1">
-                                                <div class="font-medium text-sm">{{ $task->title }}</div>
+                                                <div class="font-medium text-sm group-hover:text-primary transition-colors">{{ $task->title }}</div>
                                                 <div class="text-xs text-slate-500 mt-1">
                                                     <span class="mr-3">{{ $task->code }}</span>
                                                     @if($task->project)
@@ -568,6 +566,9 @@
                                             </div>
                                         </div>
                                         <div class="flex items-center space-x-2">
+                                            <!-- Click Indicator -->
+                                            <x-base.lucide class="h-4 w-4 text-slate-400 group-hover:text-primary transition-colors" icon="ExternalLink" />
+                                            
                                             <!-- Priority Badge -->
                                             @php
                                                 $priorityClass = match($task->priority) {
@@ -595,7 +596,7 @@
                                                 {{ ucfirst(str_replace('_', ' ', $task->status)) }}
                                             </span>
                                         </div>
-                                    </div>
+                                    </a>
                                 @endforeach
                             </div>
                             
@@ -638,12 +639,10 @@
                             <div class="flex flex-col items-center justify-center py-10">
                                 <x-base.lucide class="h-12 w-12 text-slate-400 mb-4" icon="CheckSquare" />
                                 <div class="text-slate-500 text-center mb-2">No tasks assigned</div>
-                                @if(Route::has('tasks.create'))
-                                    <a href="{{ route('tasks.create', ['employee_id' => $employee->id]) }}"
-                                       class="text-primary hover:text-primary/80 text-sm">
-                                        Assign first task
-                                    </a>
-                                @endif
+                                <a href="{{ route('tasks.create', ['employee_id' => $employee->id]) }}"
+                                   class="text-primary hover:text-primary/80 text-sm">
+                                    Assign first task
+                                </a>
                             </div>
                         @endif
                     </div>

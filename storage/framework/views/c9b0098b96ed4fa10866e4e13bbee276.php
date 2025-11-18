@@ -1,4 +1,4 @@
-<?php if (! $__env->hasRenderedOnce('6e8ba4d2-49c3-4c61-9dda-afa713c5df34')): $__env->markAsRenderedOnce('6e8ba4d2-49c3-4c61-9dda-afa713c5df34');
+<?php if (! $__env->hasRenderedOnce('474d6ac9-f183-4d9a-95b5-61a69ccdc2ec')): $__env->markAsRenderedOnce('474d6ac9-f183-4d9a-95b5-61a69ccdc2ec');
 $__env->startPush('styles'); ?>
     <style>
         [data-erp-table-wrapper] {

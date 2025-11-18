@@ -20,11 +20,11 @@
                         <div class="flex items-center gap-4">
                             <h2 class="text-2xl font-medium">{{ $project->name }}</h2>
                             <span class="inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold
-                                @if($project->status === 'active') bg-green-100 text-green-700
-                                @elseif($project->status === 'planning') bg-blue-100 text-blue-700
-                                @elseif($project->status === 'on_hold') bg-yellow-100 text-yellow-700
-                                @elseif($project->status === 'completed') bg-gray-100 text-gray-700
-                                @else bg-red-100 text-red-700
+                                @if($project->status === 'active') stats-card-warning
+                                @elseif($project->status === 'planning') stats-card-info
+                                @elseif($project->status === 'on_hold') stats-card-neutral
+                                @elseif($project->status === 'completed') stats-card-success
+                                @else stats-card-danger
                                 @endif">
                                 {{ ucfirst(str_replace('_', ' ', $project->status)) }}
                             </span>
@@ -48,14 +48,38 @@
                     </div>
 
                     <!-- Progress Bar -->
-                    <div class="mb-6">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-sm font-medium">Progress</span>
-                            <span class="text-sm text-gray-600">{{ $project->progress_percentage }}%</span>
+                    <div class="mb-6 p-4 rounded-lg" style="background-color: color-mix(in oklch, #2563eb 5%, #ffffff); border: 1px solid color-mix(in oklch, #2563eb, transparent 90%);">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-sm font-medium" style="color: color-mix(in oklch, #2563eb, black 22%);">Project Progress</span>
+                            <span class="text-sm font-semibold px-2 py-1 rounded-full" style="background-color: color-mix(in oklch, #2563eb 15%, #ffffff); color: color-mix(in oklch, #2563eb, black 30%);">{{ $project->progress_percentage }}%</span>
                         </div>
-                        <div class="w-full bg-gray-200 rounded-full h-3">
-                            <div class="bg-{{ $project->progress_percentage >= 75 ? 'green' : ($project->progress_percentage >= 50 ? 'yellow' : 'red') }}-500 h-3 rounded-full transition-all duration-300"
-                                 style="width: {{ $project->progress_percentage }}%"></div>
+                        <div class="w-full rounded-full h-3" style="background-color: color-mix(in oklch, #2563eb, transparent 85%);">
+                            <div class="h-3 rounded-full transition-all duration-500 ease-out" 
+                                 style="width: {{ $project->progress_percentage }}%; 
+                                        background: linear-gradient(90deg, 
+                                            @if($project->progress_percentage >= 75) color-mix(in oklch, #1b7a4a 70%, #ffffff), color-mix(in oklch, #1b7a4a 90%, #ffffff)
+                                            @elseif($project->progress_percentage >= 50) color-mix(in oklch, #c98028 70%, #ffffff), color-mix(in oklch, #c98028 90%, #ffffff)
+                                            @else color-mix(in oklch, #b21a50 70%, #ffffff), color-mix(in oklch, #b21a50 90%, #ffffff)
+                                            @endif);"></div>
+                        </div>
+                        <div class="flex items-center justify-between mt-2 text-xs">
+                            <span style="color: color-mix(in oklch, #2563eb, black 35%);">
+                                @if($project->progress_percentage >= 75) Excellent Progress
+                                @elseif($project->progress_percentage >= 50) Good Progress
+                                @elseif($project->progress_percentage > 0) Getting Started
+                                @else Not Started
+                                @endif
+                            </span>
+                            <span class="px-2 py-1 rounded-full text-xs" style="
+                                @if($project->progress_percentage >= 75) background-color: color-mix(in oklch, #1b7a4a 15%, #ffffff); color: color-mix(in oklch, #1b7a4a, black 30%);
+                                @elseif($project->progress_percentage >= 50) background-color: color-mix(in oklch, #c98028 15%, #ffffff); color: color-mix(in oklch, #c98028, black 30%);
+                                @else background-color: color-mix(in oklch, #b21a50 15%, #ffffff); color: color-mix(in oklch, #b21a50, black 30%);
+                                @endif">
+                                @if($project->progress_percentage >= 75) On Track
+                                @elseif($project->progress_percentage >= 50) In Progress
+                                @else Needs Attention
+                                @endif
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -223,42 +247,168 @@
                 <div class="p-5">
                     <h3 class="text-lg font-medium mb-4">Project Stats</h3>
                     <div class="space-y-4">
-                        <div class="flex justify-between">
-                            <span class="text-sm text-gray-600 dark:text-gray-400">Total Tasks</span>
-                            <span class="text-sm font-medium">{{ $project->tasks->count() }}</span>
+                        <div class="stats-card-info p-3 rounded-lg">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm opacity-80">Total Tasks</span>
+                                <span class="text-lg font-bold">{{ $project->tasks->count() }}</span>
+                            </div>
                         </div>
 
-                        <div class="flex justify-between">
-                            <span class="text-sm text-gray-600 dark:text-gray-400">Completed Tasks</span>
-                            <span class="text-sm font-medium">{{ $project->tasks->where('status', 'completed')->count() }}</span>
+                        <div class="stats-card-success p-3 rounded-lg">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm opacity-80">Completed Tasks</span>
+                                <span class="text-lg font-bold">{{ $project->tasks->where('status', 'completed')->count() }}</span>
+                            </div>
                         </div>
 
-                        <div class="flex justify-between">
-                            <span class="text-sm text-gray-600 dark:text-gray-400">Days Remaining</span>
-                            <span class="text-sm font-medium">
-                                @if($project->end_date)
-                                    {{ max(0, now()->diffInDays($project->end_date, false)) }}
-                                @else
-                                    N/A
-                                @endif
-                            </span>
+                        <div class="stats-card-warning p-3 rounded-lg">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm opacity-80">Days Remaining</span>
+                                <span class="text-lg font-bold">
+                                    @if($project->end_date)
+                                        {{ max(0, now()->diffInDays($project->end_date, false)) }}
+                                    @else
+                                        N/A
+                                    @endif
+                                </span>
+                            </div>
                         </div>
 
-                        <div class="flex justify-between">
-                            <span class="text-sm text-gray-600 dark:text-gray-400">Days Passed</span>
-                            <span class="text-sm font-medium">{{ $project->start_date ? now()->diffInDays($project->start_date) : 0 }}</span>
+                        <div class="stats-card-neutral p-3 rounded-lg">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm opacity-80">Days Passed</span>
+                                <span class="text-lg font-bold">{{ $project->start_date ? now()->diffInDays($project->start_date) : 0 }}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </x-base.preview-component>
+
+            <!-- Project Tasks Chart -->
+            @if($project->tasks->count() > 0)
+                @php
+                    $totalTasks = $project->tasks->count();
+                    $completedTasks = $project->tasks->where('status', 'completed')->count();
+                    $inProgressTasks = $project->tasks->where('status', 'in_progress')->count();
+                    $pendingTasks = $project->tasks->where('status', 'pending')->count();
+                @endphp
+                <x-base.preview-component class="intro-y box mt-6">
+                    <div class="p-5">
+                        <h3 class="text-lg font-medium mb-4">Tasks Overview</h3>
+                        <div class="chart-container p-4">
+                            <canvas id="project-tasks-chart" width="300" height="300"></canvas>
+                        </div>
+                        
+                        <!-- Task Stats -->
+                        <div class="mt-4 space-y-2">
+                            <div class="flex items-center justify-between text-sm">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-3 h-3 rounded-full" style="background-color: color-mix(in oklch, #1b7a4a 70%, #ffffff);"></div>
+                                    <span>Completed</span>
+                                </div>
+                                <span class="font-medium">{{ $completedTasks }}</span>
+                            </div>
+                            <div class="flex items-center justify-between text-sm">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-3 h-3 rounded-full" style="background-color: color-mix(in oklch, #2563eb 70%, #ffffff);"></div>
+                                    <span>In Progress</span>
+                                </div>
+                                <span class="font-medium">{{ $inProgressTasks }}</span>
+                            </div>
+                            <div class="flex items-center justify-between text-sm">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-3 h-3 rounded-full" style="background-color: color-mix(in oklch, #c98028 70%, #ffffff);"></div>
+                                    <span>Pending</span>
+                                </div>
+                                <span class="font-medium">{{ $pendingTasks }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </x-base.preview-component>
+            @endif
         </div>
     </div>
 @endsection
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Project Tasks Chart
+            const tasksChart = document.getElementById('project-tasks-chart');
+            if (tasksChart) {
+                initProjectTasksChart();
+            }
+        });
+
+        function initProjectTasksChart() {
+            const ctx = document.getElementById('project-tasks-chart').getContext('2d');
+            
+            const completedTasks = {{ $completedTasks ?? 0 }};
+            const inProgressTasks = {{ $inProgressTasks ?? 0 }};
+            const pendingTasks = {{ $pendingTasks ?? 0 }};
+            
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Completed', 'In Progress', 'Pending'],
+                    datasets: [{
+                        data: [completedTasks, inProgressTasks, pendingTasks],
+                        backgroundColor: [
+                            'color-mix(in oklch, #1b7a4a 18%, #ffffff)', // success
+                            'color-mix(in oklch, #2563eb 18%, #ffffff)',  // info
+                            'color-mix(in oklch, #c98028 18%, #ffffff)'   // warning
+                        ],
+                        borderColor: [
+                            'color-mix(in oklch, #1b7a4a, transparent 78%)',
+                            'color-mix(in oklch, #2563eb, transparent 78%)',
+                            'color-mix(in oklch, #c98028, transparent 78%)'
+                        ],
+                        borderWidth: 2,
+                        hoverBackgroundColor: [
+                            'color-mix(in oklch, #1b7a4a 25%, #ffffff)',
+                            'color-mix(in oklch, #2563eb 25%, #ffffff)',
+                            'color-mix(in oklch, #c98028 25%, #ffffff)'
+                        ],
+                        hoverBorderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '60%',
+                    animation: {
+                        animateRotate: true,
+                        duration: 1000
+                    }
+                }
+            });
+        }
         function editProject(id) {
             window.location.href = `{{ url('work/projects') }}/${id}/edit`;
         }

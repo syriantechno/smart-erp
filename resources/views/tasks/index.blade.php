@@ -343,6 +343,34 @@
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
+    
+    <style>
+        /* DataTable Links Styling */
+        .dataTables_wrapper a {
+            text-decoration: none;
+        }
+        
+        .dataTables_wrapper a:hover {
+            text-decoration: none;
+        }
+        
+        /* Kanban Card Link Styling */
+        .tasks-kanban-card {
+            color: inherit;
+            text-decoration: none;
+        }
+        
+        .tasks-kanban-card:hover {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .tasks-kanban-card:focus {
+            outline: 2px solid rgb(var(--color-primary-rgb));
+            outline-offset: 2px;
+        }
+    </style>
+    
     <script>
     // Define showToast function if not available
     if (typeof showToast === 'undefined') {
@@ -422,8 +450,32 @@
                 },
                 columns: [
                     { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center font-medium', orderable: false },
-                    { data: 'code', name: 'code', className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700 whitespace-nowrap' },
-                    { data: 'title', name: 'title', className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700 datatable-cell-wrap' },
+                    { 
+                        data: 'code', 
+                        name: 'code', 
+                        className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700 whitespace-nowrap',
+                        render: function (data, type, row) {
+                            return `<a href="/tasks/${row.id}" class="text-primary hover:text-primary/80 font-medium transition-colors inline-flex items-center gap-1 group">
+                                ${data}
+                                <svg class="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                </svg>
+                            </a>`;
+                        }
+                    },
+                    { 
+                        data: 'title', 
+                        name: 'title', 
+                        className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700 datatable-cell-wrap',
+                        render: function (data, type, row) {
+                            return `<a href="/tasks/${row.id}" class="text-primary hover:text-primary/80 font-medium transition-colors hover:underline inline-flex items-center gap-2 group">
+                                <span>${data}</span>
+                                <svg class="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                </svg>
+                            </a>`;
+                        }
+                    },
                     {
                         data: 'priority',
                         name: 'priority',
@@ -672,8 +724,9 @@
             }
 
             function buildKanbanCard(task) {
-                const card = document.createElement('div');
-                card.className = 'tasks-kanban-card group rounded-xl border border-slate-200/80 bg-white/90 px-3 py-3 text-xs shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-md dark:border-darkmode-500 dark:bg-darkmode-600/95';
+                const card = document.createElement('a');
+                card.href = `/tasks/${task.id}`;
+                card.className = 'tasks-kanban-card group rounded-xl border border-slate-200/80 bg-white/90 px-3 py-3 text-xs shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-md dark:border-darkmode-500 dark:bg-darkmode-600/95 block no-underline';
                 card.setAttribute('draggable', 'true');
                 card.dataset.taskId = task.id;
                 card.dataset.status = task.status;
@@ -715,7 +768,10 @@
                         <div class="flex flex-col gap-1">
                             <div class="flex items-center gap-1.5">
                                 ${colorDot}
-                                <span class="max-w-[180px] truncate font-semibold text-slate-800 dark:text-slate-50">${task.title || 'Untitled Task'}</span>
+                                <span class="max-w-[160px] truncate font-semibold text-slate-800 dark:text-slate-50 group-hover:text-primary transition-colors">${task.title || 'Untitled Task'}</span>
+                                <svg class="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                </svg>
                             </div>
                             <div class="text-[10px] font-medium uppercase tracking-wide text-slate-400">${task.code || ''}</div>
                         </div>

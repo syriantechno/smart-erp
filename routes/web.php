@@ -163,6 +163,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/{task}/edit', [App\Http\Controllers\Work\TaskController::class, 'edit'])->name('edit');
         Route::put('/{task}', [App\Http\Controllers\Work\TaskController::class, 'update'])->name('update');
         Route::delete('/{task}', [App\Http\Controllers\Work\TaskController::class, 'destroy'])->name('destroy');
+        
+        // Task Steps Routes
+        Route::post('/steps/{step}/complete', [App\Http\Controllers\Work\TaskController::class, 'completeStep'])->name('steps.complete');
+        Route::post('/steps/{step}/uncomplete', [App\Http\Controllers\Work\TaskController::class, 'uncompleteStep'])->name('steps.uncomplete');
+        
+        // Task Comments Routes
+        Route::post('/{task}/comments', [App\Http\Controllers\Work\TaskController::class, 'addComment'])->name('comments.store');
     });
 
     // Warehouse Routes
@@ -440,23 +447,23 @@ Route::middleware('auth')->group(function () {
     // Project Management Routes
     Route::prefix('project-management')->name('project-management.')->group(function () {
         // Main CRUD & listing
-        Route::get('projects', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'index'])->name('projects.index');
-        Route::get('projects/create', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'create'])->name('projects.create');
+        Route::get('projects', [App\Http\Controllers\Work\ProjectController::class, 'index'])->name('projects.index');
+        Route::get('projects/create', [App\Http\Controllers\Work\ProjectController::class, 'create'])->name('projects.create');
 
         // Data & operations (define BEFORE dynamic {project} routes to avoid conflicts)
-        Route::get('projects/datatable', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'datatable'])->name('projects.datatable');
-        Route::post('projects', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'store'])->name('projects.store');
-        Route::put('projects/{project}', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'update'])->name('projects.update');
-        Route::delete('projects/{project}', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'destroy'])->name('projects.destroy');
+        Route::get('projects/datatable', [App\Http\Controllers\Work\ProjectController::class, 'datatable'])->name('projects.datatable');
+        Route::post('projects', [App\Http\Controllers\Work\ProjectController::class, 'store'])->name('projects.store');
+        Route::put('projects/{project}', [App\Http\Controllers\Work\ProjectController::class, 'update'])->name('projects.update');
+        Route::delete('projects/{project}', [App\Http\Controllers\Work\ProjectController::class, 'destroy'])->name('projects.destroy');
 
         // Status, stats & export
-        Route::put('projects/{project}/status', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'updateStatus'])->name('projects.update-status');
-        Route::get('projects/stats', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'stats'])->name('projects.stats');
-        Route::get('projects/export', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'export'])->name('projects.export');
+        Route::put('projects/{project}/status', [App\Http\Controllers\Work\ProjectController::class, 'updateStatus'])->name('projects.update-status');
+        Route::get('projects/stats', [App\Http\Controllers\Work\ProjectController::class, 'stats'])->name('projects.stats');
+        Route::get('projects/export', [App\Http\Controllers\Work\ProjectController::class, 'export'])->name('projects.export');
 
         // Detail & edit views (placed last so they don't swallow other routes)
-        Route::get('projects/{project}', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'show'])->name('projects.show');
-        Route::get('projects/{project}/edit', [App\Http\Controllers\ProjectManagement\ProjectController::class, 'edit'])->name('projects.edit');
+        Route::get('projects/{project}', [App\Http\Controllers\Work\ProjectController::class, 'show'])->name('projects.show');
+        Route::get('projects/{project}/edit', [App\Http\Controllers\Work\ProjectController::class, 'edit'])->name('projects.edit');
     });
 
     // Dashboard and other pages

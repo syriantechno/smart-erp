@@ -175,7 +175,7 @@
                             var deptOption = document.createElement('option');
                             deptOption.value = '{{ $department->id }}';
                             deptOption.textContent = '{{ $department->name }}';
-                            if ({{ $department->company_id }} == this.value || this.value === '') {
+                            if ('{{ $department->company_id }}' == this.value || this.value === '') {
                                 departmentSelect.appendChild(deptOption);
                             }
                         @endforeach
@@ -196,7 +196,7 @@
                             var empOption = document.createElement('option');
                             empOption.value = '{{ $employee->id }}';
                             empOption.textContent = '{{ $employee->full_name }}';
-                            if ({{ $employee->department_id ?? 'null' }} == this.value || this.value === '') {
+                            if ('{{ $employee->department_id ?? "" }}' == this.value || this.value === '') {
                                 employeeSelect.appendChild(empOption);
                             }
                         @endforeach

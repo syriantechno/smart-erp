@@ -10,6 +10,7 @@ use App\Models\Work\Project;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Task extends BaseModel
 {
@@ -104,6 +105,30 @@ class Task extends BaseModel
     public function assignedTo(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_to');
+    }
+
+    /**
+     * Get the steps for this task.
+     */
+    public function steps(): HasMany
+    {
+        return $this->hasMany(TaskStep::class)->ordered();
+    }
+
+    /**
+     * Get the comments for this task.
+     */
+    public function comments(): HasMany
+    {
+        return $this->hasMany(TaskComment::class)->with('user')->latest();
+    }
+
+    /**
+     * Get only task-level comments (not step comments).
+     */
+    public function taskComments(): HasMany
+    {
+        return $this->hasMany(TaskComment::class)->taskComments()->with('user')->latest();
     }
 
     /**

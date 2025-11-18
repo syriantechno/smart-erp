@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Work;
 
 use App\Http\Controllers\Controller;
 use App\Models\Work\Task;
+use App\Models\Work\TaskStep;
+use App\Models\Work\TaskComment;
 use App\Models\HR\Employee;
 use App\Models\HR\Department;
 use App\Models\Setting\Company;
@@ -147,6 +149,10 @@ class TaskController extends Controller
             'estimated_hours' => 'nullable|numeric|min:0|max:999.99',
             'tags' => 'nullable|string|max:1000',
             'is_active' => 'nullable|boolean',
+            'steps' => 'nullable|array',
+            'steps.*.title' => 'required|string|max:255',
+            'steps.*.description' => 'nullable|string|max:1000',
+            'steps.*.step_order' => 'required|integer|min:1',
         ]);
 
         try {
@@ -175,6 +181,10 @@ class TaskController extends Controller
                 }
             }
 
+            // Extract steps data before creating task
+            $stepsData = $validated['steps'] ?? [];
+            unset($validated['steps']);
+
             Log::info('TASK_STORE_ATTEMPT', $validated);
 
             $task = Task::create($validated);
@@ -184,6 +194,22 @@ class TaskController extends Controller
                 'task_code' => $task->code,
                 'task_title' => $task->title
             ]);
+
+            // Create task steps if provided
+            if (!empty($stepsData)) {
+                foreach ($stepsData as $stepData) {
+                    $task->steps()->create([
+                        'title' => $stepData['title'],
+                        'description' => $stepData['description'] ?? null,
+                        'step_order' => $stepData['step_order'],
+                        'is_completed' => false,
+                    ]);
+                }
+                Log::info('TASK_STEPS_CREATED', [
+                    'task_id' => $task->id,
+                    'steps_count' => count($stepsData)
+                ]);
+            }
 
             DB::commit();
 
@@ -210,7 +236,119 @@ class TaskController extends Controller
 
     public function show(Task $task)
     {
+        $task->load(['steps', 'employee', 'project', 'assignedBy', 'taskComments']);
         return view('tasks.show', compact('task'));
+    }
+
+    public function addComment(Request $request, Task $task)
+    {
+        $request->validate([
+            'comment' => 'required|string|max:1000',
+            'is_internal' => 'boolean',
+            'step_id' => 'nullable|exists:task_steps,id'
+        ]);
+
+        try {
+            $comment = TaskComment::create([
+                'task_id' => $task->id,
+                'user_id' => auth()->id(),
+                'comment' => $request->comment,
+                'type' => $request->step_id ? 'step' : 'task',
+                'step_id' => $request->step_id,
+                'is_internal' => $request->boolean('is_internal', false),
+            ]);
+
+            $comment->load('user');
+
+            Log::info('TASK_COMMENT_ADDED', [
+                'task_id' => $task->id,
+                'comment_id' => $comment->id,
+                'user_id' => auth()->id(),
+                'type' => $comment->type
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Comment added successfully',
+                'comment' => $comment
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('TASK_COMMENT_ERROR', [
+                'task_id' => $task->id,
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to add comment'
+            ], 500);
+        }
+    }
+
+    public function completeStep(TaskStep $step)
+    {
+        try {
+            $step->markAsCompleted();
+            
+            // Check if all steps are completed
+            $task = $step->task;
+            $allStepsCompleted = $task->steps()->where('is_completed', false)->count() === 0;
+            
+            $message = 'Step marked as completed successfully';
+            
+            if ($allStepsCompleted && $task->status !== 'completed') {
+                // Auto-complete the task when all steps are done
+                $task->update(['status' => 'completed']);
+                $message .= ' All steps completed! Task automatically marked as completed.';
+                
+                Log::info('TASK_AUTO_COMPLETED', [
+                    'task_id' => $task->id,
+                    'task_code' => $task->code,
+                    'completed_by_step' => $step->id
+                ]);
+            }
+            
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'all_completed' => $allStepsCompleted
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('STEP_COMPLETE_ERROR', [
+                'step_id' => $step->id,
+                'error' => $e->getMessage()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to complete step'
+            ], 500);
+        }
+    }
+
+    public function uncompleteStep(TaskStep $step)
+    {
+        try {
+            $step->markAsPending();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Step marked as pending successfully'
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('STEP_UNCOMPLETE_ERROR', [
+                'step_id' => $step->id,
+                'error' => $e->getMessage()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to uncomplete step'
+            ], 500);
+        }
     }
 
     public function edit(Task $task)

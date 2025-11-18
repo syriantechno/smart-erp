@@ -86,6 +86,198 @@
     outline-offset: 3px;
 }
 
+/* Chart and Component Colors - Extended btn-tonal system */
+:root {
+    --chart-success: #1b7a4a;
+    --chart-warning: #c98028;
+    --chart-info: #2563eb;
+    --chart-danger: #b21a50;
+    --chart-neutral: #6b7280;
+}
+
+/* Stats Cards - btn-tonal style components */
+.stats-card-success {
+    background-color: color-mix(in oklch, var(--chart-success) 18%, #ffffff);
+    border: 1px solid color-mix(in oklch, var(--chart-success), transparent 78%);
+    color: color-mix(in oklch, var(--chart-success), black 22%);
+    border-radius: 0.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 8px color-mix(in oklch, var(--chart-success), transparent 85%);
+}
+
+.stats-card-warning {
+    background-color: color-mix(in oklch, var(--chart-warning) 18%, #ffffff);
+    border: 1px solid color-mix(in oklch, var(--chart-warning), transparent 78%);
+    color: color-mix(in oklch, var(--chart-warning), black 22%);
+    border-radius: 0.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 8px color-mix(in oklch, var(--chart-warning), transparent 85%);
+}
+
+.stats-card-info {
+    background-color: color-mix(in oklch, var(--chart-info) 18%, #ffffff);
+    border: 1px solid color-mix(in oklch, var(--chart-info), transparent 78%);
+    color: color-mix(in oklch, var(--chart-info), black 22%);
+    border-radius: 0.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 8px color-mix(in oklch, var(--chart-info), transparent 85%);
+}
+
+.stats-card-danger {
+    background-color: color-mix(in oklch, var(--chart-danger) 18%, #ffffff);
+    border: 1px solid color-mix(in oklch, var(--chart-danger), transparent 78%);
+    color: color-mix(in oklch, var(--chart-danger), black 22%);
+    border-radius: 0.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 8px color-mix(in oklch, var(--chart-danger), transparent 85%);
+}
+
+.stats-card-neutral {
+    background-color: color-mix(in oklch, var(--chart-neutral) 18%, #ffffff);
+    border: 1px solid color-mix(in oklch, var(--chart-neutral), transparent 78%);
+    color: color-mix(in oklch, var(--chart-neutral), black 22%);
+    border-radius: 0.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 8px color-mix(in oklch, var(--chart-neutral), transparent 85%);
+}
+
+/* Hover effects for stats cards */
+.stats-card-success:hover,
+.stats-card-warning:hover,
+.stats-card-info:hover,
+.stats-card-danger:hover,
+.stats-card-neutral:hover {
+    transform: translateY(-1px) scale(1.02);
+}
+
+.stats-card-success:hover {
+    box-shadow: 0 8px 16px color-mix(in oklch, var(--chart-success), transparent 80%);
+}
+
+.stats-card-warning:hover {
+    box-shadow: 0 8px 16px color-mix(in oklch, var(--chart-warning), transparent 80%);
+}
+
+.stats-card-info:hover {
+    box-shadow: 0 8px 16px color-mix(in oklch, var(--chart-info), transparent 80%);
+}
+
+.stats-card-danger:hover {
+    box-shadow: 0 8px 16px color-mix(in oklch, var(--chart-danger), transparent 80%);
+}
+
+.stats-card-neutral:hover {
+    box-shadow: 0 8px 16px color-mix(in oklch, var(--chart-neutral), transparent 80%);
+}
+
+/* Chart containers with btn-tonal styling */
+.chart-container {
+    background-color: color-mix(in oklch, var(--chart-info) 5%, #ffffff);
+    border: 1px solid color-mix(in oklch, var(--chart-info), transparent 90%);
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 12px color-mix(in oklch, var(--chart-info), transparent 90%);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.chart-container:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px color-mix(in oklch, var(--chart-info), transparent 85%);
+}
+
+/* Timeline step numbers - btn-tonal style */
+.timeline-step-completed {
+    background-color: color-mix(in oklch, var(--chart-success) 18%, #ffffff);
+    color: color-mix(in oklch, var(--chart-success), black 22%);
+    border: 1px solid color-mix(in oklch, var(--chart-success), transparent 78%);
+    box-shadow: 0 4px 8px color-mix(in oklch, var(--chart-success), transparent 85%);
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.timeline-step-pending {
+    background-color: color-mix(in oklch, var(--chart-neutral) 18%, #ffffff);
+    color: color-mix(in oklch, var(--chart-neutral), black 22%);
+    border: 1px solid color-mix(in oklch, var(--chart-neutral), transparent 78%);
+    box-shadow: 0 4px 8px color-mix(in oklch, var(--chart-neutral), transparent 85%);
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+/* Timeline action buttons - btn-tonal style */
+.timeline-btn-complete {
+    background-color: color-mix(in oklch, var(--chart-success) 18%, #ffffff);
+    color: color-mix(in oklch, var(--chart-success), black 22%);
+    border: 1px solid color-mix(in oklch, var(--chart-success), transparent 78%);
+    box-shadow: 0 2px 6px color-mix(in oklch, var(--chart-success), transparent 85%);
+    border-radius: 0.375rem;
+    transition: all 0.2s ease;
+}
+
+.timeline-btn-complete:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px color-mix(in oklch, var(--chart-success), transparent 80%);
+}
+
+.timeline-btn-undo {
+    background-color: color-mix(in oklch, var(--chart-neutral) 18%, #ffffff);
+    color: color-mix(in oklch, var(--chart-neutral), black 22%);
+    border: 1px solid color-mix(in oklch, var(--chart-neutral), transparent 78%);
+    box-shadow: 0 2px 6px color-mix(in oklch, var(--chart-neutral), transparent 85%);
+    border-radius: 0.375rem;
+    transition: all 0.2s ease;
+}
+
+.timeline-btn-undo:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px color-mix(in oklch, var(--chart-neutral), transparent 80%);
+}
+
+/* Status badges - btn-tonal style */
+.status-badge-success {
+    background-color: color-mix(in oklch, var(--chart-success) 15%, #ffffff);
+    color: color-mix(in oklch, var(--chart-success), black 30%);
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-badge-warning {
+    background-color: color-mix(in oklch, var(--chart-warning) 15%, #ffffff);
+    color: color-mix(in oklch, var(--chart-warning), black 30%);
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-badge-info {
+    background-color: color-mix(in oklch, var(--chart-info) 15%, #ffffff);
+    color: color-mix(in oklch, var(--chart-info), black 30%);
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-badge-danger {
+    background-color: color-mix(in oklch, var(--chart-danger) 15%, #ffffff);
+    color: color-mix(in oklch, var(--chart-danger), black 30%);
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-badge-neutral {
+    background-color: color-mix(in oklch, var(--chart-neutral) 15%, #ffffff);
+    color: color-mix(in oklch, var(--chart-neutral), black 30%);
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
 /* Prevent layout shift when modals/slideover toggle body scroll */
 html {
     overflow-y: scroll;

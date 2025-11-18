@@ -3,7 +3,7 @@
 
 </div>
 
-<?php if (! $__env->hasRenderedOnce('d77a4489-d7d6-4678-b233-58fa4274d198')): $__env->markAsRenderedOnce('d77a4489-d7d6-4678-b233-58fa4274d198');
+<?php if (! $__env->hasRenderedOnce('a2aa62bc-7392-4687-9894-44c4dd0bbbcc')): $__env->markAsRenderedOnce('a2aa62bc-7392-4687-9894-44c4dd0bbbcc');
 $__env->startPush('scripts'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/js/components/base/preview-component.js'); ?>
 <?php $__env->stopPush(); endif; ?>
