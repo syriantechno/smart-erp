@@ -58,6 +58,31 @@ window.erpCrud = {
     },
 
     /**
+     * Render a unified status badge similar to Midone demo tables.
+     * @param {boolean|number|string} value - Truthy = active
+     * @param {Object} [options]
+     * @param {Object} [options.labels]
+     * @param {string} [options.labels.active]
+     * @param {string} [options.labels.inactive]
+     * @returns {string}
+     */
+    renderStatusBadge(value, options = {}) {
+        const isActive = Boolean(value);
+        const labels = Object.assign({ active: 'Active', inactive: 'Inactive' }, options.labels || {});
+        const colorClasses = isActive ? 'text-lime-600' : 'text-rose-500';
+        const iconSvg = isActive
+            ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>'
+            : '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/><path d="M19 5v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>';
+
+        return `
+            <span class="inline-flex items-center text-base font-semibold ${colorClasses}">
+                ${iconSvg}
+                ${isActive ? labels.active : labels.inactive}
+            </span>
+        `;
+    },
+
+    /**
      * Attach unified AJAX submit handler for create form.
      * @param {Object} options
      * @param {string} options.formSelector

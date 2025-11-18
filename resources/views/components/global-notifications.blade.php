@@ -84,6 +84,81 @@
         .toast-icon-delete { color: #ef4444; }
         .toast-icon-update { color: #0ea5e9; }
 
+        /* SweetAlert modern delete dialog */
+        .swal2-popup.swal-modern-popup {
+            border-radius: 1.5rem !important;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            box-shadow: 0 30px 60px rgba(15, 23, 42, 0.18);
+            padding: 1.75rem 1.75rem 1.85rem !important;
+            background: #ffffff;
+        }
+
+        .swal-modern-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            text-align: center;
+        }
+
+        .swal-modern-icon {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, 0.08);
+            color: #ef4444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.15), 0 18px 30px rgba(239, 68, 68, 0.25);
+        }
+
+        .swal-modern-icon svg {
+            width: 34px;
+            height: 34px;
+        }
+
+        .swal-modern-text {
+            color: #475569;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .swal-modern-text span {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        .swal-modern-actions {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-top: 1.25rem;
+        }
+
+        .swal2-styled.swal-modern-confirm {
+            background: rgb(var(--primary-rgb, 37 99 235));
+            color: #ffffff;
+            border-radius: 999px;
+            padding: 0.65rem 1.75rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: none;
+            box-shadow: 0 15px 30px rgba(var(--primary-rgb, 37 99 235), 0.25);
+        }
+
+        .swal2-styled.swal-modern-cancel {
+            background: #f8fafc;
+            color: #1f2933;
+            border-radius: 999px;
+            padding: 0.65rem 1.75rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        }
+
         /* Confirm Modal Icons */
         .confirm-icon-delete { color: #ef4444; font-size: 2rem; }
         .confirm-icon-warning { color: #f59e0b; font-size: 2rem; }
@@ -371,45 +446,37 @@
             return Swal.fire({
                 title: 'Delete this item?',
                 html: `
-                    <div class="flex flex-col items-center gap-3">
-                        <div class="flex h-16 w-16 items-center justify-center rounded-full bg-red-50 text-red-500 shadow-sm">
-                            <i class="fa fa-trash text-3xl"></i>
+                    <div class="swal-modern-card">
+                        <div class="swal-modern-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+                                <path d="M10 11v6"></path>
+                                <path d="M14 11v6"></path>
+                                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
+                            </svg>
                         </div>
-                        <div class="text-slate-700 dark:text-slate-200 text-sm leading-relaxed">
+                        <div class="swal-modern-text">
                             Are you sure you want to delete<br>
-                            <span class="font-semibold text-red-600 dark:text-red-400">"${itemName}"</span>?<br>
+                            <span>"${itemName}"</span>?<br>
                             This action cannot be undone.
                         </div>
                     </div>
                 `,
-                icon: 'warning',
-                iconColor: '#ef4444',
+                icon: undefined,
                 showCancelButton: true,
                 reverseButtons: true,
                 focusCancel: true,
                 confirmButtonText: 'Yes, delete',
                 cancelButtonText: 'Cancel',
                 buttonsStyling: false,
-                background: '#ffffff',
-                color: '#0f172a',
-                padding: '1.5rem 1.75rem 1.75rem',
                 customClass: {
-                    popup: 'rounded-2xl shadow-2xl border border-slate-200/60 dark:border-slate-700/60',
-                    title: 'text-base font-semibold text-slate-900 dark:text-slate-100 mb-1',
-                    htmlContainer: 'mt-1',
-                    actions: 'mt-6 flex justify-center gap-3',
-                    confirmButton: 'px-5 py-2.5 rounded-full font-semibold text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 text-sm',
-                    cancelButton: 'px-5 py-2.5 rounded-full font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-1 text-sm',
+                    popup: 'swal-modern-popup',
+                    actions: 'swal-modern-actions',
+                    confirmButton: 'swal-modern-confirm',
+                    cancelButton: 'swal-modern-cancel',
                 },
                 backdrop: 'rgba(15,23,42,0.55)',
-                showClass: {
-                    popup: 'animate__animated animate__fadeInDown animate__faster',
-                    backdrop: 'animate__animated animate__fadeIn animate__faster',
-                },
-                hideClass: {
-                    popup: 'animate__animated animate__fadeOutUp animate__faster',
-                    backdrop: 'animate__animated animate__fadeOut animate__faster',
-                },
             }).then((result) => {
                 if (result.isConfirmed) {
                     onConfirm();

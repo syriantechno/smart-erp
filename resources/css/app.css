@@ -28,6 +28,13 @@
 @import "./components/base/_zoom-in.css";
 @import "./components/base/_intro.css";
 
+/* Bridge custom theme colors with Tailwind CSS variables */
+:root {
+    --color-primary: var(--primary-color, #2563eb);
+    --color-secondary: var(--secondary-color, #0f172a);
+    --color-primary-rgb: var(--primary-rgb, 37 99 235);
+}
+
 /* Prevent layout shift when modals/slideover toggle body scroll */
 html {
     overflow-y: scroll;

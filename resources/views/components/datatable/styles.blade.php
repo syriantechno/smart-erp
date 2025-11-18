@@ -14,6 +14,11 @@
             border-bottom: 1px solid #e2e8f0;
         }
 
+        table.dataTable {
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+        }
+
         .datatable-default thead th {
             background-color: #f8fafc;
             font-weight: 600;

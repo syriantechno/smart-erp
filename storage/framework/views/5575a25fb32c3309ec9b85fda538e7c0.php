@@ -1,4 +1,4 @@
-<?php if (! $__env->hasRenderedOnce('a965f54c-a595-4a26-99fd-485abaf97247')): $__env->markAsRenderedOnce('a965f54c-a595-4a26-99fd-485abaf97247');
+<?php if (! $__env->hasRenderedOnce('0271e634-7468-40dc-8cac-905a75e33322')): $__env->markAsRenderedOnce('0271e634-7468-40dc-8cac-905a75e33322');
 $__env->startPush('styles'); ?>
     <!-- DataTables CSS is now loaded globally in base.blade.php -->
     <style>
@@ -13,6 +13,11 @@ $__env->startPush('styles'); ?>
             padding: 0.75rem 1.25rem;
             vertical-align: middle;
             border-bottom: 1px solid #e2e8f0;
+        }
+
+        table.dataTable {
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
         }
 
         .datatable-default thead th {

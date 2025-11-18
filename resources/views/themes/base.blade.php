@@ -39,6 +39,14 @@
         <link rel="stylesheet" href="{{ asset('css/custom-theme.css?v=' . filemtime(public_path('css/custom-theme.css'))) }}">
     @endif
 
+    <style>
+        :root {
+            --color-primary: var(--primary-color, #2563eb);
+            --color-secondary: var(--secondary-color, #0f172a);
+            --color-primary-rgb: var(--primary-rgb, 37 99 235);
+        }
+    </style>
+
     <!-- Dark Mode CSS -->
     @vite('resources/css/dark-mode.css')
 
