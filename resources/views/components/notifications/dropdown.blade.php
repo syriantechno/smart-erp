@@ -201,12 +201,12 @@ function renderNotifications() {
                     ${!notification.is_read ? `
                         <button onclick="event.stopPropagation(); markAsRead(${notification.id})"
                                 class="text-blue-600 hover:text-blue-800 p-1" title="Mark as read">
-                            <i data-lucide="Check" class="h-3 w-3"></i>
+                            <i data-lucide="check" class="h-3 w-3"></i>
                         </button>
                     ` : ''}
                     <button onclick="event.stopPropagation(); deleteNotification(${notification.id})"
                             class="text-red-600 hover:text-red-800 p-1" title="Delete">
-                        <i data-lucide="X" class="h-3 w-3"></i>
+                        <i data-lucide="x" class="h-3 w-3"></i>
                     </button>
                 </div>
             </div>
@@ -358,14 +358,27 @@ function getTypeColor(type) {
 }
 
 function getIconName(icon, type) {
-    if (icon) return icon;
+    if (icon) {
+        // Fix common icon name issues
+        const iconMap = {
+            'UserPlus': 'user-plus',
+            'UserMinus': 'user-minus',
+            'UserCheck': 'user-check',
+            'UserX': 'user-x',
+            'InformationCircle': 'info',
+            'CheckCircle': 'check-circle',
+            'ExclamationCircle': 'alert-circle',
+            'ExclamationTriangle': 'alert-triangle'
+        };
+        return iconMap[icon] || icon.toLowerCase();
+    }
 
     // Return default icon based on notification type
     switch (type) {
-        case 'success': return 'CheckCircle';
-        case 'error': return 'ExclamationCircle';
-        case 'warning': return 'ExclamationTriangle';
-        default: return 'InformationCircle';
+        case 'success': return 'check-circle';
+        case 'error': return 'alert-circle';
+        case 'warning': return 'alert-triangle';
+        default: return 'info';
     }
 }
 

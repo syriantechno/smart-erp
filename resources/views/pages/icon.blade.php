@@ -1819,28 +1819,28 @@
         <div class="col-span-6 sm:col-span-3 lg:col-span-2 xl:col-span-1">
             <x-base.lucide
                 class="mx-auto block"
-                icon="UserCheck"
+                icon="user-check"
             />
             <div class="mt-2 text-center text-xs">UserCheckIcon</div>
         </div>
         <div class="col-span-6 sm:col-span-3 lg:col-span-2 xl:col-span-1">
             <x-base.lucide
                 class="mx-auto block"
-                icon="UserMinus"
+                icon="user-minus"
             />
             <div class="mt-2 text-center text-xs">UserMinusIcon</div>
         </div>
         <div class="col-span-6 sm:col-span-3 lg:col-span-2 xl:col-span-1">
             <x-base.lucide
                 class="mx-auto block"
-                icon="UserPlus"
+                icon="user-plus"
             />
             <div class="mt-2 text-center text-xs">UserPlusIcon</div>
         </div>
         <div class="col-span-6 sm:col-span-3 lg:col-span-2 xl:col-span-1">
             <x-base.lucide
                 class="mx-auto block"
-                icon="UserX"
+                icon="user-x"
             />
             <div class="mt-2 text-center text-xs">UserXIcon</div>
         </div>

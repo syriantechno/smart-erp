@@ -86,7 +86,7 @@
                 data-tw-toggle="modal"
                 data-tw-target="#create-employee-modal"
             >
-                <x-base.lucide icon="UserPlus" class="w-4 h-4 mr-2" />
+                <x-base.lucide icon="user-plus" class="w-4 h-4 mr-2" />
                 Add Employee
             </button>
         </div>

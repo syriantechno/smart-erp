@@ -5,6 +5,9 @@ namespace App\Models\Work;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use App\Models\Company;
+use App\Models\HR\Department;
+use App\Models\HR\Employee;
 
 class Project extends Model
 {

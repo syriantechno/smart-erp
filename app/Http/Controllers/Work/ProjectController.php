@@ -142,65 +142,35 @@ class ProjectController extends Controller
     public function datatable(Request $request): JsonResponse
     {
         try {
-            Log::info('Project datatable called with params:', $request->all());
-
-            $projects = Project::with(['company', 'department', 'manager'])
-                ->select(['id', 'code', 'name', 'company_id', 'department_id', 'manager_id', 'start_date', 'end_date', 'status', 'priority', 'budget', 'progress_percentage', 'is_active', 'created_at']);
-
-            // Log the count using proper context array to avoid TypeError
-            Log::info('Projects query count:', ['count' => $projects->count()]);
-
-            return \Yajra\DataTables\Facades\DataTables::of($projects)
-                ->addIndexColumn()
-                ->orderColumn('DT_RowIndex', 'id $1')
-                ->addColumn('company_name', function ($project) {
-                    return $project->company?->name ?? 'N/A';
-                })
-                ->addColumn('department_name', function ($project) {
-                    return $project->department?->name ?? 'N/A';
-                })
-                ->addColumn('manager_name', function ($project) {
-                    return $project->manager?->full_name ?? 'N/A';
-                })
-                ->addColumn('status_badge', function ($project) {
-                    $color = $project->status_color;
-                    $label = $project->status_label;
-                    return '<span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold bg-' . $color . '-100 text-' . $color . '-700">' . $label . '</span>';
-                })
-                ->addColumn('priority_badge', function ($project) {
-                    $color = $project->priority_color;
-                    $label = $project->priority_label;
-                    return '<span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold bg-' . $color . '-100 text-' . $color . '-700">' . $label . '</span>';
-                })
-                ->addColumn('budget_formatted', function ($project) {
-                    return $project->budget_formatted;
-                })
-                ->addColumn('duration_days', function ($project) {
-                    return $project->duration . ' days';
-                })
-                ->addColumn('progress_bar', function ($project) {
-                    $percentage = $project->progress_percentage;
-                    $color = $percentage >= 75 ? 'bg-green-500' : ($percentage >= 50 ? 'bg-yellow-500' : 'bg-red-500');
-                    return '<div class="w-full bg-gray-200 rounded-full h-2"><div class="' . $color . ' h-2 rounded-full" style="width: ' . $percentage . '%"></div></div><span class="text-xs text-gray-600">' . $percentage . '%</span>';
-                })
-                ->addColumn('actions', function ($project) {
-                    try {
-                        return view('work.projects.partials.actions', compact('project'))->render();
-                    } catch (\Exception $e) {
-                        Log::error('Error rendering actions view:', $e->getMessage());
-                        return 'Error: ' . $e->getMessage();
-                    }
-                })
-                ->rawColumns(['status_badge', 'priority_badge', 'progress_bar', 'actions'])
-                ->toJson();
-        } catch (\Exception $e) {
-            Log::error('Project datatable error:', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
+            $projects = Project::query()->get();
+            
             return response()->json([
-                'error' => 'Database error: ' . $e->getMessage()
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $projects->count(),
+                'recordsFiltered' => $projects->count(),
+                'data' => $projects->map(function ($project, $index) {
+                    return [
+                        'DT_RowIndex' => $index + 1,
+                        'code' => '<a href="' . route('project-management.projects.show', $project->id) . '" class="font-medium text-primary hover:underline">' . e($project->code) . '</a>',
+                        'name' => '<a href="' . route('project-management.projects.show', $project->id) . '" class="font-medium hover:text-primary">' . e($project->name) . '</a>',
+                        'company_department' => 'N/A<span class="mt-0.5 block text-xs text-slate-500">No Department</span>',
+                        'manager' => '<span class="text-slate-400">Unassigned</span>',
+                        'status' => '<span class="stats-card-info px-3 py-1 rounded-full text-xs font-medium">' . ucfirst(str_replace('_', ' ', $project->status ?? 'planning')) . '</span>',
+                        'priority' => '<span class="stats-card-neutral px-2 py-1 rounded-full text-xs font-medium">' . ucfirst($project->priority ?? 'low') . '</span>',
+                        'progress_percentage' => '<div class="flex flex-col items-center"><div class="w-full bg-slate-200 rounded-full h-2 mb-1"><div class="h-2 rounded-full transition-all duration-300" style="width: ' . ($project->progress_percentage ?? 0) . '%; background: #1b7a4a;"></div></div><span class="text-xs font-medium">' . ($project->progress_percentage ?? 0) . '%</span></div>',
+                        'actions' => '<div class="flex items-center justify-center gap-2">' .
+                            '<a href="' . route('project-management.projects.show', $project->id) . '" class="btn-tonal btn-tonal--info btn-tonal--icon" title="View">' .
+                            '<i data-lucide="eye" class="w-4 h-4"></i></a>' .
+                            '<a href="' . route('project-management.projects.edit', $project->id) . '" class="btn-tonal btn-tonal--warning btn-tonal--icon" title="Edit">' .
+                            '<i data-lucide="edit" class="w-4 h-4"></i></a>' .
+                            '<button onclick="deleteProject(' . $project->id . ', \'' . addslashes($project->name) . '\')" class="btn-tonal btn-tonal--danger btn-tonal--icon" title="Delete">' .
+                            '<i data-lucide="trash-2" class="w-4 h-4"></i></button></div>'
+                    ];
+                })
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Error: ' . $e->getMessage()
             ], 500);
         }
     }

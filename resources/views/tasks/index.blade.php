@@ -1182,21 +1182,7 @@
 
     // Fix missing Lucide icons
     document.addEventListener('DOMContentLoaded', function() {
-        // Replace missing icons with available ones
-        const iconReplacements = {
-            'UserPlus': 'UserCheck',
-            'InformationCircle': 'Info', 
-            'UserMinus': 'UserX'
-        };
-
-        // Find and replace missing icons
-        document.querySelectorAll('[data-lucide]').forEach(function(element) {
-            const iconName = element.getAttribute('data-lucide');
-            if (iconReplacements[iconName]) {
-                element.setAttribute('data-lucide', iconReplacements[iconName]);
-                console.log('🔧 Replaced missing icon:', iconName, '→', iconReplacements[iconName]);
-            }
-        });
+        // Icons are now fixed, no replacements needed
 
         // Re-initialize Lucide icons after replacement
         if (typeof window.Lucide !== 'undefined') {
