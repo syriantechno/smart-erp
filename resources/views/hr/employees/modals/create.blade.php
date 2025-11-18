@@ -5,7 +5,7 @@
     $countries = include app_path('Data/countries.php');
     $countriesJson = json_encode($countries);
 @endphp
-<x-modal.form id="create-employee-modal" title="Add New Employee" size="xl">
+<x-modal.form id="create-employee-modal" title="Add New Employee" size="3xl">
     <form id="create-employee-form" action="{{ route('hr.employees.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
@@ -16,37 +16,43 @@
                 Personal Information
             </h4>
             <div class="grid grid-cols-12 gap-4 gap-y-4">
-                <div class="col-span-12 md:col-span-3">
+                <div class="col-span-12 md:col-span-4 lg:col-span-3">
                     <x-base.form-label for="code">Employee Code</x-base.form-label>
-                    <x-base.form-input id="code" name="code" type="text" class="w-full" value="{{ $previewCode }}" readonly />
+                    <x-base.form-input id="code" name="code" type="text" class="w-full" formInputSize="sm" value="{{ $previewCode }}" readonly />
                 </div>
 
-                <div class="col-span-12 md:col-span-3">
+                <div class="col-span-12 md:col-span-4 lg:col-span-3">
                     <x-base.form-label for="first_name">First Name <span class="text-danger">*</span></x-base.form-label>
-                    <x-base.form-input id="first_name" name="first_name" type="text" placeholder="Enter first name" class="w-full" required />
+                    <x-base.form-input id="first_name" name="first_name" type="text" placeholder="Enter first name" class="w-full" formInputSize="sm" required />
                 </div>
 
-                <div class="col-span-12 md:col-span-3">
+                <div class="col-span-12 md:col-span-4 lg:col-span-3">
                     <x-base.form-label for="middle_name">Middle Name</x-base.form-label>
-                    <x-base.form-input id="middle_name" name="middle_name" type="text" placeholder="Enter middle name" class="w-full" />
+                    <x-base.form-input id="middle_name" name="middle_name" type="text" placeholder="Enter middle name" class="w-full" formInputSize="sm" />
                 </div>
 
-                <div class="col-span-12 md:col-span-3">
+                <div class="col-span-12 md:col-span-4 lg:col-span-3">
                     <x-base.form-label for="last_name">Last Name <span class="text-danger">*</span></x-base.form-label>
-                    <x-base.form-input id="last_name" name="last_name" type="text" placeholder="Enter last name" class="w-full" required />
+                    <x-base.form-input id="last_name" name="last_name" type="text" placeholder="Enter last name" class="w-full" formInputSize="sm" required />
                 </div>
 
-                <div class="col-span-12 md:col-span-3">
+                <div class="col-span-12 md:col-span-4 lg:col-span-3">
+                    <x-base.form-label for="translated_name">Translated / Localized Name</x-base.form-label>
+                    <x-base.form-input id="translated_name" name="translated_name" type="text" placeholder="Enter translated name" class="w-full" formInputSize="sm" />
+                    <x-base.form-help>Use any language needed for official documents.</x-base.form-help>
+                </div>
+
+                <div class="col-span-12 md:col-span-4 lg:col-span-3">
                     <x-base.form-label for="email">Email Address <span class="text-danger">*</span></x-base.form-label>
-                    <x-base.form-input id="email" name="email" type="email" placeholder="employee@example.com" class="w-full" required />
+                    <x-base.form-input id="email" name="email" type="email" placeholder="employee@example.com" class="w-full" formInputSize="sm" required />
                 </div>
 
-                <div class="col-span-12 md:col-span-3">
+                <div class="col-span-12 md:col-span-4 lg:col-span-3">
                     <x-base.form-label for="phone">Phone Number</x-base.form-label>
-                    <x-base.form-input id="phone" name="phone" type="tel" placeholder="+966XXXXXXXXX" class="w-full" />
+                    <x-base.form-input id="phone" name="phone" type="tel" placeholder="+966XXXXXXXXX" class="w-full" formInputSize="sm" />
                 </div>
 
-                <div class="col-span-12 md:col-span-3">
+                <div class="col-span-12 md:col-span-4 lg:col-span-3">
                     <x-base.form-label for="birth_date">Date of Birth</x-base.form-label>
                     <div class="relative w-full">
                         <div
@@ -63,7 +69,7 @@
                     </div>
                 </div>
 
-                <div class="col-span-12 md:col-span-3">
+                <div class="col-span-12 md:col-span-4 lg:col-span-3">
                     <x-base.form-label for="gender">Gender</x-base.form-label>
                     <x-base.form-select id="gender" name="gender" class="w-full">
                         <option value="">Select Gender</option>
@@ -82,7 +88,7 @@
                 Employment Information
             </h4>
             <div class="grid grid-cols-12 gap-4 gap-y-4">
-                <div class="col-span-12 md:col-span-4">
+                <div class="col-span-12 md:col-span-4 lg:col-span-3">
                     <x-base.form-label for="company_id">Company <span class="text-danger">*</span></x-base.form-label>
                     <x-base.form-select id="company_id" name="company_id" class="w-full" required>
                         <option value="">Select Company</option>
@@ -92,21 +98,26 @@
                     </x-base.form-select>
                 </div>
 
-                <div class="col-span-12 md:col-span-4">
+                <div class="col-span-12 md:col-span-4 lg:col-span-3">
                     <x-base.form-label for="department_id">Department <span class="text-danger">*</span></x-base.form-label>
                     <x-base.form-select id="department_id" name="department_id" class="w-full" required disabled>
                         <option value="">Select Department</option>
                     </x-base.form-select>
                 </div>
 
-                <div class="col-span-12 md:col-span-4">
+                <div class="col-span-12 md:col-span-4 lg:col-span-3">
                     <x-base.form-label for="position">Position <span class="text-danger">*</span></x-base.form-label>
                     <x-base.form-select id="position" name="position" class="w-full" required disabled>
                         <option value="">Select Position</option>
                     </x-base.form-select>
                 </div>
 
-                <div class="col-span-12 md:col-span-4">
+                <div class="col-span-12 md:col-span-4 lg:col-span-3">
+                    <x-base.form-label for="iqama_position">Iqama / Residency Position</x-base.form-label>
+                    <x-base.form-input id="iqama_position" name="iqama_position" type="text" placeholder="Enter iqama position title" class="w-full" formInputSize="sm" />
+                </div>
+
+                <div class="col-span-12 md:col-span-4 lg:col-span-3">
                     <x-base.form-label for="hire_date">Hire Date <span class="text-danger">*</span></x-base.form-label>
                     <div class="relative w-full">
                         <div
@@ -124,12 +135,12 @@
                     </div>
                 </div>
 
-                <div class="col-span-12 md:col-span-4">
+                <div class="col-span-12 md:col-span-4 lg:col-span-3">
                     <x-base.form-label for="salary">Basic Salary <span class="text-danger">*</span></x-base.form-label>
-                    <x-base.form-input id="salary" name="salary" type="number" step="0.01" min="0" placeholder="0.00" class="w-full" required />
+                    <x-base.form-input id="salary" name="salary" type="number" step="0.01" min="0" placeholder="0.00" class="w-full" formInputSize="sm" required />
                 </div>
 
-                <div class="col-span-12 md:col-span-4">
+                <div class="col-span-12 md:col-span-4 lg:col-span-3">
                     <x-base.form-label for="is_active">Status</x-base.form-label>
                     <x-base.form-select id="is_active" name="is_active" class="w-full">
                         <option value="1">Active</option>
@@ -151,20 +162,90 @@
                     <x-base.form-textarea id="address" name="address" rows="3" placeholder="Enter full address" class="w-full"></x-base.form-textarea>
                 </div>
 
-                <div class="col-span-12 md:col-span-4">
+                <div class="col-span-12 md:col-span-4 lg:col-span-3">
                     <x-base.form-label for="city">City</x-base.form-label>
-                    <x-base.form-input id="city" name="city" type="text" placeholder="Enter city" class="w-full" />
+                    <x-base.form-input id="city" name="city" type="text" placeholder="Enter city" class="w-full" formInputSize="sm" />
                 </div>
 
-                <div class="col-span-12 md:col-span-4">
+                <div class="col-span-12 md:col-span-4 lg:col-span-3">
                     <x-base.form-label for="country">Country</x-base.form-label>
                     <x-base.form-select id="country" name="country" class="w-full">
                         <option value="">Select Country</option>
                     </x-base.form-select>
                 </div>
-                <div class="col-span-12 md:col-span-4">
+                <div class="col-span-12 md:col-span-4 lg:col-span-3">
                     <x-base.form-label for="postal_code">Postal Code</x-base.form-label>
-                    <x-base.form-input id="postal_code" name="postal_code" type="text" placeholder="Enter postal code" class="w-full" />
+                    <x-base.form-input id="postal_code" name="postal_code" type="text" placeholder="Enter postal code" class="w-full" formInputSize="sm" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Residency & Access -->
+        <div class="mb-6">
+            <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                <x-base.lucide icon="Shield" class="h-5 w-5"></x-base.lucide>
+                Residency & Access
+            </h4>
+            <div class="grid grid-cols-12 gap-4 gap-y-4">
+                <div class="col-span-12 md:col-span-6">
+                    <div class="rounded-xl bg-white/80 px-4 py-3 shadow-sm ring-1 ring-slate-100 dark:bg-darkmode-600/70 dark:ring-darkmode-500/50">
+                        <div class="flex items-center justify-between gap-4">
+                            <div>
+                                <div class="font-medium text-sm text-slate-800 dark:text-slate-100">Company Housing</div>
+                                <div class="text-xs text-slate-500">Toggle if employee lives in company accommodation.</div>
+                            </div>
+                            <label class="inline-flex cursor-pointer items-center">
+                                <input
+                                    type="checkbox"
+                                    id="is_company_housing"
+                                    name="is_company_housing"
+                                    value="1"
+                                    class="transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 dark:bg-darkmode-800 dark:border-transparent dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&[type='radio']]:checked:bg-primary [&[type='radio']]:checked:border-primary [&[type='radio']]:checked:border-opacity-10 [&[type='checkbox']]:checked:bg-primary [&[type='checkbox']]:checked:border-primary [&[type='checkbox']]:checked:border-opacity-10 [&:disabled:not(:checked)]:bg-slate-100 [&:disabled:not(:checked)]:cursor-not-allowed [&:disabled:not(:checked)]:dark:bg-darkmode-800/50 [&:disabled:checked]:opacity-70 [&:disabled:checked]:cursor-not-allowed [&:disabled:checked]:dark:bg-darkmode-800/50 w-[38px] h-[24px] p-px rounded-full relative before:w-[20px] before:h-[20px] before:shadow-[1px_1px_3px_rgba(0,0,0,0.25)] before:transition-[margin-left] before:duration-200 before:ease-in-out before:absolute before:inset-y-0 before:my-auto before:rounded-full before:dark:bg-darkmode-600 checked:bg-primary checked:border-primary checked:bg-none before:checked:ml-[14px] before:checked:bg-white"
+                                >
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-12 md:col-span-6 hidden" id="housing-details">
+                    <div class="rounded-2xl border border-slate-200/70 bg-slate-50/70 p-4 shadow-inner dark:border-darkmode-600 dark:bg-darkmode-700/40">
+                        <div class="grid grid-cols-12 gap-3">
+                            <div class="col-span-12 md:col-span-6">
+                                <x-base.form-label for="housing_room_number">Room / Flat No.</x-base.form-label>
+                                <x-base.form-input id="housing_room_number" name="housing_room_number" type="text" placeholder="Room number" class="w-full" formInputSize="sm" />
+                            </div>
+                            <div class="col-span-12 md:col-span-6">
+                                <x-base.form-label for="housing_unit_number">Unit / Building</x-base.form-label>
+                                <x-base.form-input id="housing_unit_number" name="housing_unit_number" type="text" placeholder="Building or unit" class="w-full" formInputSize="sm" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-12 md:col-span-6">
+                    <div class="rounded-xl bg-white/80 px-4 py-3 shadow-sm ring-1 ring-slate-100 dark:bg-darkmode-600/70 dark:ring-darkmode-500/50">
+                        <div class="flex items-center justify-between gap-4">
+                            <div>
+                                <div class="font-medium text-sm text-slate-800 dark:text-slate-100">System Access</div>
+                                <div class="text-xs text-slate-500">Allow employee to login to Smart ERP.</div>
+                            </div>
+                            <label class="inline-flex cursor-pointer items-center">
+                                <input
+                                    type="checkbox"
+                                    id="has_system_access"
+                                    name="has_system_access"
+                                    value="1"
+                                    class="transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 dark:bg-darkmode-800 dark:border-transparent dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&[type='radio']]:checked:bg-primary [&[type='radio']]:checked:border-primary [&[type='radio']]:checked:border-opacity-10 [&[type='checkbox']]:checked:bg-primary [&[type='checkbox']]:checked:border-primary [&[type='checkbox']]:checked:border-opacity-10 [&:disabled:not(:checked)]:bg-slate-100 [&:disabled:not(:checked)]:cursor-not-allowed [&:disabled:not(:checked)]:dark:bg-darkmode-800/50 [&:disabled:checked]:opacity-70 [&:disabled:checked]:cursor-not-allowed [&:disabled:checked]:dark:bg-darkmode-800/50 w-[38px] h-[24px] p-px rounded-full relative before:w-[20px] before:h-[20px] before:shadow-[1px_1px_3px_rgba(0,0,0,0.25)] before:transition-[margin-left] before:duration-200 before:ease-in-out before:absolute before:inset-y-0 before:my-auto before:rounded-full before:dark:bg-darkmode-600 checked:bg-primary checked:border-primary checked:bg-none before:checked:ml-[14px] before:checked:bg-white"
+                                >
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-12 md:col-span-6 hidden" id="system-access-details">
+                    <x-base.form-label for="system_password">Temporary Password</x-base.form-label>
+                    <x-base.form-input id="system_password" name="system_password" type="password" placeholder="Enter temporary password" class="w-full" formInputSize="sm" />
+                    <x-base.form-help>Password is required when access is enabled.</x-base.form-help>
                 </div>
             </div>
         </div>
@@ -241,6 +322,12 @@
         function setupEventListeners() {
             const companySelect = document.getElementById('company_id');
             const departmentSelect = document.getElementById('department_id');
+            const housingToggle = document.getElementById('is_company_housing');
+            const housingDetails = document.getElementById('housing-details');
+            const housingInputs = ['housing_room_number', 'housing_unit_number'].map(id => document.getElementById(id));
+            const systemToggle = document.getElementById('has_system_access');
+            const systemDetails = document.getElementById('system-access-details');
+            const systemPasswordInput = document.getElementById('system_password');
 
             if (companySelect) {
                 console.log('🎧 Setting up company change listener');
@@ -254,6 +341,36 @@
                 departmentSelect.addEventListener('change', function() {
                     handleDepartmentChange.call(this);
                 });
+            }
+
+            if (housingToggle && housingDetails) {
+                const syncHousingUI = () => {
+                    const enabled = housingToggle.checked;
+                    housingDetails.classList.toggle('hidden', !enabled);
+                    housingInputs.forEach(input => {
+                        if (input) {
+                            input.disabled = !enabled;
+                            if (!enabled) input.value = '';
+                        }
+                    });
+                };
+
+                housingToggle.addEventListener('change', syncHousingUI);
+                syncHousingUI();
+            }
+
+            if (systemToggle && systemDetails && systemPasswordInput) {
+                const syncSystemUI = () => {
+                    const enabled = systemToggle.checked;
+                    systemDetails.classList.toggle('hidden', !enabled);
+                    systemPasswordInput.disabled = !enabled;
+                    if (!enabled) {
+                        systemPasswordInput.value = '';
+                    }
+                };
+
+                systemToggle.addEventListener('change', syncSystemUI);
+                syncSystemUI();
             }
         }
 

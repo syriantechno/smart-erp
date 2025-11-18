@@ -1,26 +1,20 @@
 <div class="flex items-center gap-2 justify-center">
-    <x-base.button
-        variant="outline-primary"
-        size="sm"
+    <x-erp.action-button
+        icon="Eye"
+        variant="primary"
         title="View"
         onclick="viewVendor({{ $vendor->id }})"
-    >
-        <x-base.lucide icon="Eye" class="w-4 h-4" />
-    </x-base.button>
-    <x-base.button
-        variant="outline-warning"
-        size="sm"
+    />
+    <x-erp.action-button
+        icon="Edit"
+        variant="warning"
         title="Edit"
         onclick="editVendor({{ $vendor->id }})"
-    >
-        <x-base.lucide icon="Pencil" class="w-4 h-4" />
-    </x-base.button>
-    <x-base.button
-        variant="outline-danger"
-        size="sm"
+    />
+    <x-erp.action-button
+        icon="Trash2"
+        variant="danger"
         title="Delete"
         onclick="deleteVendor({{ $vendor->id }})"
-    >
-        <x-base.lucide icon="Trash2" class="w-4 h-4" />
-    </x-base.button>
+    />
 </div>

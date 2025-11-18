@@ -10,6 +10,7 @@ use App\Services\DocumentCodeGenerator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -85,16 +86,39 @@ class EmployeeController extends Controller
                 return '<img src="' . $employee->profile_picture_url . '" alt="' . $employee->full_name . '" class="w-10 h-10 rounded-full object-cover">';
             })
             ->addColumn('full_name', function ($employee) {
-                return '<a href="' . route('hr.employees.show', $employee->id) . '" class="font-medium text-slate-700 hover:text-primary">' . $employee->full_name . '</a>';
+                $translated = $employee->translated_name
+                    ? '<span class="mt-0.5 block text-xs text-slate-500">' . e($employee->translated_name) . '</span>'
+                    : '';
+
+                return '<div class="leading-tight">'
+                    . '<a href="' . route('hr.employees.show', $employee->id) . '" class="font-medium text-slate-700 hover:text-primary">' . e($employee->full_name) . '</a>'
+                    . $translated
+                    . '</div>';
             })
             ->addColumn('company_name', function ($employee) {
                 return $employee->company ? $employee->company->name : '-';
             })
             ->addColumn('department_name', function ($employee) {
-                return $employee->department ? $employee->department->name : '-';
-            })
-            ->addColumn('position', function ($employee) {
-                return $employee->position ?? '-';
+                $departmentName = $employee->department ? e($employee->department->name) : '-';
+                $position = $employee->position ? e($employee->position) : null;
+                $iqamaPosition = $employee->iqama_position ? e($employee->iqama_position) : null;
+
+                $content = '<div class="leading-tight text-slate-800">'
+                    . '<span class="block font-medium">' . $departmentName . '</span>';
+
+                if ($position) {
+                    $content .= '<span class="mt-0.5 block text-xs text-slate-500">' . $position . '</span>';
+                }
+
+                if ($iqamaPosition) {
+                    $content .= '<span class="mt-0.5 inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">'
+                        . 'Iqama: ' . $iqamaPosition
+                        . '</span>';
+                }
+
+                $content .= '</div>';
+
+                return $content;
             })
             ->addColumn('hire_date_formatted', function ($employee) {
                 return $employee->hire_date ? $employee->hire_date->format('M d, Y') : '-';
@@ -109,7 +133,7 @@ class EmployeeController extends Controller
             ->addColumn('actions', function ($employee) {
                 return view('hr.employees.partials.actions', ['employee' => $employee])->render();
             })
-            ->rawColumns(['status', 'actions', 'profile_picture', 'full_name'])
+            ->rawColumns(['status', 'actions', 'profile_picture', 'full_name', 'department_name'])
             ->make(true);
     }
 
@@ -171,20 +195,27 @@ class EmployeeController extends Controller
             'first_name' => 'required|string|max:255',
             'middle_name' => 'nullable|string|max:255',
             'last_name' => 'required|string|max:255',
+            'translated_name' => 'nullable|string|max:255',
             'email' => 'required|email|unique:employees,email',
             'phone' => 'nullable|string|max:20',
             'position' => 'required|string|max:255',
+            'iqama_position' => 'nullable|string|max:255',
             'salary' => 'required|numeric|min:0',
             'hire_date' => 'required|date_format:Y-m-d',
             'birth_date' => 'nullable|date_format:Y-m-d',
             'gender' => 'nullable|in:male,female,other',
             'address' => 'nullable|string',
+            'is_company_housing' => 'nullable|boolean',
+            'housing_room_number' => 'nullable|string|max:255',
+            'housing_unit_number' => 'nullable|string|max:255',
             'city' => 'nullable|string|max:100',
             'country' => 'nullable|string|max:100',
             'postal_code' => 'nullable|string|max:20',
             'department_id' => 'required|exists:departments,id',
             'company_id' => 'required|exists:companies,id',
             'is_active' => 'nullable|boolean',
+            'has_system_access' => 'nullable|boolean',
+            'system_password' => 'required_if:has_system_access,1|string|min:6|nullable',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120', // 5MB max
         ]);
 
@@ -194,6 +225,19 @@ class EmployeeController extends Controller
             $validated['code'] = $this->codeGenerator->generate('employees');
             $validated['employee_id'] = 'EMP' . strtoupper(Str::random(8)); // Keep this for backward compatibility
             $validated['is_active'] = $request->boolean('is_active', true);
+            $validated['is_company_housing'] = $request->boolean('is_company_housing');
+            $validated['has_system_access'] = $request->boolean('has_system_access');
+
+            if (!$validated['is_company_housing']) {
+                $validated['housing_room_number'] = null;
+                $validated['housing_unit_number'] = null;
+            }
+
+            if (!$validated['has_system_access']) {
+                $validated['system_password'] = null;
+            } elseif (!empty($validated['system_password'])) {
+                $validated['system_password'] = Hash::make($validated['system_password']);
+            }
 
             // Handle profile picture upload
             if ($request->hasFile('profile_picture')) {
@@ -244,6 +288,7 @@ class EmployeeController extends Controller
             'first_name' => 'required|string|max:255',
             'middle_name' => 'nullable|string|max:255',
             'last_name' => 'required|string|max:255',
+            'translated_name' => 'nullable|string|max:255',
             'email' => [
                 'required',
                 'email',
@@ -251,17 +296,23 @@ class EmployeeController extends Controller
             ],
             'phone' => 'nullable|string|max:20',
             'position' => 'required|string|max:255',
+            'iqama_position' => 'nullable|string|max:255',
             'salary' => 'required|numeric|min:0',
             'hire_date' => 'required|date_format:Y-m-d',
             'birth_date' => 'nullable|date_format:Y-m-d',
             'gender' => 'nullable|in:male,female,other',
             'address' => 'nullable|string',
+            'is_company_housing' => 'nullable|boolean',
+            'housing_room_number' => 'nullable|string|max:255',
+            'housing_unit_number' => 'nullable|string|max:255',
             'city' => 'nullable|string|max:100',
             'country' => 'nullable|string|max:100',
             'postal_code' => 'nullable|string|max:20',
             'department_id' => 'required|exists:departments,id',
             'company_id' => 'required|exists:companies,id',
             'is_active' => 'nullable|boolean',
+            'has_system_access' => 'nullable|boolean',
+            'system_password' => 'nullable|string|min:6',
             // In edit form the input name is `photo`, but the column is `profile_picture`
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
         ]);
@@ -270,6 +321,17 @@ class EmployeeController extends Controller
             DB::beginTransaction();
 
             $validated['is_active'] = $request->boolean('is_active', false);
+            $validated['is_company_housing'] = $request->boolean('is_company_housing');
+            $validated['has_system_access'] = $request->boolean('has_system_access');
+
+            if (!$validated['is_company_housing']) {
+                $validated['housing_room_number'] = null;
+                $validated['housing_unit_number'] = null;
+            }
+
+            if (!$validated['has_system_access']) {
+                $validated['system_password'] = null;
+            }
 
             // Map photo input to profile_picture column
             if ($request->hasFile('photo')) {

@@ -83,6 +83,60 @@ window.erpCrud = {
     },
 
     /**
+     * Render unified action buttons with animations.
+     * @param {Object} data - Row data
+     * @param {string} data.id - Record ID
+     * @param {string} data.name - Record name for delete confirmation
+     * @param {Object} [options]
+     * @param {function} [options.editUrl] - Function to get edit URL
+     * @param {function} [options.viewUrl] - Function to get view URL
+     * @param {boolean} [options.canEdit=true]
+     * @param {boolean} [options.canDelete=true]
+     * @param {boolean} [options.canView=true]
+     * @returns {string}
+     */
+    renderActionButtons(data, options = {}) {
+        const {
+            editUrl = (id) => `javascript:void(0)`,
+            viewUrl = (id) => `javascript:void(0)`,
+            canEdit = true,
+            canDelete = true,
+            canView = false
+        } = options;
+
+        let buttons = [];
+
+        if (canView && viewUrl) {
+            buttons.push(`
+                <button class="btn-action btn-secondary" onclick="window.location.href='${viewUrl(data.id)}'" title="View">
+                    <i data-lucide="Eye" class="w-4 h-4"></i>
+                    View
+                </button>
+            `);
+        }
+
+        if (canEdit && editUrl) {
+            buttons.push(`
+                <button class="btn-action btn-primary" onclick="window.location.href='${editUrl(data.id)}'" title="Edit">
+                    <i data-lucide="Edit" class="w-4 h-4"></i>
+                    Edit
+                </button>
+            `);
+        }
+
+        if (canDelete) {
+            buttons.push(`
+                <button class="btn-action btn-danger" onclick="window.deleteDepartment('${data.id}', '${data.name || 'item'}')" title="Delete">
+                    <i data-lucide="Trash2" class="w-4 h-4"></i>
+                    Delete
+                </button>
+            `);
+        }
+
+        return `<div class="flex gap-2">${buttons.join('')}</div>`;
+    },
+
+    /**
      * Attach unified AJAX submit handler for create form.
      * @param {Object} options
      * @param {string} options.formSelector

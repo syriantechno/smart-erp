@@ -308,8 +308,9 @@
     .top-bar-pattern::before {
         content: "";
         position: absolute;
-        inset: -15%;
+        inset: 0;
         pointer-events: none;
+        transform: scale(1.15);
         background:
             /* موجة عريضة في الأسفل */
             radial-gradient(

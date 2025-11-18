@@ -261,5 +261,141 @@
                 gap: 0.35rem;
             }
         }
+
+        /* Unified Button Animations for DataTable Actions */
+        [data-erp-table-wrapper] .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        [data-erp-table-wrapper] .btn-action::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        [data-erp-table-wrapper] .btn-action:hover::before {
+            width: 200px;
+            height: 200px;
+        }
+
+        [data-erp-table-wrapper] .btn-action svg {
+            transition: transform 0.3s ease;
+            width: 16px;
+            height: 16px;
+        }
+
+        [data-erp-table-wrapper] .btn-action:hover svg {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        [data-erp-table-wrapper] .btn-primary {
+            background: rgb(var(--dt-primary-rgb));
+            color: white;
+        }
+
+        [data-erp-table-wrapper] .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(var(--dt-primary-rgb), 0.3);
+        }
+
+        [data-erp-table-wrapper] .btn-secondary {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            color: #374151;
+        }
+
+        [data-erp-table-wrapper] .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            background: #e5e7eb;
+        }
+
+        [data-erp-table-wrapper] .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        [data-erp-table-wrapper] .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+        }
+
+        [data-erp-table-wrapper] .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        [data-erp-table-wrapper] .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
+        }
+
+        /* Unified Status Badge Styling */
+        [data-erp-table-wrapper] .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.2s ease;
+        }
+
+        [data-erp-table-wrapper] .status-badge svg {
+            width: 14px;
+            height: 14px;
+            animation: status-badge-pulse 2s ease-in-out infinite;
+        }
+
+        [data-erp-table-wrapper] .status-active {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
+
+        [data-erp-table-wrapper] .status-inactive {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+        }
+
+        [data-erp-table-wrapper] .status-pending {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+        }
+
+        [data-erp-table-wrapper] .status-suspended {
+            background: linear-gradient(135deg, #6b7280, #4b5563);
+            color: white;
+            box-shadow: 0 2px 8px rgba(107, 114, 128, 0.3);
+        }
+
+        @keyframes status-badge-pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
     </style>
 @endPushOnce

@@ -408,8 +408,7 @@
                                     <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Code</th>
                                     <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Photo</th>
                                     <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Full Name</th>
-                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Department</th>
-                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Position</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Department / Position</th>
                                     <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Email</th>
                                     <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Status</th>
                                     <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Actions</th>
@@ -828,18 +827,17 @@
                     { data: 'profile_picture', name: 'profile_picture', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center', orderable: false },
                     { data: 'full_name', name: 'full_name', className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700 datatable-cell-wrap' },
                     { data: 'department_name', name: 'department_name', className: 'px-5 py-3 border-b dark:border-darkmode-300 datatable-cell-wrap' },
-                    { data: 'position', name: 'position', className: 'px-5 py-3 border-b dark:border-darkmode-300 datatable-cell-wrap' },
                     { data: 'email', name: 'email', className: 'px-5 py-3 border-b dark:border-darkmode-300 datatable-cell-wrap' },
                     {
                         data: 'is_active',
                         name: 'is_active',
+                        className: 'text-center',
+                        title: 'Status',
                         render: function (value) {
-                            const status = Boolean(value);
-                            const badgeClass = status
-                                ? 'bg-green-100 text-green-700'
-                                : 'bg-red-100 text-red-700';
-                            const label = status ? 'Active' : 'Inactive';
-                            return `<span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${badgeClass}">${label}</span>`;
+                            if (window.erpCrud && typeof window.erpCrud.renderStatusBadge === 'function') {
+                                return window.erpCrud.renderStatusBadge(value);
+                            }
+                            return value ? 'Active' : 'Inactive';
                         }
                     },
                     {

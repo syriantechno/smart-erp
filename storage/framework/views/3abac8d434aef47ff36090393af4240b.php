@@ -287,19 +287,19 @@
     </div>
 <?php $__env->stopSection(); ?>
 
-<?php if (! $__env->hasRenderedOnce('4742b359-3c39-459b-831c-349fd545f5c6')): $__env->markAsRenderedOnce('4742b359-3c39-459b-831c-349fd545f5c6');
+<?php if (! $__env->hasRenderedOnce('66458f0e-bb67-4bee-9b11-56d218c23b95')): $__env->markAsRenderedOnce('66458f0e-bb67-4bee-9b11-56d218c23b95');
 $__env->startPush('styles'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/css/vendors/tippy.css'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/css/themes/enigma/side-nav.css'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/css/themes/enigma/top-nav.css'); ?>
 <?php $__env->stopPush(); endif; ?>
 
-<?php if (! $__env->hasRenderedOnce('97dfd259-7d4f-4500-b255-3bc3cf28af22')): $__env->markAsRenderedOnce('97dfd259-7d4f-4500-b255-3bc3cf28af22');
+<?php if (! $__env->hasRenderedOnce('9805fa72-3c33-4674-9676-e4b824665690')): $__env->markAsRenderedOnce('9805fa72-3c33-4674-9676-e4b824665690');
 $__env->startPush('vendors'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/js/vendors/tippy.js'); ?>
 <?php $__env->stopPush(); endif; ?>
 
-<?php if (! $__env->hasRenderedOnce('ea5b4699-46f4-4c8b-b7ba-e5e0c83ce178')): $__env->markAsRenderedOnce('ea5b4699-46f4-4c8b-b7ba-e5e0c83ce178');
+<?php if (! $__env->hasRenderedOnce('69264bf4-fc18-4b80-a1d9-c2192c5d70af')): $__env->markAsRenderedOnce('69264bf4-fc18-4b80-a1d9-c2192c5d70af');
 $__env->startPush('scripts'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/js/themes/enigma.js'); ?>
 
@@ -312,8 +312,26 @@ $__env->startPush('scripts'); ?>
 
             if (!sidebar || !toggleBtn || !mainContent || !header) return;
 
+            // Restore saved sidebar state from localStorage
+            var savedState = localStorage.getItem('sidebar-collapsed');
+            if (savedState === 'true') {
+                // Apply collapsed state on page load
+                sidebar.classList.add('side-nav--simple');
+                sidebar.classList.remove('w-[100px]', 'xl:w-[260px]');
+                sidebar.classList.add('w-[72px]', 'xl:w-[88px]');
+                
+                mainContent.classList.remove('md:ml-[100px]', 'xl:ml-[260px]');
+                mainContent.classList.add('md:ml-[72px]', 'xl:ml-[88px]');
+                
+                header.classList.remove('md:ml-[100px]', 'xl:ml-[260px]');
+                header.classList.add('md:ml-[72px]', 'xl:ml-[88px]');
+            }
+
             toggleBtn.addEventListener('click', function () {
                 var isSimple = sidebar.classList.toggle('side-nav--simple');
+                
+                // Save state to localStorage
+                localStorage.setItem('sidebar-collapsed', isSimple);
 
                 if (isSimple) {
                     // Sidebar becomes narrower

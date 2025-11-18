@@ -7,6 +7,7 @@ export default defineConfig({
         commonjsOptions: {
             include: ["tailwind.config.js", "node_modules/**"],
         },
+        
     },
     optimizeDeps: {
         include: ["tailwind-config"],

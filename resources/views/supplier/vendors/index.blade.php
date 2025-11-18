@@ -488,6 +488,9 @@
                         className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center',
                         orderable: false,
                         render: function(value) {
+                            if (window.erpCrud && typeof window.erpCrud.renderStatusBadge === 'function') {
+                                return window.erpCrud.renderStatusBadge(value);
+                            }
                             const status = Boolean(value);
                             const badgeClass = status ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
                             const label = status ? 'Active' : 'Inactive';

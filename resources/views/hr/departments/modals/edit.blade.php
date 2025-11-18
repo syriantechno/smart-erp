@@ -10,10 +10,15 @@ $departments = \App\Models\HR\Department::where('id', '!=', $department->id)
     ->where('is_active', true)
     ->get();
 @endphp
-<x-base.dialog id="edit-department-modal-{{ $department->id }}" size="lg">
+<x-base.dialog id="edit-department-modal-{{ $department->id }}" size="lg" class="hidden">
     <x-base.dialog.panel>
         <x-base.dialog.title>
-            <h2 class="font-medium text-lg text-gray-900 dark:text-white">Edit Department: {{ $department->name }}</h2>
+            <div class="flex items-center gap-3">
+                <div class="side-menu__icon">
+                    <x-base.lucide icon="layers" />
+                </div>
+                <h2 class="font-medium text-lg text-white">Edit Department: {{ $department->name }}</h2>
+            </div>
             <button
                 type="button"
                 class="text-slate-500 hover:text-slate-400"

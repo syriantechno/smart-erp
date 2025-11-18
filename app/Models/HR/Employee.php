@@ -28,18 +28,25 @@ class Employee extends Model
         'last_name',
         'email',
         'phone',
+        'translated_name',
         'position',
+        'iqama_position',
         'salary',
         'hire_date',
         'birth_date',
         'gender',
         'address',
+        'is_company_housing',
+        'housing_room_number',
+        'housing_unit_number',
         'city',
         'country',
         'postal_code',
         'department_id',
         'company_id',
         'user_id',
+        'has_system_access',
+        'system_password',
         'is_active',
         'profile_picture'
     ];
@@ -49,6 +56,8 @@ class Employee extends Model
         'birth_date' => 'date',
         'salary' => 'decimal:2',
         'is_active' => 'boolean',
+        'is_company_housing' => 'boolean',
+        'has_system_access' => 'boolean',
     ];
 
     /**
