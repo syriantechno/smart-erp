@@ -99,26 +99,10 @@ class EmployeeController extends Controller
                 return $employee->company ? $employee->company->name : '-';
             })
             ->addColumn('department_name', function ($employee) {
-                $departmentName = $employee->department ? e($employee->department->name) : '-';
-                $position = $employee->position ? e($employee->position) : null;
-                $iqamaPosition = $employee->iqama_position ? e($employee->iqama_position) : null;
-
-                $content = '<div class="leading-tight text-slate-800">'
-                    . '<span class="block font-medium">' . $departmentName . '</span>';
-
-                if ($position) {
-                    $content .= '<span class="mt-0.5 block text-xs text-slate-500">' . $position . '</span>';
-                }
-
-                if ($iqamaPosition) {
-                    $content .= '<span class="mt-0.5 inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">'
-                        . 'Iqama: ' . $iqamaPosition
-                        . '</span>';
-                }
-
-                $content .= '</div>';
-
-                return $content;
+                return $employee->department ? $employee->department->name : '-';
+            })
+            ->addColumn('position', function ($employee) {
+                return $employee->position ?? '-';
             })
             ->addColumn('hire_date_formatted', function ($employee) {
                 return $employee->hire_date ? $employee->hire_date->format('M d, Y') : '-';
