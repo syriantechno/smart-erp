@@ -161,7 +161,18 @@
                     { data: 'created_by_name', name: 'created_by_name' },
                     { data: 'order_date', name: 'order_date' },
                     { data: 'total_amount', name: 'total_amount' },
-                    { data: 'status_badge', name: 'status_badge', orderable: false },
+                    { 
+                        data: 'is_active', 
+                        name: 'is_active',
+                        className: 'text-center',
+                        title: 'Status',
+                        render: function (value) {
+                            if (window.erpCrud && typeof window.erpCrud.renderStatusBadge === 'function') {
+                                return window.erpCrud.renderStatusBadge(value);
+                            }
+                            return value ? 'Active' : 'Inactive';
+                        }
+                    },
                     { data: 'actions', name: 'actions', orderable: false, searchable: false }
                 ],
                 pageLength: 25

@@ -12,14 +12,14 @@ $departments = \App\Models\HR\Department::where('id', '!=', $department->id)
 ?>
 <?php if (isset($component)) { $__componentOriginalad7e71e98d6bc7c4deec90df8ba81dfd = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalad7e71e98d6bc7c4deec90df8ba81dfd = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.dialog.index','data' => ['id' => 'edit-department-modal-'.e($department->id).'','size' => 'lg']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.dialog.index','data' => ['id' => 'edit-department-modal-'.e($department->id).'','size' => 'lg','class' => 'hidden']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.dialog'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['id' => 'edit-department-modal-'.e($department->id).'','size' => 'lg']); ?>
+<?php $component->withAttributes(['id' => 'edit-department-modal-'.e($department->id).'','size' => 'lg','class' => 'hidden']); ?>
     <?php if (isset($component)) { $__componentOriginal231386b9e8f52ce181634663542c77d5 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal231386b9e8f52ce181634663542c77d5 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.dialog.panel','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -40,7 +40,31 @@ $departments = \App\Models\HR\Department::where('id', '!=', $department->id)
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
 <?php $component->withAttributes([]); ?>
-            <h2 class="font-medium text-lg text-gray-900 dark:text-white">Edit Department: <?php echo e($department->name); ?></h2>
+            <div class="flex items-center gap-3">
+                <div class="side-menu__icon">
+                    <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'layers']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.lucide'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['icon' => 'layers']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+                </div>
+                <h2 class="font-medium text-lg text-white">Edit Department: <?php echo e($department->name); ?></h2>
+            </div>
             <button
                 type="button"
                 class="text-slate-500 hover:text-slate-400"

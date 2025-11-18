@@ -1,4 +1,4 @@
-<?php if (! $__env->hasRenderedOnce('ba7c47b0-cbab-4739-b2c6-1cfc0f32e6c5')): $__env->markAsRenderedOnce('ba7c47b0-cbab-4739-b2c6-1cfc0f32e6c5');
+<?php if (! $__env->hasRenderedOnce('1764a41a-13b2-4ce9-a7fe-e1e58aa91f28')): $__env->markAsRenderedOnce('1764a41a-13b2-4ce9-a7fe-e1e58aa91f28');
 $__env->startPush('styles'); ?>
     <style>
         /* Global Notification Styles */
@@ -7,27 +7,283 @@ $__env->startPush('styles'); ?>
             top: 24px;
             right: 24px;
             z-index: 99999;
-            display: flex;
+            display: none;
             flex-direction: column;
             gap: 12px;
+            pointer-events: none;
+            max-width: 400px;
+            width: auto;
+            box-sizing: border-box;
         }
 
-        #global-confirm-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 99998;
-            display: none;
+        #global-toast-container:not(:empty) {
+            display: flex;
+        }
+
+        /* Modern Modal Design */
+        .modal {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            background: rgba(15, 23, 42, 0.4);
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        .modal.show {
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        .modal .modal-dialog,
+        .modal .modal-content,
+        .modal > div {
+            background: #ffffff;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 
+                0 25px 50px -12px rgba(0, 0, 0, 0.25),
+                0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+            animation: modalSlideUp 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .modal .modal-header,
+        .modal .dialog-title,
+        .modal > div > div:first-child {
+            background: linear-gradient(90deg, 
+                rgb(var(--primary-rgb, 37, 99, 235)) 0%,
+                rgba(var(--primary-rgb, 37, 99, 235), 0.7) 100%
+            );
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .modal .modal-header h2,
+        .modal .dialog-title h2,
+        .modal > div > div:first-child h2 {
+            color: white !important;
+            font-weight: 600;
+        }
+
+        .modal .modal-header button,
+        .modal .dialog-title button,
+        .modal > div > div:first-child button {
+            color: black !important;
+            background: transparent !important;
+            border: none !important;
+            transition: transform 0.3s ease;
+        }
+
+        .modal .modal-header button:hover,
+        .modal .dialog-title button:hover,
+        .modal > div > div:first-child button:hover {
+            transform: rotate(45deg);
+            background: transparent !important;
+        }
+
+        .modal .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal .modal-footer {
+            background: rgba(248, 250, 252, 0.5);
+            border-top: 1px solid rgba(148, 163, 184, 0.1);
+            padding: 1rem 1.5rem;
+        }
+
+        /* Animated Save and Cancel buttons */
+        .modal .btn-primary,
+        .modal .btn-secondary,
+        .modal button[type="submit"],
+        .modal button[data-tw-dismiss="modal"],
+        .modal button[variant="primary"],
+        .modal button[variant="outline-secondary"] {
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal .btn-primary::before,
+        .modal .btn-secondary::before,
+        .modal button[type="submit"]::before,
+        .modal button[data-tw-dismiss="modal"]::before,
+        .modal button[variant="primary"]::before,
+        .modal button[variant="outline-secondary"]::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .modal .btn-primary:hover::before,
+        .modal .btn-secondary:hover::before,
+        .modal button[type="submit"]:hover::before,
+        .modal button[data-tw-dismiss="modal"]:hover::before,
+        .modal button[variant="primary"]:hover::before,
+        .modal button[variant="outline-secondary"]:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .modal .btn-primary,
+        .modal [variant="primary"],
+        .modal button[type="submit"] {
+            background: rgb(var(--primary-rgb, 37, 99, 235));
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+        }
+
+        .modal .btn-primary:hover,
+        .modal [variant="primary"]:hover,
+        .modal button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(var(--primary-rgb, 37, 99, 235), 0.3);
+        }
+
+        .modal .btn-secondary,
+        .modal [variant="outline-secondary"],
+        .modal button[data-tw-dismiss="modal"] {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            color: #374151;
+            padding: 8px 16px;
+            border-radius: 6px;
+        }
+
+        .modal .btn-secondary:hover,
+        .modal [variant="outline-secondary"]:hover,
+        .modal button[data-tw-dismiss="modal"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            background: #e5e7eb;
+        }
+
+        .modal .btn-primary svg,
+        .modal .btn-secondary svg,
+        .modal [variant="primary"] svg,
+        .modal [variant="outline-secondary"] svg,
+        .modal button[type="submit"] svg,
+        .modal button[data-tw-dismiss="modal"] svg {
+            transition: transform 0.3s ease;
+        }
+
+        .modal .btn-primary:hover svg,
+        .modal [variant="primary"]:hover svg,
+        .modal button[type="submit"]:hover svg {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .modal .btn-secondary:hover svg,
+        .modal [variant="outline-secondary"]:hover svg,
+        .modal button[data-tw-dismiss="modal"]:hover svg {
+            transform: scale(1.1) rotate(-5deg);
+        }
+
+        /* SweetAlert Delete Modal Animated Buttons */
+        .swal-modern-confirm,
+        .swal-modern-cancel {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .swal-modern-confirm::before,
+        .swal-modern-cancel::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .swal-modern-confirm:hover::before,
+        .swal-modern-cancel:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .swal-modern-confirm {
+            background: #ef4444;
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+        }
+
+        .swal-modern-confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+        }
+
+        .swal-modern-cancel {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            color: #374151;
+            padding: 8px 16px;
+            border-radius: 6px;
+        }
+
+        .swal-modern-cancel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            background: #e5e7eb;
+        }
+
+        .swal-modern-confirm svg,
+        .swal-modern-cancel svg {
+            transition: transform 0.3s ease;
+        }
+
+        .swal-modern-confirm:hover svg {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .swal-modern-cancel:hover svg {
+            transform: scale(1.1) rotate(-5deg);
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes modalSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         .toast-wrapper {
-            display: flex;
-            align-items: center;
             padding: 20px;
             background-color: #ffffff;
             border-radius: 0.75rem;
@@ -37,6 +293,38 @@ $__env->startPush('styles'); ?>
             max-width: 480px;
             position: relative;
             animation: toast-slide-down 0.35s ease-out;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .toast-icon {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            animation: toast-icon-bounce 0.5s ease-in-out;
+        }
+
+        .toast-content {
+            flex: 1;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        @keyframes toast-slide-down {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes toast-icon-bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
         }
 
         .confirm-modal-content {
@@ -262,14 +550,14 @@ $__env->startPush('styles'); ?>
     <div id="toast-template-success" class="toast-wrapper">
         <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'CheckCircle','class' => 'toast-icon-success stroke-1.5 w-6 h-6']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'CheckCircle','class' => 'toast-icon toast-icon-success stroke-1.5 w-6 h-6']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.lucide'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['icon' => 'CheckCircle','class' => 'toast-icon-success stroke-1.5 w-6 h-6']); ?> <?php echo $__env->renderComponent(); ?>
+<?php $component->withAttributes(['icon' => 'CheckCircle','class' => 'toast-icon toast-icon-success stroke-1.5 w-6 h-6']); ?> <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
 <?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
@@ -279,7 +567,7 @@ $__env->startPush('styles'); ?>
 <?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
-        <div class="ml-4 mr-4 flex-1">
+        <div class="toast-content">
             <div class="toast-title">Success!</div>
             <div class="toast-message"></div>
         </div>
@@ -290,14 +578,14 @@ $__env->startPush('styles'); ?>
     <div id="toast-template-error" class="toast-wrapper">
         <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'XCircle','class' => 'toast-icon-error stroke-1.5 w-6 h-6']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'XCircle','class' => 'toast-icon toast-icon-error stroke-1.5 w-6 h-6']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.lucide'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['icon' => 'XCircle','class' => 'toast-icon-error stroke-1.5 w-6 h-6']); ?> <?php echo $__env->renderComponent(); ?>
+<?php $component->withAttributes(['icon' => 'XCircle','class' => 'toast-icon toast-icon-error stroke-1.5 w-6 h-6']); ?> <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
 <?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
@@ -307,7 +595,7 @@ $__env->startPush('styles'); ?>
 <?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
-        <div class="ml-4 mr-4 flex-1">
+        <div class="toast-content">
             <div class="toast-title">Error!</div>
             <div class="toast-message"></div>
         </div>
@@ -318,14 +606,14 @@ $__env->startPush('styles'); ?>
     <div id="toast-template-warning" class="toast-wrapper">
         <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'AlertTriangle','class' => 'toast-icon-warning stroke-1.5 w-6 h-6']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'AlertTriangle','class' => 'toast-icon toast-icon-warning stroke-1.5 w-6 h-6']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.lucide'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['icon' => 'AlertTriangle','class' => 'toast-icon-warning stroke-1.5 w-6 h-6']); ?> <?php echo $__env->renderComponent(); ?>
+<?php $component->withAttributes(['icon' => 'AlertTriangle','class' => 'toast-icon toast-icon-warning stroke-1.5 w-6 h-6']); ?> <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
 <?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
@@ -335,7 +623,7 @@ $__env->startPush('styles'); ?>
 <?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
-        <div class="ml-4 mr-4 flex-1">
+        <div class="toast-content">
             <div class="toast-title">Warning!</div>
             <div class="toast-message"></div>
         </div>
@@ -346,14 +634,14 @@ $__env->startPush('styles'); ?>
     <div id="toast-template-info" class="toast-wrapper">
         <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Info','class' => 'toast-icon-info stroke-1.5 w-6 h-6']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Info','class' => 'toast-icon toast-icon-info stroke-1.5 w-6 h-6']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.lucide'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['icon' => 'Info','class' => 'toast-icon-info stroke-1.5 w-6 h-6']); ?> <?php echo $__env->renderComponent(); ?>
+<?php $component->withAttributes(['icon' => 'Info','class' => 'toast-icon toast-icon-info stroke-1.5 w-6 h-6']); ?> <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
 <?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
@@ -363,8 +651,8 @@ $__env->startPush('styles'); ?>
 <?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
-        <div class="ml-4 mr-4 flex-1">
-            <div class="toast-title">Information</div>
+        <div class="toast-content">
+            <div class="toast-title">Info!</div>
             <div class="toast-message"></div>
         </div>
         <button type="button" class="toast-close-btn">×</button>
@@ -374,14 +662,14 @@ $__env->startPush('styles'); ?>
     <div id="toast-template-delete" class="toast-wrapper">
         <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Trash2','class' => 'toast-icon-delete stroke-1.5 w-6 h-6']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Trash2','class' => 'toast-icon toast-icon-delete stroke-1.5 w-6 h-6']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.lucide'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['icon' => 'Trash2','class' => 'toast-icon-delete stroke-1.5 w-6 h-6']); ?> <?php echo $__env->renderComponent(); ?>
+<?php $component->withAttributes(['icon' => 'Trash2','class' => 'toast-icon toast-icon-delete stroke-1.5 w-6 h-6']); ?> <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
 <?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
@@ -391,7 +679,7 @@ $__env->startPush('styles'); ?>
 <?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
-        <div class="ml-4 mr-4 flex-1">
+        <div class="toast-content">
             <div class="toast-title">Deleted!</div>
             <div class="toast-message"></div>
         </div>
@@ -402,14 +690,14 @@ $__env->startPush('styles'); ?>
     <div id="toast-template-update" class="toast-wrapper">
         <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Pencil','class' => 'toast-icon-update stroke-1.5 w-6 h-6']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Pencil','class' => 'toast-icon toast-icon-update stroke-1.5 w-6 h-6']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.lucide'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['icon' => 'Pencil','class' => 'toast-icon-update stroke-1.5 w-6 h-6']); ?> <?php echo $__env->renderComponent(); ?>
+<?php $component->withAttributes(['icon' => 'Pencil','class' => 'toast-icon toast-icon-update stroke-1.5 w-6 h-6']); ?> <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
 <?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
@@ -419,7 +707,7 @@ $__env->startPush('styles'); ?>
 <?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
-        <div class="ml-4 mr-4 flex-1">
+        <div class="toast-content">
             <div class="toast-title">Updated!</div>
             <div class="toast-message"></div>
         </div>
@@ -472,7 +760,7 @@ $__env->startPush('styles'); ?>
     </div>
 </div>
 
-<?php if (! $__env->hasRenderedOnce('cb700156-175f-4b67-afa1-01afebdd7562')): $__env->markAsRenderedOnce('cb700156-175f-4b67-afa1-01afebdd7562');
+<?php if (! $__env->hasRenderedOnce('8760505f-5807-4eab-a324-fd24d5cb640e')): $__env->markAsRenderedOnce('8760505f-5807-4eab-a324-fd24d5cb640e');
 $__env->startPush('scripts'); ?>
 <script>
     // Global Notification System

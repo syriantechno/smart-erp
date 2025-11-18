@@ -91,10 +91,19 @@ class EmployeeController extends Controller
                 return $employee->company ? $employee->company->name : '-';
             })
             ->addColumn('department_name', function ($employee) {
-                return $employee->department ? $employee->department->name : '-';
-            })
-            ->addColumn('position', function ($employee) {
-                return $employee->position ?? '-';
+                $departmentName = $employee->department ? e($employee->department->name) : '-';
+                $position = $employee->position ? e($employee->position) : null;
+
+                $content = '<div class="leading-tight text-slate-800">'
+                    . '<span class="block font-medium">' . $departmentName . '</span>';
+
+                if ($position) {
+                    $content .= '<span class="mt-0.5 block text-xs text-slate-500">' . $position . '</span>';
+                }
+
+                $content .= '</div>';
+
+                return $content;
             })
             ->addColumn('hire_date_formatted', function ($employee) {
                 return $employee->hire_date ? $employee->hire_date->format('M d, Y') : '-';
@@ -109,7 +118,7 @@ class EmployeeController extends Controller
             ->addColumn('actions', function ($employee) {
                 return view('hr.employees.partials.actions', ['employee' => $employee])->render();
             })
-            ->rawColumns(['status', 'actions', 'profile_picture', 'full_name'])
+            ->rawColumns(['status', 'actions', 'profile_picture', 'full_name', 'department_name'])
             ->make(true);
     }
 

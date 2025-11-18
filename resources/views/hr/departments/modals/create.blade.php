@@ -5,7 +5,7 @@
 @endphp
 
 @push('modals')
-    <x-modal.form id="create-department-modal" title="Create New Department">
+    <x-modal.form id="create-department-modal" title="📋 Create New Department" class="hidden">
         <form id="create-department-form" action="{{ route('hr.departments.store') }}" method="POST">
             @csrf
             <div class="grid grid-cols-12 gap-4 gap-y-4">
@@ -66,11 +66,12 @@
         @slot('footer')
             <div class="flex justify-end gap-2 w-full">
                 <x-base.button
-                    class="w-24"
-                    data-tw-dismiss="modal"
+                    class="w-32"
                     type="button"
+                    data-tw-dismiss="modal"
                     variant="outline-secondary"
                 >
+                    <x-base.lucide icon="X" class="w-4 h-4 mr-2" />
                     Cancel
                 </x-base.button>
                 <x-base.button

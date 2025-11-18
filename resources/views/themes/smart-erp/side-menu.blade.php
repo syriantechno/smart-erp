@@ -159,8 +159,26 @@
 
             if (!sidebar || !toggleBtn || !mainContent || !header) return;
 
+            // Restore saved sidebar state from localStorage
+            var savedState = localStorage.getItem('sidebar-collapsed');
+            if (savedState === 'true') {
+                // Apply collapsed state on page load
+                sidebar.classList.add('side-nav--simple');
+                sidebar.classList.remove('w-[100px]', 'xl:w-[260px]');
+                sidebar.classList.add('w-[72px]', 'xl:w-[88px]');
+                
+                mainContent.classList.remove('md:ml-[100px]', 'xl:ml-[260px]');
+                mainContent.classList.add('md:ml-[72px]', 'xl:ml-[88px]');
+                
+                header.classList.remove('md:ml-[100px]', 'xl:ml-[260px]');
+                header.classList.add('md:ml-[72px]', 'xl:ml-[88px]');
+            }
+
             toggleBtn.addEventListener('click', function () {
                 var isSimple = sidebar.classList.toggle('side-nav--simple');
+                
+                // Save state to localStorage
+                localStorage.setItem('sidebar-collapsed', isSimple);
 
                 if (isSimple) {
                     // Sidebar becomes narrower

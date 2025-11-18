@@ -363,7 +363,18 @@
                     { data: 'code', name: 'code' },
                     { data: 'name', name: 'name' },
                     { data: 'description', name: 'description' },
-                    { data: 'status_badge', name: 'status_badge', orderable: false, searchable: false },
+                    { 
+                        data: 'is_active', 
+                        name: 'is_active',
+                        className: 'text-center',
+                        title: 'Status',
+                        render: function (value) {
+                            if (window.erpCrud && typeof window.erpCrud.renderStatusBadge === 'function') {
+                                return window.erpCrud.renderStatusBadge(value);
+                            }
+                            return value ? 'Active' : 'Inactive';
+                        }
+                    },
                     { data: 'actions', name: 'actions', orderable: false, searchable: false }
                 ],
                 pageLength: 25
