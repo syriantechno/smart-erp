@@ -2,62 +2,47 @@
     <?php echo $__env->make('hr.departments.modals.edit', ['department' => $department], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
     <!-- Edit Department -->
-    <button
-        type="button"
-        data-tw-toggle="modal"
-        data-tw-target="#edit-department-modal-<?php echo e($department->id); ?>"
-        class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-blue-50 text-blue-600 transition hover:bg-blue-100 hover:text-blue-800 dark:bg-darkmode-700 dark:text-blue-400 dark:hover:bg-darkmode-600"
-        title="Edit"
-    >
-        <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Edit','class' => 'h-4 w-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.lucide'); ?>
+    <?php if (isset($component)) { $__componentOriginal032f83e94ea583b9c58157a8acdf0a87 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal032f83e94ea583b9c58157a8acdf0a87 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.erp.action-button','data' => ['icon' => 'Edit','variant' => 'primary','dataTwToggle' => 'modal','dataTwTarget' => '#edit-department-modal-'.e($department->id).'','title' => 'Edit Department']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('erp.action-button'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['icon' => 'Edit','class' => 'h-4 w-4']); ?>
+<?php $component->withAttributes(['icon' => 'Edit','variant' => 'primary','data-tw-toggle' => 'modal','data-tw-target' => '#edit-department-modal-'.e($department->id).'','title' => 'Edit Department']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
-<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
-<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php if (isset($__attributesOriginal032f83e94ea583b9c58157a8acdf0a87)): ?>
+<?php $attributes = $__attributesOriginal032f83e94ea583b9c58157a8acdf0a87; ?>
+<?php unset($__attributesOriginal032f83e94ea583b9c58157a8acdf0a87); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
-<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
-<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php if (isset($__componentOriginal032f83e94ea583b9c58157a8acdf0a87)): ?>
+<?php $component = $__componentOriginal032f83e94ea583b9c58157a8acdf0a87; ?>
+<?php unset($__componentOriginal032f83e94ea583b9c58157a8acdf0a87); ?>
 <?php endif; ?>
-    </button>
 
     <!-- Delete Department -->
-    <button
-        type="button"
-        onclick="deleteDepartment(<?php echo e($department->id); ?>, '<?php echo e(addslashes($department->name)); ?>')"
-        class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-red-50 text-red-600 transition hover:bg-red-100 hover:text-red-800 dark:bg-darkmode-700 dark:text-red-400 dark:hover:bg-darkmode-600"
-        title="Delete"
-    >
-        <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Trash2','class' => 'h-4 w-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.lucide'); ?>
+    <?php if (isset($component)) { $__componentOriginal032f83e94ea583b9c58157a8acdf0a87 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal032f83e94ea583b9c58157a8acdf0a87 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.erp.action-button','data' => ['icon' => 'Trash2','variant' => 'danger','title' => 'Delete Department','onclick' => 'deleteDepartment('.e($department->id).', \''.e(addslashes($department->name)).'\')']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('erp.action-button'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['icon' => 'Trash2','class' => 'h-4 w-4']); ?>
+<?php $component->withAttributes(['icon' => 'Trash2','variant' => 'danger','title' => 'Delete Department','onclick' => 'deleteDepartment('.e($department->id).', \''.e(addslashes($department->name)).'\')']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
-<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
-<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php if (isset($__attributesOriginal032f83e94ea583b9c58157a8acdf0a87)): ?>
+<?php $attributes = $__attributesOriginal032f83e94ea583b9c58157a8acdf0a87; ?>
+<?php unset($__attributesOriginal032f83e94ea583b9c58157a8acdf0a87); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
-<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
-<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php if (isset($__componentOriginal032f83e94ea583b9c58157a8acdf0a87)): ?>
+<?php $component = $__componentOriginal032f83e94ea583b9c58157a8acdf0a87; ?>
+<?php unset($__componentOriginal032f83e94ea583b9c58157a8acdf0a87); ?>
 <?php endif; ?>
-    </button>
 </div>
 <?php /**PATH E:\ERP System\Source\resources\views/hr/departments/partials/actions.blade.php ENDPATH**/ ?>

@@ -497,7 +497,7 @@
 
         const table = (window.erpCrud && window.erpCrud.initDataTable) ? window.erpCrud.initDataTable({
             tableSelector: '#departments-table',
-            ajaxUrl: <?php echo json_encode(route('hr.departments.datatable'), 15, 512) ?>,
+            ajaxUrl: '<?php echo e(route("hr.departments.datatable")); ?>',
             ajaxData: function (d) {
                 if (filterField) {
                     d.filter_field = filterField.value || 'all';
@@ -577,12 +577,7 @@
                     orderable: false,
                     searchable: false
                 }
-            ],
-            drawCallback: function (settings) {
-                if (typeof window.Lucide !== 'undefined') {
-                    window.Lucide.createIcons();
-                }
-            }
+            ]
         }) : null;
 
         if (!table) {
@@ -605,7 +600,7 @@
                 return;
             }
 
-            fetch(<?php echo json_encode(route('hr.departments.preview-code'), 15, 512) ?>)
+            fetch('<?php echo e(route("hr.departments.preview-code")); ?>')
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Failed to preview department code');

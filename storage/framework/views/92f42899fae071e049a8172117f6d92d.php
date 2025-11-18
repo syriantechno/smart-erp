@@ -1,7 +1,7 @@
 <?php
 $companies = \App\Models\Company::active()->get();
-$managers = \App\Models\Employee::active()->get();
-$departments = \App\Models\Department::where('id', '!=', $department->id)
+$managers = \App\Models\HR\Employee::active()->get();
+$departments = \App\Models\HR\Department::where('id', '!=', $department->id)
     ->where('company_id', $department->company_id)
     ->where(function($query) use ($department) {
         $query->whereNull('parent_id')
