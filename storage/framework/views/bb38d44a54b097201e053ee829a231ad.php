@@ -1134,7 +1134,7 @@
                             return;
                         }
 
-                        const headers = ['#', 'Code', 'Photo', 'Full Name', 'Department', 'Position', 'Email', 'Status'];
+                        const headers = ['#', 'Code', 'Photo', 'Full Name', 'Department / Position', 'Email', 'Status'];
                         const csvRows = [headers.join(',')];
 
                         rows.forEach(function (row) {
@@ -1144,7 +1144,6 @@
                                 row.profile_picture ? 'Yes' : 'No', // Photo indicator
                                 '"' + (row.full_name || '').replace(/"/g, '""') + '"',
                                 '"' + (row.department_name || '').replace(/"/g, '""') + '"',
-                                '"' + (row.position || '').replace(/"/g, '""') + '"',
                                 '"' + (row.email || '').replace(/"/g, '""') + '"',
                                 row.is_active ? 'Active' : 'Inactive'
                             ];
