@@ -246,4 +246,12 @@ class Employee extends Model
 
         return $days[$dayOfWeek] ?? 'monday';
     }
+
+    /**
+     * Get the tasks assigned to this employee.
+     */
+    public function assignedTasks(): HasMany
+    {
+        return $this->hasMany(\App\Models\Work\Task::class, 'employee_id');
+    }
 }

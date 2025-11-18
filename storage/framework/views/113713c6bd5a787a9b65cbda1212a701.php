@@ -454,6 +454,31 @@
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?> Documents
                     </a>
+                    <a
+                        class="mt-5 flex items-center"
+                        href="#assigned-tasks"
+                    >
+                        <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['class' => 'mr-2 h-4 w-4','icon' => 'CheckSquare']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.lucide'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'mr-2 h-4 w-4','icon' => 'CheckSquare']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?> Assigned Tasks
+                    </a>
                 </div>
                 <div class="border-t border-slate-200/60 p-5 dark:border-darkmode-400">
                     <div class="text-sm">
@@ -577,9 +602,19 @@
                         <span>Department</span>
                         <span><?php echo e($employee->department->name ?? 'N/A'); ?></span>
                     </div>
-                    <div class="flex justify-between items-center">
+                    <div class="flex justify-between items-center mb-2">
                         <span>Position</span>
                         <span><?php echo e($employee->position ?? 'N/A'); ?></span>
+                    </div>
+                    <?php
+                        $taskStats = [
+                            'total' => $employee->assignedTasks()->count(),
+                            'completed' => $employee->assignedTasks()->where('status', 'completed')->count(),
+                        ];
+                    ?>
+                    <div class="flex justify-between items-center">
+                        <span>Tasks Completed</span>
+                        <span><?php echo e($taskStats['completed']); ?>/<?php echo e($taskStats['total']); ?></span>
                     </div>
                 </div>
                 <div class="mt-5 flex font-medium">
@@ -1173,6 +1208,205 @@
                     </div>
                 </div>
                 <!-- END: Documents -->
+
+                <!-- BEGIN: Assigned Tasks -->
+                <div class="intro-y box col-span-12" id="assigned-tasks">
+                    <div class="flex items-center border-b border-slate-200/60 px-5 py-5 dark:border-darkmode-400 sm:py-3">
+                        <h2 class="mr-auto text-base font-medium">Assigned Tasks</h2>
+                        <?php if(Route::has('tasks.index')): ?>
+                            <?php if (isset($component)) { $__componentOriginale00eb601fbe667f0da582732d70c41c5 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginale00eb601fbe667f0da582732d70c41c5 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.button.index','data' => ['as' => 'a','href' => ''.e(route('tasks.index', ['employee_id' => $employee->id])).'','variant' => 'outline-secondary']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.button'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['as' => 'a','href' => ''.e(route('tasks.index', ['employee_id' => $employee->id])).'','variant' => 'outline-secondary']); ?>
+                                <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['class' => 'mr-2 h-4 w-4','icon' => 'ExternalLink']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.lucide'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'mr-2 h-4 w-4','icon' => 'ExternalLink']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+                                View All
+                             <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginale00eb601fbe667f0da582732d70c41c5)): ?>
+<?php $attributes = $__attributesOriginale00eb601fbe667f0da582732d70c41c5; ?>
+<?php unset($__attributesOriginale00eb601fbe667f0da582732d70c41c5); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginale00eb601fbe667f0da582732d70c41c5)): ?>
+<?php $component = $__componentOriginale00eb601fbe667f0da582732d70c41c5; ?>
+<?php unset($__componentOriginale00eb601fbe667f0da582732d70c41c5); ?>
+<?php endif; ?>
+                        <?php endif; ?>
+                    </div>
+                    <div class="p-5">
+                        <?php
+                            $assignedTasks = $employee->assignedTasks()->with(['project'])->latest()->take(5)->get();
+                        ?>
+
+                        <?php if($assignedTasks->count() > 0): ?>
+                            <div class="space-y-3">
+                                <?php $__currentLoopData = $assignedTasks; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $task): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <div class="flex items-center justify-between p-4 border border-slate-200/60 rounded-lg dark:border-darkmode-400 hover:bg-slate-50 dark:hover:bg-darkmode-600 transition-colors">
+                                        <div class="flex items-center flex-1">
+                                            <?php if($task->color): ?>
+                                                <div class="w-3 h-3 rounded-full mr-3 border border-white shadow-sm" style="background-color: <?php echo e($task->color); ?>"></div>
+                                            <?php else: ?>
+                                                <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['class' => 'h-4 w-4 text-slate-400 mr-3','icon' => 'CheckSquare']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.lucide'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'h-4 w-4 text-slate-400 mr-3','icon' => 'CheckSquare']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+                                            <?php endif; ?>
+                                            <div class="flex-1">
+                                                <div class="font-medium text-sm"><?php echo e($task->title); ?></div>
+                                                <div class="text-xs text-slate-500 mt-1">
+                                                    <span class="mr-3"><?php echo e($task->code); ?></span>
+                                                    <?php if($task->project): ?>
+                                                        <span class="mr-3"><?php echo e($task->project->name); ?></span>
+                                                    <?php endif; ?>
+                                                    <?php if($task->due_date): ?>
+                                                        <span>Due: <?php echo e($task->due_date->format('M d, Y')); ?></span>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <!-- Priority Badge -->
+                                            <?php
+                                                $priorityClass = match($task->priority) {
+                                                    'high' => 'bg-red-100 text-red-700',
+                                                    'medium' => 'bg-yellow-100 text-yellow-700',
+                                                    'low' => 'bg-green-100 text-green-700',
+                                                    default => 'bg-gray-100 text-gray-700'
+                                                };
+                                            ?>
+                                            <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold <?php echo e($priorityClass); ?>">
+                                                <?php echo e(ucfirst($task->priority)); ?>
+
+                                            </span>
+                                            
+                                            <!-- Status Badge -->
+                                            <?php
+                                                $statusClass = match($task->status) {
+                                                    'completed' => 'bg-green-100 text-green-700',
+                                                    'in_progress' => 'bg-blue-100 text-blue-700',
+                                                    'pending' => 'bg-yellow-100 text-yellow-700',
+                                                    'cancelled' => 'bg-red-100 text-red-700',
+                                                    default => 'bg-gray-100 text-gray-700'
+                                                };
+                                            ?>
+                                            <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold <?php echo e($statusClass); ?>">
+                                                <?php echo e(ucfirst(str_replace('_', ' ', $task->status))); ?>
+
+                                            </span>
+                                        </div>
+                                    </div>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </div>
+                            
+                            <?php
+                                $totalTasks = $employee->assignedTasks()->count();
+                                $completedTasks = $employee->assignedTasks()->where('status', 'completed')->count();
+                                $pendingTasks = $employee->assignedTasks()->where('status', 'pending')->count();
+                                $inProgressTasks = $employee->assignedTasks()->where('status', 'in_progress')->count();
+                            ?>
+                            
+                            <?php if($totalTasks > 5): ?>
+                                <div class="mt-4 text-center">
+                                    <a href="<?php echo e(route('tasks.index', ['employee_id' => $employee->id])); ?>"
+                                       class="text-primary hover:text-primary/80 text-sm">
+                                        View all <?php echo e($totalTasks); ?> tasks
+                                    </a>
+                                </div>
+                            <?php endif; ?>
+                            
+                            <!-- Task Statistics -->
+                            <div class="mt-6 grid grid-cols-4 gap-4 pt-4 border-t border-slate-200/60 dark:border-darkmode-400">
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-slate-700 dark:text-slate-300"><?php echo e($totalTasks); ?></div>
+                                    <div class="text-xs text-slate-500">Total</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-green-600"><?php echo e($completedTasks); ?></div>
+                                    <div class="text-xs text-slate-500">Completed</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-blue-600"><?php echo e($inProgressTasks); ?></div>
+                                    <div class="text-xs text-slate-500">In Progress</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-yellow-600"><?php echo e($pendingTasks); ?></div>
+                                    <div class="text-xs text-slate-500">Pending</div>
+                                </div>
+                            </div>
+                        <?php else: ?>
+                            <div class="flex flex-col items-center justify-center py-10">
+                                <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['class' => 'h-12 w-12 text-slate-400 mb-4','icon' => 'CheckSquare']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.lucide'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'h-12 w-12 text-slate-400 mb-4','icon' => 'CheckSquare']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+                                <div class="text-slate-500 text-center mb-2">No tasks assigned</div>
+                                <?php if(Route::has('tasks.create')): ?>
+                                    <a href="<?php echo e(route('tasks.create', ['employee_id' => $employee->id])); ?>"
+                                       class="text-primary hover:text-primary/80 text-sm">
+                                        Assign first task
+                                    </a>
+                                <?php endif; ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <!-- END: Assigned Tasks -->
 
                 <!-- BEGIN: Recent Activities -->
                 <div class="intro-y box col-span-12">

@@ -111,6 +111,15 @@
                             icon="FileText"
                         /> Documents
                     </a>
+                    <a
+                        class="mt-5 flex items-center"
+                        href="#assigned-tasks"
+                    >
+                        <x-base.lucide
+                            class="mr-2 h-4 w-4"
+                            icon="CheckSquare"
+                        /> Assigned Tasks
+                    </a>
                 </div>
                 <div class="border-t border-slate-200/60 p-5 dark:border-darkmode-400">
                     <div class="text-sm">
@@ -167,9 +176,19 @@
                         <span>Department</span>
                         <span>{{ $employee->department->name ?? 'N/A' }}</span>
                     </div>
-                    <div class="flex justify-between items-center">
+                    <div class="flex justify-between items-center mb-2">
                         <span>Position</span>
                         <span>{{ $employee->position ?? 'N/A' }}</span>
+                    </div>
+                    @php
+                        $taskStats = [
+                            'total' => $employee->assignedTasks()->count(),
+                            'completed' => $employee->assignedTasks()->where('status', 'completed')->count(),
+                        ];
+                    @endphp
+                    <div class="flex justify-between items-center">
+                        <span>Tasks Completed</span>
+                        <span>{{ $taskStats['completed'] }}/{{ $taskStats['total'] }}</span>
                     </div>
                 </div>
                 <div class="mt-5 flex font-medium">
@@ -508,6 +527,128 @@
                     </div>
                 </div>
                 <!-- END: Documents -->
+
+                <!-- BEGIN: Assigned Tasks -->
+                <div class="intro-y box col-span-12" id="assigned-tasks">
+                    <div class="flex items-center border-b border-slate-200/60 px-5 py-5 dark:border-darkmode-400 sm:py-3">
+                        <h2 class="mr-auto text-base font-medium">Assigned Tasks</h2>
+                        @if(Route::has('tasks.index'))
+                            <x-base.button as="a" href="{{ route('tasks.index', ['employee_id' => $employee->id]) }}" variant="outline-secondary">
+                                <x-base.lucide class="mr-2 h-4 w-4" icon="ExternalLink" />
+                                View All
+                            </x-base.button>
+                        @endif
+                    </div>
+                    <div class="p-5">
+                        @php
+                            $assignedTasks = $employee->assignedTasks()->with(['project'])->latest()->take(5)->get();
+                        @endphp
+
+                        @if($assignedTasks->count() > 0)
+                            <div class="space-y-3">
+                                @foreach($assignedTasks as $task)
+                                    <div class="flex items-center justify-between p-4 border border-slate-200/60 rounded-lg dark:border-darkmode-400 hover:bg-slate-50 dark:hover:bg-darkmode-600 transition-colors">
+                                        <div class="flex items-center flex-1">
+                                            @if($task->color)
+                                                <div class="w-3 h-3 rounded-full mr-3 border border-white shadow-sm" style="background-color: {{ $task->color }}"></div>
+                                            @else
+                                                <x-base.lucide class="h-4 w-4 text-slate-400 mr-3" icon="CheckSquare" />
+                                            @endif
+                                            <div class="flex-1">
+                                                <div class="font-medium text-sm">{{ $task->title }}</div>
+                                                <div class="text-xs text-slate-500 mt-1">
+                                                    <span class="mr-3">{{ $task->code }}</span>
+                                                    @if($task->project)
+                                                        <span class="mr-3">{{ $task->project->name }}</span>
+                                                    @endif
+                                                    @if($task->due_date)
+                                                        <span>Due: {{ $task->due_date->format('M d, Y') }}</span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <!-- Priority Badge -->
+                                            @php
+                                                $priorityClass = match($task->priority) {
+                                                    'high' => 'bg-red-100 text-red-700',
+                                                    'medium' => 'bg-yellow-100 text-yellow-700',
+                                                    'low' => 'bg-green-100 text-green-700',
+                                                    default => 'bg-gray-100 text-gray-700'
+                                                };
+                                            @endphp
+                                            <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold {{ $priorityClass }}">
+                                                {{ ucfirst($task->priority) }}
+                                            </span>
+                                            
+                                            <!-- Status Badge -->
+                                            @php
+                                                $statusClass = match($task->status) {
+                                                    'completed' => 'bg-green-100 text-green-700',
+                                                    'in_progress' => 'bg-blue-100 text-blue-700',
+                                                    'pending' => 'bg-yellow-100 text-yellow-700',
+                                                    'cancelled' => 'bg-red-100 text-red-700',
+                                                    default => 'bg-gray-100 text-gray-700'
+                                                };
+                                            @endphp
+                                            <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold {{ $statusClass }}">
+                                                {{ ucfirst(str_replace('_', ' ', $task->status)) }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                            
+                            @php
+                                $totalTasks = $employee->assignedTasks()->count();
+                                $completedTasks = $employee->assignedTasks()->where('status', 'completed')->count();
+                                $pendingTasks = $employee->assignedTasks()->where('status', 'pending')->count();
+                                $inProgressTasks = $employee->assignedTasks()->where('status', 'in_progress')->count();
+                            @endphp
+                            
+                            @if($totalTasks > 5)
+                                <div class="mt-4 text-center">
+                                    <a href="{{ route('tasks.index', ['employee_id' => $employee->id]) }}"
+                                       class="text-primary hover:text-primary/80 text-sm">
+                                        View all {{ $totalTasks }} tasks
+                                    </a>
+                                </div>
+                            @endif
+                            
+                            <!-- Task Statistics -->
+                            <div class="mt-6 grid grid-cols-4 gap-4 pt-4 border-t border-slate-200/60 dark:border-darkmode-400">
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-slate-700 dark:text-slate-300">{{ $totalTasks }}</div>
+                                    <div class="text-xs text-slate-500">Total</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-green-600">{{ $completedTasks }}</div>
+                                    <div class="text-xs text-slate-500">Completed</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-blue-600">{{ $inProgressTasks }}</div>
+                                    <div class="text-xs text-slate-500">In Progress</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-yellow-600">{{ $pendingTasks }}</div>
+                                    <div class="text-xs text-slate-500">Pending</div>
+                                </div>
+                            </div>
+                        @else
+                            <div class="flex flex-col items-center justify-center py-10">
+                                <x-base.lucide class="h-12 w-12 text-slate-400 mb-4" icon="CheckSquare" />
+                                <div class="text-slate-500 text-center mb-2">No tasks assigned</div>
+                                @if(Route::has('tasks.create'))
+                                    <a href="{{ route('tasks.create', ['employee_id' => $employee->id]) }}"
+                                       class="text-primary hover:text-primary/80 text-sm">
+                                        Assign first task
+                                    </a>
+                                @endif
+                            </div>
+                        @endif
+                    </div>
+                </div>
+                <!-- END: Assigned Tasks -->
 
                 <!-- BEGIN: Recent Activities -->
                 <div class="intro-y box col-span-12">
