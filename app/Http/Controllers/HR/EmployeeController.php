@@ -99,7 +99,12 @@ class EmployeeController extends Controller
                 return $employee->company ? $employee->company->name : '-';
             })
             ->addColumn('department_name', function ($employee) {
-                return $employee->department ? $employee->department->name : '-';
+                $department = $employee->department ? e($employee->department->name) : '-';
+                $position = $employee->position
+                    ? '<span class="mt-0.5 block text-xs text-slate-500">' . e($employee->position) . '</span>'
+                    : '';
+
+                return '<div class="leading-tight">' . $department . $position . '</div>';
             })
             ->addColumn('position', function ($employee) {
                 return $employee->position ?? '-';

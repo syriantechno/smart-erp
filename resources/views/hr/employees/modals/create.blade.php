@@ -1,82 +1,127 @@
 @php
     $companies = \App\Models\Setting\Company::active()->get();
     $codeGenerator = app(\App\Services\DocumentCodeGenerator::class);
-    $previewCode = $codeGenerator->preview('employees');
+    $generatedCode = $codeGenerator->generate('employees');
     $countries = include app_path('Data/countries.php');
     $countriesJson = json_encode($countries);
 @endphp
-<x-modal.form id="create-employee-modal" title="Add New Employee" size="3xl">
+<x-modal.form id="create-employee-modal" title="Add New Employee" size="5xl">
     <form id="create-employee-form" action="{{ route('hr.employees.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
-        <!-- Personal Information -->
-        <div class="mb-6">
-            <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                <x-base.lucide icon="User" class="h-5 w-5"></x-base.lucide>
-                Personal Information
-            </h4>
-            <div class="grid grid-cols-12 gap-4 gap-y-4">
-                <div class="col-span-12 md:col-span-4 lg:col-span-3">
-                    <x-base.form-label for="code">Employee Code</x-base.form-label>
-                    <x-base.form-input id="code" name="code" type="text" class="w-full" formInputSize="sm" value="{{ $previewCode }}" readonly />
-                </div>
-
-                <div class="col-span-12 md:col-span-4 lg:col-span-3">
-                    <x-base.form-label for="first_name">First Name <span class="text-danger">*</span></x-base.form-label>
-                    <x-base.form-input id="first_name" name="first_name" type="text" placeholder="Enter first name" class="w-full" formInputSize="sm" required />
-                </div>
-
-                <div class="col-span-12 md:col-span-4 lg:col-span-3">
-                    <x-base.form-label for="middle_name">Middle Name</x-base.form-label>
-                    <x-base.form-input id="middle_name" name="middle_name" type="text" placeholder="Enter middle name" class="w-full" formInputSize="sm" />
-                </div>
-
-                <div class="col-span-12 md:col-span-4 lg:col-span-3">
-                    <x-base.form-label for="last_name">Last Name <span class="text-danger">*</span></x-base.form-label>
-                    <x-base.form-input id="last_name" name="last_name" type="text" placeholder="Enter last name" class="w-full" formInputSize="sm" required />
-                </div>
-
-                <div class="col-span-12 md:col-span-4 lg:col-span-3">
-                    <x-base.form-label for="translated_name">Translated / Localized Name</x-base.form-label>
-                    <x-base.form-input id="translated_name" name="translated_name" type="text" placeholder="Enter translated name" class="w-full" formInputSize="sm" />
-                    <x-base.form-help>Use any language needed for official documents.</x-base.form-help>
-                </div>
-
-                <div class="col-span-12 md:col-span-4 lg:col-span-3">
-                    <x-base.form-label for="email">Email Address <span class="text-danger">*</span></x-base.form-label>
-                    <x-base.form-input id="email" name="email" type="email" placeholder="employee@example.com" class="w-full" formInputSize="sm" required />
-                </div>
-
-                <div class="col-span-12 md:col-span-4 lg:col-span-3">
-                    <x-base.form-label for="phone">Phone Number</x-base.form-label>
-                    <x-base.form-input id="phone" name="phone" type="tel" placeholder="+966XXXXXXXXX" class="w-full" formInputSize="sm" />
-                </div>
-
-                <div class="col-span-12 md:col-span-4 lg:col-span-3">
-                    <x-base.form-label for="birth_date">Date of Birth</x-base.form-label>
-                    <div class="relative w-full">
-                        <div
-                            class="absolute flex h-full w-10 items-center justify-center rounded-l border bg-slate-100 text-slate-500 dark:border-darkmode-800 dark:bg-darkmode-700 dark:text-slate-400">
-                            <x-base.lucide icon="calendar" class="stroke-1.5 w-5 h-5"></x-base.lucide>
-                        </div>
-                        <x-base.litepicker
-                            id="birth_date"
-                            name="birth_date"
-                            class="pl-12"
-                            data-single-mode="true"
-                            data-format="YYYY-MM-DD"
+        <!-- Profile Picture and Personal Information Section -->
+        <div class="mb-6 flex flex-col lg:flex-row gap-6 lg:items-start">
+            <!-- Personal Information Fields (Left) -->
+            <div class="flex-1 order-2 lg:order-1">
+                <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                    <x-base.lucide icon="User" class="h-5 w-5"></x-base.lucide>
+                    Personal Information
+                </h4>
+                <div class="flex flex-wrap gap-4 gap-y-4">
+                    <div class="w-full md:w-1/3 lg:w-1/6">
+                        <x-base.form-label for="code">Employee Code</x-base.form-label>
+                        <x-base.form-input
+                            id="code"
+                            name="code"
+                            type="text"
+                            class="w-full"
+                            value="{{ old('code', $generatedCode) }}"
+                            readonly
                         />
                     </div>
-                </div>
 
-                <div class="col-span-12 md:col-span-4 lg:col-span-3">
-                    <x-base.form-label for="gender">Gender</x-base.form-label>
-                    <x-base.form-select id="gender" name="gender" class="w-full">
-                        <option value="">Select Gender</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="other">Other</option>
-                    </x-base.form-select>
+                    <div class="w-full md:w-1/3 lg:w-1/6">
+                        <x-base.form-label for="first_name">First Name <span class="text-danger">*</span></x-base.form-label>
+                        <x-base.form-input id="first_name" name="first_name" type="text" placeholder="Enter first name" class="w-full" required />
+                    </div>
+
+                    <div class="w-full md:w-1/3 lg:w-1/6">
+                        <x-base.form-label for="middle_name">Middle Name</x-base.form-label>
+                        <x-base.form-input id="middle_name" name="middle_name" type="text" placeholder="Enter middle name" class="w-full" />
+                    </div>
+
+                    <div class="w-full md:w-1/3 lg:w-1/6">
+                        <x-base.form-label for="last_name">Last Name <span class="text-danger">*</span></x-base.form-label>
+                        <x-base.form-input id="last_name" name="last_name" type="text" placeholder="Enter last name" class="w-full" required />
+                    </div>
+
+                    <div class="w-full md:w-1/3 lg:w-1/6">
+                        <x-base.form-label for="translated_name">Translated Name</x-base.form-label>
+                        <x-base.form-input id="translated_name" name="translated_name" type="text" placeholder="Enter translated name" class="w-full" />
+                        <x-base.form-help>Use any language needed for official documents.</x-base.form-help>
+                    </div>
+
+                    <div class="w-full md:w-1/3 lg:w-1/6">
+                        <x-base.form-label for="email">Email Address <span class="text-danger">*</span></x-base.form-label>
+                        <x-base.form-input id="email" name="email" type="email" placeholder="employee@example.com" class="w-full" required />
+                    </div>
+
+                    <div class="w-full md:w-1/3 lg:w-1/6">
+                        <x-base.form-label for="phone">Phone Number</x-base-form-label>
+                        <x-base.form-input id="phone" name="phone" type="tel" placeholder="+966XXXXXXXXX" class="w-full" />
+                    </div>
+
+                    <div class="w-full md:w-1/3 lg:w-1/6">
+                        <x-base.form-label for="birth_date">Date of Birth</x-base-form-label>
+                        <div class="relative w-full">
+                            <div
+                                class="absolute flex h-full w-10 items-center justify-center rounded-l border bg-slate-100 text-slate-500 dark:border-darkmode-800 dark:bg-darkmode-700 dark:text-slate-400">
+                                <x-base.lucide icon="calendar" class="stroke-1.5 w-5 h-5"></x-base.lucide>
+                            </div>
+                            <x-base.litepicker
+                                id="birth_date"
+                                name="birth_date"
+                                class="pl-12"
+                                data-single-mode="true"
+                                data-format="YYYY-MM-DD"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="w-full md:w-1/3 lg:w-1/6">
+                        <x-base.form-label for="gender">Gender</x-base-form-label>
+                        <x-base.form-select id="gender" name="gender" class="w-full">
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </x-base.form-select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Picture (Right) -->
+            <div class="w-full lg:w-1/4 order-1 lg:order-2 lg:self-start">
+                <div class="rounded-lg bg-white dark:bg-darkmode-700 p-5 shadow-md border border-slate-200 dark:border-darkmode-600">
+                    <div class="text-center">
+                        <!-- Image Preview -->
+                        <div id="image-preview-container" class="hidden mb-4">
+                            <div class="relative inline-block">
+                                <img id="image-preview" src="" alt="Profile Preview"
+                                     class="w-40 h-48 object-cover rounded-lg shadow-md">
+                                <button type="button" id="remove-image"
+                                        class="absolute -top-2 -right-2 bg-danger text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 shadow-md">
+                                    ×
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Placeholder -->
+                        <div id="image-placeholder" class="mb-4">
+                            <div class="w-40 h-48 mx-auto bg-slate-300 dark:bg-darkmode-500 rounded-lg flex items-center justify-center">
+                                <x-base.lucide icon="User" class="w-16 h-16 text-slate-600 dark:text-slate-400"></x-base.lucide>
+                            </div>
+                        </div>
+                        
+                        <!-- Upload Button -->
+                        <div class="text-xs font-medium text-slate-700 dark:text-slate-300 mb-3">Add a photo of user:</div>
+                        <input type="file" id="profile_picture" name="profile_picture" accept="image/*"
+                               class="hidden" />
+                        <button type="button" onclick="document.getElementById('profile_picture').click()"
+                                class="w-full px-3 py-2 bg-primary text-white text-xs font-semibold rounded hover:bg-primary/90 transition">
+                            Browse...
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -87,8 +132,8 @@
                 <x-base.lucide icon="Briefcase" class="h-5 w-5"></x-base.lucide>
                 Employment Information
             </h4>
-            <div class="grid grid-cols-12 gap-4 gap-y-4">
-                <div class="col-span-12 md:col-span-4 lg:col-span-3">
+            <div class="flex flex-wrap gap-4 gap-y-4">
+                <div class="w-full md:w-1/3 lg:w-1/6">
                     <x-base.form-label for="company_id">Company <span class="text-danger">*</span></x-base.form-label>
                     <x-base.form-select id="company_id" name="company_id" class="w-full" required>
                         <option value="">Select Company</option>
@@ -98,26 +143,26 @@
                     </x-base.form-select>
                 </div>
 
-                <div class="col-span-12 md:col-span-4 lg:col-span-3">
+                <div class="w-full md:w-1/3 lg:w-1/6">
                     <x-base.form-label for="department_id">Department <span class="text-danger">*</span></x-base.form-label>
                     <x-base.form-select id="department_id" name="department_id" class="w-full" required disabled>
                         <option value="">Select Department</option>
                     </x-base.form-select>
                 </div>
 
-                <div class="col-span-12 md:col-span-4 lg:col-span-3">
+                <div class="w-full md:w-1/3 lg:w-1/6">
                     <x-base.form-label for="position">Position <span class="text-danger">*</span></x-base.form-label>
                     <x-base.form-select id="position" name="position" class="w-full" required disabled>
                         <option value="">Select Position</option>
                     </x-base.form-select>
                 </div>
 
-                <div class="col-span-12 md:col-span-4 lg:col-span-3">
+                <div class="w-full md:w-1/3 lg:w-1/6">
                     <x-base.form-label for="iqama_position">Iqama / Residency Position</x-base.form-label>
-                    <x-base.form-input id="iqama_position" name="iqama_position" type="text" placeholder="Enter iqama position title" class="w-full" formInputSize="sm" />
+                    <x-base.form-input id="iqama_position" name="iqama_position" type="text" placeholder="Enter iqama position title" class="w-full" />
                 </div>
 
-                <div class="col-span-12 md:col-span-4 lg:col-span-3">
+                <div class="w-full md:w-1/3 lg:w-1/6">
                     <x-base.form-label for="hire_date">Hire Date <span class="text-danger">*</span></x-base.form-label>
                     <div class="relative w-full">
                         <div
@@ -135,12 +180,12 @@
                     </div>
                 </div>
 
-                <div class="col-span-12 md:col-span-4 lg:col-span-3">
+                <div class="w-full md:w-1/3 lg:w-1/6">
                     <x-base.form-label for="salary">Basic Salary <span class="text-danger">*</span></x-base.form-label>
-                    <x-base.form-input id="salary" name="salary" type="number" step="0.01" min="0" placeholder="0.00" class="w-full" formInputSize="sm" required />
+                    <x-base.form-input id="salary" name="salary" type="number" step="0.01" min="0" placeholder="0.00" class="w-full" required />
                 </div>
 
-                <div class="col-span-12 md:col-span-4 lg:col-span-3">
+                <div class="w-full md:w-1/3 lg:w-1/6">
                     <x-base.form-label for="is_active">Status</x-base.form-label>
                     <x-base.form-select id="is_active" name="is_active" class="w-full">
                         <option value="1">Active</option>
@@ -156,26 +201,26 @@
                 <x-base.lucide icon="MapPin" class="h-5 w-5"></x-base.lucide>
                 Address Information
             </h4>
-            <div class="grid grid-cols-12 gap-4 gap-y-4">
-                <div class="col-span-12">
+            <div class="flex flex-wrap gap-4 gap-y-4">
+                <div class="w-full">
                     <x-base.form-label for="address">Full Address</x-base.form-label>
                     <x-base.form-textarea id="address" name="address" rows="3" placeholder="Enter full address" class="w-full"></x-base.form-textarea>
                 </div>
 
-                <div class="col-span-12 md:col-span-4 lg:col-span-3">
+                <div class="w-full md:w-1/3 lg:w-1/6">
                     <x-base.form-label for="city">City</x-base.form-label>
-                    <x-base.form-input id="city" name="city" type="text" placeholder="Enter city" class="w-full" formInputSize="sm" />
+                    <x-base.form-input id="city" name="city" type="text" placeholder="Enter city" class="w-full" />
                 </div>
 
-                <div class="col-span-12 md:col-span-4 lg:col-span-3">
+                <div class="w-full md:w-1/3 lg:w-1/6">
                     <x-base.form-label for="country">Country</x-base.form-label>
                     <x-base.form-select id="country" name="country" class="w-full">
                         <option value="">Select Country</option>
                     </x-base.form-select>
                 </div>
-                <div class="col-span-12 md:col-span-4 lg:col-span-3">
+                <div class="w-full md:w-1/3 lg:w-1/6">
                     <x-base.form-label for="postal_code">Postal Code</x-base.form-label>
-                    <x-base.form-input id="postal_code" name="postal_code" type="text" placeholder="Enter postal code" class="w-full" formInputSize="sm" />
+                    <x-base.form-input id="postal_code" name="postal_code" type="text" placeholder="Enter postal code" class="w-full" />
                 </div>
             </div>
         </div>
@@ -186,99 +231,72 @@
                 <x-base.lucide icon="Shield" class="h-5 w-5"></x-base.lucide>
                 Residency & Access
             </h4>
-            <div class="grid grid-cols-12 gap-4 gap-y-4">
-                <div class="col-span-12 md:col-span-6">
+            <div class="flex flex-wrap gap-4 gap-y-4">
+                <div class="w-full md:w-1/2 lg:w-1/3">
                     <div class="rounded-xl bg-white/80 px-4 py-3 shadow-sm ring-1 ring-slate-100 dark:bg-darkmode-600/70 dark:ring-darkmode-500/50">
                         <div class="flex items-center justify-between gap-4">
                             <div>
                                 <div class="font-medium text-sm text-slate-800 dark:text-slate-100">Company Housing</div>
                                 <div class="text-xs text-slate-500">Toggle if employee lives in company accommodation.</div>
                             </div>
-                            <label class="inline-flex cursor-pointer items-center">
+                            <label class="inline-flex cursor-pointer items-center gap-3">
                                 <input
                                     type="checkbox"
                                     id="is_company_housing"
                                     name="is_company_housing"
                                     value="1"
-                                    class="transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 dark:bg-darkmode-800 dark:border-transparent dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&[type='radio']]:checked:bg-primary [&[type='radio']]:checked:border-primary [&[type='radio']]:checked:border-opacity-10 [&[type='checkbox']]:checked:bg-primary [&[type='checkbox']]:checked:border-primary [&[type='checkbox']]:checked:border-opacity-10 [&:disabled:not(:checked)]:bg-slate-100 [&:disabled:not(:checked)]:cursor-not-allowed [&:disabled:not(:checked)]:dark:bg-darkmode-800/50 [&:disabled:checked]:opacity-70 [&:disabled:checked]:cursor-not-allowed [&:disabled:checked]:dark:bg-darkmode-800/50 w-[38px] h-[24px] p-px rounded-full relative before:w-[20px] before:h-[20px] before:shadow-[1px_1px_3px_rgba(0,0,0,0.25)] before:transition-[margin-left] before:duration-200 before:ease-in-out before:absolute before:inset-y-0 before:my-auto before:rounded-full before:dark:bg-darkmode-600 checked:bg-primary checked:border-primary checked:bg-none before:checked:ml-[14px] before:checked:bg-white"
-                                >
+                                    class="sr-only peer"
+                                />
+                                <div class="relative w-11 h-6 rounded-full bg-slate-200 transition-colors duration-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/25 dark:bg-darkmode-600 peer-checked:bg-primary after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition-all after:duration-200 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"></div>
                             </label>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-span-12 md:col-span-6 hidden" id="housing-details">
+                <div class="w-full md:w-1/2 lg:w-1/3 hidden" id="housing-details">
                     <div class="rounded-2xl border border-slate-200/70 bg-slate-50/70 p-4 shadow-inner dark:border-darkmode-600 dark:bg-darkmode-700/40">
-                        <div class="grid grid-cols-12 gap-3">
-                            <div class="col-span-12 md:col-span-6">
+                        <div class="flex flex-wrap gap-3 gap-y-3">
+                            <div class="w-full md:w-1/2">
                                 <x-base.form-label for="housing_room_number">Room / Flat No.</x-base.form-label>
-                                <x-base.form-input id="housing_room_number" name="housing_room_number" type="text" placeholder="Room number" class="w-full" formInputSize="sm" />
+                                <x-base.form-input id="housing_room_number" name="housing_room_number" type="text" placeholder="Room number" class="w-full" />
                             </div>
-                            <div class="col-span-12 md:col-span-6">
+                            <div class="w-full md:w-1/2">
                                 <x-base.form-label for="housing_unit_number">Unit / Building</x-base.form-label>
-                                <x-base.form-input id="housing_unit_number" name="housing_unit_number" type="text" placeholder="Building or unit" class="w-full" formInputSize="sm" />
+                                <x-base.form-input id="housing_unit_number" name="housing_unit_number" type="text" placeholder="Building or unit" class="w-full" />
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-span-12 md:col-span-6">
+                <div class="w-full md:w-1/2 lg:w-1/3">
                     <div class="rounded-xl bg-white/80 px-4 py-3 shadow-sm ring-1 ring-slate-100 dark:bg-darkmode-600/70 dark:ring-darkmode-500/50">
                         <div class="flex items-center justify-between gap-4">
                             <div>
                                 <div class="font-medium text-sm text-slate-800 dark:text-slate-100">System Access</div>
                                 <div class="text-xs text-slate-500">Allow employee to login to Smart ERP.</div>
                             </div>
-                            <label class="inline-flex cursor-pointer items-center">
+                            <label class="inline-flex cursor-pointer items-center gap-3">
                                 <input
                                     type="checkbox"
                                     id="has_system_access"
                                     name="has_system_access"
                                     value="1"
-                                    class="transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 dark:bg-darkmode-800 dark:border-transparent dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&[type='radio']]:checked:bg-primary [&[type='radio']]:checked:border-primary [&[type='radio']]:checked:border-opacity-10 [&[type='checkbox']]:checked:bg-primary [&[type='checkbox']]:checked:border-primary [&[type='checkbox']]:checked:border-opacity-10 [&:disabled:not(:checked)]:bg-slate-100 [&:disabled:not(:checked)]:cursor-not-allowed [&:disabled:not(:checked)]:dark:bg-darkmode-800/50 [&:disabled:checked]:opacity-70 [&:disabled:checked]:cursor-not-allowed [&:disabled:checked]:dark:bg-darkmode-800/50 w-[38px] h-[24px] p-px rounded-full relative before:w-[20px] before:h-[20px] before:shadow-[1px_1px_3px_rgba(0,0,0,0.25)] before:transition-[margin-left] before:duration-200 before:ease-in-out before:absolute before:inset-y-0 before:my-auto before:rounded-full before:dark:bg-darkmode-600 checked:bg-primary checked:border-primary checked:bg-none before:checked:ml-[14px] before:checked:bg-white"
-                                >
+                                    class="sr-only peer"
+                                />
+                                <div class="relative w-11 h-6 rounded-full bg-slate-200 transition-colors duration-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/25 dark:bg-darkmode-600 peer-checked:bg-primary after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition-all after:duration-200 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"></div>
                             </label>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-span-12 md:col-span-6 hidden" id="system-access-details">
+                <div class="w-full md:w-1/2 lg:w-1/3 hidden" id="system-access-details">
                     <x-base.form-label for="system_password">Temporary Password</x-base.form-label>
-                    <x-base.form-input id="system_password" name="system_password" type="password" placeholder="Enter temporary password" class="w-full" formInputSize="sm" />
+                    <x-base.form-input id="system_password" name="system_password" type="password" placeholder="Enter temporary password" class="w-full" />
                     <x-base.form-help>Password is required when access is enabled.</x-base.form-help>
                 </div>
             </div>
         </div>
 
-        <!-- Profile Picture -->
-        <div class="mb-6">
-            <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                <x-base.lucide icon="Camera" class="h-5 w-5"></x-base.lucide>
-                Profile Picture
-            </h4>
-            <div class="grid grid-cols-12 gap-4 gap-y-4">
-                <div class="col-span-12 md:col-span-6">
-                    <x-base.form-label for="profile_picture">Upload Picture</x-base.form-label>
-                    <input type="file" id="profile_picture" name="profile_picture" accept="image/*"
-                           class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
-                    <p class="mt-1 text-sm text-gray-500">PNG, JPG, GIF up to 5MB</p>
-                </div>
-
-                <div class="col-span-12 md:col-span-6">
-                    <div id="image-preview-container" class="hidden">
-                        <x-base.form-label>Preview</x-base.form-label>
-                        <div class="relative">
-                            <img id="image-preview" src="" alt="Profile Preview"
-                                 class="w-32 h-32 object-cover rounded-lg border border-gray-300">
-                            <button type="button" id="remove-image"
-                                    class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600">
-                                ×
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </form>
 
     @slot('footer')
@@ -538,6 +556,37 @@
 
         // Initialize immediately since modal is rendered in DOM
         initializeModal();
+
+        // Handle profile picture upload
+        const profilePictureInput = document.getElementById('profile_picture');
+        const imagePreview = document.getElementById('image-preview');
+        const imagePreviewContainer = document.getElementById('image-preview-container');
+        const imagePlaceholder = document.getElementById('image-placeholder');
+        const removeImageBtn = document.getElementById('remove-image');
+
+        if (profilePictureInput) {
+            profilePictureInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        imagePreview.src = event.target.result;
+                        imagePreviewContainer.classList.remove('hidden');
+                        imagePlaceholder.classList.add('hidden');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        if (removeImageBtn) {
+            removeImageBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                profilePictureInput.value = '';
+                imagePreviewContainer.classList.add('hidden');
+                imagePlaceholder.classList.remove('hidden');
+            });
+        }
     });
     </script>
 </x-modal.form>
