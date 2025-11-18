@@ -276,7 +276,7 @@
             <!-- BEGIN: Content -->
             <div id="smart-main-content" class="flex-1 w-full flex justify-center md:justify-start -mt-24 md:-mt-28 pr-6 pl-6 md:ml-[100px] xl:ml-[260px] relative z-[70]">
                 <div class="<?php echo \Illuminate\Support\Arr::toCssClasses([
-                    'w-full rounded-[8px] px-4 md:px-8 min-h-[calc(100vh-9rem)] bg-white/95 shadow-sm md:pt-8 pb-10 mt-6 md:mt-4 relative z-10 dark:bg-darkmode-700/95',
+                    'w-full rounded-[8px] px-4 md:px-8 min-h-[calc(100vh-9rem)] bg-white/95 shadow-sm pb-10 mt-6 md:mt-4 relative z-10 dark:bg-darkmode-700/95',
                     "before:content-[''] before:w-full before:h-px before:block",
                 ]); ?>">
                     <?php echo $__env->yieldContent('subcontent'); ?>
@@ -287,19 +287,19 @@
     </div>
 <?php $__env->stopSection(); ?>
 
-<?php if (! $__env->hasRenderedOnce('f311f3ec-7cf9-41c4-aa4e-48a3c735fe04')): $__env->markAsRenderedOnce('f311f3ec-7cf9-41c4-aa4e-48a3c735fe04');
+<?php if (! $__env->hasRenderedOnce('a79b19cc-bb13-4949-929b-9eab2ee5949f')): $__env->markAsRenderedOnce('a79b19cc-bb13-4949-929b-9eab2ee5949f');
 $__env->startPush('styles'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/css/vendors/tippy.css'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/css/themes/enigma/side-nav.css'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/css/themes/enigma/top-nav.css'); ?>
 <?php $__env->stopPush(); endif; ?>
 
-<?php if (! $__env->hasRenderedOnce('5acf09a9-481b-42a7-9987-ac285a4e7192')): $__env->markAsRenderedOnce('5acf09a9-481b-42a7-9987-ac285a4e7192');
+<?php if (! $__env->hasRenderedOnce('155e757d-853c-402c-b5c3-9e8f2fcd9bf0')): $__env->markAsRenderedOnce('155e757d-853c-402c-b5c3-9e8f2fcd9bf0');
 $__env->startPush('vendors'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/js/vendors/tippy.js'); ?>
 <?php $__env->stopPush(); endif; ?>
 
-<?php if (! $__env->hasRenderedOnce('79a48b08-b90c-42bd-a928-c33937c6d509')): $__env->markAsRenderedOnce('79a48b08-b90c-42bd-a928-c33937c6d509');
+<?php if (! $__env->hasRenderedOnce('12065a9a-43a8-4a9e-a8ea-af8822d93a4b')): $__env->markAsRenderedOnce('12065a9a-43a8-4a9e-a8ea-af8822d93a4b');
 $__env->startPush('scripts'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/js/themes/enigma.js'); ?>
 

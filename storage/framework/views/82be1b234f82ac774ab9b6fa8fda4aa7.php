@@ -18,6 +18,36 @@
             padding-top: 0.375rem;  /* 6px */
             padding-bottom: 0.375rem;
         }
+
+        .btn-tonal {
+            --btn-surface: color-mix(in oklch, var(--color-primary, #2563eb) 20%, #ffffff);
+            --btn-border: color-mix(in oklch, var(--color-primary, #2563eb), transparent 80%);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.5rem 1.15rem;
+            border-radius: 9999px;
+            border: 1px solid var(--btn-border);
+            background-color: var(--btn-surface);
+            color: color-mix(in oklch, var(--color-primary, #2563eb), black 20%);
+            font-weight: 600;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.08);
+        }
+
+        .btn-tonal:hover {
+            transform: translateY(-1px) scale(1.02);
+            box-shadow: 0 15px 25px rgba(37, 99, 235, 0.12);
+        }
+
+        .btn-tonal:focus-visible {
+            outline: 2px solid color-mix(in oklch, var(--color-primary, #2563eb), transparent 60%);
+            outline-offset: 3px;
+        }
+
+        .btn-tonal svg {
+            color: color-mix(in oklch, var(--color-primary, #2563eb), black 10%);
+        }
     </style>
 <?php $__env->stopPush(); ?>
 
@@ -26,16 +56,12 @@
     <div class="intro-y mt-8 flex items-center">
         <h2 class="mr-auto text-lg font-medium">Employees Management</h2>
         <div class="flex items-center gap-2">
-            <?php if (isset($component)) { $__componentOriginale00eb601fbe667f0da582732d70c41c5 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginale00eb601fbe667f0da582732d70c41c5 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.button.index','data' => ['variant' => 'outline-secondary','class' => 'hidden sm:flex','dataTwToggle' => 'modal','dataTwTarget' => '#employees-filters-slideover']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.button'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['variant' => 'outline-secondary','class' => 'hidden sm:flex','data-tw-toggle' => 'modal','data-tw-target' => '#employees-filters-slideover']); ?>
+            <button
+                type="button"
+                class="btn-tonal btn-tonal--info hidden sm:flex"
+                data-tw-toggle="modal"
+                data-tw-target="#employees-filters-slideover"
+            >
                 <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Filter','class' => 'w-4 h-4 mr-2']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -58,16 +84,7 @@
 <?php endif; ?>
                 Filters
                 <span id="active-filters-indicator" class="hidden ml-2 px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full">Active</span>
-             <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginale00eb601fbe667f0da582732d70c41c5)): ?>
-<?php $attributes = $__attributesOriginale00eb601fbe667f0da582732d70c41c5; ?>
-<?php unset($__attributesOriginale00eb601fbe667f0da582732d70c41c5); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginale00eb601fbe667f0da582732d70c41c5)): ?>
-<?php $component = $__componentOriginale00eb601fbe667f0da582732d70c41c5; ?>
-<?php unset($__componentOriginale00eb601fbe667f0da582732d70c41c5); ?>
-<?php endif; ?>
+            </button>
 
             <!-- Mobile filters icon -->
             <button
@@ -99,16 +116,12 @@
 <?php endif; ?>
             </button>
 
-            <?php if (isset($component)) { $__componentOriginale00eb601fbe667f0da582732d70c41c5 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginale00eb601fbe667f0da582732d70c41c5 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.button.index','data' => ['variant' => 'primary','class' => 'w-40 sm:w-auto sm:ml-2','dataTwToggle' => 'modal','dataTwTarget' => '#create-employee-modal']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.button'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['variant' => 'primary','class' => 'w-40 sm:w-auto sm:ml-2','data-tw-toggle' => 'modal','data-tw-target' => '#create-employee-modal']); ?>
+            <button
+                type="button"
+                class="btn-tonal btn-tonal--success"
+                data-tw-toggle="modal"
+                data-tw-target="#create-employee-modal"
+            >
                 <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'UserPlus','class' => 'w-4 h-4 mr-2']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -130,16 +143,7 @@
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
                 Add Employee
-             <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginale00eb601fbe667f0da582732d70c41c5)): ?>
-<?php $attributes = $__attributesOriginale00eb601fbe667f0da582732d70c41c5; ?>
-<?php unset($__attributesOriginale00eb601fbe667f0da582732d70c41c5); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginale00eb601fbe667f0da582732d70c41c5)): ?>
-<?php $component = $__componentOriginale00eb601fbe667f0da582732d70c41c5; ?>
-<?php unset($__componentOriginale00eb601fbe667f0da582732d70c41c5); ?>
-<?php endif; ?>
+            </button>
         </div>
     </div>
 
@@ -270,73 +274,69 @@
 <?php unset($__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a); ?>
 <?php endif; ?>
                             </div>
-                            <div class="mt-2 xl:mt-0">
-                                <?php if (isset($component)) { $__componentOriginale00eb601fbe667f0da582732d70c41c5 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginale00eb601fbe667f0da582732d70c41c5 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.button.index','data' => ['id' => 'employees-filter-go','type' => 'button','variant' => 'primary','class' => 'w-full sm:w-16']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.button'); ?>
+                            <div class="mt-2 flex flex-wrap gap-2 xl:mt-0">
+                                <button id="employees-filter-go" type="button" class="btn-tonal btn-tonal--info">
+                                    <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Search','class' => 'w-4 h-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.lucide'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['id' => 'employees-filter-go','type' => 'button','variant' => 'primary','class' => 'w-full sm:w-16']); ?>
+<?php $component->withAttributes(['icon' => 'Search','class' => 'w-4 h-4']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
                                     Go
-                                 <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginale00eb601fbe667f0da582732d70c41c5)): ?>
-<?php $attributes = $__attributesOriginale00eb601fbe667f0da582732d70c41c5; ?>
-<?php unset($__attributesOriginale00eb601fbe667f0da582732d70c41c5); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginale00eb601fbe667f0da582732d70c41c5)): ?>
-<?php $component = $__componentOriginale00eb601fbe667f0da582732d70c41c5; ?>
-<?php unset($__componentOriginale00eb601fbe667f0da582732d70c41c5); ?>
-<?php endif; ?>
-                                <?php if (isset($component)) { $__componentOriginale00eb601fbe667f0da582732d70c41c5 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginale00eb601fbe667f0da582732d70c41c5 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.button.index','data' => ['id' => 'employees-filter-reset','type' => 'button','variant' => 'secondary','class' => 'mt-2 w-full sm:ml-1 sm:mt-0 sm:w-16']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.button'); ?>
+                                </button>
+                                <button id="employees-filter-reset" type="button" class="btn-tonal btn-tonal--warning">
+                                    <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'RotateCcw','class' => 'w-4 h-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.lucide'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['id' => 'employees-filter-reset','type' => 'button','variant' => 'secondary','class' => 'mt-2 w-full sm:ml-1 sm:mt-0 sm:w-16']); ?>
+<?php $component->withAttributes(['icon' => 'RotateCcw','class' => 'w-4 h-4']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
                                     Reset
-                                 <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginale00eb601fbe667f0da582732d70c41c5)): ?>
-<?php $attributes = $__attributesOriginale00eb601fbe667f0da582732d70c41c5; ?>
-<?php unset($__attributesOriginale00eb601fbe667f0da582732d70c41c5); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginale00eb601fbe667f0da582732d70c41c5)): ?>
-<?php $component = $__componentOriginale00eb601fbe667f0da582732d70c41c5; ?>
-<?php unset($__componentOriginale00eb601fbe667f0da582732d70c41c5); ?>
-<?php endif; ?>
+                                </button>
                             </div>
                         </form>
 
-                        <div class="mt-5 flex sm:mt-0">
-                            <?php if (isset($component)) { $__componentOriginale00eb601fbe667f0da582732d70c41c5 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginale00eb601fbe667f0da582732d70c41c5 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.button.index','data' => ['id' => 'employees-export','variant' => 'outline-secondary','class' => 'mr-2 w-1/2 sm:w-auto']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.button'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['id' => 'employees-export','variant' => 'outline-secondary','class' => 'mr-2 w-1/2 sm:w-auto']); ?>
+                        <div class="mt-5 flex items-center gap-2 sm:mt-0">
+                            <button id="employees-export" type="button"
+                                class="btn-tonal btn-tonal--info btn-tonal--icon">
                                 <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Download','class' => 'mr-2 h-4 w-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Download','class' => 'h-4 w-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.lucide'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['icon' => 'Download','class' => 'mr-2 h-4 w-4']); ?>
+<?php $component->withAttributes(['icon' => 'Download','class' => 'h-4 w-4']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
@@ -346,37 +346,20 @@
 <?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
 <?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
-<?php endif; ?> Export
-                             <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginale00eb601fbe667f0da582732d70c41c5)): ?>
-<?php $attributes = $__attributesOriginale00eb601fbe667f0da582732d70c41c5; ?>
-<?php unset($__attributesOriginale00eb601fbe667f0da582732d70c41c5); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginale00eb601fbe667f0da582732d70c41c5)): ?>
-<?php $component = $__componentOriginale00eb601fbe667f0da582732d70c41c5; ?>
-<?php unset($__componentOriginale00eb601fbe667f0da582732d70c41c5); ?>
-<?php endif; ?>
-                            <?php if (isset($component)) { $__componentOriginale00eb601fbe667f0da582732d70c41c5 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginale00eb601fbe667f0da582732d70c41c5 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.button.index','data' => ['id' => 'employees-refresh','variant' => 'outline-secondary','class' => 'w-1/2 sm:w-auto']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.button'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['id' => 'employees-refresh','variant' => 'outline-secondary','class' => 'w-1/2 sm:w-auto']); ?>
+                            </button>
+                            <button id="employees-refresh" type="button"
+                                class="btn-tonal btn-tonal--success btn-tonal--icon">
                                 <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'RefreshCcw','class' => 'mr-2 h-4 w-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'RefreshCcw','class' => 'h-4 w-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.lucide'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['icon' => 'RefreshCcw','class' => 'mr-2 h-4 w-4']); ?>
+<?php $component->withAttributes(['icon' => 'RefreshCcw','class' => 'h-4 w-4']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
@@ -386,17 +369,8 @@
 <?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
 <?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
-<?php endif; ?> Refresh
-                             <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginale00eb601fbe667f0da582732d70c41c5)): ?>
-<?php $attributes = $__attributesOriginale00eb601fbe667f0da582732d70c41c5; ?>
-<?php unset($__attributesOriginale00eb601fbe667f0da582732d70c41c5); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginale00eb601fbe667f0da582732d70c41c5)): ?>
-<?php $component = $__componentOriginale00eb601fbe667f0da582732d70c41c5; ?>
-<?php unset($__componentOriginale00eb601fbe667f0da582732d70c41c5); ?>
-<?php endif; ?>
+                            </button>
                         </div>
                     </div>
 
@@ -636,7 +610,7 @@
                         <div class="flex flex-wrap items-center gap-4">
                             <div class="text-sm text-slate-600 dark:text-slate-400">
                                 <span class="font-medium">Total Employees:</span>
-                                <span id="total-employees-count" class="font-semibold text-slate-800 dark:text-white">0</span>
+                                <span id="total-employees-count" class="font-semibold text-slate-800">0</span>
                             </div>
                             <div class="text-sm text-slate-600 dark:text-slate-400">
                                 <span class="font-medium">Filtered:</span>
@@ -645,16 +619,11 @@
                         </div>
 
                         <div class="mt-2 flex justify-end gap-2">
-                            <?php if (isset($component)) { $__componentOriginale00eb601fbe667f0da582732d70c41c5 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginale00eb601fbe667f0da582732d70c41c5 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.button.index','data' => ['type' => 'button','variant' => 'secondary','class' => 'w-24','dataTwDismiss' => 'modal']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.button'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['type' => 'button','variant' => 'secondary','class' => 'w-24','data-tw-dismiss' => 'modal']); ?>
+                            <button
+                                type="button"
+                                class="btn-tonal btn-tonal--warning w-28"
+                                data-tw-dismiss="modal"
+                            >
                                 <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'X','class' => 'mr-2 h-4 w-4 animate-pulse']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -676,26 +645,12 @@
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
                                 Close
-                             <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginale00eb601fbe667f0da582732d70c41c5)): ?>
-<?php $attributes = $__attributesOriginale00eb601fbe667f0da582732d70c41c5; ?>
-<?php unset($__attributesOriginale00eb601fbe667f0da582732d70c41c5); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginale00eb601fbe667f0da582732d70c41c5)): ?>
-<?php $component = $__componentOriginale00eb601fbe667f0da582732d70c41c5; ?>
-<?php unset($__componentOriginale00eb601fbe667f0da582732d70c41c5); ?>
-<?php endif; ?>
-                            <?php if (isset($component)) { $__componentOriginale00eb601fbe667f0da582732d70c41c5 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginale00eb601fbe667f0da582732d70c41c5 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.button.index','data' => ['id' => 'advanced-filter-apply','type' => 'button','variant' => 'primary','class' => 'w-24']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.button'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['id' => 'advanced-filter-apply','type' => 'button','variant' => 'primary','class' => 'w-24']); ?>
+                            </button>
+                            <button
+                                id="advanced-filter-apply"
+                                type="button"
+                                class="btn-tonal btn-tonal--info w-28"
+                            >
                                 <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Search','class' => 'mr-2 h-4 w-4 animate-pulse']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -717,16 +672,7 @@
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
                                 Apply
-                             <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginale00eb601fbe667f0da582732d70c41c5)): ?>
-<?php $attributes = $__attributesOriginale00eb601fbe667f0da582732d70c41c5; ?>
-<?php unset($__attributesOriginale00eb601fbe667f0da582732d70c41c5); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginale00eb601fbe667f0da582732d70c41c5)): ?>
-<?php $component = $__componentOriginale00eb601fbe667f0da582732d70c41c5; ?>
-<?php unset($__componentOriginale00eb601fbe667f0da582732d70c41c5); ?>
-<?php endif; ?>
+                            </button>
                         </div>
                     </div>
                 </div>

@@ -10,6 +10,7 @@
  | https://tailwindcss.com/docs/theme
  |
  */
+@import "https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap";
 @import "./fonts/_roboto.css";
 
 /*
@@ -33,6 +34,56 @@
     --color-primary: var(--primary-color, #2563eb);
     --color-secondary: var(--secondary-color, #0f172a);
     --color-primary-rgb: var(--primary-rgb, 37 99 235);
+
+}
+
+.btn-tonal {
+    --btn-tone-color: var(--color-primary, #2563eb);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.5rem 1.15rem;
+    border-radius: 0.35rem;
+    font-weight: 600;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background-color: color-mix(in oklch, var(--btn-tone-color) 18%, #ffffff);
+    border: 1px solid color-mix(in oklch, var(--btn-tone-color), transparent 78%);
+    color: color-mix(in oklch, var(--btn-tone-color), black 22%);
+    box-shadow: 0 10px 20px color-mix(in oklch, var(--btn-tone-color), transparent 85%);
+}
+
+.btn-tonal--info {
+    --btn-tone-color: var(--color-primary, #2563eb);
+}
+
+.btn-tonal--success {
+    --btn-tone-color: #1b7a4a;
+}
+
+.btn-tonal--warning {
+    --btn-tone-color: #c98028;
+}
+
+.btn-tonal--danger {
+    --btn-tone-color: #b21a50;
+}
+
+.btn-tonal--icon {
+    padding: 0;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 0.35rem;
+    justify-content: center;
+}
+
+.btn-tonal:hover {
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 0 15px 25px color-mix(in oklch, var(--btn-tone-color), transparent 80%);
+}
+
+.btn-tonal:focus-visible {
+    outline: 2px solid color-mix(in oklch, var(--btn-tone-color), transparent 60%);
+    outline-offset: 3px;
 }
 
 /* Prevent layout shift when modals/slideover toggle body scroll */

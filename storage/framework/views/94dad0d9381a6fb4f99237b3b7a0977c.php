@@ -63,7 +63,7 @@
     <ol class="flex items-center text-white">
         <li class="flex items-center">
             <a href="<?php echo e(url('/')); ?>" class="hover:text-primary">
-                <?php echo e(setting('general.application_name', config('app.name', 'Application'))); ?>
+                <?php echo e(setting('app_name', config('app.name', 'Smart ERP'))); ?>
 
             </a>
         </li>

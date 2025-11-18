@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Work;
 
 use App\Http\Controllers\Controller;
-use App\Models\Task;
-use App\Models\Employee;
-use App\Models\Department;
-use App\Models\Company;
+use App\Models\Work\Task;
+use App\Models\HR\Employee;
+use App\Models\HR\Department;
+use App\Models\Setting\Company;
 use App\Services\DocumentCodeGenerator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -141,28 +141,49 @@ class TaskController extends Controller
             'priority' => 'required|in:low,medium,high',
             'color' => 'nullable|string|max:32',
             'status' => 'required|in:pending,in_progress,completed,cancelled',
-            'due_date' => 'nullable|date_format:d M, Y',
+            'due_date' => 'nullable|date',
             'employee_id' => 'nullable|exists:employees,id',
-            'department_id' => 'nullable|exists:departments,id',
-            'company_id' => 'nullable|exists:companies,id',
             'project_id' => 'nullable|exists:projects,id',
+            'estimated_hours' => 'nullable|numeric|min:0|max:999.99',
+            'tags' => 'nullable|string|max:1000',
             'is_active' => 'nullable|boolean',
         ]);
 
         try {
             DB::beginTransaction();
 
+            // Convert due_date to proper format if provided
             if (!empty($validated['due_date'])) {
-                $validated['due_date'] = Carbon::createFromFormat('d M, Y', $validated['due_date'])->format('Y-m-d');
+                try {
+                    $validated['due_date'] = Carbon::parse($validated['due_date'])->format('Y-m-d');
+                } catch (\Exception $e) {
+                    Log::warning('Invalid due_date format', ['due_date' => $validated['due_date']]);
+                    $validated['due_date'] = null;
+                }
             }
 
             $validated['code'] = $this->codeGenerator->generate('tasks');
             $validated['assigned_by'] = auth()->id();
             $validated['is_active'] = $request->boolean('is_active', true);
 
+            // Auto-assign department and company from selected employee
+            if (!empty($validated['employee_id'])) {
+                $employee = Employee::find($validated['employee_id']);
+                if ($employee) {
+                    $validated['department_id'] = $employee->department_id;
+                    $validated['company_id'] = $employee->company_id;
+                }
+            }
+
             Log::info('TASK_STORE_ATTEMPT', $validated);
 
-            Task::create($validated);
+            $task = Task::create($validated);
+            
+            Log::info('TASK_CREATED_SUCCESS', [
+                'task_id' => $task->id,
+                'task_code' => $task->code,
+                'task_title' => $task->title
+            ]);
 
             DB::commit();
 

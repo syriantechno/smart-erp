@@ -20,6 +20,36 @@
             padding-top: 0.375rem;  /* 6px */
             padding-bottom: 0.375rem;
         }
+
+        .btn-tonal {
+            --btn-surface: color-mix(in oklch, var(--color-primary, #2563eb) 20%, #ffffff);
+            --btn-border: color-mix(in oklch, var(--color-primary, #2563eb), transparent 80%);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.5rem 1.15rem;
+            border-radius: 9999px;
+            border: 1px solid var(--btn-border);
+            background-color: var(--btn-surface);
+            color: color-mix(in oklch, var(--color-primary, #2563eb), black 20%);
+            font-weight: 600;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.08);
+        }
+
+        .btn-tonal:hover {
+            transform: translateY(-1px) scale(1.02);
+            box-shadow: 0 15px 25px rgba(37, 99, 235, 0.12);
+        }
+
+        .btn-tonal:focus-visible {
+            outline: 2px solid color-mix(in oklch, var(--color-primary, #2563eb), transparent 60%);
+            outline-offset: 3px;
+        }
+
+        .btn-tonal svg {
+            color: color-mix(in oklch, var(--color-primary, #2563eb), black 10%);
+        }
     </style>
 @endpush
 
@@ -28,16 +58,16 @@
     <div class="intro-y mt-8 flex items-center">
         <h2 class="mr-auto text-lg font-medium">Employees Management</h2>
         <div class="flex items-center gap-2">
-            <x-base.button
-                variant="outline-secondary"
-                class="hidden sm:flex"
+            <button
+                type="button"
+                class="btn-tonal btn-tonal--info hidden sm:flex"
                 data-tw-toggle="modal"
                 data-tw-target="#employees-filters-slideover"
             >
                 <x-base.lucide icon="Filter" class="w-4 h-4 mr-2" />
                 Filters
                 <span id="active-filters-indicator" class="hidden ml-2 px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full">Active</span>
-            </x-base.button>
+            </button>
 
             <!-- Mobile filters icon -->
             <button
@@ -50,15 +80,15 @@
                 <x-base.lucide icon="Filter" class="w-4 h-4" />
             </button>
 
-            <x-base.button
-                variant="primary"
-                class="w-40 sm:w-auto sm:ml-2"
+            <button
+                type="button"
+                class="btn-tonal btn-tonal--success"
                 data-tw-toggle="modal"
                 data-tw-target="#create-employee-modal"
             >
                 <x-base.lucide icon="UserPlus" class="w-4 h-4 mr-2" />
                 Add Employee
-            </x-base.button>
+            </button>
         </div>
     </div>
 
@@ -107,23 +137,27 @@
                                     <option value="100">100</option>
                                 </x-base.form-select>
                             </div>
-                            <div class="mt-2 xl:mt-0">
-                                <x-base.button id="employees-filter-go" type="button" variant="primary" class="w-full sm:w-16">
+                            <div class="mt-2 flex flex-wrap gap-2 xl:mt-0">
+                                <button id="employees-filter-go" type="button" class="btn-tonal btn-tonal--info">
+                                    <x-base.lucide icon="Search" class="w-4 h-4" />
                                     Go
-                                </x-base.button>
-                                <x-base.button id="employees-filter-reset" type="button" variant="secondary" class="mt-2 w-full sm:ml-1 sm:mt-0 sm:w-16">
+                                </button>
+                                <button id="employees-filter-reset" type="button" class="btn-tonal btn-tonal--warning">
+                                    <x-base.lucide icon="RotateCcw" class="w-4 h-4" />
                                     Reset
-                                </x-base.button>
+                                </button>
                             </div>
                         </form>
 
-                        <div class="mt-5 flex sm:mt-0">
-                            <x-base.button id="employees-export" variant="outline-secondary" class="mr-2 w-1/2 sm:w-auto">
-                                <x-base.lucide icon="Download" class="mr-2 h-4 w-4" /> Export
-                            </x-base.button>
-                            <x-base.button id="employees-refresh" variant="outline-secondary" class="w-1/2 sm:w-auto">
-                                <x-base.lucide icon="RefreshCcw" class="mr-2 h-4 w-4" /> Refresh
-                            </x-base.button>
+                        <div class="mt-5 flex items-center gap-2 sm:mt-0">
+                            <button id="employees-export" type="button"
+                                class="btn-tonal btn-tonal--info btn-tonal--icon">
+                                <x-base.lucide icon="Download" class="h-4 w-4" />
+                            </button>
+                            <button id="employees-refresh" type="button"
+                                class="btn-tonal btn-tonal--success btn-tonal--icon">
+                                <x-base.lucide icon="RefreshCcw" class="h-4 w-4" />
+                            </button>
                         </div>
                     </div>
 
@@ -217,7 +251,7 @@
                         <div class="flex flex-wrap items-center gap-4">
                             <div class="text-sm text-slate-600 dark:text-slate-400">
                                 <span class="font-medium">Total Employees:</span>
-                                <span id="total-employees-count" class="font-semibold text-slate-800 dark:text-white">0</span>
+                                <span id="total-employees-count" class="font-semibold text-slate-800">0</span>
                             </div>
                             <div class="text-sm text-slate-600 dark:text-slate-400">
                                 <span class="font-medium">Filtered:</span>
@@ -226,24 +260,22 @@
                         </div>
 
                         <div class="mt-2 flex justify-end gap-2">
-                            <x-base.button
+                            <button
                                 type="button"
-                                variant="secondary"
-                                class="w-24"
+                                class="btn-tonal btn-tonal--warning w-28"
                                 data-tw-dismiss="modal"
                             >
                                 <x-base.lucide icon="X" class="mr-2 h-4 w-4 animate-pulse" />
                                 Close
-                            </x-base.button>
-                            <x-base.button
+                            </button>
+                            <button
                                 id="advanced-filter-apply"
                                 type="button"
-                                variant="primary"
-                                class="w-24"
+                                class="btn-tonal btn-tonal--info w-28"
                             >
                                 <x-base.lucide icon="Search" class="mr-2 h-4 w-4 animate-pulse" />
                                 Apply
-                            </x-base.button>
+                            </button>
                         </div>
                     </div>
                 </div>

@@ -1,4 +1,4 @@
-<?php if (! $__env->hasRenderedOnce('011cba1e-4e21-4e79-b610-25c475c33133')): $__env->markAsRenderedOnce('011cba1e-4e21-4e79-b610-25c475c33133');
+<?php if (! $__env->hasRenderedOnce('6e8ba4d2-49c3-4c61-9dda-afa713c5df34')): $__env->markAsRenderedOnce('6e8ba4d2-49c3-4c61-9dda-afa713c5df34');
 $__env->startPush('styles'); ?>
     <style>
         [data-erp-table-wrapper] {
@@ -32,6 +32,191 @@ $__env->startPush('styles'); ?>
             margin-bottom: 0 !important;
             font-family: 'Tajawal', 'Cairo', 'IBM Plex Sans Arabic', 'Noto Sans Arabic', 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             font-feature-settings: "kern";
+        }
+
+        /* Font Size Settings for Tables */
+        body.small table[data-erp-table],
+        body.small table[data-erp-table] td,
+        body.small table[data-erp-table] tbody td {
+            font-size: 0.75rem !important; /* 12px */
+        }
+
+        body.medium table[data-erp-table],
+        body.medium table[data-erp-table] td,
+        body.medium table[data-erp-table] tbody td {
+            font-size: 0.875rem !important; /* 14px */
+        }
+
+        body.large table[data-erp-table],
+        body.large table[data-erp-table] td,
+        body.large table[data-erp-table] tbody td {
+            font-size: 1rem !important; /* 16px */
+        }
+
+        body.extra-large table[data-erp-table],
+        body.extra-large table[data-erp-table] td,
+        body.extra-large table[data-erp-table] tbody td {
+            font-size: 1.125rem !important; /* 18px */
+        }
+
+        /* Font Size for Regular DataTables */
+        body.small table.dataTable,
+        body.small table.dataTable td,
+        body.small table.dataTable tbody td {
+            font-size: 0.75rem !important; /* 12px */
+        }
+
+        body.medium table.dataTable,
+        body.medium table.dataTable td,
+        body.medium table.dataTable tbody td {
+            font-size: 0.875rem !important; /* 14px */
+        }
+
+        body.large table.dataTable,
+        body.large table.dataTable td,
+        body.large table.dataTable tbody td {
+            font-size: 1rem !important; /* 16px */
+        }
+
+        body.extra-large table.dataTable,
+        body.extra-large table.dataTable td,
+        body.extra-large table.dataTable tbody td {
+            font-size: 1.125rem !important; /* 18px */
+        }
+
+        /* Font Size for Regular DataTables Headers */
+        body.small table.dataTable thead th {
+            font-size: 0.625rem !important; /* 10px */
+        }
+
+        body.medium table.dataTable thead th {
+            font-size: 0.7rem !important; /* 11.2px */
+        }
+
+        body.large table.dataTable thead th {
+            font-size: 0.75rem !important; /* 12px */
+        }
+
+        body.extra-large table.dataTable thead th {
+            font-size: 0.875rem !important; /* 14px */
+        }
+
+        /* Font Size for All Tables (fallback) */
+        body.small table,
+        body.small table td,
+        body.small table tbody td {
+            font-size: 0.75rem !important; /* 12px */
+        }
+
+        body.medium table,
+        body.medium table td,
+        body.medium table tbody td {
+            font-size: 0.875rem !important; /* 14px */
+        }
+
+        body.large table,
+        body.large table td,
+        body.large table tbody td {
+            font-size: 1rem !important; /* 16px */
+        }
+
+        body.extra-large table,
+        body.extra-large table td,
+        body.extra-large table tbody td {
+            font-size: 1.125rem !important; /* 18px */
+        }
+
+        /* Font Size for All Table Headers (fallback) */
+        body.small table thead th {
+            font-size: 0.625rem !important; /* 10px */
+        }
+
+        body.medium table thead th {
+            font-size: 0.7rem !important; /* 11.2px */
+        }
+
+        body.large table thead th {
+            font-size: 0.75rem !important; /* 12px */
+        }
+
+        body.extra-large table thead th {
+            font-size: 0.875rem !important; /* 14px */
+        }
+
+        /* Font Size for Table Headers */
+        body.small table[data-erp-table] thead th {
+            font-size: 0.625rem !important; /* 10px */
+        }
+
+        body.medium table[data-erp-table] thead th {
+            font-size: 0.7rem !important; /* 11.2px */
+        }
+
+        body.large table[data-erp-table] thead th {
+            font-size: 0.75rem !important; /* 12px */
+        }
+
+        body.extra-large table[data-erp-table] thead th {
+            font-size: 0.875rem !important; /* 14px */
+        }
+
+        /* Font Size for Pagination */
+        body.small [data-erp-table-wrapper] .datatable-pagination ul.pagination li a,
+        body.small [data-erp-table-wrapper] .datatable-pagination ul.pagination li span {
+            font-size: 0.75rem !important; /* 12px */
+        }
+
+        body.medium [data-erp-table-wrapper] .datatable-pagination ul.pagination li a,
+        body.medium [data-erp-table-wrapper] .datatable-pagination ul.pagination li span {
+            font-size: 0.875rem !important; /* 14px */
+        }
+
+        body.large [data-erp-table-wrapper] .datatable-pagination ul.pagination li a,
+        body.large [data-erp-table-wrapper] .datatable-pagination ul.pagination li span {
+            font-size: 1rem !important; /* 16px */
+        }
+
+        body.extra-large [data-erp-table-wrapper] .datatable-pagination ul.pagination li a,
+        body.extra-large [data-erp-table-wrapper] .datatable-pagination ul.pagination li span {
+            font-size: 1.125rem !important; /* 18px */
+        }
+
+        /* Font Size for Table Info */
+        body.small [data-erp-table-wrapper] .datatable-info {
+            font-size: 0.75rem; /* 12px */
+        }
+
+        body.medium [data-erp-table-wrapper] .datatable-info {
+            font-size: 0.875rem; /* 14px */
+        }
+
+        body.large [data-erp-table-wrapper] .datatable-info {
+            font-size: 1rem; /* 16px */
+        }
+
+        body.extra-large [data-erp-table-wrapper] .datatable-info {
+            font-size: 1.125rem; /* 18px */
+        }
+
+        /* Font Size for Action Buttons */
+        body.small [data-erp-table-wrapper] .btn-action {
+            font-size: 0.75rem; /* 12px */
+            padding: 4px 8px;
+        }
+
+        body.medium [data-erp-table-wrapper] .btn-action {
+            font-size: 0.875rem; /* 14px */
+            padding: 6px 12px;
+        }
+
+        body.large [data-erp-table-wrapper] .btn-action {
+            font-size: 1rem; /* 16px */
+            padding: 8px 16px;
+        }
+
+        body.extra-large [data-erp-table-wrapper] .btn-action {
+            font-size: 1.125rem; /* 18px */
+            padding: 10px 20px;
         }
 
         table[data-erp-table] thead {
@@ -160,14 +345,20 @@ $__env->startPush('styles'); ?>
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-width: 1.75rem;
-            height: 1.75rem;
+            width: 1.9rem;
+            height: 1.9rem;
+            min-width: 1.9rem;
             border-radius: 999px;
             font-weight: 600;
-            font-size: 0.95rem;
-            color: #94a3b8;
+            font-size: 0.875rem;
+            color: #64748b;
             text-decoration: none;
-            transition: color 140ms ease, background-color 140ms ease;
+            transition: color 140ms ease, background-color 140ms ease, transform 0.2s ease, box-shadow 0.2s ease;
+            padding: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            line-height: 1;
         }
 
         [data-erp-table-wrapper] .datatable-pagination ul.pagination li.paginate_button a {
@@ -176,20 +367,45 @@ $__env->startPush('styles'); ?>
 
         [data-erp-table-wrapper] .datatable-pagination ul.pagination li.paginate_button:not(.disabled):hover a {
             color: rgb(var(--dt-primary-rgb));
-            background-color: rgba(var(--dt-primary-rgb), 0.08);
+            background-color: color-mix(in oklch, var(--dt-primary-rgb, #2563eb) 12%, #ffffff);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+            border-color: color-mix(in oklch, var(--dt-primary-rgb, #2563eb), transparent 80%);
         }
 
         [data-erp-table-wrapper] .datatable-pagination ul.pagination li.paginate_button:not(.previous):not(.next) a {
-            width: 1.75rem;
-            height: 1.75rem;
+            width: 1.9rem;
+            height: 1.9rem;
         }
 
         [data-erp-table-wrapper] .datatable-pagination ul.pagination li.active a {
-            width: 2.1rem;
-            height: 2.1rem;
-            background-color: rgb(var(--dt-primary-rgb));
-            color: #ffffff;
-            box-shadow: 0 10px 20px rgba(var(--dt-primary-rgb), 0.25);
+            width: 1.9rem;
+            height: 1.9rem;
+            --btn-surface: color-mix(in oklch, var(--dt-primary-rgb, #2563eb) 20%, #ffffff);
+            --btn-border: color-mix(in oklch, var(--dt-primary-rgb, #2563eb), transparent 80%);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            border-radius: 9999px;
+            border: 1px solid var(--btn-border);
+            background-color: var(--btn-surface);
+            color: color-mix(in oklch, var(--dt-primary-rgb, #2563eb), black 20%);
+            font-weight: 600;
+            font-size: 0.875rem;
+            line-height: 1;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.08);
+        }
+
+        [data-erp-table-wrapper] .datatable-pagination ul.pagination li.active a:hover {
+            transform: translateY(-1px) scale(1.02);
+            box-shadow: 0 15px 25px rgba(37, 99, 235, 0.12);
+        }
+
+        [data-erp-table-wrapper] .datatable-pagination ul.pagination li.active a:focus-visible {
+            outline: 2px solid color-mix(in oklch, var(--dt-primary-rgb, #2563eb), transparent 60%);
+            outline-offset: 3px;
         }
 
         [data-erp-table-wrapper] .datatable-pagination ul.pagination li.disabled a {
@@ -208,37 +424,46 @@ $__env->startPush('styles'); ?>
             height: 1.9rem;
             padding: 0;
             border-radius: 999px;
-            background: transparent;
-            border: 1px solid rgba(148, 163, 184, 0.3);
+            background-color: color-mix(in oklch, var(--dt-primary-rgb, #2563eb) 15%, #ffffff);
+            border: 1px solid color-mix(in oklch, var(--dt-primary-rgb, #2563eb), transparent 85%);
             color: transparent;
             font-size: 0;
             position: relative;
-            box-shadow: none;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.06);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
         }
 
         [data-erp-table-wrapper] .datatable-pagination ul.pagination li.paginate_button.previous a::after,
         [data-erp-table-wrapper] .datatable-pagination ul.pagination li.paginate_button.next a::after {
             content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
             width: 10px;
             height: 10px;
-            border-top: 2px solid #94a3b8;
-            border-right: 2px solid #94a3b8;
-            transform: rotate(45deg);
+            border-top: 3px solid #374151;
+            border-right: 3px solid #374151;
+            transform: translate(-50%, -50%) rotate(45deg);
             transition: border-color 140ms ease;
+            z-index: 10;
         }
 
         [data-erp-table-wrapper] .datatable-pagination ul.pagination li.paginate_button.previous a::after {
-            transform: rotate(-135deg);
+            transform: translate(-50%, -50%) rotate(-135deg);
         }
 
         [data-erp-table-wrapper] .datatable-pagination ul.pagination li.paginate_button.previous a:hover,
         [data-erp-table-wrapper] .datatable-pagination ul.pagination li.paginate_button.next a:hover {
-            border-color: rgba(var(--dt-primary-rgb), 0.35);
+            transform: translateY(-1px) scale(1.02);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.12);
+            background-color: color-mix(in oklch, var(--dt-primary-rgb, #2563eb) 20%, #ffffff);
+            border-color: color-mix(in oklch, var(--dt-primary-rgb, #2563eb), transparent 75%);
         }
 
         [data-erp-table-wrapper] .datatable-pagination ul.pagination li.paginate_button.previous a:hover::after,
         [data-erp-table-wrapper] .datatable-pagination ul.pagination li.paginate_button.next a:hover::after {
-            border-color: rgb(var(--dt-primary-rgb));
+            border-top: 3px solid #1f2937;
+            border-right: 3px solid #1f2937;
         }
 
         @media (max-width: 1024px) {

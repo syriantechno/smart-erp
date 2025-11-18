@@ -2,6 +2,12 @@
 
 namespace App\Models\Work;
 
+use App\Models\BaseModel;
+use App\Models\HR\Employee;
+use App\Models\HR\Department;
+use App\Models\Setting\Company;
+use App\Models\Work\Project;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -28,6 +34,8 @@ class Task extends BaseModel
         'department_id',
         'company_id',
         'project_id',
+        'estimated_hours',
+        'tags',
         'is_active'
     ];
 
@@ -38,6 +46,7 @@ class Task extends BaseModel
      */
     protected $casts = [
         'due_date' => 'date',
+        'estimated_hours' => 'decimal:2',
         'is_active' => 'boolean',
     ];
 

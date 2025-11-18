@@ -249,6 +249,17 @@
             }
         }
 
+        // Handle Font Size Preview
+        const fontSizeSelect = document.querySelector('select[name="font_size"]');
+        if (fontSizeSelect) {
+            // Apply current font size on page load
+            applyFontSizePreview(fontSizeSelect.value);
+            
+            fontSizeSelect.addEventListener('change', function() {
+                applyFontSizePreview(this.value);
+            });
+        }
+
         // Handle Appearance Settings Form with AJAX
         const appearanceForm = document.getElementById('appearance-settings-form');
         if (appearanceForm && !appearanceForm.dataset.listenerAdded) {
@@ -609,6 +620,21 @@
         });
     } // Close initializeSettingsTabs function
 
+    // Font Size Preview Function
+    function applyFontSizePreview(fontSize) {
+        // Remove existing font size classes
+        document.body.classList.remove('small', 'medium', 'large', 'extra-large');
+        
+        // Add new font size class
+        document.body.classList.add(fontSize);
+        
+        console.log('Applied font size preview:', fontSize);
+        
+        // Show notification
+        if (typeof window.showToast === 'function') {
+            window.showToast(`Font size changed to ${fontSize}. Save to make it permanent.`, 'info');
+        }
+    }
 
 </script>
 @endpushonce

@@ -20,7 +20,7 @@
             class="-intro-x mr-auto h-full border-white/[0.08] md:ml-10 md:border-l md:pl-10"
             light
         >
-            <x-base.breadcrumb.link :index="0">Application</x-base.breadcrumb.link>
+            <x-base.breadcrumb.link :index="0">{{ setting('app_name', config('app.name', 'Smart ERP')) }}</x-base.breadcrumb.link>
             <x-base.breadcrumb.link
                 :index="1"
                 :active="true"

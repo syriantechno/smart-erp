@@ -344,6 +344,33 @@
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
     <script>
+    // Define showToast function if not available
+    if (typeof showToast === 'undefined') {
+        window.showToast = function(message, type = 'info') {
+            console.log(`🔔 ${type.toUpperCase()}: ${message}`);
+            
+            // Try to use SweetAlert if available
+            if (typeof Swal !== 'undefined') {
+                let iconType = 'info';
+                if (type === 'success') {
+                    iconType = 'success';
+                } else if (type === 'error') {
+                    iconType = 'error';
+                }
+                
+                Swal.fire({
+                    text: message,
+                    icon: iconType,
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+            }
+        };
+    }
+
     try {
         document.addEventListener('DOMContentLoaded', function () {
             const filterField = document.getElementById('tasks-filter-field');
@@ -401,9 +428,14 @@
                         data: 'priority',
                         name: 'priority',
                         render: function (value) {
-                            const badgeClass = value === 'high' ? 'bg-red-100 text-red-700' :
-                                             value === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                                             value === 'low' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700';
+                            let badgeClass = 'bg-gray-100 text-gray-700';
+                            if (value === 'high') {
+                                badgeClass = 'bg-red-100 text-red-700';
+                            } else if (value === 'medium') {
+                                badgeClass = 'bg-yellow-100 text-yellow-700';
+                            } else if (value === 'low') {
+                                badgeClass = 'bg-green-100 text-green-700';
+                            }
                             return `<span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${badgeClass}">${value}</span>`;
                         }
                     },
@@ -411,10 +443,16 @@
                         data: 'status',
                         name: 'status',
                         render: function (value) {
-                            const badgeClass = value === 'completed' ? 'bg-green-100 text-green-700' :
-                                             value === 'in_progress' ? 'bg-blue-100 text-blue-700' :
-                                             value === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                                             value === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700';
+                            let badgeClass = 'bg-gray-100 text-gray-700';
+                            if (value === 'completed') {
+                                badgeClass = 'bg-green-100 text-green-700';
+                            } else if (value === 'in_progress') {
+                                badgeClass = 'bg-blue-100 text-blue-700';
+                            } else if (value === 'pending') {
+                                badgeClass = 'bg-yellow-100 text-yellow-700';
+                            } else if (value === 'cancelled') {
+                                badgeClass = 'bg-red-100 text-red-700';
+                            }
                             const label = value.replace('_', ' ');
                             return `<span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${badgeClass}">${label}</span>`;
                         }
@@ -454,18 +492,26 @@
                                  (employeeFilter && employeeFilter.value) ||
                                  (statusFilter && statusFilter.value);
 
-                if (hasFilters && info.recordsTotal !== info.recordsDisplay) {
-                        showToast(`Filtered ${info.recordsDisplay} out of ${info.recordsTotal} tasks`, 'success');
-                    }
-
-                    // Update active filters indicator
-                    const activeFiltersIndicator = document.getElementById('active-filters-indicator');
-                    if (activeFiltersIndicator) {
-                        if (hasFilters) {
-                            activeFiltersIndicator.classList.remove('hidden');
+                // Show filter summary if filters are active (only once, not on every draw)
+                if (hasFilters && info && info.recordsTotal !== info.recordsDisplay) {
+                    // Only show toast if we haven't shown it for this filter combination
+                    if (typeof window.lastFilterToast === 'undefined' || window.lastFilterToast !== `${info.recordsDisplay}-${info.recordsTotal}`) {
+                        if (typeof showToast === 'function') {
+                            showToast(`Filtered ${info.recordsDisplay} out of ${info.recordsTotal} tasks`, 'success');
                         } else {
-                            activeFiltersIndicator.classList.add('hidden');
+                            console.log(`✅ Filtered ${info.recordsDisplay} out of ${info.recordsTotal} tasks`);
                         }
+                        window.lastFilterToast = `${info.recordsDisplay}-${info.recordsTotal}`;
+                    }
+                }
+
+                // Update active filters indicator
+                const activeFiltersIndicator = document.getElementById('active-filters-indicator');
+                if (activeFiltersIndicator) {
+                    if (hasFilters) {
+                        activeFiltersIndicator.classList.remove('hidden');
+                    } else {
+                        activeFiltersIndicator.classList.add('hidden');
                     }
                 }
             });
@@ -632,30 +678,34 @@
                 card.dataset.taskId = task.id;
                 card.dataset.status = task.status;
 
-                const priorityClass = task.priority === 'high'
-                    ? 'bg-red-100 text-red-700'
-                    : task.priority === 'medium'
-                        ? 'bg-yellow-100 text-yellow-700'
-                        : task.priority === 'low'
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-slate-100 text-slate-700';
+                // Priority class mapping
+                let priorityClass = 'bg-slate-100 text-slate-700';
+                if (task.priority === 'high') {
+                    priorityClass = 'bg-red-100 text-red-700';
+                } else if (task.priority === 'medium') {
+                    priorityClass = 'bg-yellow-100 text-yellow-700';
+                } else if (task.priority === 'low') {
+                    priorityClass = 'bg-green-100 text-green-700';
+                }
 
-                const statusClass = task.status === 'completed'
-                    ? 'bg-green-100 text-green-700'
-                    : task.status === 'in_progress'
-                        ? 'bg-blue-100 text-blue-700'
-                        : task.status === 'pending'
-                            ? 'bg-yellow-100 text-yellow-700'
-                            : task.status === 'cancelled'
-                                ? 'bg-rose-100 text-rose-700'
-                                : 'bg-slate-100 text-slate-700';
+                // Status class mapping
+                let statusClass = 'bg-slate-100 text-slate-700';
+                if (task.status === 'completed') {
+                    statusClass = 'bg-green-100 text-green-700';
+                } else if (task.status === 'in_progress') {
+                    statusClass = 'bg-blue-100 text-blue-700';
+                } else if (task.status === 'pending') {
+                    statusClass = 'bg-yellow-100 text-yellow-700';
+                } else if (task.status === 'cancelled') {
+                    statusClass = 'bg-rose-100 text-rose-700';
+                }
 
-                const statusLabel = (task.status || '')
-                    .replace('_', ' ');
+                const statusLabel = (task.status || '').replace('_', ' ');
 
-                const colorDot = task.color
-                    ? `<span class="mr-1 inline-block h-2.5 w-2.5 rounded-full border border-white shadow-sm" style="background-color: ${task.color}"></span>`
-                    : '';
+                let colorDot = '';
+                if (task.color) {
+                    colorDot = `<span class="mr-1 inline-block h-2.5 w-2.5 rounded-full border border-white shadow-sm" style="background-color: ${task.color}"></span>`;
+                }
 
                 const employee = task.employee_name || '-';
                 const dueDate = task.due_date_formatted || '-';
@@ -674,7 +724,7 @@
                         </span>
                     </div>
                     <div class="mb-2 line-clamp-2 text-[11px] text-slate-500 dark:text-slate-300">
-                        ${task.description ? task.description : ''}
+                        ${task.description || ''}
                     </div>
                     <div class="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-300">
                         <div class="flex items-center gap-1.5">
@@ -1071,6 +1121,31 @@
         });
     } catch (error) {
         console.error('Tasks page script error:', error);
+        console.error('Error details:', error.message, 'at line:', error.lineNumber);
     }
+
+    // Fix missing Lucide icons
+    document.addEventListener('DOMContentLoaded', function() {
+        // Replace missing icons with available ones
+        const iconReplacements = {
+            'UserPlus': 'UserCheck',
+            'InformationCircle': 'Info', 
+            'UserMinus': 'UserX'
+        };
+
+        // Find and replace missing icons
+        document.querySelectorAll('[data-lucide]').forEach(function(element) {
+            const iconName = element.getAttribute('data-lucide');
+            if (iconReplacements[iconName]) {
+                element.setAttribute('data-lucide', iconReplacements[iconName]);
+                console.log('🔧 Replaced missing icon:', iconName, '→', iconReplacements[iconName]);
+            }
+        });
+
+        // Re-initialize Lucide icons after replacement
+        if (typeof window.Lucide !== 'undefined') {
+            window.Lucide.createIcons();
+        }
+    });
     </script>
 @endpush

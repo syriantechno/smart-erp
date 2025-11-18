@@ -1,8 +1,57 @@
 @props(['layout' => 'side-menu'])
 
+@php
+    if (!isset($fakers) || empty($fakers)) {
+        $fakers = [
+            [
+                'photos' => ['resources/images/profile-1.jpg'],
+                'users' => [['name' => 'Alex Cooper', 'email' => 'alex.cooper@example.com']],
+                'images' => ['resources/images/preview-1.jpg'],
+                'products' => [['name' => 'Wireless Earbuds', 'category' => 'Audio Devices']],
+            ],
+            [
+                'photos' => ['resources/images/profile-2.jpg'],
+                'users' => [['name' => 'Sara Haddad', 'email' => 'sara.haddad@example.com']],
+                'images' => ['resources/images/preview-2.jpg'],
+                'products' => [['name' => 'Smart Desk Lamp', 'category' => 'Home Office']],
+            ],
+            [
+                'photos' => ['resources/images/profile-3.jpg'],
+                'users' => [['name' => 'Mohammed Al-Sayed', 'email' => 'malsayed@example.com']],
+                'images' => ['resources/images/preview-5.jpg'],
+                'products' => [['name' => 'Cloud Backup Suite', 'category' => 'Software']],
+            ],
+            [
+                'photos' => ['resources/images/profile-4.jpg'],
+                'users' => [['name' => 'Aisha Rahman', 'email' => 'aisha.rahman@example.com']],
+                'images' => ['resources/images/preview-6.jpg'],
+                'products' => [['name' => 'Projector HD Mini', 'category' => 'Electronics']],
+            ],
+        ];
+    }
+
+    $searchPages = [
+        ['label' => 'Mail Settings', 'icon' => 'Inbox', 'icon_bg' => 'bg-success/20 text-success'],
+        ['label' => 'Users & Permissions', 'icon' => 'Users', 'icon_bg' => 'bg-pending/10 text-pending'],
+        ['label' => 'Transactions Report', 'icon' => 'CreditCard', 'icon_bg' => 'bg-primary/10 text-primary/80 dark:bg-primary/20'],
+    ];
+
+    $searchDepartments = [
+        ['name' => 'Sales', 'location' => 'Isle of Man'],
+        ['name' => 'Product Management', 'location' => 'Svalbard'],
+        ['name' => 'Quality Assurance', 'location' => 'Lesotho'],
+    ];
+
+    $searchProducts = [
+        ['name' => 'Ultra HD 4K Smart TV', 'category' => 'Electronics'],
+        ['name' => 'Wireless Gaming Mouse', 'category' => 'Accessories'],
+        ['name' => 'Smartphone Charging Dock', 'category' => 'Home & Garden'],
+    ];
+@endphp
+
 <!-- BEGIN: Top Bar -->
 <div @class([
-    'h-[90px] md:h-[100px] z-[10] border-b border-white/[0.08] -mx-5 sm:-mx-8 md:-mx-0 px-3 sm:px-8 md:px-10 md:border-b-0 relative md:pt-6',
+    'h-[90px] md:h-[100px] z-[10] border-b border-white/[0.08] -mx-5 sm:-mx-8  px-3 sm:px-8 md:px-10 md:border-b-0 relative md:pt-6',
 ])>
     <div class="flex items-center">
 
@@ -24,7 +73,7 @@
         <!-- BEGIN: Breadcrumb -->
         <div 
             @class([
-                'h-[45px] md:ml-10 md:border-l border-white/[0.08] dark:border-white/[0.08] mr-auto -intro-x flex items-center',
+                'h-[45px]  md:border-l border-white/[0.08] dark:border-white/[0.08] mr-auto -intro-x flex items-center',
                 'md:pl-6' => $layout != 'top-menu',
                 'md:pl-10' => $layout == 'top-menu',
             ])
@@ -33,122 +82,28 @@
         </div>
         <!-- END: Breadcrumb -->
         <!-- BEGIN: Search -->
-        <div class="intro-x relative mr-3 sm:mr-6">
-            <div class="search relative hidden sm:block">
-                <x-base.form-input
-                    class="w-56 rounded-full border-transparent bg-slate-200 pr-8 shadow-none transition-[width] duration-300 ease-in-out focus:w-72 focus:border-transparent dark:bg-darkmode-400"
-                    type="text"
-                    placeholder="Search..."
-                />
-                <x-base.lucide
-                    class="absolute inset-y-0 right-0 my-auto mr-3 h-5 w-5 text-slate-600 dark:text-slate-500"
-                    icon="Search"
-                />
+        <div class="intro-x relative flex-1 flex justify-center mr-3 sm:mr-6">
+            <div class="search relative hidden sm:block w-full max-w-sm">
+                <button
+                    type="button"
+                    data-search-trigger
+                    class="bg-white/[0.12] dark:bg-darkmode-900/30 border-transparent dark:border-transparent border w-full flex items-center py-2 px-3.5 rounded-[0.5rem] text-white/70 cursor-pointer hover:bg-white/[0.15] transition-colors duration-300 hover:duration-100 shadow-[0_12px_40px_rgba(15,23,42,0.25)] backdrop-blur-xl"
+                >
+                    <x-base.lucide icon="Search" class="stroke-[1] w-[18px] h-[18px]" />
+                    <span class="ml-2.5 mr-auto">Quick search...</span>
+                    <span class="text-xs tracking-wide">⌘K</span>
+                </button>
             </div>
             <a
                 class="relative text-white/70 sm:hidden"
                 href=""
+                data-search-trigger
             >
                 <x-base.lucide
                     class="h-5 w-5 dark:text-slate-500"
                     icon="Search"
                 />
             </a>
-            <x-base.transition
-                class="search-result absolute right-0 z-10 mt-[3px] hidden"
-                selector=".show"
-                enter="transition-all ease-linear duration-150"
-                enterFrom="mt-5 invisible opacity-0 translate-y-1"
-                enterTo="mt-[3px] visible opacity-100 translate-y-0"
-                leave="transition-all ease-linear duration-150"
-                leaveFrom="mt-[3px] visible opacity-100 translate-y-0"
-                leaveTo="mt-5 invisible opacity-0 translate-y-1"
-            >
-                <div class="box w-[450px] p-5">
-                    <div class="mb-2 font-medium">Pages</div>
-                    <div class="mb-5">
-                        <a
-                            class="flex items-center"
-                            href=""
-                        >
-                            <div
-                                class="flex h-8 w-8 items-center justify-center rounded-full bg-success/20 text-success dark:bg-success/10">
-                                <x-base.lucide
-                                    class="h-4 w-4"
-                                    icon="Inbox"
-                                />
-                            </div>
-                            <div class="ml-3">Mail Settings</div>
-                        </a>
-                        <a
-                            class="mt-2 flex items-center"
-                            href=""
-                        >
-                            <div
-                                class="flex h-8 w-8 items-center justify-center rounded-full bg-pending/10 text-pending">
-                                <x-base.lucide
-                                    class="h-4 w-4"
-                                    icon="Users"
-                                />
-                            </div>
-                            <div class="ml-3">Users & Permissions</div>
-                        </a>
-                        <a
-                            class="mt-2 flex items-center"
-                            href=""
-                        >
-                            <div
-                                class="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary/80 dark:bg-primary/20">
-                                <x-base.lucide
-                                    class="h-4 w-4"
-                                    icon="CreditCard"
-                                />
-                            </div>
-                            <div class="ml-3">Transactions Report</div>
-                        </a>
-                    </div>
-                    <div class="mb-2 font-medium">Users</div>
-                    <div class="mb-5">
-                        @foreach (array_slice($fakers, 0, 4) as $faker)
-                            <a
-                                class="mt-2 flex items-center"
-                                href=""
-                            >
-                                <div class="image-fit h-8 w-8">
-                                    <img
-                                        class="rounded-full"
-                                        src="{{ Vite::asset($faker['photos'][0]) }}"
-                                        alt="Midone Tailwind HTML Admin Template"
-                                    />
-                                </div>
-                                <div class="ml-3">{{ $faker['users'][0]['name'] }}</div>
-                                <div class="ml-auto w-48 truncate text-right text-xs text-slate-500">
-                                    {{ $faker['users'][0]['email'] }}
-                                </div>
-                            </a>
-                        @endforeach
-                    </div>
-                    <div class="mb-2 font-medium">Products</div>
-                    @foreach (array_slice($fakers, 0, 4) as $faker)
-                        <a
-                            class="mt-2 flex items-center"
-                            href=""
-                        >
-                            <div class="image-fit h-8 w-8">
-                                <img
-                                    class="rounded-full"
-                                    src="{{ Vite::asset($faker['images'][0]) }}"
-                                    alt="Midone Tailwind HTML Admin Template"
-                                />
-                            </div>
-                            <div class="ml-3">{{ $faker['products'][0]['name'] }}</div>
-                            <div class="ml-auto w-48 truncate text-right text-xs text-slate-500">
-                                {{ $faker['products'][0]['category'] }}
-                            </div>
-                        </a>
-                    @endforeach
-                </div>
-            </x-base.transition>
         </div>
         <!-- END: Search -->
         <!-- BEGIN: Notifications -->
@@ -162,7 +117,7 @@
                 class="image-fit zoom-in intro-x block h-8 w-8 scale-110 overflow-hidden rounded-full shadow-lg"
             >
                 <img
-                    src="{{ Vite::asset($faker['photos'][0]) }}"
+                    src="{{ auth()->user()->profile_photo_url ?? Vite::asset($faker[0]['photos'][0]) }}"
                     alt="{{ auth()->user()->name }}"
                 />
             </x-base.menu.button>
@@ -222,6 +177,7 @@
     </div>
 </div>
 <!-- END: Top Bar -->
+
 
 @pushOnce('scripts')
     @vite('resources/js/components/themes/enigma/top-bar.js')

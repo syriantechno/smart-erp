@@ -1,4 +1,4 @@
-<?php if (! $__env->hasRenderedOnce('e8fa40d9-314d-4745-a3bb-8eaae40f328d')): $__env->markAsRenderedOnce('e8fa40d9-314d-4745-a3bb-8eaae40f328d');
+<?php if (! $__env->hasRenderedOnce('3e046a67-4081-486b-9947-44a78eeae429')): $__env->markAsRenderedOnce('3e046a67-4081-486b-9947-44a78eeae429');
 $__env->startPush('scripts'); ?>
 <script>
     console.log('Settings scripts loaded successfully');
@@ -248,6 +248,17 @@ $__env->startPush('scripts'); ?>
                     });
                 });
             }
+        }
+
+        // Handle Font Size Preview
+        const fontSizeSelect = document.querySelector('select[name="font_size"]');
+        if (fontSizeSelect) {
+            // Apply current font size on page load
+            applyFontSizePreview(fontSizeSelect.value);
+            
+            fontSizeSelect.addEventListener('change', function() {
+                applyFontSizePreview(this.value);
+            });
         }
 
         // Handle Appearance Settings Form with AJAX
@@ -610,6 +621,21 @@ $__env->startPush('scripts'); ?>
         });
     } // Close initializeSettingsTabs function
 
+    // Font Size Preview Function
+    function applyFontSizePreview(fontSize) {
+        // Remove existing font size classes
+        document.body.classList.remove('small', 'medium', 'large', 'extra-large');
+        
+        // Add new font size class
+        document.body.classList.add(fontSize);
+        
+        console.log('Applied font size preview:', fontSize);
+        
+        // Show notification
+        if (typeof window.showToast === 'function') {
+            window.showToast(`Font size changed to ${fontSize}. Save to make it permanent.`, 'info');
+        }
+    }
 
 </script>
 <?php $__env->stopPush(); endif; ?>

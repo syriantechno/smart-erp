@@ -24,12 +24,14 @@
         }
 
         &::-webkit-scrollbar-thumb {
-            background-color: rgba(148, 163, 184, 0.6); /* slate-400-ish */
+            background-color: color-mix(in oklch, rgb(var(--primary-rgb, 37, 99, 235)) 30%, #ffffff);
             border-radius: 9999px;
+            border: 1px solid color-mix(in oklch, rgb(var(--primary-rgb, 37, 99, 235)), transparent 85%);
         }
 
         &::-webkit-scrollbar-thumb:hover {
-            background-color: rgba(148, 163, 184, 0.9);
+            background-color: color-mix(in oklch, rgb(var(--primary-rgb, 37, 99, 235)) 45%, #ffffff);
+            box-shadow: 0 8px 18px color-mix(in oklch, rgb(var(--primary-rgb, 37, 99, 235)), transparent 85%);
         }
 
         &.side-nav--simple {
@@ -78,16 +80,10 @@
                     transition: all 0.2s ease;
                     width: 1.125rem;
                     height: 1.125rem;
-                    color: theme("colors.slate.600");
+                    color: rgb(var(--primary-rgb, 37, 99, 235));
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    
-                    svg {
-                        width: 1.125rem !important;
-                        height: 1.125rem !important;
-                        display: block;
-                    }
                 }
                 
                 .side-menu__title {
@@ -181,6 +177,7 @@
             .side-menu__icon {
                 transition: all 0.2s ease;
                 flex-shrink: 0;
+                color: rgb(var(--primary-rgb, 37, 99, 235));
             }
             
             .side-menu__title {

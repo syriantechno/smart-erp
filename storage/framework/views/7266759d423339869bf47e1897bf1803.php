@@ -1,7 +1,7 @@
 <div class="flex items-center justify-center gap-3">
     <button
         type="button"
-        onclick="openEditModal({{ $task->id }}, {{ json_encode($task->title) }}, {{ json_encode($task->description ?? '') }}, {{ json_encode($task->priority) }}, {{ json_encode($task->status) }}, {{ json_encode($task->due_date ? $task->due_date->format('Y-m-d') : '') }}, {{ $task->employee_id ?? 'null' }}, {{ $task->department_id ?? 'null' }}, {{ $task->company_id ?? 'null' }}, {{ $task->is_active ? 'true' : 'false' }})"
+        onclick="openEditModal(<?php echo e($task->id); ?>, <?php echo e(json_encode($task->title)); ?>, <?php echo e(json_encode($task->description ?? '')); ?>, <?php echo e(json_encode($task->priority)); ?>, <?php echo e(json_encode($task->status)); ?>, <?php echo e(json_encode($task->due_date ? $task->due_date->format('Y-m-d') : '')); ?>, <?php echo e($task->employee_id ?? 'null'); ?>, <?php echo e($task->department_id ?? 'null'); ?>, <?php echo e($task->company_id ?? 'null'); ?>, <?php echo e($task->is_active ? 'true' : 'false'); ?>)"
         class="inline-flex items-center justify-center p-2 text-slate-500 transition hover:text-primary focus:outline-none"
         title="Edit"
     >
@@ -13,7 +13,7 @@
 
     <button
         type="button"
-        onclick="deleteTask({{ $task->id }}, {{ json_encode($task->title) }})"
+        onclick="deleteTask(<?php echo e($task->id); ?>, <?php echo e(json_encode($task->title)); ?>)"
         class="inline-flex items-center justify-center p-2 text-slate-500 transition hover:text-danger focus:outline-none"
         title="Delete"
     >
@@ -26,3 +26,4 @@
         </svg>
     </button>
 </div>
+<?php /**PATH D:\laravel\smart-erp\resources\views/tasks/partials/actions.blade.php ENDPATH**/ ?>

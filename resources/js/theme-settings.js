@@ -61,9 +61,20 @@ function setupFontSizePreview() {
     const fontSizeSelect = document.querySelector('select[name="font_size"]');
     if (fontSizeSelect) {
         fontSizeSelect.addEventListener('change', function() {
-            console.log('Selected font size:', this.value);
+            applyFontSizePreview(this.value);
         });
     }
+}
+
+function applyFontSizePreview(fontSize) {
+    // Remove existing font size classes
+    document.body.classList.remove('small', 'medium', 'large', 'extra-large');
+    
+    // Add new font size class
+    document.body.classList.add(fontSize);
+    
+    console.log('Applied font size:', fontSize);
+    showNotification(`Font size changed to ${fontSize}. Save to make it permanent.`, 'info');
 }
 
 function resetToDefaults() {

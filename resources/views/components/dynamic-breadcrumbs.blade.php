@@ -63,7 +63,7 @@
     <ol class="flex items-center text-white">
         <li class="flex items-center">
             <a href="{{ url('/') }}" class="hover:text-primary">
-                {{ setting('general.application_name', config('app.name', 'Application')) }}
+                {{ setting('app_name', config('app.name', 'Smart ERP')) }}
             </a>
         </li>
         

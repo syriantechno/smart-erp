@@ -417,11 +417,11 @@
                     <div class="pt-4 mt-4 border-t border-slate-200/60">
                         @if (app('router')->has('users.edit'))
                             <a href="{{ route('users.edit', $employee->user) }}" class="btn btn-outline-primary w-full">
-                            <i data-lucide="edit-3" class="w-4 h-4 ml-2"></i> Edit User Account
+                            <x-base.lucide icon="Edit3" class="w-4 h-4 ml-2" /> Edit User Account
                             </a>
                         @else
                             <button type="button" class="btn btn-outline-secondary w-full" disabled>
-                                <i data-lucide="info" class="w-4 h-4 ml-2"></i> User account management is not enabled yet
+                                <x-base.lucide icon="Info" class="w-4 h-4 ml-2" /> User account management is not enabled yet
                             </button>
                         @endif
                     </div>
@@ -436,11 +436,11 @@
                 
                 @if (app('router')->has('users.create'))
                     <a href="{{ route('users.create', ['employee_id' => $employee->id]) }}" class="btn btn-primary w-full">
-                        <i data-lucide="user-plus" class="w-4 h-4 ml-2"></i> Create User Account
+                        <x-base.lucide icon="UserPlus" class="w-4 h-4 ml-2" /> Create User Account
                     </a>
                 @else
                     <button type="button" class="btn btn-primary w-full" disabled>
-                        <i data-lucide="user-plus" class="w-4 h-4 ml-2 animate-pulse"></i> Create User Account (not configured yet)
+                        <x-base.lucide icon="UserPlus" class="w-4 h-4 ml-2 animate-pulse" /> Create User Account (not configured yet)
                     </button>
                 @endif
             </div>

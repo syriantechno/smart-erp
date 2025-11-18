@@ -45,7 +45,73 @@
             --color-secondary: var(--secondary-color, #0f172a);
             --color-primary-rgb: var(--primary-rgb, 37 99 235);
         }
+
+        /* Fix for Toggle Switches */
+        .peer:checked ~ div {
+            background-color: rgb(var(--color-primary-rgb, 37 99 235)) !important;
+        }
+        
+        .peer:checked ~ .peer-checked\:bg-primary {
+            background-color: rgb(var(--color-primary-rgb, 37 99 235)) !important;
+        }
+
+        /* Add Shadow to Toggle Switches */
+        input[type="checkbox"] + div,
+        input[type="checkbox"] ~ div {
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+        }
+
+        input[type="checkbox"]:focus + div,
+        input[type="checkbox"]:focus ~ div {
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05), 0 0 0 3px rgba(var(--color-primary-rgb, 37 99 235), 0.1) !important;
+        }
+
+        /* Fix for Form Input Shadows */
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="number"],
+        input[type="tel"],
+        input[type="url"],
+        input[type="date"],
+        input[type="datetime-local"],
+        input[type="time"],
+        textarea,
+        select {
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+            transition: box-shadow 0.15s ease-in-out, border-color 0.15s ease-in-out !important;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus,
+        input[type="number"]:focus,
+        input[type="tel"]:focus,
+        input[type="url"]:focus,
+        input[type="date"]:focus,
+        input[type="datetime-local"]:focus,
+        input[type="time"]:focus,
+        textarea:focus,
+        select:focus {
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05), 0 0 0 3px rgba(var(--color-primary-rgb, 37 99 235), 0.1) !important;
+            border-color: rgb(var(--color-primary-rgb, 37 99 235)) !important;
+        }
+        
     </style>
+
+    <script>
+        // Apply font size immediately on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentFontSize = '{{ setting("font_size", "medium") }}';
+            if (currentFontSize && !document.body.classList.contains(currentFontSize)) {
+                // Remove any existing font size classes
+                document.body.classList.remove('small', 'medium', 'large', 'extra-large');
+                // Add current font size class
+                document.body.classList.add(currentFontSize);
+                console.log('Applied font size from settings:', currentFontSize);
+            }
+        });
+    </script>
 
     <!-- Dark Mode CSS -->
     @vite('resources/css/dark-mode.css')
@@ -59,6 +125,7 @@
 
 
 @yield('content')
+
 
  <!-- BEGIN: Vendor JS Assets-->
     @vite('resources/js/vendors/dom.js')
@@ -119,8 +186,12 @@
         });
     </script>
     @vite('resources/js/app.js')
+    
+    
     @stack('scripts')
     <!-- END: Pages, layouts, components JS Assets-->
+
+
 </body>
 
 </html>

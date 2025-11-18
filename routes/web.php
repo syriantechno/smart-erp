@@ -50,6 +50,9 @@ Route::middleware('auth')->group(function () {
     Route::get('notifications/recent', [NotificationController::class, 'recent'])->name('notifications.recent');
     Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unread-count');
 
+    // Global Search API
+    Route::get('search', [App\Http\Controllers\SearchController::class, 'search'])->name('search');
+
     // Calendar
     Route::get('calendar', [CalendarController::class, 'index'])->name('calendar');
 

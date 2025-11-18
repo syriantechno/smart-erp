@@ -28,9 +28,58 @@ foreach ($attributes->all() as $__key => $__value) {
 
 unset($__defined_vars); ?>
 
+<?php
+    if (!isset($fakers) || empty($fakers)) {
+        $fakers = [
+            [
+                'photos' => ['resources/images/profile-1.jpg'],
+                'users' => [['name' => 'Alex Cooper', 'email' => 'alex.cooper@example.com']],
+                'images' => ['resources/images/preview-1.jpg'],
+                'products' => [['name' => 'Wireless Earbuds', 'category' => 'Audio Devices']],
+            ],
+            [
+                'photos' => ['resources/images/profile-2.jpg'],
+                'users' => [['name' => 'Sara Haddad', 'email' => 'sara.haddad@example.com']],
+                'images' => ['resources/images/preview-2.jpg'],
+                'products' => [['name' => 'Smart Desk Lamp', 'category' => 'Home Office']],
+            ],
+            [
+                'photos' => ['resources/images/profile-3.jpg'],
+                'users' => [['name' => 'Mohammed Al-Sayed', 'email' => 'malsayed@example.com']],
+                'images' => ['resources/images/preview-5.jpg'],
+                'products' => [['name' => 'Cloud Backup Suite', 'category' => 'Software']],
+            ],
+            [
+                'photos' => ['resources/images/profile-4.jpg'],
+                'users' => [['name' => 'Aisha Rahman', 'email' => 'aisha.rahman@example.com']],
+                'images' => ['resources/images/preview-6.jpg'],
+                'products' => [['name' => 'Projector HD Mini', 'category' => 'Electronics']],
+            ],
+        ];
+    }
+
+    $searchPages = [
+        ['label' => 'Mail Settings', 'icon' => 'Inbox', 'icon_bg' => 'bg-success/20 text-success'],
+        ['label' => 'Users & Permissions', 'icon' => 'Users', 'icon_bg' => 'bg-pending/10 text-pending'],
+        ['label' => 'Transactions Report', 'icon' => 'CreditCard', 'icon_bg' => 'bg-primary/10 text-primary/80 dark:bg-primary/20'],
+    ];
+
+    $searchDepartments = [
+        ['name' => 'Sales', 'location' => 'Isle of Man'],
+        ['name' => 'Product Management', 'location' => 'Svalbard'],
+        ['name' => 'Quality Assurance', 'location' => 'Lesotho'],
+    ];
+
+    $searchProducts = [
+        ['name' => 'Ultra HD 4K Smart TV', 'category' => 'Electronics'],
+        ['name' => 'Wireless Gaming Mouse', 'category' => 'Accessories'],
+        ['name' => 'Smartphone Charging Dock', 'category' => 'Home & Garden'],
+    ];
+?>
+
 <!-- BEGIN: Top Bar -->
 <div class="<?php echo \Illuminate\Support\Arr::toCssClasses([
-    'h-[90px] md:h-[100px] z-[10] border-b border-white/[0.08] -mx-5 sm:-mx-8 md:-mx-0 px-3 sm:px-8 md:px-10 md:border-b-0 relative md:pt-6',
+    'h-[90px] md:h-[100px] z-[10] border-b border-white/[0.08] -mx-5 sm:-mx-8  px-3 sm:px-8 md:px-10 md:border-b-0 relative md:pt-6',
 ]); ?>">
     <div class="flex items-center">
 
@@ -68,7 +117,7 @@ unset($__defined_vars); ?>
         <!-- BEGIN: Breadcrumb -->
         <div 
             class="<?php echo \Illuminate\Support\Arr::toCssClasses([
-                'h-[45px] md:ml-10 md:border-l border-white/[0.08] dark:border-white/[0.08] mr-auto -intro-x flex items-center',
+                'h-[45px]  md:border-l border-white/[0.08] dark:border-white/[0.08] mr-auto -intro-x flex items-center',
                 'md:pl-6' => $layout != 'top-menu',
                 'md:pl-10' => $layout == 'top-menu',
             ]); ?>"
@@ -96,38 +145,23 @@ unset($__defined_vars); ?>
         </div>
         <!-- END: Breadcrumb -->
         <!-- BEGIN: Search -->
-        <div class="intro-x relative mr-3 sm:mr-6">
-            <div class="search relative hidden sm:block">
-                <?php if (isset($component)) { $__componentOriginal40054831fd8fc1521987609af4b37cc0 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal40054831fd8fc1521987609af4b37cc0 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-input.index','data' => ['class' => 'w-56 rounded-full border-transparent bg-slate-200 pr-8 shadow-none transition-[width] duration-300 ease-in-out focus:w-72 focus:border-transparent dark:bg-darkmode-400','type' => 'text','placeholder' => 'Search...']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.form-input'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['class' => 'w-56 rounded-full border-transparent bg-slate-200 pr-8 shadow-none transition-[width] duration-300 ease-in-out focus:w-72 focus:border-transparent dark:bg-darkmode-400','type' => 'text','placeholder' => 'Search...']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal40054831fd8fc1521987609af4b37cc0)): ?>
-<?php $attributes = $__attributesOriginal40054831fd8fc1521987609af4b37cc0; ?>
-<?php unset($__attributesOriginal40054831fd8fc1521987609af4b37cc0); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal40054831fd8fc1521987609af4b37cc0)): ?>
-<?php $component = $__componentOriginal40054831fd8fc1521987609af4b37cc0; ?>
-<?php unset($__componentOriginal40054831fd8fc1521987609af4b37cc0); ?>
-<?php endif; ?>
-                <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+        <div class="intro-x relative flex-1 flex justify-center mr-3 sm:mr-6">
+            <div class="search relative hidden sm:block w-full max-w-sm">
+                <button
+                    type="button"
+                    data-search-trigger
+                    class="bg-white/[0.12] dark:bg-darkmode-900/30 border-transparent dark:border-transparent border w-full flex items-center py-2 px-3.5 rounded-[0.5rem] text-white/70 cursor-pointer hover:bg-white/[0.15] transition-colors duration-300 hover:duration-100 shadow-[0_12px_40px_rgba(15,23,42,0.25)] backdrop-blur-xl"
+                >
+                    <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['class' => 'absolute inset-y-0 right-0 my-auto mr-3 h-5 w-5 text-slate-600 dark:text-slate-500','icon' => 'Search']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Search','class' => 'stroke-[1] w-[18px] h-[18px]']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.lucide'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['class' => 'absolute inset-y-0 right-0 my-auto mr-3 h-5 w-5 text-slate-600 dark:text-slate-500','icon' => 'Search']); ?>
+<?php $component->withAttributes(['icon' => 'Search','class' => 'stroke-[1] w-[18px] h-[18px]']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
@@ -138,10 +172,14 @@ unset($__defined_vars); ?>
 <?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
+                    <span class="ml-2.5 mr-auto">Quick search...</span>
+                    <span class="text-xs tracking-wide">⌘K</span>
+                </button>
             </div>
             <a
                 class="relative text-white/70 sm:hidden"
                 href=""
+                data-search-trigger
             >
                 <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
@@ -164,160 +202,6 @@ unset($__defined_vars); ?>
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
             </a>
-            <?php if (isset($component)) { $__componentOriginalf680044c1842e049a2fe070d6973c7e9 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalf680044c1842e049a2fe070d6973c7e9 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.transition.index','data' => ['class' => 'search-result absolute right-0 z-10 mt-[3px] hidden','selector' => '.show','enter' => 'transition-all ease-linear duration-150','enterFrom' => 'mt-5 invisible opacity-0 translate-y-1','enterTo' => 'mt-[3px] visible opacity-100 translate-y-0','leave' => 'transition-all ease-linear duration-150','leaveFrom' => 'mt-[3px] visible opacity-100 translate-y-0','leaveTo' => 'mt-5 invisible opacity-0 translate-y-1']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.transition'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['class' => 'search-result absolute right-0 z-10 mt-[3px] hidden','selector' => '.show','enter' => 'transition-all ease-linear duration-150','enterFrom' => 'mt-5 invisible opacity-0 translate-y-1','enterTo' => 'mt-[3px] visible opacity-100 translate-y-0','leave' => 'transition-all ease-linear duration-150','leaveFrom' => 'mt-[3px] visible opacity-100 translate-y-0','leaveTo' => 'mt-5 invisible opacity-0 translate-y-1']); ?>
-                <div class="box w-[450px] p-5">
-                    <div class="mb-2 font-medium">Pages</div>
-                    <div class="mb-5">
-                        <a
-                            class="flex items-center"
-                            href=""
-                        >
-                            <div
-                                class="flex h-8 w-8 items-center justify-center rounded-full bg-success/20 text-success dark:bg-success/10">
-                                <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['class' => 'h-4 w-4','icon' => 'Inbox']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.lucide'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['class' => 'h-4 w-4','icon' => 'Inbox']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
-<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
-<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
-<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
-<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
-<?php endif; ?>
-                            </div>
-                            <div class="ml-3">Mail Settings</div>
-                        </a>
-                        <a
-                            class="mt-2 flex items-center"
-                            href=""
-                        >
-                            <div
-                                class="flex h-8 w-8 items-center justify-center rounded-full bg-pending/10 text-pending">
-                                <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['class' => 'h-4 w-4','icon' => 'Users']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.lucide'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['class' => 'h-4 w-4','icon' => 'Users']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
-<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
-<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
-<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
-<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
-<?php endif; ?>
-                            </div>
-                            <div class="ml-3">Users & Permissions</div>
-                        </a>
-                        <a
-                            class="mt-2 flex items-center"
-                            href=""
-                        >
-                            <div
-                                class="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary/80 dark:bg-primary/20">
-                                <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['class' => 'h-4 w-4','icon' => 'CreditCard']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.lucide'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['class' => 'h-4 w-4','icon' => 'CreditCard']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
-<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
-<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
-<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
-<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
-<?php endif; ?>
-                            </div>
-                            <div class="ml-3">Transactions Report</div>
-                        </a>
-                    </div>
-                    <div class="mb-2 font-medium">Users</div>
-                    <div class="mb-5">
-                        <?php $__currentLoopData = array_slice($fakers, 0, 4); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $faker): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <a
-                                class="mt-2 flex items-center"
-                                href=""
-                            >
-                                <div class="image-fit h-8 w-8">
-                                    <img
-                                        class="rounded-full"
-                                        src="<?php echo e(Vite::asset($faker['photos'][0])); ?>"
-                                        alt="Midone Tailwind HTML Admin Template"
-                                    />
-                                </div>
-                                <div class="ml-3"><?php echo e($faker['users'][0]['name']); ?></div>
-                                <div class="ml-auto w-48 truncate text-right text-xs text-slate-500">
-                                    <?php echo e($faker['users'][0]['email']); ?>
-
-                                </div>
-                            </a>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    </div>
-                    <div class="mb-2 font-medium">Products</div>
-                    <?php $__currentLoopData = array_slice($fakers, 0, 4); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $faker): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <a
-                            class="mt-2 flex items-center"
-                            href=""
-                        >
-                            <div class="image-fit h-8 w-8">
-                                <img
-                                    class="rounded-full"
-                                    src="<?php echo e(Vite::asset($faker['images'][0])); ?>"
-                                    alt="Midone Tailwind HTML Admin Template"
-                                />
-                            </div>
-                            <div class="ml-3"><?php echo e($faker['products'][0]['name']); ?></div>
-                            <div class="ml-auto w-48 truncate text-right text-xs text-slate-500">
-                                <?php echo e($faker['products'][0]['category']); ?>
-
-                            </div>
-                        </a>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                </div>
-             <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginalf680044c1842e049a2fe070d6973c7e9)): ?>
-<?php $attributes = $__attributesOriginalf680044c1842e049a2fe070d6973c7e9; ?>
-<?php unset($__attributesOriginalf680044c1842e049a2fe070d6973c7e9); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginalf680044c1842e049a2fe070d6973c7e9)): ?>
-<?php $component = $__componentOriginalf680044c1842e049a2fe070d6973c7e9; ?>
-<?php unset($__componentOriginalf680044c1842e049a2fe070d6973c7e9); ?>
-<?php endif; ?>
         </div>
         <!-- END: Search -->
         <!-- BEGIN: Notifications -->
@@ -366,7 +250,7 @@ unset($__defined_vars); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['class' => 'image-fit zoom-in intro-x block h-8 w-8 scale-110 overflow-hidden rounded-full shadow-lg']); ?>
                 <img
-                    src="<?php echo e(Vite::asset($faker['photos'][0])); ?>"
+                    src="<?php echo e(auth()->user()->profile_photo_url ?? Vite::asset($faker[0]['photos'][0])); ?>"
                     alt="<?php echo e(auth()->user()->name); ?>"
                 />
              <?php echo $__env->renderComponent(); ?>
@@ -654,7 +538,8 @@ unset($__defined_vars); ?>
 </div>
 <!-- END: Top Bar -->
 
-<?php if (! $__env->hasRenderedOnce('83114cfd-54dc-4ef8-8c53-ceadd8803106')): $__env->markAsRenderedOnce('83114cfd-54dc-4ef8-8c53-ceadd8803106');
+
+<?php if (! $__env->hasRenderedOnce('d3c05e28-907b-4cae-8caa-ba3436906375')): $__env->markAsRenderedOnce('d3c05e28-907b-4cae-8caa-ba3436906375');
 $__env->startPush('scripts'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/js/components/themes/enigma/top-bar.js'); ?>
 <?php $__env->stopPush(); endif; ?>

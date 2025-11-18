@@ -1,8 +1,8 @@
 @php
-    $companies = \App\Models\Company::active()->get();
-    $departments = \App\Models\Department::active()->get();
-    $employees = \App\Models\Employee::active()->get();
-    $projects = \App\Models\Project::active()->get();
+    $companies = \App\Models\Setting\Company::active()->get();
+    $departments = \App\Models\HR\Department::active()->get();
+    $employees = \App\Models\HR\Employee::active()->get();
+    $projects = \App\Models\Work\Project::active()->get();
 @endphp
 <x-modal.form id="edit-task-modal" title="Edit Task" size="xl">
     <form id="edit-task-form" method="POST" enctype="multipart/form-data">
