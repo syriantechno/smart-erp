@@ -5,7 +5,7 @@
 
         <div class="mb-6">
             <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                <x-base.lucide icon="Package" class="h-5 w-5"></x-base.lucide>
+                <x-base.lucide icon="package" class="h-5 w-5"></x-base.lucide>
                 Material Information
             </h4>
             <div class="grid grid-cols-12 gap-4 gap-y-4">

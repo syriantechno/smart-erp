@@ -1,0 +1,177 @@
+/* Unified Invoice Form Styles */
+
+.unified-invoice-modal {
+    max-width: 95vw !important;
+    width: 1200px;
+}
+
+.unified-invoice-modal .modal-body {
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+/* Materials Table Styles */
+.materials-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.materials-table th,
+.materials-table td {
+    border: 1px solid #e2e8f0;
+    padding: 0.75rem 0.5rem;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.materials-table th {
+    background-color: #f8fafc;
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.875rem;
+}
+
+.materials-table tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+.materials-table .form-input,
+.materials-table .form-select {
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    width: 100%;
+}
+
+.materials-table .form-input:focus,
+.materials-table .form-select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Row Actions */
+.materials-table .remove-row {
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    border: 1px solid #ef4444;
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+    transition: all 0.2s;
+}
+
+.materials-table .remove-row:hover {
+    background-color: #ef4444;
+    color: white;
+}
+
+/* Total Row */
+.materials-table tfoot tr {
+    background-color: #f1f5f9;
+    font-weight: 600;
+}
+
+.materials-table tfoot td {
+    border-top: 2px solid #cbd5e1;
+    padding: 1rem 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .unified-invoice-modal {
+        max-width: 98vw !important;
+        margin: 0.5rem;
+    }
+    
+    .materials-table {
+        font-size: 0.75rem;
+    }
+    
+    .materials-table th,
+    .materials-table td {
+        padding: 0.5rem 0.25rem;
+    }
+}
+
+/* Animation for adding rows */
+.material-row {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Form Section Headers */
+.invoice-section-header {
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.invoice-section-header h4 {
+    color: #1e293b;
+    font-weight: 600;
+}
+
+/* Add Material Button */
+.add-material-btn {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+}
+
+.add-material-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+}
+
+/* Form Grid Improvements */
+.invoice-form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Status Indicators */
+.invoice-status-draft {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.invoice-status-pending {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.invoice-status-approved {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+/* Print Styles */
+@media print {
+    .unified-invoice-modal .modal-header,
+    .unified-invoice-modal .modal-footer {
+        display: none;
+    }
+    
+    .materials-table {
+        page-break-inside: avoid;
+    }
+}

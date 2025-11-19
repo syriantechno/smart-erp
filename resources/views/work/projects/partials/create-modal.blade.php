@@ -21,7 +21,7 @@
                     <!-- Basic Information -->
                     <div class="mb-6">
                         <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                            <x-base.lucide icon="ClipboardList" class="h-5 w-5"></x-base.lucide>
+                            <x-base.lucide icon="clipboard-list" class="h-5 w-5"></x-base.lucide>
                             Basic Information
                         </h4>
 
@@ -67,7 +67,7 @@
                     <!-- Organization -->
                     <div class="mb-6">
                         <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                            <x-base.lucide icon="Building2" class="h-5 w-5"></x-base.lucide>
+                            <x-base.lucide icon="building-2" class="h-5 w-5"></x-base.lucide>
                             Organization
                         </h4>
 
@@ -104,7 +104,7 @@
                     <!-- Timeline -->
                     <div class="mb-6">
                         <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                            <x-base.lucide icon="CalendarRange" class="h-5 w-5"></x-base.lucide>
+                            <x-base.lucide icon="calendar-range" class="h-5 w-5"></x-base.lucide>
                             Timeline
                         </h4>
 
@@ -147,7 +147,7 @@
                     <!-- Status & Priority -->
                     <div class="mb-6">
                         <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                            <x-base.lucide icon="Activity" class="h-5 w-5"></x-base.lucide>
+                            <x-base.lucide icon="activity" class="h-5 w-5"></x-base.lucide>
                             Status & Priority
                         </h4>
 
@@ -178,7 +178,7 @@
                     <!-- Progress & Budget -->
                     <div class="mb-6">
                         <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                            <x-base.lucide icon="BarChart2" class="h-5 w-5"></x-base.lucide>
+                            <x-base.lucide icon="bar-chart-2" class="h-5 w-5"></x-base.lucide>
                             Progress & Budget
                         </h4>
 
@@ -213,7 +213,7 @@
                     <!-- Objectives & Deliverables -->
                     <div class="mb-6">
                         <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                            <x-base.lucide icon="Target" class="h-5 w-5"></x-base.lucide>
+                            <x-base.lucide icon="target" class="h-5 w-5"></x-base.lucide>
                             Objectives & Deliverables
                         </h4>
 
@@ -245,7 +245,7 @@
                     <!-- Risks & Notes -->
                     <div class="mb-6">
                         <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                            <x-base.lucide icon="AlertTriangle" class="h-5 w-5"></x-base.lucide>
+                            <x-base.lucide icon="alert-triangle" class="h-5 w-5"></x-base.lucide>
                             Risks & Notes
                         </h4>
 
@@ -277,9 +277,9 @@
 
             <!-- Modal Footer -->
             <div class="custom-modal-footer">
-                <button type="button" class="btn btn-outline-secondary" onclick="closeCreateModal()">Cancel</button>
-                <button type="submit" class="btn btn-primary" id="create-project-btn">
-                    <x-base.lucide icon="Save" class="w-4 h-4 mr-2" />
+                <button type="button" class="btn-tonal btn-tonal--warning" onclick="closeCreateModal()">Cancel</button>
+                <button type="submit" class="btn-tonal btn-tonal--success" id="create-project-btn">
+                    <x-base.lucide icon="save" class="w-4 h-4 mr-2" />
                     Create Project
                 </button>
             </div>

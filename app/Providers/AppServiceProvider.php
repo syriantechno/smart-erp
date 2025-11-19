@@ -19,6 +19,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Register view composers
+        \Illuminate\Support\Facades\View::composer('*', \App\View\Composers\ThemeComposer::class);
+        \Illuminate\Support\Facades\View::composer('*', \App\View\Composers\LayoutComposer::class);
+        \Illuminate\Support\Facades\View::composer('*', \App\View\Composers\MenuComposer::class);
     }
 }

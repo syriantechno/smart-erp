@@ -5,6 +5,7 @@ namespace App\Models\Work;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Company;
 use App\Models\HR\Department;
 use App\Models\HR\Employee;
@@ -109,6 +110,12 @@ class Project extends Model
         return $this->belongsToMany(Employee::class, 'project_employees', 'project_id', 'employee_id')
                     ->withPivot('role', 'joined_at', 'left_at')
                     ->withTimestamps();
+    }
+
+    // One-to-many relationship with tasks
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(Task::class, 'project_id');
     }
 
     /**

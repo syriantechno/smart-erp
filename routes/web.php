@@ -235,6 +235,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/preview-code', [App\Http\Controllers\Warehouse\PurchaseOrderController::class, 'previewCode'])->name('preview-code');
             Route::post('/', [App\Http\Controllers\Warehouse\PurchaseOrderController::class, 'store'])->name('store');
             Route::get('/{purchaseOrder}', [App\Http\Controllers\Warehouse\PurchaseOrderController::class, 'show'])->name('show');
+            Route::get('/{purchaseOrder}/edit', [App\Http\Controllers\Warehouse\PurchaseOrderController::class, 'edit'])->name('edit');
             Route::put('/{purchaseOrder}', [App\Http\Controllers\Warehouse\PurchaseOrderController::class, 'update'])->name('update');
             Route::delete('/{purchaseOrder}', [App\Http\Controllers\Warehouse\PurchaseOrderController::class, 'destroy'])->name('destroy');
         });
@@ -554,8 +555,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/send-to-users', [App\Http\Controllers\NotificationController::class, 'sendToUsers'])->name('send-to-users');
     });
 
-    // Work/Projects Routes
+    // Work Management Routes
     Route::prefix('work')->name('work.')->group(function () {
+        // Projects
         Route::resource('projects', App\Http\Controllers\Work\ProjectController::class);
         Route::get('projects/datatable/data', [App\Http\Controllers\Work\ProjectController::class, 'datatable'])->name('projects.datatable');
         Route::put('projects/{project}/status', [App\Http\Controllers\Work\ProjectController::class, 'updateStatus'])->name('projects.update-status');
@@ -563,6 +565,16 @@ Route::middleware('auth')->group(function () {
         Route::get('projects/export/data', [App\Http\Controllers\Work\ProjectController::class, 'export'])->name('projects.export');
         Route::get('projects/preview-code', [App\Http\Controllers\Work\ProjectController::class, 'previewCode'])->name('projects.preview-code');
         Route::get('projects/debug-prefix', [App\Http\Controllers\Work\ProjectController::class, 'debugPrefix'])->name('projects.debug-prefix');
+        
+        // Estimates
+        Route::resource('estimates', App\Http\Controllers\Work\EstimateController::class);
+        Route::get('estimates/datatable', [App\Http\Controllers\Work\EstimateController::class, 'datatable'])->name('estimates.datatable');
+        Route::get('estimates/preview-code', [App\Http\Controllers\Work\EstimateController::class, 'previewCode'])->name('estimates.preview-code');
+        
+        // Contracts
+        Route::resource('contracts', App\Http\Controllers\Work\ContractController::class);
+        Route::get('contracts/datatable', [App\Http\Controllers\Work\ContractController::class, 'datatable'])->name('contracts.datatable');
+        Route::get('contracts/preview-code', [App\Http\Controllers\Work\ContractController::class, 'previewCode'])->name('contracts.preview-code');
     });
     // Manufacturing Routes
 

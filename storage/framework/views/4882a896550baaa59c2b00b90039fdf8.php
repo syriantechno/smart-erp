@@ -65,14 +65,14 @@
                         <div class="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
                             <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Layers','class' => 'h-9 w-9 text-primary']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'layers','class' => 'h-9 w-9 text-primary']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.lucide'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['icon' => 'Layers','class' => 'h-9 w-9 text-primary']); ?>
+<?php $component->withAttributes(['icon' => 'layers','class' => 'h-9 w-9 text-primary']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
@@ -287,19 +287,19 @@
     </div>
 <?php $__env->stopSection(); ?>
 
-<?php if (! $__env->hasRenderedOnce('b101f424-0e63-4efb-a12a-1246ed6c0b45')): $__env->markAsRenderedOnce('b101f424-0e63-4efb-a12a-1246ed6c0b45');
+<?php if (! $__env->hasRenderedOnce('d065a125-3fcf-471c-984e-9b7ce23bf855')): $__env->markAsRenderedOnce('d065a125-3fcf-471c-984e-9b7ce23bf855');
 $__env->startPush('styles'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/css/vendors/tippy.css'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/css/themes/enigma/side-nav.css'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/css/themes/enigma/top-nav.css'); ?>
 <?php $__env->stopPush(); endif; ?>
 
-<?php if (! $__env->hasRenderedOnce('2490688d-7643-4fda-91b3-97b924e36b4f')): $__env->markAsRenderedOnce('2490688d-7643-4fda-91b3-97b924e36b4f');
+<?php if (! $__env->hasRenderedOnce('eb650a60-d399-4a30-8dc2-dc9fccb9eb74')): $__env->markAsRenderedOnce('eb650a60-d399-4a30-8dc2-dc9fccb9eb74');
 $__env->startPush('vendors'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/js/vendors/tippy.js'); ?>
 <?php $__env->stopPush(); endif; ?>
 
-<?php if (! $__env->hasRenderedOnce('95984e6b-9814-4e3d-af9f-84f2e1ecbd76')): $__env->markAsRenderedOnce('95984e6b-9814-4e3d-af9f-84f2e1ecbd76');
+<?php if (! $__env->hasRenderedOnce('4661fb49-8f6e-470c-b19d-54208ea38ce5')): $__env->markAsRenderedOnce('4661fb49-8f6e-470c-b19d-54208ea38ce5');
 $__env->startPush('scripts'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/js/themes/enigma.js'); ?>
 

@@ -94,11 +94,6 @@ class SideMenu
                         'icon' => 'user-plus',
                         'title' => 'Recruitment',
                         'route_name' => 'hr.recruitment.index'
-                    ],
-                    'project-management' => [
-                        'icon' => 'folder',
-                        'title' => 'Project Management',
-                        'route_name' => 'project-management.projects.index'
                     ]
                 ]
             ],
@@ -112,15 +107,31 @@ class SideMenu
                 'route_name' => 'manufacturing.index',
                 'title' => 'Manufacturing'
             ],
-            'projects-manager' => [
-                'icon' => 'folder',
-                'route_name' => 'project-management.projects.index',
-                'title' => 'Projects Manager'
-            ],
-            'work-projects' => [
+            'work' => [
                 'icon' => 'briefcase',
-                'route_name' => 'work.projects.index',
-                'title' => 'Work Projects'
+                'title' => 'Work Management',
+                'sub_menu' => [
+                    'projects' => [
+                        'icon' => 'folder',
+                        'route_name' => 'project-management.projects.index',
+                        'title' => 'Projects'
+                    ],
+                    'tasks' => [
+                        'icon' => 'check-square',
+                        'route_name' => 'tasks.index',
+                        'title' => 'Tasks'
+                    ],
+                    'estimates' => [
+                        'icon' => 'calculator',
+                        'route_name' => 'work.estimates.index',
+                        'title' => 'Estimates'
+                    ],
+                    'contracts' => [
+                        'icon' => 'file-signature',
+                        'route_name' => 'work.contracts.index',
+                        'title' => 'Contracts'
+                    ]
+                ]
             ],
             'warehouse' => [
                 'icon' => 'package',
@@ -167,11 +178,6 @@ class SideMenu
                         'title' => 'Delivery Orders'
                     ]
                 ]
-            ],
-            'tasks' => [
-                'icon' => 'check-square',
-                'route_name' => 'tasks.index',
-                'title' => 'Tasks Management'
             ],
             'electronic-mail' => [
                 'icon' => 'mail',

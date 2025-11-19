@@ -102,13 +102,13 @@
                 <div class="p-5">
                     <div class="flex items-center justify-between mb-6">
                         <h2 class="text-lg font-medium">Projects Management</h2>
-                        <x-base.button
-                            variant="primary"
+                        <button
+                            class="btn-tonal btn-tonal--success"
                             onclick="openCreateModal()"
                         >
-                            <x-base.lucide icon="Plus" class="w-4 h-4 mr-2" />
+                            <x-base.lucide icon="plus" class="w-4 h-4 mr-2" />
                             Add New Project
-                        </x-base.button>
+                        </button>
                     </div>
 
                     <!-- Stats Cards -->
@@ -117,7 +117,7 @@
                             <div class="stats-card-info p-5 text-center">
                                 <div class="text-3xl font-bold mb-2">{{ $stats['total'] }}</div>
                                 <div class="flex items-center justify-center gap-2 text-sm opacity-80">
-                                    <x-base.lucide icon="TrendingUp" class="w-4 h-4" />
+                                    <x-base.lucide icon="trending-up" class="w-4 h-4" />
                                     Total Projects
                                 </div>
                             </div>
@@ -126,7 +126,7 @@
                             <div class="stats-card-warning p-5 text-center">
                                 <div class="text-3xl font-bold mb-2">{{ $stats['active'] }}</div>
                                 <div class="flex items-center justify-center gap-2 text-sm opacity-80">
-                                    <x-base.lucide icon="Activity" class="w-4 h-4" />
+                                    <x-base.lucide icon="activity" class="w-4 h-4" />
                                     Active Projects
                                 </div>
                             </div>
@@ -135,7 +135,7 @@
                             <div class="stats-card-success p-5 text-center">
                                 <div class="text-3xl font-bold mb-2">{{ $stats['completed'] }}</div>
                                 <div class="flex items-center justify-center gap-2 text-sm opacity-80">
-                                    <x-base.lucide icon="CheckCircle" class="w-4 h-4" />
+                                    <x-base.lucide icon="check-circle" class="w-4 h-4" />
                                     Completed
                                 </div>
                             </div>
@@ -144,7 +144,7 @@
                             <div class="stats-card-danger p-5 text-center">
                                 <div class="text-3xl font-bold mb-2">{{ $stats['overdue'] }}</div>
                                 <div class="flex items-center justify-center gap-2 text-sm opacity-80">
-                                    <x-base.lucide icon="AlertTriangle" class="w-4 h-4" />
+                                    <x-base.lucide icon="alert-circle" class="w-4 h-4" />
                                     Overdue
                                 </div>
                             </div>

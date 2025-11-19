@@ -7,7 +7,24 @@ export default defineConfig({
         commonjsOptions: {
             include: ["tailwind.config.js", "node_modules/**"],
         },
-        
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    vendor: ['lodash', 'axios', 'dayjs'],
+                    charts: [
+                        'resources/js/vendors/chartjs.js',
+                        'resources/js/components/donut-chart.js',
+                        'resources/js/components/line-chart.js',
+                        'resources/js/components/pie-chart.js'
+                    ],
+                    editors: [
+                        'resources/js/vendors/ckeditor/classic.js',
+                        'resources/js/vendors/ckeditor/balloon.js'
+                    ]
+                }
+            }
+        },
+        chunkSizeWarningLimit: 1000
     },
     optimizeDeps: {
         include: ["tailwind-config"],
@@ -42,6 +59,7 @@ export default defineConfig({
 
                 // CSS Components
                 "resources/css/components/mobile-menu.css",
+                "resources/css/components/unified-invoice.css",
 
                 // CSS General
                 "resources/css/app.css",
@@ -151,8 +169,11 @@ export default defineConfig({
                 "resources/js/components/stacked-bar-chart.js",
                 "resources/js/components/vertical-bar-chart.js",
 
-                // JS General
-                "resources/js/app.js",
+                // JS Performance
+                "resources/js/performance/lazy-loading.js",
+                "resources/js/accessibility-fixes.js",
+                "resources/js/modal-fixes.js",
+                "resources/js/purchase-orders-modal.js",
             ],
             refresh: true,
         }),

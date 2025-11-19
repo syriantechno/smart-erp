@@ -50,6 +50,11 @@ class PurchaseOrder extends Model
         return $this->belongsTo(User::class, 'approved_by');
     }
 
+    public function supplier(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Supplier\Vendor::class, 'supplier_id');
+    }
+
     public function items(): HasMany
     {
         return $this->hasMany(PurchaseOrderItem::class);

@@ -1,0 +1,82 @@
+/* Critical CSS for above-the-fold content */
+
+/* Loading spinner */
+.loading-spinner {
+    @apply animate-spin rounded-full border-b-2 border-primary;
+}
+
+/* Critical btn-tonal styles */
+.btn-tonal {
+    @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+}
+
+.btn-tonal--icon {
+    @apply w-8 h-8 p-0;
+}
+
+.btn-tonal--info {
+    background-color: color-mix(in oklch, var(--chart-info) 15%, #ffffff);
+    color: color-mix(in oklch, var(--chart-info), black 30%);
+    border: 1px solid color-mix(in oklch, var(--chart-info), transparent 85%);
+}
+
+.btn-tonal--success {
+    background-color: color-mix(in oklch, var(--chart-success) 15%, #ffffff);
+    color: color-mix(in oklch, var(--chart-success), black 30%);
+    border: 1px solid color-mix(in oklch, var(--chart-success), transparent 85%);
+}
+
+.btn-tonal--warning {
+    background-color: color-mix(in oklch, var(--chart-warning) 15%, #ffffff);
+    color: color-mix(in oklch, var(--chart-warning), black 30%);
+    border: 1px solid color-mix(in oklch, var(--chart-warning), transparent 85%);
+}
+
+.btn-tonal--danger {
+    background-color: color-mix(in oklch, var(--chart-danger) 15%, #ffffff);
+    color: color-mix(in oklch, var(--chart-danger), black 30%);
+    border: 1px solid color-mix(in oklch, var(--chart-danger), transparent 85%);
+}
+
+/* Critical stats-card styles */
+.stats-card-info {
+    background-color: color-mix(in oklch, var(--chart-info) 15%, #ffffff);
+    color: color-mix(in oklch, var(--chart-info), black 30%);
+    border: 1px solid color-mix(in oklch, var(--chart-info), transparent 85%);
+}
+
+.stats-card-success {
+    background-color: color-mix(in oklch, var(--chart-success) 15%, #ffffff);
+    color: color-mix(in oklch, var(--chart-success), black 30%);
+    border: 1px solid color-mix(in oklch, var(--chart-success), transparent 85%);
+}
+
+.stats-card-warning {
+    background-color: color-mix(in oklch, var(--chart-warning) 15%, #ffffff);
+    color: color-mix(in oklch, var(--chart-warning), black 30%);
+    border: 1px solid color-mix(in oklch, var(--chart-warning), transparent 85%);
+}
+
+.stats-card-danger {
+    background-color: color-mix(in oklch, var(--chart-danger) 15%, #ffffff);
+    color: color-mix(in oklch, var(--chart-danger), black 30%);
+    border: 1px solid color-mix(in oklch, var(--chart-danger), transparent 85%);
+}
+
+/* Critical layout styles */
+.side-nav {
+    @apply fixed top-2 left-2 h-screen bg-white/95 rounded-lg shadow-lg;
+}
+
+/* Skeleton loading */
+.skeleton {
+    @apply animate-pulse bg-slate-200 rounded;
+}
+
+.skeleton-text {
+    @apply h-4 bg-slate-200 rounded animate-pulse;
+}
+
+.skeleton-avatar {
+    @apply w-10 h-10 bg-slate-200 rounded-full animate-pulse;
+}

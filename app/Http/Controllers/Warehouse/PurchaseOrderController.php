@@ -22,7 +22,16 @@ class PurchaseOrderController extends Controller
 
     public function index()
     {
-        return view('warehouse.purchase-orders.index');
+        // Get suppliers and materials for the unified invoice form
+        try {
+            $suppliers = collect(); // Empty collection as fallback
+            $materials = \App\Models\Warehouse\Material::select('id', 'name', 'unit', 'price')->get();
+        } catch (\Exception $e) {
+            $suppliers = collect();
+            $materials = collect();
+        }
+        
+        return view('warehouse.purchase-orders.index', compact('suppliers', 'materials'));
     }
 
     public function previewCode()
@@ -34,26 +43,82 @@ class PurchaseOrderController extends Controller
     public function datatable(Request $request): JsonResponse
     {
         $baseQuery = PurchaseOrder::query()
-            ->with(['createdBy:id,name', 'approvedBy:id,name']);
+            ->with(['createdBy:id,name', 'approvedBy:id,name', 'supplier:id,name'])
+            ->select([
+                'purchase_orders.*'
+            ]);
 
-        if ($request->filled('status')) {
-            $baseQuery->where('status', $request->status);
+        // Apply advanced filters like employees
+        if ($request->filled('filter_field') && $request->filled('filter_value')) {
+            $field = $request->filter_field;
+            $type = $request->filter_type ?? 'contains';
+            $value = $request->filter_value;
+
+            if ($field === 'all') {
+                $baseQuery->where(function($q) use ($type, $value) {
+                    if ($type === 'contains') {
+                        $q->where('code', 'like', '%' . $value . '%')
+                          ->orWhere('title', 'like', '%' . $value . '%')
+                          ->orWhere('status', 'like', '%' . $value . '%');
+                    } else {
+                        $q->where('code', $value)
+                          ->orWhere('title', $value)
+                          ->orWhere('status', $value);
+                    }
+                });
+            } else {
+                if ($type === 'contains') {
+                    $baseQuery->where($field, 'like', '%' . $value . '%');
+                } else {
+                    $baseQuery->where($field, $value);
+                }
+            }
         }
 
         return DataTables::of($baseQuery)
-            ->addColumn('created_by_name', function ($po) {
-                return $po->createdBy ? $po->createdBy->name : 'N/A';
+            ->addIndexColumn()
+            ->addColumn('code', function ($po) {
+                return '<a href="' . route('warehouse.purchase-orders.show', $po->id) . '" class="font-medium text-primary hover:underline">' . e($po->code) . '</a>';
             })
-            ->addColumn('approved_by_name', function ($po) {
-                return $po->approvedBy ? $po->approvedBy->name : 'N/A';
+            ->addColumn('supplier_name', function ($po) {
+                return $po->supplier ? $po->supplier->name : 'N/A';
             })
-            ->addColumn('status_badge', function ($po) {
-                return '<span class="px-2 py-1 text-xs font-medium rounded-full ' . $po->getStatusBadgeClass() . '">' . ucfirst($po->status) . '</span>';
+            ->addColumn('order_date', function ($po) {
+                return $po->order_date ? $po->order_date->format('Y-m-d') : 'N/A';
+            })
+            ->addColumn('total_amount', function ($po) {
+                return '$' . number_format($po->total_amount ?? 0, 2);
+            })
+            ->addColumn('status', function ($po) {
+                $statusClasses = [
+                    'pending' => 'bg-yellow-100 text-yellow-800',
+                    'approved' => 'bg-green-100 text-green-800',
+                    'shipped' => 'bg-blue-100 text-blue-800',
+                    'delivered' => 'bg-emerald-100 text-emerald-800',
+                    'cancelled' => 'bg-red-100 text-red-800'
+                ];
+                $class = $statusClasses[$po->status] ?? 'bg-slate-100 text-slate-800';
+                return '<span class="px-2 py-1 text-xs font-medium rounded-full ' . $class . '">' . ucfirst($po->status) . '</span>';
             })
             ->addColumn('actions', function ($po) {
-                return view('warehouse.purchase-orders.partials.actions', compact('po'))->render();
+                $editUrl = route('warehouse.purchase-orders.edit', $po->id);
+                $showUrl = route('warehouse.purchase-orders.show', $po->id);
+                
+                return '
+                    <div class="flex items-center justify-center gap-1">
+                        <a href="' . $showUrl . '" class="btn-tonal btn-tonal--info btn-tonal--icon" title="View Details">
+                            <i data-lucide="eye" class="w-4 h-4"></i>
+                        </a>
+                        <a href="' . $editUrl . '" class="btn-tonal btn-tonal--warning btn-tonal--icon" title="Edit">
+                            <i data-lucide="edit" class="w-4 h-4"></i>
+                        </a>
+                        <button onclick="deletePurchaseOrder(' . $po->id . ', \'' . addslashes($po->title) . '\')" class="btn-tonal btn-tonal--danger btn-tonal--icon" title="Delete">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                ';
             })
-            ->rawColumns(['status_badge', 'actions'])
+            ->rawColumns(['code', 'status', 'actions'])
             ->make(true);
     }
 
@@ -122,15 +187,31 @@ class PurchaseOrderController extends Controller
         }
     }
 
-    public function show(PurchaseOrder $purchaseOrder): JsonResponse
+    public function show(PurchaseOrder $purchaseOrder)
     {
         $purchaseOrder->load([
             'createdBy', 
             'approvedBy', 
+            'supplier',
             'items.material',
             'approvalRequest.logs'
         ]);
-        return response()->json(['success' => true, 'purchase_order' => $purchaseOrder]);
+        
+        return view('warehouse.purchase-orders.show', compact('purchaseOrder'));
+    }
+
+    public function edit(PurchaseOrder $purchaseOrder)
+    {
+        // Get suppliers and materials for the unified invoice form
+        try {
+            $suppliers = collect(); // Empty collection as fallback
+            $materials = \App\Models\Warehouse\Material::select('id', 'name', 'unit', 'price')->get();
+        } catch (\Exception $e) {
+            $suppliers = collect();
+            $materials = collect();
+        }
+        
+        return view('warehouse.purchase-orders.edit', compact('purchaseOrder', 'suppliers', 'materials'));
     }
 
     public function update(Request $request, PurchaseOrder $purchaseOrder): JsonResponse

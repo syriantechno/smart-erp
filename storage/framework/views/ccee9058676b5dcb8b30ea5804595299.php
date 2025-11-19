@@ -170,22 +170,26 @@
     </script>
 
     <!-- Lucide Icons Local JavaScript -->
-    <script src="<?php echo e(asset('vendor/lucide/lucide.umd.min.js')); ?>"></script>
+    <script src="<?php echo e(asset('vendor/lucide/lucide.umd.min.js')); ?>" defer></script>
     <script>
-        // Initialize Lucide Icons
+        // Initialize Lucide Icons with performance optimization
         document.addEventListener('DOMContentLoaded', function() {
             if (typeof lucide !== 'undefined' && lucide.createIcons) {
-                lucide.createIcons({
-                    'stroke-width': 1.5,
-                    nameAttr: 'data-lucide'
+                // Use requestAnimationFrame for better performance
+                requestAnimationFrame(() => {
+                    lucide.createIcons({
+                        'stroke-width': 1.5,
+                        nameAttr: 'data-lucide'
+                    });
+                    console.log('✅ Lucide icons initialized locally');
                 });
-                console.log('✅ Lucide icons initialized locally');
             } else {
                 console.error('❌ Lucide library not loaded');
             }
         });
     </script>
-    <?php echo app('Illuminate\Foundation\Vite')('resources/js/app.js'); ?>
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/js/app.js', 'resources/js/accessibility-fixes.js']); ?>
+    <?php echo app('Illuminate\Foundation\Vite')('resources/js/modal-fixes.js'); ?>
     
     
     <?php echo $__env->yieldPushContent('scripts'); ?>

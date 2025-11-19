@@ -28,7 +28,7 @@
                     <div class="flex flex-col items-center gap-2">
                         <div class="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
                             <x-base.lucide
-                                icon="Layers"
+                                icon="layers"
                                 class="h-9 w-9 text-primary"
                             />
                         </div>

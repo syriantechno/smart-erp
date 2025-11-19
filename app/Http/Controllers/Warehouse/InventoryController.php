@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Warehouse;
 
 use App\Http\Controllers\Controller;
-use App\Models\Inventory;
-use App\Models\Warehouse;
-use App\Models\Material;
+use App\Models\Warehouse\Inventory;
+use App\Models\Warehouse\Warehouse;
+use App\Models\Warehouse\Material;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;

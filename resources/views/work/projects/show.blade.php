@@ -30,20 +30,20 @@
                             </span>
                         </div>
                         <div class="flex gap-2">
-                            <x-base.button
-                                variant="outline-primary"
+                            <button
+                                class="btn-tonal btn-tonal--warning"
                                 onclick="window.location.href='{{ route('work.projects.edit', $project) }}'"
                             >
-                                <x-base.lucide icon="Edit" class="w-4 h-4 mr-2" />
+                                <x-base.lucide icon="edit" class="w-4 h-4 mr-2" />
                                 Edit
-                            </x-base.button>
-                            <x-base.button
-                                variant="outline-secondary"
+                            </button>
+                            <button
+                                class="btn-tonal btn-tonal--info"
                                 onclick="window.location.href='{{ route('work.projects.index') }}'"
                             >
-                                <x-base.lucide icon="ArrowLeft" class="w-4 h-4 mr-2" />
+                                <x-base.lucide icon="arrow-left" class="w-4 h-4 mr-2" />
                                 Back
-                            </x-base.button>
+                            </button>
                         </div>
                     </div>
 
@@ -221,23 +221,21 @@
                 <div class="p-5">
                     <h3 class="text-lg font-medium mb-4">Quick Actions</h3>
                     <div class="space-y-3">
-                        <x-base.button
-                            variant="outline-primary"
-                            class="w-full justify-start"
+                        <button
+                            class="btn-tonal btn-tonal--warning w-full justify-start"
                             onclick="editProject({{ $project->id }})"
                         >
-                            <x-base.lucide icon="Edit" class="w-4 h-4 mr-2" />
+                            <x-base.lucide icon="edit" class="w-4 h-4 mr-2" />
                             Edit Project
-                        </x-base.button>
+                        </button>
 
-                        <x-base.button
-                            variant="outline-danger"
-                            class="w-full justify-start"
+                        <button
+                            class="btn-tonal btn-tonal--danger w-full justify-start"
                             onclick="deleteProject({{ $project->id }}, '{{ addslashes($project->name) }}')"
                         >
-                            <x-base.lucide icon="Trash" class="w-4 h-4 mr-2" />
+                            <x-base.lucide icon="trash-2" class="w-4 h-4 mr-2" />
                             Delete Project
-                        </x-base.button>
+                        </button>
                     </div>
                 </div>
             </x-base.preview-component>

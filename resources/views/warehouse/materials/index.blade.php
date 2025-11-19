@@ -36,7 +36,7 @@
                 data-tw-target="#materials-filters-slideover"
                 title="Filters"
             >
-                <x-base.lucide icon="Filter" class="w-4 h-4" />
+                <x-base.lucide icon="filter" class="w-4 h-4" />
             </button>
 
             <x-base.button
@@ -46,7 +46,7 @@
                 data-tw-toggle="modal"
                 data-tw-target="#create-material-modal"
             >
-                <x-base.lucide icon="Plus" class="w-4 h-4 mr-2" />
+                <x-base.lucide icon="plus" class="w-4 h-4 mr-2" />
                 Add Material
             </x-base.button>
         </div>
@@ -251,7 +251,7 @@
                     },
                     { data: 'actions', name: 'actions', orderable: false, searchable: false }
                 ],
-                pageLength: 25
+                pageLength: 25,
                 drawCallback: function () {
                     if (typeof window.Lucide !== 'undefined') {
                         window.Lucide.createIcons();

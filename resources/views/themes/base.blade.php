@@ -170,22 +170,26 @@
     </script>
 
     <!-- Lucide Icons Local JavaScript -->
-    <script src="{{ asset('vendor/lucide/lucide.umd.min.js') }}"></script>
+    <script src="{{ asset('vendor/lucide/lucide.umd.min.js') }}" defer></script>
     <script>
-        // Initialize Lucide Icons
+        // Initialize Lucide Icons with performance optimization
         document.addEventListener('DOMContentLoaded', function() {
             if (typeof lucide !== 'undefined' && lucide.createIcons) {
-                lucide.createIcons({
-                    'stroke-width': 1.5,
-                    nameAttr: 'data-lucide'
+                // Use requestAnimationFrame for better performance
+                requestAnimationFrame(() => {
+                    lucide.createIcons({
+                        'stroke-width': 1.5,
+                        nameAttr: 'data-lucide'
+                    });
+                    console.log('✅ Lucide icons initialized locally');
                 });
-                console.log('✅ Lucide icons initialized locally');
             } else {
                 console.error('❌ Lucide library not loaded');
             }
         });
     </script>
-    @vite('resources/js/app.js')
+    @vite(['resources/js/app.js', 'resources/js/accessibility-fixes.js'])
+    @vite('resources/js/modal-fixes.js')
     
     
     @stack('scripts')

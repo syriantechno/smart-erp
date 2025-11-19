@@ -11,104 +11,130 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.min.css">
 @endpush
 
+@push('scripts')
+    @vite('resources/js/purchase-orders-modal.js')
+@endpush
+
 @section('subcontent')
     @include('components.global-notifications')
 
     <div class="intro-y mt-8 flex items-center">
         <h2 class="mr-auto text-lg font-medium">Purchase Orders</h2>
-        <x-base.button
-            id="open-create-po-modal"
-            variant="primary"
-            class="w-40 sm:w-auto sm:ml-4"
-            data-tw-toggle="modal"
-            data-tw-target="#create-po-modal"
-        >
-            <x-base.lucide icon="Plus" class="w-4 h-4 mr-2" />
-            Add Purchase Order
-        </x-base.button>
+        <div class="flex items-center gap-2">
+            <button
+                type="button"
+                class="btn-tonal btn-tonal--info hidden sm:flex"
+                data-tw-toggle="modal"
+                data-tw-target="#purchase-orders-filters-slideover"
+            >
+                <x-base.lucide icon="filter" class="w-4 h-4 mr-2" />
+                Filters
+                <span id="active-filters-indicator" class="hidden ml-2 px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full">Active</span>
+            </button>
+
+            <!-- Mobile filters icon -->
+            <button
+                type="button"
+                class="flex items-center justify-center rounded-full border border-slate-200 px-3 py-2 text-slate-600 hover:bg-slate-50 sm:hidden"
+                data-tw-toggle="modal"
+                data-tw-target="#purchase-orders-filters-slideover"
+                title="Filters"
+            >
+                <x-base.lucide icon="filter" class="w-4 h-4" />
+            </button>
+
+            <button
+                type="button"
+                class="btn-tonal btn-tonal--success"
+                data-tw-toggle="modal"
+                data-tw-target="#create-po-modal"
+            >
+                <x-base.lucide icon="plus" class="w-4 h-4 mr-2" />
+                Add Purchase Order
+            </button>
+        </div>
     </div>
 
     <div class="mt-5 grid grid-cols-12 gap-6">
         <div class="intro-y col-span-12">
-            <!-- Filters -->
-            <x-base.preview-component class="intro-y box mb-6">
-                <div class="p-5">
-                    <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                        <x-base.lucide icon="Filter" class="h-5 w-5" />
-                        Filters
-                    </h3>
-
-                    <div class="grid grid-cols-12 gap-4">
-                        <div class="col-span-12 md:col-span-4">
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Status
-                            </label>
-                            <x-base.form-select id="po-status-filter" class="w-full">
-                                <option value="">All Status</option>
-                                <option value="pending">Pending</option>
-                                <option value="approved">Approved</option>
-                                <option value="shipped">Shipped</option>
-                                <option value="delivered">Delivered</option>
-                                <option value="cancelled">Cancelled</option>
-                            </x-base.form-select>
-                        </div>
-
-                        <div class="col-span-12 md:col-span-4">
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Search
-                            </label>
-                            <x-base.form-input
-                                id="po-search-filter"
-                                type="text"
-                                placeholder="Search purchase orders..."
-                                class="w-full"
-                            />
-                        </div>
-
-                        <div class="col-span-12 md:col-span-4 flex items-end gap-2">
-                            <x-base.button
-                                variant="secondary"
-                                class="flex-1"
-                                type="button"
-                                onclick="clearPoFilters()"
-                            >
-                                <x-base.lucide icon="X" class="w-4 h-4 mr-2" />
-                                Clear
-                            </x-base.button>
-                            <x-base.button
-                                variant="primary"
-                                class="flex-1"
-                                type="button"
-                                onclick="applyPoFilters()"
-                            >
-                                <x-base.lucide icon="Filter" class="w-4 h-4 mr-2" />
-                                Apply
-                            </x-base.button>
-                        </div>
-                    </div>
-                </div>
-            </x-base.preview-component>
-
-            <!-- Purchase Orders Table -->
             <x-base.preview-component class="intro-y box">
                 <div class="p-5">
+                    <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
+                        <form id="purchase-orders-filter-form" class="w-full sm:mr-auto xl:flex">
+                            <div class="items-center sm:mr-4 sm:flex">
+                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
+                                    Field
+                                </label>
+                                <x-base.form-select id="purchase-orders-filter-field" class="mt-2 w-full sm:mt-0 sm:w-auto 2xl:w-full">
+                                    <option value="all">All Fields</option>
+                                    <option value="code">Code</option>
+                                    <option value="title">Title</option>
+                                    <option value="supplier_name">Supplier</option>
+                                    <option value="status">Status</option>
+                                </x-base.form-select>
+                            </div>
+                            <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
+                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
+                                    Type
+                                </label>
+                                <x-base.form-select id="purchase-orders-filter-type" class="mt-2 w-full sm:mt-0 sm:w-auto">
+                                    <option value="contains">Contains</option>
+                                    <option value="equals">Equals</option>
+                                </x-base.form-select>
+                            </div>
+                            <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
+                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
+                                    Value
+                                </label>
+                                <x-base.form-input id="purchase-orders-filter-value" type="text" placeholder="Search..." class="mt-2 w-full sm:mt-0 sm:w-48 2xl:w-full" />
+                            </div>
+                            <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
+                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
+                                    Show
+                                </label>
+                                <x-base.form-select id="purchase-orders-filter-length" class="mt-2 w-full sm:mt-0 sm:w-auto">
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </x-base.form-select>
+                            </div>
+                            <div class="mt-2 flex flex-wrap gap-2 xl:mt-0">
+                                <button id="purchase-orders-filter-go" type="button" class="btn-tonal btn-tonal--info">
+                                    <x-base.lucide icon="search" class="w-4 h-4" />
+                                    Go
+                                </button>
+                                <button id="purchase-orders-filter-reset" type="button" class="btn-tonal btn-tonal--warning">
+                                    <x-base.lucide icon="rotate-ccw" class="w-4 h-4" />
+                                    Reset
+                                </button>
+                            </div>
+                        </form>
+
+                        <div class="mt-5 flex items-center gap-2 sm:mt-0">
+                            <button id="purchase-orders-export" type="button"
+                                class="btn-tonal btn-tonal--info btn-tonal--icon">
+                                <x-base.lucide icon="download" class="h-4 w-4" />
+                            </button>
+                            <button id="purchase-orders-refresh" type="button"
+                                class="btn-tonal btn-tonal--success btn-tonal--icon">
+                                <x-base.lucide icon="refresh-ccw" class="h-4 w-4" />
+                            </button>
+                        </div>
+                    </div>
+
                     <div class="overflow-x-auto sm:overflow-visible" data-erp-table-wrapper>
-                        <table
-                            id="purchase-orders-table"
-                            data-tw-merge
-                            data-erp-table
-                            class="datatable-default w-full min-w-full table-auto text-left text-sm"
-                        >
+                        <table id="purchase-orders-table" data-tw-merge data-erp-table class="datatable-default w-full min-w-full table-auto text-left text-sm">
                             <thead>
                                 <tr>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Code</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Title</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Created By</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Approved By</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Order Date</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Total Amount</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Status</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Actions</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">#</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Code</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Title</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Supplier</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Order Date</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Total Amount</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Status</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -119,217 +145,10 @@
         </div>
     </div>
 
-    <!-- Create Purchase Order Modal (unified design) -->
-    <x-modal.form id="create-po-modal" title="Add New Purchase Order" size="xl">
-        <form id="create-po-form">
-            @csrf
+    <!-- Purchase Order Create Modal -->
+    @include('warehouse.purchase-orders.modals.create')
 
-            <div class="mb-6">
-                <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                    <x-base.lucide icon="ClipboardList" class="h-5 w-5"></x-base.lucide>
-                    Purchase Order Information
-                </h4>
-
-                <div class="grid grid-cols-12 gap-4 gap-y-4">
-                    <div class="col-span-12 md:col-span-6">
-                        <x-base.form-label for="create-po-code">Code</x-base.form-label>
-                        <div class="flex gap-2">
-                            <x-base.form-input
-                                id="create-po-code"
-                                name="code"
-                                type="text"
-                                class="flex-1"
-                                placeholder="PO code"
-                                required
-                                readonly
-                            />
-                            <x-base.button
-                                type="button"
-                                variant="outline-secondary"
-                                onclick="refreshPurchaseOrderCode()"
-                                title="Refresh Code"
-                            >
-                                <x-base.lucide icon="refresh-cw" class="w-4 h-4" />
-                            </x-base.button>
-                        </div>
-                    </div>
-
-                    <div class="col-span-12 md:col-span-6">
-                        <x-base.form-label for="create-po-title">Title</x-base.form-label>
-                        <x-base.form-input
-                            id="create-po-title"
-                            name="title"
-                            type="text"
-                            class="w-full"
-                            placeholder="Purchase order title"
-                            required
-                        />
-                    </div>
-
-                    <div class="col-span-12 md:col-span-6">
-                        <x-base.form-label for="create-po-order-date">Order Date</x-base.form-label>
-                        <x-base.form-input
-                            id="create-po-order-date"
-                            name="order_date"
-                            type="date"
-                            class="w-full"
-                            required
-                        />
-                    </div>
-
-                    <div class="col-span-12 md:col-span-6">
-                        <x-base.form-label for="create-po-expected-delivery-date">Expected Delivery Date</x-base.form-label>
-                        <x-base.form-input
-                            id="create-po-expected-delivery-date"
-                            name="expected_delivery_date"
-                            type="date"
-                            class="w-full"
-                        />
-                    </div>
-
-                    <div class="col-span-12 md:col-span-6">
-                        <x-base.form-label for="create-po-total-amount">Total Amount</x-base.form-label>
-                        <x-base.form-input
-                            id="create-po-total-amount"
-                            name="total_amount"
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            class="w-full"
-                            placeholder="0.00"
-                            required
-                        />
-                    </div>
-
-                    <div class="col-span-12 md:col-span-6">
-                        <x-base.form-label for="create-po-status">Active</x-base.form-label>
-                        <x-base.form-select id="create-po-status" name="is_active" class="w-full" required>
-                            <option value="1">Active</option>
-                            <option value="0">Inactive</option>
-                        </x-base.form-select>
-                    </div>
-
-                    <div class="col-span-12">
-                        <x-base.form-label for="create-po-description">Description</x-base.form-label>
-                        <x-base.form-textarea
-                            id="create-po-description"
-                            name="description"
-                            class="w-full"
-                            rows="3"
-                            placeholder="Purchase order description"
-                        ></x-base.form-textarea>
-                    </div>
-                </div>
-            </div>
-        </form>
-
-        @slot('footer')
-            <div class="flex justify-end gap-2 w-full">
-                <x-base.button
-                    class="w-24"
-                    data-tw-dismiss="modal"
-                    type="button"
-                    variant="outline-secondary"
-                >
-                    Cancel
-                </x-base.button>
-                <x-base.button
-                    class="w-32"
-                    type="submit"
-                    form="create-po-form"
-                    id="create-po-btn"
-                    variant="primary"
-                >
-                    <x-base.lucide icon="Save" class="w-4 h-4 mr-2" />
-                    Save Purchase Order
-                </x-base.button>
-            </div>
-        @endslot
-
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const jq = window.jQuery || window.$;
-                if (!jq) {
-                    console.error('jQuery not available for create purchase order modal.');
-                    return;
-                }
-
-                const $ = jq;
-                const form = document.getElementById('create-po-form');
-                const submitBtn = $('#create-po-btn');
-
-                if (!form) {
-                    return;
-                }
-
-                form.addEventListener('submit', function (e) {
-                    e.preventDefault();
-
-                    const formData = new FormData(form);
-                    const originalText = submitBtn.html();
-
-                    submitBtn.prop('disabled', true).html('<i class="w-4 h-4 mr-2 animate-spin" data-lucide="loader"></i> Saving...');
-
-                    $.ajax({
-                        url: '{{ route("warehouse.purchase-orders.store") }}',
-                        type: 'POST',
-                        data: formData,
-                        processData: false,
-                        contentType: false,
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        success: function(response) {
-                            if (response.success) {
-                                const modalEl = document.getElementById('create-po-modal');
-                                if (modalEl && modalEl.__tippy?.hide) {
-                                    modalEl.__tippy.hide();
-                                }
-
-                                form.reset();
-                                if (window.purchaseOrdersTable) {
-                                    window.purchaseOrdersTable.ajax.reload();
-                                }
-
-                                if (typeof window.showSuccess === 'function') {
-                                    window.showSuccess(response.message || 'Purchase order created successfully');
-                                }
-                            } else if (typeof window.showError === 'function') {
-                                window.showError(response.message || 'Failed to create purchase order.');
-                            }
-                        },
-                        error: function(xhr) {
-                            let errors = xhr.responseJSON?.errors || {};
-                            let errorMessage = xhr.responseJSON?.message || 'An error occurred';
-
-                            if (Object.keys(errors).length > 0) {
-                                errorMessage = Object.values(errors).flat().join('\n');
-                            }
-
-                            if (typeof window.showError === 'function') {
-                                window.showError(errorMessage);
-                            }
-                        },
-                        complete: function() {
-                            submitBtn.prop('disabled', false).html(originalText);
-                            if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
-                                lucide.createIcons();
-                            }
-                        }
-                    });
-                });
-            });
-        </script>
-    </x-modal.form>
-
-    <!-- View Purchase Order Modal -->
-    @include('warehouse.purchase-orders.modals.view')
-@endsection
-
-@include('components.datatable.scripts')
-
-@push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
+    @include('components.datatable.scripts')
 
     <script>
         let purchaseOrdersTable;
@@ -337,158 +156,143 @@
         document.addEventListener('DOMContentLoaded', function () {
             const jq = window.jQuery || window.$;
             if (!jq) {
-                console.error('jQuery not available on purchase orders page.');
+                console.error('jQuery not available for purchase orders.');
                 return;
             }
 
-            jq(function () {
+            jq(document).ready(function () {
                 initializePurchaseOrdersTable();
-                setupPurchaseOrdersFilters();
+                setupEventListeners();
 
                 // Auto-generate PO code when opening create modal
                 const openBtn = document.getElementById('open-create-po-modal');
                 if (openBtn) {
                     openBtn.addEventListener('click', function () {
-                        window.refreshPurchaseOrderCode();
+                        const codeInput = document.getElementById('create-po-modal-code');
+                        if (codeInput) {
+                            jq.get('{{ route("warehouse.purchase-orders.preview-code") }}')
+                                .done(function (response) {
+                                    if (response && response.code) {
+                                        codeInput.value = response.code;
+                                    }
+                                });
+                        }
                     });
                 }
             });
         });
-
-        // Global function to refresh PO code
-        window.refreshPurchaseOrderCode = function() {
-            const codeInput = document.getElementById('create-po-code');
-            if (!codeInput) return;
-            
-            fetch('{{ route("warehouse.purchase-orders.preview-code") }}')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Failed to preview PO code');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    const code = data.code || '-';
-                    codeInput.value = code;
-                })
-                .catch(() => {
-                    codeInput.value = '-';
-                });
-        };
 
         function initializePurchaseOrdersTable() {
             purchaseOrdersTable = window.erpCrud.initDataTable({
                 tableSelector: '#purchase-orders-table',
                 ajaxUrl: '{{ route("warehouse.purchase-orders.datatable") }}',
                 ajaxData: function(d) {
-                    const jq = window.jQuery || window.$;
-                    d.status = jq ? jq('#po-status-filter').val() : '';
-                    d.search_value = jq ? jq('#po-search-filter').val() : '';
+                    // Advanced filtering like employees
+                    const field = $('#purchase-orders-filter-field').val();
+                    const type = $('#purchase-orders-filter-type').val();
+                    const value = $('#purchase-orders-filter-value').val();
+                    
+                    if (field && field !== 'all' && value) {
+                        d.filter_field = field;
+                        d.filter_type = type;
+                        d.filter_value = value;
+                    }
+                    
+                    return d;
                 },
                 columns: [
-                    { data: 'code', name: 'code' },
-                    { data: 'title', name: 'title' },
-                    { data: 'created_by_name', name: 'created_by_name' },
-                    { data: 'approved_by_name', name: 'approved_by_name' },
-                    { data: 'order_date', name: 'order_date' },
-                    { data: 'total_amount', name: 'total_amount' },
-                    { 
-                        data: 'is_active', 
-                        name: 'is_active',
-                        className: 'text-center',
-                        title: 'Status',
-                        render: function (value) {
-                            if (window.erpCrud && typeof window.erpCrud.renderStatusBadge === 'function') {
-                                return window.erpCrud.renderStatusBadge(value);
-                            }
-                            return value ? 'Active' : 'Inactive';
+                    { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center font-medium', orderable: false },
+                    { data: 'code', name: 'code', className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700 whitespace-nowrap' },
+                    { data: 'title', name: 'title', className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700 whitespace-nowrap' },
+                    { data: 'supplier_name', name: 'supplier_name', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-slate-700 whitespace-nowrap' },
+                    { data: 'order_date', name: 'order_date', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-slate-700 whitespace-nowrap' },
+                    { data: 'total_amount', name: 'total_amount', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-slate-700 whitespace-nowrap' },
+                    { data: 'status', name: 'status', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-slate-700 whitespace-nowrap' },
+                    { data: 'actions', name: 'actions', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center', orderable: false, searchable: false }
+                ],
+                pageLength: parseInt($('#purchase-orders-filter-length').val()) || 25,
+                drawCallback: function() {
+                    // Re-initialize Lucide icons
+                    if (typeof lucide !== 'undefined') {
+                        lucide.createIcons();
+                    }
+                }
+            });
+
+            window.purchaseOrdersTable = purchaseOrdersTable;
+        }
+
+        function setupEventListeners() {
+            // Filter form submission
+            $('#purchase-orders-filter-go').on('click', function() {
+                purchaseOrdersTable.page.len(parseInt($('#purchase-orders-filter-length').val())).draw();
+                purchaseOrdersTable.ajax.reload();
+            });
+
+            // Reset filters
+            $('#purchase-orders-filter-reset').on('click', function() {
+                $('#purchase-orders-filter-field').val('all');
+                $('#purchase-orders-filter-type').val('contains');
+                $('#purchase-orders-filter-value').val('');
+                $('#purchase-orders-filter-length').val('25');
+                purchaseOrdersTable.page.len(25).draw();
+                purchaseOrdersTable.ajax.reload();
+            });
+
+            // Enter key on search
+            $('#purchase-orders-filter-value').on('keypress', function(e) {
+                if (e.which === 13) {
+                    $('#purchase-orders-filter-go').click();
+                }
+            });
+
+            // Page length change
+            $('#purchase-orders-filter-length').on('change', function() {
+                purchaseOrdersTable.page.len(parseInt($(this).val())).draw();
+            });
+
+            // Export functionality
+            $('#purchase-orders-export').on('click', function() {
+                // Add export functionality here
+                console.log('Export purchase orders');
+            });
+
+            // Refresh table
+            $('#purchase-orders-refresh').on('click', function() {
+                purchaseOrdersTable.ajax.reload();
+            });
+        }
+
+        function refreshPurchaseOrderCode() {
+            const $ = window.jQuery || window.$;
+            $.get('{{ route("warehouse.purchase-orders.preview-code") }}')
+                .done(function (response) {
+                    if (response && response.code) {
+                        document.getElementById('create-po-modal-code').value = response.code;
+                    }
+                });
+        }
+
+        function deletePurchaseOrder(id, name) {
+            if (confirm(`Are you sure you want to delete "${name}"?`)) {
+                const $ = window.jQuery || window.$;
+                $.ajax({
+                    url: `/warehouse/purchase-orders/${id}`,
+                    type: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            purchaseOrdersTable.ajax.reload();
+                            // Show success message
                         }
                     },
-                    { data: 'actions', name: 'actions', orderable: false, searchable: false }
-                ],
-                pageLength: 25
-            });
-        }
-
-        function setupPurchaseOrdersFilters() {
-            const jq = window.jQuery || window.$;
-            if (!jq) {
-                return;
+                    error: function() {
+                        alert('Error deleting purchase order');
+                    }
+                });
             }
-
-            jq('#po-search-filter').on('keypress', function(e) {
-                if (e.which === 13) {
-                    applyPoFilters();
-                }
-            });
-
-            jq('#po-status-filter').on('change', function() {
-                applyPoFilters();
-            });
-        }
-
-        function applyPoFilters() {
-            if (purchaseOrdersTable) {
-                purchaseOrdersTable.ajax.reload();
-            }
-        }
-
-        function clearPoFilters() {
-            const jq = window.jQuery || window.$;
-            if (!jq) {
-                return;
-            }
-
-            jq('#po-status-filter').val('');
-            jq('#po-search-filter').val('');
-            applyPoFilters();
-        }
-
-        // viewPurchaseOrder function is now in modals/view.blade.php
-
-        function editPurchaseOrder(id) {
-            // TODO: Implement edit functionality
-            Swal.fire({
-                title: 'Edit Purchase Order',
-                text: 'Edit functionality will be implemented soon',
-                icon: 'info'
-            });
-        }
-
-        function deletePurchaseOrder(id) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const jq = window.jQuery || window.$;
-                    if (!jq) return;
-
-                    jq.ajax({
-                        url: '{{ route("warehouse.purchase-orders.destroy", ":id") }}'.replace(':id', id),
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': jq('meta[name="csrf-token"]').attr('content')
-                        },
-                        success: function(response) {
-                            if (response.success) {
-                                Swal.fire('Deleted!', response.message, 'success');
-                                if (purchaseOrdersTable) {
-                                    purchaseOrdersTable.ajax.reload();
-                                }
-                            }
-                        },
-                        error: function(xhr) {
-                            Swal.fire('Error!', xhr.responseJSON?.message || 'Failed to delete', 'error');
-                        }
-                    });
-                }
-            });
         }
     </script>
-@endpush
+@endsection

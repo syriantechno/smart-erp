@@ -38,20 +38,32 @@ window.erpCrud = {
                     if (typeof ajaxData === 'function') {
                         ajaxData(d);
                     }
+                },
+                error: function(xhr, error, thrown) {
+                    console.error('DataTable AJAX Error:', error, thrown);
                 }
             },
             pageLength,
             columns,
             lengthChange: false,
             searching: false,
+            deferRender: true,
+            stateSave: true,
+            stateDuration: 300,
             dom:
                 "t<'datatable-footer flex flex-col md:flex-row md:items-center md:justify-between mt-5 gap-4'<'datatable-info text-slate-500'i><'datatable-pagination'p>>",
+            language: {
+                processing: '<div class="flex items-center justify-center py-4"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div><span class="ml-2">Loading...</span></div>',
+                emptyTable: '<div class="text-center py-8 text-slate-500"><i data-lucide="inbox" class="w-12 h-12 mx-auto mb-3 opacity-50"></i><p>No data available</p></div>',
+                zeroRecords: '<div class="text-center py-8 text-slate-500"><i data-lucide="search" class="w-12 h-12 mx-auto mb-3 opacity-50"></i><p>No matching records found</p></div>'
+            },
             drawCallback: function () {
                 // Re-render Lucide icons after table draw
-                if (typeof window.Lucide !== 'undefined') {
-                    window.Lucide.createIcons();
-                } else if (typeof window.lucide !== 'undefined' && typeof window.lucide.createIcons === 'function') {
-                    window.lucide.createIcons();
+                if (typeof window.lucide !== 'undefined' && typeof window.lucide.createIcons === 'function') {
+                    window.lucide.createIcons({
+                        'stroke-width': 1.5,
+                        nameAttr: 'data-lucide'
+                    });
                 }
             }
         });

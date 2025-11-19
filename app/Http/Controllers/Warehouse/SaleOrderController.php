@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Warehouse;
 
 use App\Http\Controllers\Controller;
-use App\Models\SaleOrder;
-use App\Models\Warehouse;
+use App\Models\Warehouse\SaleOrder;
+use App\Models\Warehouse\Warehouse;
 use App\Services\DocumentCodeGenerator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
