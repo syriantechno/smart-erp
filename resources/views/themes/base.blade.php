@@ -189,7 +189,6 @@
         });
     </script>
     @vite(['resources/js/app.js', 'resources/js/accessibility-fixes.js'])
-    @vite('resources/js/modal-fixes.js')
     
     
     @stack('scripts')

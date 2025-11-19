@@ -14,13 +14,18 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Carbon\Carbon;
 use App\Exports\EmployeesExport;
 use Yajra\DataTables\Facades\DataTables;
 use App\Helpers\Reply;
+use App\Services\PdfExporter;
 
 class EmployeeController extends Controller
 {
-    public function __construct(private DocumentCodeGenerator $codeGenerator)
+    public function __construct(
+        private readonly DocumentCodeGenerator $codeGenerator,
+        private readonly PdfExporter $pdfExporter
+    )
     {
     }
     
@@ -28,8 +33,10 @@ class EmployeeController extends Controller
     {
         $companies = Company::where('is_active', true)->select('id', 'name')->get();
         $departments = Department::where('is_active', true)->select('id', 'name')->get();
+        $generatedCode = $this->codeGenerator->preview('employees');
+        $countriesJson = json_encode($this->getCountriesData(), JSON_UNESCAPED_UNICODE);
         
-        return view('hr.employees.index', compact('companies', 'departments'));
+        return view('hr.employees.index', compact('companies', 'departments', 'generatedCode', 'countriesJson'));
     }
     
     public function previewCode()
@@ -173,9 +180,13 @@ class EmployeeController extends Controller
 
     public function create()
     {
-        $departments = Department::where('is_active', true)->get();
         $companies = Company::where('is_active', true)->get();
-        return view('hr.employees.create', compact('departments', 'companies'));
+        $departments = Department::where('is_active', true)->get();
+        
+        // استخدام نظام توليد الكود الأصلي (نفس document_type المستخدم في store)
+        $generatedCode = $this->codeGenerator->preview('employees');
+        
+        return view('hr.employees.modals.create', compact('companies', 'departments', 'generatedCode'));
     }
 
     public function store(Request $request)
@@ -355,6 +366,115 @@ class EmployeeController extends Controller
         }
     }
 
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:csv,txt|max:5120',
+        ]);
+
+        $file = $request->file('file');
+        $path = $file->getRealPath();
+        $handle = fopen($path, 'r');
+
+        if ($handle === false) {
+            return Reply::error('Unable to read the uploaded file.', [], 422);
+        }
+
+        $header = null;
+        $created = 0;
+        $updated = 0;
+
+        DB::beginTransaction();
+
+        try {
+            while (($row = fgetcsv($handle, 2000, ',')) !== false) {
+                if ($header === null) {
+                    $header = array_map(function ($value) {
+                        return Str::snake(trim($value));
+                    }, $row);
+                    continue;
+                }
+
+                if (count(array_filter($row, function ($value) {
+                    return trim((string) $value) !== '';
+                })) === 0) {
+                    continue;
+                }
+
+                if (count($row) !== count($header)) {
+                    continue;
+                }
+
+                $data = array_combine($header, array_map('trim', $row));
+
+                if (empty($data['email'])) {
+                    continue;
+                }
+
+                $employee = Employee::firstOrNew(['email' => $data['email']]);
+                $isNew = !$employee->exists;
+
+                if ($isNew) {
+                    $employee->code = $data['code'] ?? $this->codeGenerator->generate('employees');
+                    $employee->employee_id = $data['employee_id'] ?? ('EMP' . strtoupper(Str::random(8)));
+                }
+
+                $this->assignIfProvided($employee, $data, 'first_name');
+                $this->assignIfProvided($employee, $data, 'last_name');
+                $this->assignIfProvided($employee, $data, 'phone');
+                $this->assignIfProvided($employee, $data, 'position');
+                $this->assignIfProvided($employee, $data, 'salary');
+                $this->assignIfProvided($employee, $data, 'department_id');
+                $this->assignIfProvided($employee, $data, 'company_id');
+
+                if (!empty($data['hire_date'])) {
+                    try {
+                        $employee->hire_date = Carbon::parse($data['hire_date']);
+                    } catch (\Exception $e) {
+                        // Ignore invalid date formats
+                    }
+                }
+
+                if (isset($data['is_active']) && $data['is_active'] !== '') {
+                    $employee->is_active = filter_var($data['is_active'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                    if ($employee->is_active === null) {
+                        $employee->is_active = in_array(strtolower($data['is_active']), ['1', 'active', 'yes']);
+                    }
+                }
+
+                if (!$employee->first_name) {
+                    $employee->first_name = 'Imported';
+                }
+
+                if (!$employee->last_name) {
+                    $employee->last_name = 'Employee';
+                }
+
+                $employee->save();
+                $isNew ? $created++ : $updated++;
+            }
+
+            fclose($handle);
+            DB::commit();
+
+            return Reply::success('Employees imported successfully.', [
+                'created' => $created,
+                'updated' => $updated,
+            ]);
+        } catch (\Exception $e) {
+            fclose($handle);
+            DB::rollBack();
+            return Reply::error('Failed to import employees: ' . $e->getMessage(), [], 500);
+        }
+    }
+
+    private function assignIfProvided(Employee $employee, array $data, string $key): void
+    {
+        if (array_key_exists($key, $data) && $data[$key] !== '') {
+            $employee->{$key} = $data[$key];
+        }
+    }
+
     public function destroy(Employee $employee, Request $request)
     {
         try {
@@ -381,5 +501,85 @@ class EmployeeController extends Controller
 
             return back()->with('error', 'Error deleting employee: ' . $e->getMessage());
         }
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $employees = $this->datatableQuery($request)->get();
+
+        return $this->pdfExporter->stream(
+            'hr.employees.export_pdf',
+            [
+                'employees' => $employees,
+                'exportedAt' => now(),
+            ],
+            'employees.pdf'
+        );
+    }
+
+    private function datatableQuery(Request $request)
+    {
+        // Replicate your existing datatable query logic here
+        // This should match the query from your datatable method
+        $baseQuery = Employee::query()->with(['department', 'company']);
+        
+        // Add your filters from $request here
+        // Apply filters
+        if ($request->filled('filter_field') && $request->filled('filter_value')) {
+            $field = $request->filter_field;
+            $type = $request->filter_type ?? 'contains';
+            $value = $request->filter_value;
+
+            if ($field === 'all') {
+                $baseQuery->where(function ($query) use ($value, $type) {
+                    $query->where('code', $type === 'equals' ? '=' : 'like', $type === 'equals' ? $value : "%{$value}%")
+                          ->orWhere('first_name', $type === 'equals' ? '=' : 'like', $type === 'equals' ? $value : "%{$value}%")
+                          ->orWhere('last_name', $type === 'equals' ? '=' : 'like', $type === 'equals' ? $value : "%{$value}%")
+                          ->orWhere('employee_id', $type === 'equals' ? '=' : 'like', $type === 'equals' ? $value : "%{$value}%")
+                          ->orWhere('email', $type === 'equals' ? '=' : 'like', $type === 'equals' ? $value : "%{$value}%");
+                });
+            } else {
+                $operator = $type === 'equals' ? '=' : 'like';
+                $searchValue = $type === 'equals' ? $value : "%{$value}%";
+                $baseQuery->where($field, $operator, $searchValue);
+            }
+        }
+
+        // Apply advanced filters
+        if ($request->filled('company_id') && $request->company_id !== '') {
+            $baseQuery->where('company_id', $request->company_id);
+        }
+
+        if ($request->filled('department_id') && $request->department_id !== '') {
+            $baseQuery->where('department_id', $request->department_id);
+        }
+
+        if ($request->filled('position_filter') && $request->position_filter !== '') {
+            $baseQuery->where('position', '=', $request->position_filter);
+        }
+
+        return $baseQuery;
+    }
+
+    private function getCountriesData(): array
+    {
+        $path = resource_path('data/countries.json');
+
+        if (file_exists($path)) {
+            $json = file_get_contents($path);
+            $data = json_decode($json, true);
+
+            if (json_last_error() === JSON_ERROR_NONE && is_array($data)) {
+                return $data;
+            }
+        }
+
+        return [
+            ['name' => 'Saudi Arabia', 'flag' => '🇸🇦'],
+            ['name' => 'United Arab Emirates', 'flag' => '🇦🇪'],
+            ['name' => 'Qatar', 'flag' => '🇶🇦'],
+            ['name' => 'Bahrain', 'flag' => '🇧🇭'],
+            ['name' => 'Kuwait', 'flag' => '🇰🇼'],
+        ];
     }
 }

@@ -97,8 +97,12 @@ Route::middleware('auth')->group(function () {
             ->name('employees.positions.by-department');
         Route::get('employees/test-data', [App\Http\Controllers\HR\EmployeeController::class, 'testData'])
             ->name('employees.test-data');
+        Route::post('employees/import', [App\Http\Controllers\HR\EmployeeController::class, 'import'])
+            ->name('employees.import');
         Route::resource('employees', 'App\Http\Controllers\HR\EmployeeController');
-
+        Route::post('employees/export-pdf', [\App\Http\Controllers\HR\EmployeeController::class, 'exportPdf'])
+            ->name('employees.export-pdf');
+        
         // Employee evaluations & rewards overview
         Route::get('employee-evaluations', [App\Http\Controllers\HR\EmployeeEvaluationController::class, 'index'])
             ->name('employee-evaluations.index');
@@ -217,8 +221,8 @@ Route::middleware('auth')->group(function () {
             Route::delete('/{inventory}', [App\Http\Controllers\Warehouse\InventoryController::class, 'destroy'])->name('destroy');
         });
 
-        // Purchase Requests
-        Route::prefix('purchase-requests')->name('purchase-requests.')->group(function () {
+        // Material Requests
+        Route::prefix('material-requests')->name('material-requests.')->group(function () {
             Route::get('/', [App\Http\Controllers\Warehouse\PurchaseRequestController::class, 'index'])->name('index');
             Route::get('/datatable', [App\Http\Controllers\Warehouse\PurchaseRequestController::class, 'datatable'])->name('datatable');
             Route::get('/preview-code', [App\Http\Controllers\Warehouse\PurchaseRequestController::class, 'previewCode'])->name('preview-code');

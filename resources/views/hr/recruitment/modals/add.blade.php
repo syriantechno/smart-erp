@@ -205,6 +205,7 @@
                     variant="secondary"
                     x-on:click="$dispatch('close')"
                 >
+                    <x-base.lucide icon="X" class="w-4 h-4 mr-2" />
                     Cancel
                 </x-base.button>
 
@@ -214,7 +215,7 @@
                     id="submit-recruitment-btn"
                 >
                     <x-base.lucide icon="Save" class="w-4 h-4 mr-2" />
-                    Add Candidate
+                    Save
                 </x-base.button>
             </x-base.dialog.footer>
         </form>

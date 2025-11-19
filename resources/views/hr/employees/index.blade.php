@@ -63,6 +63,8 @@
                 class="btn-tonal btn-tonal--info hidden sm:flex"
                 data-tw-toggle="modal"
                 data-tw-target="#employees-filters-slideover"
+                title="Open advanced filters"
+                aria-label="Open advanced filters"
             >
                 <x-base.lucide icon="Filter" class="w-4 h-4 mr-2" />
                 Filters
@@ -70,21 +72,24 @@
             </button>
 
             <!-- Mobile filters icon -->
-            <button
+            <x-base.tippy
+                as="button"
                 type="button"
+                content="Open filters"
                 class="flex items-center justify-center rounded-full border border-slate-200 px-3 py-2 text-slate-600 hover:bg-slate-50 sm:hidden"
                 data-tw-toggle="modal"
                 data-tw-target="#employees-filters-slideover"
-                title="Filters"
             >
                 <x-base.lucide icon="Filter" class="w-4 h-4" />
-            </button>
+            </x-base.tippy>
 
             <button
                 type="button"
                 class="btn-tonal btn-tonal--success"
                 data-tw-toggle="modal"
                 data-tw-target="#create-employee-modal"
+                title="Add a new employee"
+                aria-label="Add a new employee"
             >
                 <x-base.lucide icon="user-plus" class="w-4 h-4 mr-2" />
                 Add Employee
@@ -138,26 +143,39 @@
                                 </x-base.form-select>
                             </div>
                             <div class="mt-2 flex flex-wrap gap-2 xl:mt-0">
-                                <button id="employees-filter-go" type="button" class="btn-tonal btn-tonal--info">
+                                <x-base.tippy as="button" id="employees-filter-go" type="button" content="Run filters" class="btn-tonal btn-tonal--info">
                                     <x-base.lucide icon="Search" class="w-4 h-4" />
                                     Go
-                                </button>
-                                <button id="employees-filter-reset" type="button" class="btn-tonal btn-tonal--warning">
+                                </x-base.tippy>
+                                <x-base.tippy as="button" id="employees-filter-reset" type="button" content="Reset filters" class="btn-tonal btn-tonal--warning">
                                     <x-base.lucide icon="RotateCcw" class="w-4 h-4" />
                                     Reset
-                                </button>
+                                </x-base.tippy>
                             </div>
                         </form>
 
                         <div class="mt-5 flex items-center gap-2 sm:mt-0">
-                            <button id="employees-export" type="button"
-                                class="btn-tonal btn-tonal--info btn-tonal--icon">
+                            <x-base.tippy id="employees-export" as="button" type="button"
+                                class="btn-tonal btn-tonal--info btn-tonal--icon"
+                                content="Export current view to CSV">
                                 <x-base.lucide icon="Download" class="h-4 w-4" />
-                            </button>
-                            <button id="employees-refresh" type="button"
-                                class="btn-tonal btn-tonal--success btn-tonal--icon">
+                            </x-base.tippy>
+                            <x-base.tippy id="employees-export-pdf" as="button" type="button"
+                                class="btn-tonal btn-tonal--danger btn-tonal--icon"
+                                content="Export current view to PDF">
+                                <x-base.lucide icon="FileText" class="h-4 w-4" />
+                            </x-base.tippy>
+                            <x-base.tippy id="employees-import" as="button" type="button"
+                                class="btn-tonal btn-tonal--warning btn-tonal--icon"
+                                content="Import employees from CSV">
+                                <x-base.lucide icon="UploadCloud" class="h-4 w-4" />
+                            </x-base.tippy>
+                            <input type="file" id="employees-import-input" accept=".csv,text/csv" class="hidden" />
+                            <x-base.tippy id="employees-refresh" as="button" type="button"
+                                class="btn-tonal btn-tonal--success btn-tonal--icon"
+                                content="Refresh table">
                                 <x-base.lucide icon="RefreshCcw" class="h-4 w-4" />
-                            </button>
+                            </x-base.tippy>
                         </div>
                     </div>
 
@@ -167,7 +185,7 @@
                                 <tr>
                                     <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">#</th>
                                     <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Code</th>
-                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Photo</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 text-center">Photo</th>
                                     <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Full Name</th>
                                     <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Department / Position</th>
                                     <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Email</th>
@@ -260,22 +278,26 @@
                         </div>
 
                         <div class="mt-2 flex justify-end gap-2">
-                            <button
+                            <x-base.tippy
+                                as="button"
                                 type="button"
+                                content="Close advanced filters"
                                 class="btn-tonal btn-tonal--warning w-28"
                                 data-tw-dismiss="modal"
                             >
                                 <x-base.lucide icon="X" class="mr-2 h-4 w-4 animate-pulse" />
                                 Close
-                            </button>
-                            <button
+                            </x-base.tippy>
+                            <x-base.tippy
+                                as="button"
                                 id="advanced-filter-apply"
                                 type="button"
+                                content="Apply filters"
                                 class="btn-tonal btn-tonal--info w-28"
                             >
                                 <x-base.lucide icon="Search" class="mr-2 h-4 w-4 animate-pulse" />
                                 Apply
-                            </button>
+                            </x-base.tippy>
                         </div>
                     </div>
                 </div>
@@ -304,15 +326,10 @@
             const filterGoBtn = document.getElementById('employees-filter-go');
             const filterResetBtn = document.getElementById('employees-filter-reset');
             const exportBtn = document.getElementById('employees-export');
+            const exportPdfBtn = document.getElementById('employees-export-pdf');
             const refreshBtn = document.getElementById('employees-refresh');
-
-            // Advanced filters
-            const companyFilter = document.getElementById('company-filter');
-            const departmentFilter = document.getElementById('department-filter');
-            const positionFilter = document.getElementById('position-filter');
-            const advancedFilterApplyBtn = document.getElementById('advanced-filter-apply');
-            const totalEmployeesCount = document.getElementById('total-employees-count');
-            const filteredEmployeesCount = document.getElementById('filtered-employees-count');
+            const importBtn = document.getElementById('employees-import');
+            const importInput = document.getElementById('employees-import-input');
 
             const initialLength = lengthSelect ? parseInt(lengthSelect.value, 10) || 10 : 10;
 
@@ -328,15 +345,6 @@
                     }
                     if (filterValue) {
                         d.filter_value = filterValue.value || '';
-                    }
-                    if (companyFilter) {
-                        d.company_id = companyFilter.value || '';
-                    }
-                    if (departmentFilter) {
-                        d.department_id = departmentFilter.value || '';
-                    }
-                    if (positionFilter) {
-                        d.position_filter = positionFilter.value || '';
                     }
                     d.page_length = lengthSelect ? parseInt(lengthSelect.value, 10) || initialLength : initialLength;
                 },
@@ -376,6 +384,9 @@
                     }
 
                     const info = settings.api().page.info();
+                    const totalEmployeesCount = document.getElementById('total-employees-count');
+                    const filteredEmployeesCount = document.getElementById('filtered-employees-count');
+
                     if (totalEmployeesCount) {
                         totalEmployeesCount.textContent = info.recordsTotal;
                     }
@@ -383,17 +394,9 @@
                         filteredEmployeesCount.textContent = info.recordsDisplay;
                     }
 
-                    const hasFilters = (companyFilter && companyFilter.value) ||
-                                      (departmentFilter && departmentFilter.value) ||
-                                      (positionFilter && positionFilter.value);
-
-                    if (hasFilters && info.recordsTotal !== info.recordsDisplay && typeof window.showToast === 'function') {
-                        window.showToast(`Filtered ${info.recordsDisplay} out of ${info.recordsTotal} employees`, 'success');
-                    }
-
                     const activeFiltersIndicator = document.getElementById('active-filters-indicator');
                     if (activeFiltersIndicator) {
-                        activeFiltersIndicator.classList.toggle('hidden', !hasFilters);
+                        activeFiltersIndicator.classList.toggle('hidden', !hasFilters());
                     }
                 }
             }) : null;
@@ -406,6 +409,94 @@
                 lengthSelect.addEventListener('change', function () {
                     const newLength = parseInt(this.value, 10) || initialLength;
                     table.page.len(newLength).draw();
+                });
+            }
+
+            if (exportPdfBtn) {
+                exportPdfBtn.addEventListener('click', function () {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '{{ route("hr.employees.export-pdf") }}';
+
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                    if (csrfToken) {
+                        const csrfInput = document.createElement('input');
+                        csrfInput.type = 'hidden';
+                        csrfInput.name = '_token';
+                        csrfInput.value = csrfToken;
+                        form.appendChild(csrfInput);
+                    }
+
+                    const params = {
+                        'filter_field': filterField ? filterField.value : '',
+                        'filter_type': filterType ? filterType.value : '',
+                        'filter_value': filterValue ? filterValue.value : '',
+                        'company_id': companyFilter ? companyFilter.value : '',
+                        'department_id': departmentFilter ? departmentFilter.value : '',
+                        'position_filter': positionFilter ? positionFilter.value : ''
+                    };
+
+                    Object.entries(params).forEach(function ([key, value]) {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = key;
+                        input.value = value || '';
+                        form.appendChild(input);
+                    });
+
+                    document.body.appendChild(form);
+                    form.submit();
+                    document.body.removeChild(form);
+                });
+            }
+
+            if (importBtn && importInput) {
+                importBtn.addEventListener('click', function () {
+                    importInput.click();
+                });
+
+                importInput.addEventListener('change', function () {
+                    const file = this.files[0];
+                    if (!file) {
+                        return;
+                    }
+
+                    if (!file.name.toLowerCase().endsWith('.csv')) {
+                        showToast('Please select a CSV file.', 'error');
+                        this.value = '';
+                        return;
+                    }
+
+                    const formData = new FormData();
+                    formData.append('file', file);
+
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+                    fetch('{{ route('hr.employees.import') }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken || '',
+                            'Accept': 'application/json',
+                        },
+                        body: formData,
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                const details = data.data || {};
+                                const summary = `Imported: ${details.created ?? 0}, Updated: ${details.updated ?? 0}`;
+                                showToast(details.message || summary, 'success');
+                                reloadTable();
+                            } else {
+                                showToast(data.message || 'Import failed.', 'error');
+                            }
+                        })
+                        .catch(() => {
+                            showToast('Unable to import the selected file.', 'error');
+                        })
+                        .finally(() => {
+                            importInput.value = '';
+                        });
                 });
             }
 
@@ -440,17 +531,6 @@
                         lengthSelect.value = String(initialLength);
                         table.page.len(initialLength).draw();
                     }
-                    // Reset advanced filters
-                    if (companyFilter) {
-                        companyFilter.value = '';
-                    }
-                    if (departmentFilter) {
-                        departmentFilter.value = '';
-                    }
-                    if (positionFilter) {
-                        positionFilter.value = '';
-                        loadPositionsForDepartment(''); // Reset positions
-                    }
                     reloadTable();
                 });
             }
@@ -460,6 +540,11 @@
             }
 
             // Advanced filters event listeners
+            const companyFilter = document.getElementById('company-filter');
+            const departmentFilter = document.getElementById('department-filter');
+            const positionFilter = document.getElementById('position-filter');
+            const advancedFilterApplyBtn = document.getElementById('advanced-filter-apply');
+
             if (advancedFilterApplyBtn) {
                 advancedFilterApplyBtn.addEventListener('click', reloadTable);
             }
@@ -605,6 +690,7 @@
                         }
                     });
             };
+
             // Image preview functionality
             const profilePictureInput = document.getElementById('profile_picture');
             const imagePreviewContainer = document.getElementById('image-preview-container');
@@ -647,6 +733,25 @@
                 });
             }
 
+            const htmlStripper = document.createElement('div');
+            const stripHtml = function (value) {
+                if (!value) {
+                    return '';
+                }
+                htmlStripper.innerHTML = value;
+                const walker = document.createTreeWalker(htmlStripper, NodeFilter.SHOW_TEXT, null);
+                const parts = [];
+                while (walker.nextNode()) {
+                    const textChunk = walker.currentNode.textContent.replace(/\s+/g, ' ').trim();
+                    if (textChunk) {
+                        parts.push(textChunk);
+                    }
+                }
+                return parts.join(' ')
+                    .replace(/\s*\/\s*/g, ' / ')
+                    .trim();
+            };
+
             if (exportBtn) {
                 exportBtn.addEventListener('click', function () {
                     try {
@@ -664,8 +769,8 @@
                                 row.DT_RowIndex,
                                 '"' + (row.code || '').replace(/"/g, '""') + '"',
                                 row.profile_picture ? 'Yes' : 'No', // Photo indicator
-                                '"' + (row.full_name || '').replace(/"/g, '""') + '"',
-                                '"' + (row.department_name || '').replace(/"/g, '""') + '"',
+                                '"' + stripHtml(row.full_name || '').replace(/"/g, '""') + '"',
+                                '"' + stripHtml(row.department_name || '').replace(/"/g, '""') + '"',
                                 '"' + (row.email || '').replace(/"/g, '""') + '"',
                                 row.is_active ? 'Active' : 'Inactive'
                             ];
@@ -757,5 +862,6 @@
                 };
             }
         });
+        console.log('[Employees Index] Script loaded - version 2025-11-19-01');
     </script>
 @endpush

@@ -76,7 +76,7 @@
                             <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">Organization</h4>
 
                             <div class="grid grid-cols-12 gap-4">
-                                <div class="col-span-12 md:col-span-4">
+                                <div class="col-span-12 md:col-span-6">
                                     <label class="form-label">Company <span class="text-danger">*</span></label>
                                     <x-base.form-select id="company_id" name="company_id" class="w-full" required>
                                         <option value="">Select Company</option>
@@ -86,17 +86,7 @@
                                     </x-base.form-select>
                                 </div>
 
-                                <div class="col-span-12 md:col-span-4">
-                                    <label class="form-label">Department</label>
-                                    <x-base.form-select id="department_id" name="department_id" class="w-full">
-                                        <option value="">Select Department</option>
-                                        @foreach($departments as $department)
-                                            <option value="{{ $department->id }}">{{ $department->name }}</option>
-                                        @endforeach
-                                    </x-base.form-select>
-                                </div>
-
-                                <div class="col-span-12 md:col-span-4">
+                                <div class="col-span-12 md:col-span-6">
                                     <label class="form-label">Project Manager</label>
                                     <x-base.form-select id="manager_id" name="manager_id" class="w-full">
                                         <option value="">Select Manager</option>

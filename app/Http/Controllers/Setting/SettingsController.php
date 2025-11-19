@@ -9,6 +9,7 @@ use App\Models\Setting\PrefixSetting;
 use App\Models\Setting\Company;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 
@@ -18,7 +19,8 @@ class SettingsController extends Controller
     {
         $settings = Setting::all()->pluck('value', 'key');
         $prefixSettings = PrefixSetting::all();
-        $company = Company::first();
+        $companies = Company::orderBy('name')->get();
+        $company = $companies->first();
         $roles = Role::with('permissions')->get();
         $permissions = Permission::all();
 
@@ -26,6 +28,7 @@ class SettingsController extends Controller
             'settings' => $settings,
             'prefixSettings' => $prefixSettings,
             'company' => $company,
+            'companies' => $companies,
             'roles' => $roles,
             'permissions' => $permissions,
         ]);
@@ -56,6 +59,7 @@ class SettingsController extends Controller
     {
         $request->validate([
             'app_name' => 'required|string|max:255',
+            'app_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:4096',
             'default_language' => 'nullable|string|in:en,ar',
             'timezone' => 'nullable|string',
             'date_format' => 'nullable|string|in:Y-m-d,d/m/Y,m/d/Y',
@@ -78,6 +82,20 @@ class SettingsController extends Controller
         Setting::set('currency.code', $request->currency_code ?? 'USD', 'string', 'Default currency code');
         Setting::set('currency.symbol', $request->currency_symbol ?? '$', 'string', 'Default currency symbol');
         Setting::set('currency.position', $request->currency_position ?? 'before', 'string', 'Currency symbol position (before or after amount)');
+
+        $existingLogo = Setting::get('app.logo');
+
+        if ($request->hasFile('app_logo')) {
+            $newLogoPath = $request->file('app_logo')->store('branding', 'public');
+            Setting::set('app.logo', $newLogoPath, 'string', 'Application logo');
+
+            if ($existingLogo) {
+                Storage::disk('public')->delete($existingLogo);
+            }
+        } elseif ($request->boolean('reset_app_logo') && $existingLogo) {
+            Storage::disk('public')->delete($existingLogo);
+            Setting::set('app.logo', null, 'string', 'Application logo');
+        }
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([

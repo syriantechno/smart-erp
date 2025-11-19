@@ -1,10 +1,3 @@
-@php
-    $companies = \App\Models\Setting\Company::active()->get();
-    $codeGenerator = app(\App\Services\DocumentCodeGenerator::class);
-    $generatedCode = $codeGenerator->generate('employees');
-    $countries = include app_path('Data/countries.php');
-    $countriesJson = json_encode($countries);
-@endphp
 <x-modal.form id="create-employee-modal" title="Add New Employee" size="5xl">
     <form id="create-employee-form" action="{{ route('hr.employees.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
@@ -300,20 +293,21 @@
     </form>
 
     @slot('footer')
-        <div class="flex justify-end gap-2 w-full">
+        <div class="custom-modal-footer w-full">
             <x-base.button
                 class="w-24"
                 data-tw-dismiss="modal"
                 type="button"
-                variant="outline-secondary"
+                tone="warning"
             >
+                <x-base.lucide icon="X" class="w-4 h-4 mr-2" />
                 Cancel
             </x-base.button>
             <x-base.button
                 class="w-32"
                 type="submit"
                 form="create-employee-form"
-                variant="primary"
+                tone="success"
             >
                 <x-base.lucide icon="Save" class="w-4 h-4 mr-2" />
                 Save

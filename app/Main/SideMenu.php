@@ -157,10 +157,10 @@ class SideMenu
                         'route_name' => 'warehouse.inventory.index',
                         'title' => 'Inventory'
                     ],
-                    'purchase-requests' => [
+                    'material-requests' => [
                         'icon' => 'file-text',
-                        'route_name' => 'warehouse.purchase-requests.index',
-                        'title' => 'Purchase Requests'
+                        'route_name' => 'warehouse.material-requests.index',
+                        'title' => 'Material Requests'
                     ],
                     'purchase-orders' => [
                         'icon' => 'shopping-cart',

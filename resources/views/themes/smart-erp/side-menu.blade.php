@@ -24,16 +24,29 @@
             <!-- BEGIN: Side Menu -->
             <nav id="smart-sidebar" class="side-nav z-[80] mt-0 hidden w-[100px] xl:w-[260px] overflow-y-auto overflow-x-hidden px-5 pb-16 pt-12 md:fixed md:top-2 md:left-2 md:h-screen md:block bg-white/95 rounded-[8px] shadow-lg dark:bg-darkmode-700/80">
                 {{-- Brand / logo --}}
+                @php
+                    $brandName = $appBrandName ?? $appCompany->name ?? config('app.name', 'ERP System');
+                    $brandLogoUrl = $appBrandLogoUrl ?? $appCompanyLogoUrl ?? null;
+                @endphp
                 <div class="mb-6 flex items-center justify-center">
-                    <div class="flex flex-col items-center gap-2">
-                        <div class="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-                            <x-base.lucide
-                                icon="layers"
-                                class="h-9 w-9 text-primary"
-                            />
-                        </div>
-                        <div class="text-sm font-semibold text-slate-800 dark:text-slate-100 text-center">
-                            Smart ERP
+                    <div class="flex flex-col items-center gap-2 text-center">
+                        @if ($brandLogoUrl)
+                            <div class="relative h-16 w-16 overflow-hidden rounded-2xl border border-slate-200 shadow-sm dark:border-darkmode-400">
+                                <img
+                                    src="{{ $brandLogoUrl }}"
+                                    alt="{{ $brandName }} logo"
+                                    class="h-full w-full object-cover"
+                                >
+                            </div>
+                        @else
+                            <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
+                                <span class="text-lg font-bold text-primary">
+                                    {{ Str::of($brandName)->substr(0, 2)->upper() }}
+                                </span>
+                            </div>
+                        @endif
+                        <div class="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                            {{ $brandName }}
                         </div>
                     </div>
                 </div>

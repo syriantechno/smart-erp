@@ -66,9 +66,9 @@
         @slot('footer')
             <div class="flex justify-end gap-2 w-full">
                 <x-base.button
-                    class="w-32"
-                    type="button"
+                    class="w-24"
                     data-tw-dismiss="modal"
+                    type="button"
                     variant="outline-secondary"
                 >
                     <x-base.lucide icon="X" class="w-4 h-4 mr-2" />

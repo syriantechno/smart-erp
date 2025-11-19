@@ -31,7 +31,8 @@ class Project extends Model
         'deliverables',
         'risks',
         'notes',
-        'is_active'
+        'is_active',
+        'is_private'
     ];
 
     protected $casts = [
@@ -41,7 +42,8 @@ class Project extends Model
         'budget' => 'decimal:2',
         'actual_cost' => 'decimal:2',
         'progress_percentage' => 'integer',
-        'is_active' => 'boolean'
+        'is_active' => 'boolean',
+        'is_private' => 'boolean'
     ];
 
     /**

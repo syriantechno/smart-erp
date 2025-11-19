@@ -3,6 +3,7 @@
 
     // Litepicker
     $(".datepicker").each(function () {
+        const currentYear = dayjs().year();
         let options = {
             autoApply: false,
             singleMode: false,
@@ -12,7 +13,7 @@
             format: "D MMM, YYYY",
             dropdowns: {
                 minYear: 1990,
-                maxYear: null,
+                maxYear: currentYear + 10,
                 months: true,
                 years: true,
             },

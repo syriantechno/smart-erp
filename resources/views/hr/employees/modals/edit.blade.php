@@ -254,18 +254,19 @@
                 class="w-24"
                 data-tw-dismiss="modal"
                 type="button"
-                variant="outline-secondary"
+                tone="warning"
             >
+                <x-base.lucide icon="X" class="w-4 h-4 mr-2" />
                 Cancel
             </x-base.button>
             <x-base.button
                 class="w-32"
                 type="submit"
                 form="edit-employee-form"
-                variant="primary"
+                tone="success"
             >
                 <x-base.lucide icon="Save" class="w-4 h-4 mr-2" />
-                Update
+                Save
             </x-base.button>
         </div>
     @endslot

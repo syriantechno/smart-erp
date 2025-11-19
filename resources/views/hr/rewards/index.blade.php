@@ -132,10 +132,11 @@
                 </div>
                 <div class="flex justify-end gap-2 border-t border-slate-200/60 px-5 py-3 dark:border-darkmode-400">
                     <x-base.button type="button" variant="secondary" data-tw-dismiss="modal">
-                        Close
+                        <x-base.lucide icon="X" class="w-4 h-4 mr-2" />
+                        Cancel
                     </x-base.button>
                     <x-base.button type="submit" variant="primary">
-                        Save Reward
+                        Save
                     </x-base.button>
                 </div>
             </form>

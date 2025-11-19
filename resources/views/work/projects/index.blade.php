@@ -41,9 +41,9 @@
             background: white;
             border-radius: 0.75rem;
             box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.45);
-            max-width: 1100px;
-            width: 95%;
-            max-height: 90vh;
+            max-width: 1400px;
+            width: min(96%, 1400px);
+            max-height: 93vh;
             overflow-y: auto;
             animation: slideIn 0.25s ease-out;
         }

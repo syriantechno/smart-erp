@@ -1,4 +1,15 @@
-@props(['as' => 'button', 'variant' => null, 'elevated' => null, 'size' => null, 'rounded' => null])
+@props([
+    'as' => 'button',
+    'variant' => null,
+    'elevated' => null,
+    'size' => null,
+    'rounded' => null,
+    'icon' => null,
+    'iconPosition' => 'left',
+    'iconClass' => 'w-4 h-4',
+    'iconSpacing' => null,
+    'tone' => null,
+])
 
 @php
     // General Styles
@@ -132,13 +143,16 @@
         '[&:hover:not(:disabled)]:bg-opacity-10 [&:hover:not(:disabled)]:border-opacity-10', // On hover and not disabled
         '[&:hover:not(:disabled)]:dark:bg-darkmode-800/50 [&:hover:not(:disabled)]:dark:border-darkmode-800', // On hover and not disabled in dark mode
     ];
+    $hasIcon = filled($icon);
+    $computedIconSpacing = $iconSpacing ?? ($iconPosition === 'left' ? 'mr-2' : 'ml-2');
+    $toneClass = filled($tone) ? 'btn-tonal btn-tonal--' . \Illuminate\Support\Str::kebab($tone) : null;
 @endphp
 
 <{{ $as }}
     data-tw-merge
     {{ $attributes->class(
             merge([
-                $generalStyles,
+                $toneClass ?: $generalStyles,
                 $size == 'sm' ? $small : null,
                 $size == 'lg' ? $large : null,
                 $variant == 'primary' ? $primary : null,
@@ -171,4 +185,14 @@
                 $attributes->whereStartsWith('class')->first(),
             ]),
         )->merge($attributes->whereDoesntStartWith('class')->getAttributes()) }}
->{{ $slot }}</{{ $as }}>
+>
+    @if($hasIcon && $iconPosition === 'left')
+        <x-base.lucide :icon="$icon" class="{{ trim($iconClass . ' ' . ($slot->isEmpty() ? '' : $computedIconSpacing)) }}" />
+    @endif
+
+    {{ $slot }}
+
+    @if($hasIcon && $iconPosition === 'right')
+        <x-base.lucide :icon="$icon" class="{{ trim($iconClass . ' ' . ($slot->isEmpty() ? '' : $computedIconSpacing)) }}" />
+    @endif
+</{{ $as }}>

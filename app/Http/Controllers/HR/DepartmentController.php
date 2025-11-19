@@ -7,6 +7,7 @@ use App\Models\HR\Department;
 use App\Models\Approval\ApprovalRequest;
 use App\Models\Approval\ApprovalTemplate;
 use App\Services\DocumentCodeGenerator;
+use App\Services\PdfExporter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,7 +18,10 @@ use App\Helpers\Reply;
 
 class DepartmentController extends Controller
 {
-    public function __construct(private DocumentCodeGenerator $codeGenerator)
+    public function __construct(
+        private DocumentCodeGenerator $codeGenerator,
+        private PdfExporter $pdfExporter
+    )
     {
     }
 

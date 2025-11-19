@@ -15,6 +15,7 @@
     function initializeSettingsTabs() {
         const tabs = document.querySelectorAll('.settings-tab');
         const contents = document.querySelectorAll('.settings-content');
+        const companyTableSection = document.getElementById('company-table-section');
 
         console.log('Found', tabs.length, 'tabs and', contents.length, 'contents');
 
@@ -51,6 +52,9 @@
                 targetTab.classList.add('bg-primary', 'text-white');
                 targetTab.classList.remove('text-slate-700', 'hover:bg-slate-100', 'dark:text-slate-300', 'dark:hover:bg-darkmode-400');
                 targetContent.classList.remove('hidden');
+                if (companyTableSection) {
+                    companyTableSection.classList.toggle('hidden', tabName !== 'company');
+                }
                 console.log('Successfully showed tab:', tabName);
             } else {
                 console.error('Tab or content not found:', tabName, targetTab, targetContent);
@@ -128,6 +132,56 @@
                     }
                 });
             });
+
+            const appLogoInput = document.getElementById('app_logo');
+            const appLogoPreview = document.getElementById('app-logo-preview');
+            const appLogoPlaceholder = document.getElementById('app-logo-placeholder');
+            const appLogoResetBtn = document.getElementById('app-logo-reset');
+            const resetAppLogoField = document.getElementById('reset_app_logo');
+
+            function toggleAppLogoPreview(showPreview) {
+                if (!appLogoPreview || !appLogoPlaceholder) return;
+                appLogoPreview.classList.toggle('hidden', !showPreview);
+                appLogoPlaceholder.classList.toggle('hidden', showPreview);
+            }
+
+            function resetAppLogoPreview() {
+                if (appLogoPreview) {
+                    appLogoPreview.src = '';
+                }
+                toggleAppLogoPreview(false);
+                if (appLogoInput) {
+                    appLogoInput.value = '';
+                }
+                if (resetAppLogoField) {
+                    resetAppLogoField.value = '1';
+                }
+            }
+
+            if (appLogoInput && appLogoPreview) {
+                appLogoInput.addEventListener('change', function () {
+                    if (this.files && this.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            appLogoPreview.src = e.target.result;
+                            toggleAppLogoPreview(true);
+                        };
+                        reader.readAsDataURL(this.files[0]);
+                        if (resetAppLogoField) {
+                            resetAppLogoField.value = '0';
+                        }
+                    } else {
+                        resetAppLogoPreview();
+                    }
+                });
+            }
+
+            if (appLogoResetBtn) {
+                appLogoResetBtn.addEventListener('click', function () {
+                    resetAppLogoPreview();
+                    window.showToast('Application logo reset. Save to apply.', 'info');
+                });
+            }
         }
 
         // Handle AI Settings Form with AJAX
@@ -633,6 +687,130 @@
         // Show notification
         if (typeof window.showToast === 'function') {
             window.showToast(`Font size changed to ${fontSize}. Save to make it permanent.`, 'info');
+        }
+
+        // Company table actions
+        const companyTable = document.getElementById('settings-company-table');
+        const companyLoadButtons = document.querySelectorAll('.company-load-btn');
+        const companyExportBtn = document.getElementById('company-table-export');
+        const companyRefreshBtn = document.getElementById('company-table-refresh');
+        const companyLogoInput = document.getElementById('company_logo');
+        const companyLogoPreview = document.getElementById('company-logo-preview');
+        const companyLogoPlaceholder = document.getElementById('company-logo-placeholder');
+        const companyLogoReset = document.getElementById('company-logo-reset');
+
+        function toggleLogoPreview(showPreview) {
+            if (!companyLogoPreview || !companyLogoPlaceholder) return;
+            companyLogoPreview.classList.toggle('hidden', !showPreview);
+            companyLogoPlaceholder.classList.toggle('hidden', showPreview);
+        }
+
+        function resetLogoPreview() {
+            if (!companyLogoPreview) return;
+            const defaultSrc = companyLogoPreview.dataset.initialSrc || '';
+            companyLogoPreview.src = defaultSrc;
+            toggleLogoPreview(!!defaultSrc);
+            if (companyLogoInput) {
+                companyLogoInput.value = '';
+            }
+        }
+
+        if (companyLogoInput && companyLogoPreview) {
+            companyLogoInput.addEventListener('change', function () {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        companyLogoPreview.src = e.target.result;
+                        toggleLogoPreview(true);
+                    };
+                    reader.readAsDataURL(this.files[0]);
+                } else {
+                    resetLogoPreview();
+                }
+            });
+        }
+
+        if (companyLogoReset) {
+            companyLogoReset.addEventListener('click', function () {
+                resetLogoPreview();
+                window.showToast('Logo selection cleared.', 'info');
+            });
+        }
+
+        function populateCompanyForm(payload) {
+            if (!companyForm || !payload) return;
+            const entries = {
+                name: 'company_name',
+                address: 'company_address',
+                commercial_registration: 'commercial_registration',
+                tax_number: 'tax_number',
+                phone: 'company_phone',
+                email: 'company_email',
+                website: 'company_website',
+                country: 'company_country',
+                city: 'company_city',
+                postal_code: 'postal_code'
+            };
+
+            Object.entries(entries).forEach(([key, inputId]) => {
+                const input = document.getElementById(inputId);
+                if (input) {
+                    input.value = payload[key] ?? '';
+                }
+            });
+        }
+
+        companyLoadButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const payload = this.dataset.company ? JSON.parse(this.dataset.company) : null;
+                populateCompanyForm(payload);
+                window.showToast('Company details loaded into the form.', 'success');
+            });
+        });
+
+        if (companyExportBtn && companyTable) {
+            companyExportBtn.addEventListener('click', function () {
+                const rows = Array.from(companyTable.querySelectorAll('tbody tr'));
+                if (!rows.length) {
+                    window.showToast('No company data to export.', 'warning');
+                    return;
+                }
+
+                const headers = ['Name', 'Commercial Registration', 'Tax Number', 'Phone', 'Email', 'Website', 'Country', 'City', 'Postal Code'];
+                const csvRows = [headers.join(',')];
+
+                rows.forEach(row => {
+                    const payload = row.querySelector('.company-load-btn')?.dataset.company;
+                    if (!payload) return;
+                    const data = JSON.parse(payload);
+                    const csvRow = [
+                        data.name || '',
+                        data.commercial_registration || '',
+                        data.tax_number || '',
+                        data.phone || '',
+                        data.email || '',
+                        data.website || '',
+                        data.country || '',
+                        data.city || '',
+                        data.postal_code || ''
+                    ].map(value => '"' + String(value).replace(/"/g, '""') + '"');
+                    csvRows.push(csvRow.join(','));
+                });
+
+                const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'companies.csv';
+                link.click();
+                URL.revokeObjectURL(url);
+            });
+        }
+
+        if (companyRefreshBtn) {
+            companyRefreshBtn.addEventListener('click', function () {
+                window.location.reload();
+            });
         }
     }
 

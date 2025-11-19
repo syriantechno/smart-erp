@@ -135,6 +135,7 @@
                     variant="secondary"
                     x-on:click="$dispatch('close')"
                 >
+                    <x-base.lucide icon="X" class="w-4 h-4 mr-2" />
                     Cancel
                 </x-base.button>
 
@@ -143,8 +144,8 @@
                     variant="primary"
                     id="update-status-btn"
                 >
-                    <x-base.lucide icon="CheckCircle" class="w-4 h-4 mr-2" />
-                    Update Status
+                    <x-base.lucide icon="Save" class="w-4 h-4 mr-2" />
+                    Save
                 </x-base.button>
             </x-base.dialog.footer>
 

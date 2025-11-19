@@ -20,7 +20,7 @@ class PurchaseRequestController extends Controller
 
     public function index()
     {
-        return view('warehouse.purchase-requests.index');
+        return view('warehouse.material-requests.index');
     }
 
     public function previewCode()
@@ -50,7 +50,7 @@ class PurchaseRequestController extends Controller
                 return '<span class="px-2 py-1 text-xs font-medium rounded-full ' . $pr->getStatusBadgeClass() . '">' . ucfirst($pr->status) . '</span>';
             })
             ->addColumn('actions', function ($pr) {
-                return view('warehouse.purchase-requests.partials.actions', compact('pr'))->render();
+                return view('warehouse.material-requests.partials.actions', compact('pr'))->render();
             })
             ->rawColumns(['status_badge', 'actions'])
             ->make(true);

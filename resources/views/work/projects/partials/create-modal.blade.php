@@ -25,8 +25,8 @@
                             Basic Information
                         </h4>
 
-                        <div class="grid grid-cols-12 gap-4">
-                            <div class="col-span-12 md:col-span-6">
+                        <div class="grid grid-cols-12 gap-4 lg:gap-5">
+                            <div class="col-span-12 md:col-span-6 xl:col-span-3">
                                 <label class="form-label">Project Code <span class="text-danger">*</span></label>
                                 <x-base.form-input
                                     id="create-code"
@@ -39,7 +39,7 @@
                                 />
                             </div>
 
-                            <div class="col-span-12 md:col-span-6">
+                            <div class="col-span-12 md:col-span-6 xl:col-span-3">
                                 <label class="form-label">Project Name <span class="text-danger">*</span></label>
                                 <x-base.form-input
                                     id="create-name"
@@ -51,7 +51,7 @@
                                 />
                             </div>
 
-                            <div class="col-span-12">
+                            <div class="col-span-12 md:col-span-6 xl:col-span-3">
                                 <label class="form-label">Description</label>
                                 <x-base.form-textarea
                                     id="create-description"
@@ -61,6 +61,9 @@
                                     class="w-full"
                                 ></x-base.form-textarea>
                             </div>
+                            <div class="hidden xl:block xl:col-span-3"></div>
+                            <div class="hidden xl:block xl:col-span-3"></div>
+                            <div class="hidden xl:block xl:col-span-3"></div>
                         </div>
                     </div>
 
@@ -71,8 +74,8 @@
                             Organization
                         </h4>
 
-                        <div class="grid grid-cols-12 gap-4">
-                            <div class="col-span-12 md:col-span-4">
+                        <div class="grid grid-cols-12 gap-4 lg:gap-5">
+                            <div class="col-span-12 md:col-span-6 xl:col-span-3">
                                 <label class="form-label">Company <span class="text-danger">*</span></label>
                                 <x-base.form-select id="create-company_id" name="company_id" class="w-full" required>
                                     <option value="">Select Company</option>
@@ -81,15 +84,10 @@
                                     @endforeach
                                 </x-base.form-select>
                             </div>
+                            <div class="hidden xl:block xl:col-span-3"></div>
+                            <div class="hidden xl:block xl:col-span-3"></div>
 
-                            <div class="col-span-12 md:col-span-4">
-                                <label class="form-label">Department</label>
-                                <x-base.form-select id="create-department_id" name="department_id" class="w-full" disabled>
-                                    <option value="">Select Department</option>
-                                </x-base.form-select>
-                            </div>
-
-                            <div class="col-span-12 md:col-span-4">
+                            <div class="col-span-12 md:col-span-6 xl:col-span-3">
                                 <label class="form-label">Project Manager</label>
                                 <x-base.form-select id="create-manager_id" name="manager_id" class="w-full">
                                     <option value="">Select Manager</option>
@@ -98,6 +96,8 @@
                                     @endforeach
                                 </x-base.form-select>
                             </div>
+                            <div class="hidden xl:block xl:col-span-3"></div>
+                            <div class="hidden xl:block xl:col-span-3"></div>
                         </div>
                     </div>
 
@@ -108,8 +108,8 @@
                             Timeline
                         </h4>
 
-                        <div class="grid grid-cols-12 gap-4">
-                            <div class="col-span-12 md:col-span-6">
+                        <div class="grid grid-cols-12 gap-4 lg:gap-5">
+                            <div class="col-span-12 md:col-span-6 xl:col-span-3">
                                 <label class="form-label">Start Date <span class="text-danger">*</span></label>
                                 <div class="relative w-full">
                                     <div
@@ -126,7 +126,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-span-12 md:col-span-6">
+                            <div class="col-span-12 md:col-span-6 xl:col-span-3">
                                 <label class="form-label">End Date</label>
                                 <div class="relative w-full">
                                     <div
@@ -141,6 +141,8 @@
                                     />
                                 </div>
                             </div>
+                            <div class="hidden xl:block xl:col-span-3"></div>
+                            <div class="hidden xl:block xl:col-span-3"></div>
                         </div>
                     </div>
 
@@ -151,8 +153,8 @@
                             Status & Priority
                         </h4>
 
-                        <div class="grid grid-cols-12 gap-4">
-                            <div class="col-span-12 md:col-span-6">
+                        <div class="grid grid-cols-12 gap-4 lg:gap-5">
+                            <div class="col-span-12 md:col-span-6 xl:col-span-3">
                                 <label class="form-label">Status <span class="text-danger">*</span></label>
                                 <x-base.form-select id="create-status" name="status" class="w-full" required>
                                     <option value="planning">Planning</option>
@@ -163,7 +165,7 @@
                                 </x-base.form-select>
                             </div>
 
-                            <div class="col-span-12 md:col-span-6">
+                            <div class="col-span-12 md:col-span-6 xl:col-span-3">
                                 <label class="form-label">Priority <span class="text-danger">*</span></label>
                                 <x-base.form-select id="create-priority" name="priority" class="w-full" required>
                                     <option value="low">Low</option>
@@ -182,8 +184,8 @@
                             Progress & Budget
                         </h4>
 
-                        <div class="grid grid-cols-12 gap-4">
-                            <div class="col-span-12 md:col-span-6">
+                        <div class="grid grid-cols-12 gap-4 lg:gap-5">
+                            <div class="col-span-12 md:col-span-6 xl:col-span-3">
                                 <label class="form-label">Progress (%)</label>
                                 <x-base.form-input
                                     id="create-progress_percentage"
@@ -196,7 +198,7 @@
                                 />
                             </div>
 
-                            <div class="col-span-12 md:col-span-6">
+                            <div class="col-span-12 md:col-span-6 xl:col-span-3">
                                 <label class="form-label">Budget</label>
                                 <x-base.form-input
                                     id="create-budget"
@@ -207,6 +209,8 @@
                                     class="w-full"
                                 />
                             </div>
+                            <div class="hidden xl:block xl:col-span-3"></div>
+                            <div class="hidden xl:block xl:col-span-3"></div>
                         </div>
                     </div>
 
@@ -217,8 +221,8 @@
                             Objectives & Deliverables
                         </h4>
 
-                        <div class="grid grid-cols-12 gap-4">
-                            <div class="col-span-12 md:col-span-6">
+                        <div class="grid grid-cols-12 gap-4 lg:gap-5">
+                            <div class="col-span-12 md:col-span-6 xl:col-span-3">
                                 <label class="form-label">Objectives</label>
                                 <x-base.form-textarea
                                     id="create-objectives"
@@ -229,7 +233,7 @@
                                 ></x-base.form-textarea>
                             </div>
 
-                            <div class="col-span-12 md:col-span-6">
+                            <div class="col-span-12 md:col-span-6 xl:col-span-3">
                                 <label class="form-label">Deliverables</label>
                                 <x-base.form-textarea
                                     id="create-deliverables"
@@ -239,6 +243,8 @@
                                     class="w-full"
                                 ></x-base.form-textarea>
                             </div>
+                            <div class="hidden xl:block xl:col-span-3"></div>
+                            <div class="hidden xl:block xl:col-span-3"></div>
                         </div>
                     </div>
 
@@ -249,8 +255,8 @@
                             Risks & Notes
                         </h4>
 
-                        <div class="grid grid-cols-12 gap-4">
-                            <div class="col-span-12 md:col-span-6">
+                        <div class="grid grid-cols-12 gap-4 lg:gap-5">
+                            <div class="col-span-12 md:col-span-6 xl:col-span-3">
                                 <label class="form-label">Risks</label>
                                 <x-base.form-textarea
                                     id="create-risks"
@@ -261,7 +267,7 @@
                                 ></x-base.form-textarea>
                             </div>
 
-                            <div class="col-span-12 md:col-span-6">
+                            <div class="col-span-12 md:col-span-6 xl:col-span-3">
                                 <label class="form-label">Notes</label>
                                 <x-base.form-textarea
                                     id="create-notes"
@@ -277,7 +283,10 @@
 
             <!-- Modal Footer -->
             <div class="custom-modal-footer">
-                <button type="button" class="btn-tonal btn-tonal--warning" onclick="closeCreateModal()">Cancel</button>
+                <button type="button" class="btn-tonal btn-tonal--warning" onclick="closeCreateModal()">
+                    <x-base.lucide icon="X" class="w-4 h-4 mr-2" />
+                    Cancel
+                </button>
                 <button type="submit" class="btn-tonal btn-tonal--success" id="create-project-btn">
                     <x-base.lucide icon="save" class="w-4 h-4 mr-2" />
                     Create Project

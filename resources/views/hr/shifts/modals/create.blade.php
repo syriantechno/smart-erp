@@ -206,6 +206,7 @@
                 type="button"
                 variant="outline-secondary"
             >
+                <x-base.lucide icon="X" class="w-4 h-4 mr-2" />
                 Cancel
             </x-base.button>
             <x-base.button

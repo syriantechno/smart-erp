@@ -97,6 +97,7 @@
                 data-tw-dismiss="modal"
                 type="button"
                 variant="outline-secondary"
+                icon="X"
             >
                 Cancel
             </x-base.button>
@@ -106,9 +107,9 @@
                 form="create-material-form"
                 id="create-material-btn"
                 variant="primary"
+                icon="Save"
             >
-                <x-base.lucide icon="Save" class="w-4 h-4 mr-2" />
-                Save Material
+                Save
             </x-base.button>
         </div>
     @endslot
