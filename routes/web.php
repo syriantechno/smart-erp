@@ -13,7 +13,6 @@ use App\Http\Controllers\CRM\ContactController;
 use App\Http\Controllers\CRM\LeadController;
 use App\Http\Controllers\CRM\OpportunityController;
 use App\Http\Controllers\CRM\ActivityController;
-use App\Http\Controllers\CRM\TaskController;
 use App\Http\Controllers\CRM\FileController;
 
 /*
@@ -421,9 +420,6 @@ Route::middleware('auth')->group(function () {
 
     // CRM Routes
     Route::prefix('crm')->name('crm.')->group(function () {
-        Route::get('companies/datatable', [CompanyController::class, 'datatable'])->name('companies.datatable');
-        Route::resource('companies', CompanyController::class)->except(['create', 'edit']);
-
         Route::get('contacts/datatable', [ContactController::class, 'datatable'])->name('contacts.datatable');
         Route::resource('contacts', ContactController::class)->except(['create', 'edit']);
 
@@ -435,9 +431,6 @@ Route::middleware('auth')->group(function () {
 
         Route::get('activities/datatable', [ActivityController::class, 'datatable'])->name('activities.datatable');
         Route::resource('activities', ActivityController::class)->except(['create', 'edit']);
-
-        Route::get('tasks/datatable', [TaskController::class, 'datatable'])->name('tasks.datatable');
-        Route::resource('tasks', TaskController::class)->except(['create', 'edit']);
 
         Route::prefix('files')->name('files.')->group(function () {
             Route::get('/', [FileController::class, 'index'])->name('index');

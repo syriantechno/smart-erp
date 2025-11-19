@@ -14,15 +14,19 @@ class Material extends Model
     protected $fillable = [
         'code',
         'name',
+        'sku',
+        'barcode',
         'description',
         'category_id',
-        'unit',
+        'unit_id',
+        'opening_quantity',
         'price',
         'is_active'
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
+        'opening_quantity' => 'decimal:4',
         'is_active' => 'boolean',
     ];
 
@@ -34,6 +38,11 @@ class Material extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function unit(): BelongsTo
+    {
+        return $this->belongsTo(MeasurementUnit::class, 'unit_id');
     }
 
     public function inventories(): HasMany

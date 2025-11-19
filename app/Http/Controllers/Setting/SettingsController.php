@@ -186,22 +186,30 @@ class SettingsController extends Controller
 
     public function updateAppearance(Request $request)
     {
+        $palettes = config('theme.palettes', []);
+        $paletteKeys = implode(',', array_keys($palettes));
+
         $request->validate([
             'dark_mode' => 'nullable|boolean',
-            'primary_color' => 'nullable|string|regex:/^#[a-fA-F0-9]{6}$/',
-            'secondary_color' => 'nullable|string|regex:/^#[a-fA-F0-9]{6}$/',
-            'accent_color' => 'nullable|string|regex:/^#[a-fA-F0-9]{6}$/',
+            'theme_palette' => $paletteKeys ? 'nullable|string|in:' . $paletteKeys : 'nullable|string',
             'font_size' => 'nullable|string|in:small,medium,large,extra-large',
             'sidebar_collapsed' => 'nullable|boolean',
             // Allow any value here; we'll normalize it via $request->boolean()
             'animations_enabled' => 'nullable',
         ]);
 
+        $selectedPaletteKey = $request->input('theme_palette', setting('theme_palette', config('theme.default_palette')));
+        if (!$palettes || !array_key_exists($selectedPaletteKey, $palettes)) {
+            $selectedPaletteKey = config('theme.default_palette');
+        }
+        $selectedPalette = $palettes[$selectedPaletteKey];
+
         // حفظ إعدادات المظهر
         Setting::set('dark_mode', $request->boolean('dark_mode'), 'boolean', 'Enable dark mode');
-        Setting::set('primary_color', $request->primary_color ?? '#1e40af', 'string', 'Primary theme color');
-        Setting::set('secondary_color', $request->secondary_color ?? '#7c3aed', 'string', 'Secondary theme color');
-        Setting::set('accent_color', $request->accent_color ?? '#06b6d4', 'string', 'Accent theme color');
+        Setting::set('theme_palette', $selectedPaletteKey, 'string', 'Selected theme palette');
+        Setting::set('primary_color', $selectedPalette['primary'], 'string', 'Primary theme color');
+        Setting::set('secondary_color', $selectedPalette['secondary'], 'string', 'Secondary theme color');
+        Setting::set('accent_color', $selectedPalette['accent'], 'string', 'Accent theme color');
         Setting::set('font_size', $request->font_size ?? 'medium', 'string', 'Font size preference');
         Setting::set('sidebar_collapsed', $request->boolean('sidebar_collapsed'), 'boolean', 'Sidebar collapsed state');
         Setting::set('animations_enabled', $request->boolean('animations_enabled', true), 'boolean', 'Enable animations');
@@ -413,10 +421,22 @@ class SettingsController extends Controller
 /* .side-nav__item:hover { background-color: var(--secondary-color) !important; } */
 /* .side-nav__item--active { background-color: var(--accent-color) !important; } */
 
-/* Top navigation overrides - إعادة للأبيض */
-.top-nav { background-color: #ffffff !important; }
-.top-nav__item:hover { background-color: #f8fafc !important; }
-.top-nav__item--active { background-color: var(--primary-color) !important; }
+/* Top navigation overrides - HR pulse gradient */
+.top-nav {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 45%, var(--accent-color) 100%) !important;
+    color: #f8fafc !important;
+    box-shadow: 0 10px 30px rgba(var(--primary-rgb), 0.25);
+}
+
+.top-nav__item {
+    color: #e2e8f0 !important;
+}
+
+.top-nav__item:hover,
+.top-nav__item--active {
+    background-color: rgba(255, 255, 255, 0.12) !important;
+    color: #ffffff !important;
+}
 ";
 
         // حفظ ملف CSS المخصص

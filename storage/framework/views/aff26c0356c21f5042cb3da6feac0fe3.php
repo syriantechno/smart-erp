@@ -1,7 +1,18 @@
 <?php $attributes ??= new \Illuminate\View\ComponentAttributeBag;
 
 $__newAttributes = [];
-$__propNames = \Illuminate\View\ComponentAttributeBag::extractPropNames((['as' => 'button', 'variant' => null, 'elevated' => null, 'size' => null, 'rounded' => null]));
+$__propNames = \Illuminate\View\ComponentAttributeBag::extractPropNames(([
+    'as' => 'button',
+    'variant' => null,
+    'elevated' => null,
+    'size' => null,
+    'rounded' => null,
+    'icon' => null,
+    'iconPosition' => 'left',
+    'iconClass' => 'w-4 h-4',
+    'iconSpacing' => null,
+    'tone' => null,
+]));
 
 foreach ($attributes->all() as $__key => $__value) {
     if (in_array($__key, $__propNames)) {
@@ -16,7 +27,18 @@ $attributes = new \Illuminate\View\ComponentAttributeBag($__newAttributes);
 unset($__propNames);
 unset($__newAttributes);
 
-foreach (array_filter((['as' => 'button', 'variant' => null, 'elevated' => null, 'size' => null, 'rounded' => null]), 'is_string', ARRAY_FILTER_USE_KEY) as $__key => $__value) {
+foreach (array_filter(([
+    'as' => 'button',
+    'variant' => null,
+    'elevated' => null,
+    'size' => null,
+    'rounded' => null,
+    'icon' => null,
+    'iconPosition' => 'left',
+    'iconClass' => 'w-4 h-4',
+    'iconSpacing' => null,
+    'tone' => null,
+]), 'is_string', ARRAY_FILTER_USE_KEY) as $__key => $__value) {
     $$__key = $$__key ?? $__value;
 }
 
@@ -160,6 +182,9 @@ unset($__defined_vars); ?>
         '[&:hover:not(:disabled)]:bg-opacity-10 [&:hover:not(:disabled)]:border-opacity-10', // On hover and not disabled
         '[&:hover:not(:disabled)]:dark:bg-darkmode-800/50 [&:hover:not(:disabled)]:dark:border-darkmode-800', // On hover and not disabled in dark mode
     ];
+    $hasIcon = filled($icon);
+    $computedIconSpacing = $iconSpacing ?? ($iconPosition === 'left' ? 'mr-2' : 'ml-2');
+    $toneClass = filled($tone) ? 'btn-tonal btn-tonal--' . \Illuminate\Support\Str::kebab($tone) : null;
 ?>
 
 <<?php echo e($as); ?>
@@ -167,7 +192,7 @@ unset($__defined_vars); ?>
     data-tw-merge
     <?php echo e($attributes->class(
             merge([
-                $generalStyles,
+                $toneClass ?: $generalStyles,
                 $size == 'sm' ? $small : null,
                 $size == 'lg' ? $large : null,
                 $variant == 'primary' ? $primary : null,
@@ -201,5 +226,54 @@ unset($__defined_vars); ?>
             ]),
         )->merge($attributes->whereDoesntStartWith('class')->getAttributes())); ?>
 
-><?php echo e($slot); ?></<?php echo e($as); ?>>
+>
+    <?php if($hasIcon && $iconPosition === 'left'): ?>
+        <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => $icon,'class' => ''.e(trim($iconClass . ' ' . ($slot->isEmpty() ? '' : $computedIconSpacing))).'']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.lucide'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['icon' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($icon),'class' => ''.e(trim($iconClass . ' ' . ($slot->isEmpty() ? '' : $computedIconSpacing))).'']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+    <?php endif; ?>
+
+    <?php echo e($slot); ?>
+
+
+    <?php if($hasIcon && $iconPosition === 'right'): ?>
+        <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => $icon,'class' => ''.e(trim($iconClass . ' ' . ($slot->isEmpty() ? '' : $computedIconSpacing))).'']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.lucide'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['icon' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($icon),'class' => ''.e(trim($iconClass . ' ' . ($slot->isEmpty() ? '' : $computedIconSpacing))).'']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+    <?php endif; ?>
+</<?php echo e($as); ?>>
 <?php /**PATH D:\laravel\smart-erp\resources\views/components/base/button/index.blade.php ENDPATH**/ ?>

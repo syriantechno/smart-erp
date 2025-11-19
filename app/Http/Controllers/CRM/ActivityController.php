@@ -4,7 +4,7 @@ namespace App\Http\Controllers\CRM;
 
 use App\Http\Controllers\Controller;
 use App\Models\CRM\Activity;
-use App\Models\CRM\Company;
+use App\Models\Company;
 use App\Models\CRM\Contact;
 use App\Models\CRM\Lead;
 use App\Models\CRM\Opportunity;
@@ -101,7 +101,7 @@ class ActivityController extends Controller
             'scheduled_at' => ['nullable', 'date'],
             'status' => ['nullable', 'string', 'max:50'],
             'priority' => ['nullable', 'string', 'max:50'],
-            'company_id' => ['nullable', 'exists:crm_companies,id'],
+            'company_id' => ['nullable', 'exists:companies,id'],
             'contact_id' => ['nullable', 'exists:crm_contacts,id'],
             'lead_id' => ['nullable', 'exists:crm_leads,id'],
             'opportunity_id' => ['nullable', 'exists:crm_opportunities,id'],
@@ -134,7 +134,7 @@ class ActivityController extends Controller
             'completed_at' => ['nullable', 'date'],
             'status' => ['required', 'string', 'max:50'],
             'priority' => ['nullable', 'string', 'max:50'],
-            'company_id' => ['nullable', 'exists:crm_companies,id'],
+            'company_id' => ['nullable', 'exists:companies,id'],
             'contact_id' => ['nullable', 'exists:crm_contacts,id'],
             'lead_id' => ['nullable', 'exists:crm_leads,id'],
             'opportunity_id' => ['nullable', 'exists:crm_opportunities,id'],

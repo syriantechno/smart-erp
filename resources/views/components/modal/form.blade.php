@@ -4,16 +4,74 @@
     'size' => 'lg',
 ])
 
+@pushOnce('styles')
+    <style>
+        .modal-themed-header {
+            --modal-header-rgb: var(--dt-primary-rgb, var(--primary-rgb, 37 99 235));
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            background: linear-gradient(135deg,
+                    rgba(var(--modal-header-rgb), 0.68),
+                    rgba(var(--modal-header-rgb), 0.38));
+            padding: 1rem 1.5rem;
+            border-top-left-radius: 0.5rem;
+            border-top-right-radius: 0.5rem;
+            color: #f8fafc;
+            box-shadow: 0 15px 35px rgba(var(--modal-header-rgb), 0.25);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .modal-themed-header__title {
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: none;
+            color: #f8fafc;
+        }
+
+        .modal-themed-header__subtitle {
+            font-size: 0.7rem;
+            font-weight: 600;
+            opacity: 0.85;
+        }
+
+        .modal-themed-header__close {
+            margin-left: auto;
+            border: 1px solid rgba(248, 250, 252, 0.35);
+            background-color: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 150ms ease, background-color 150ms ease;
+        }
+
+        .modal-themed-header__close:hover {
+            background-color: rgba(255, 255, 255, 0.18);
+            transform: translateY(-1px);
+        }
+    </style>
+@endPushOnce
+
 <x-base.dialog :id="$id" :size="$size">
     <x-base.dialog.panel>
-        <x-base.dialog.title class="flex items-center gap-4 pr-2">
-            <h2 class="font-medium text-lg text-gray-900 dark:text-white flex-1">{{ $title }}</h2>
+        <x-base.dialog.title class="modal-themed-header">
+            <div class="flex flex-col gap-1">
+                <h2 class="modal-themed-header__title">{{ $title }}</h2>
+            </div>
             <button
                 type="button"
-                class="text-slate-500 hover:text-slate-400 p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors ml-auto"
+                class="modal-themed-header__close"
                 data-tw-dismiss="modal"
+                title="Close"
             >
-                <x-base.lucide icon="X" class="w-5 h-5" />
+                <x-base.lucide icon="x" class="w-5 h-5" />
             </button>
         </x-base.dialog.title>
 

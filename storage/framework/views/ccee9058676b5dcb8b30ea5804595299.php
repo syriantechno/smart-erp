@@ -189,7 +189,6 @@
         });
     </script>
     <?php echo app('Illuminate\Foundation\Vite')(['resources/js/app.js', 'resources/js/accessibility-fixes.js']); ?>
-    <?php echo app('Illuminate\Foundation\Vite')('resources/js/modal-fixes.js'); ?>
     
     
     <?php echo $__env->yieldPushContent('scripts'); ?>

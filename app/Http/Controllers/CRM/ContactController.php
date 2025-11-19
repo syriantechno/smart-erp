@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\CRM;
 
 use App\Http\Controllers\Controller;
-use App\Models\CRM\Company;
+use App\Models\Company;
 use App\Models\CRM\Contact;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -82,7 +82,7 @@ class ContactController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'company_id' => ['nullable', 'exists:crm_companies,id'],
+            'company_id' => ['nullable', 'exists:companies,id'],
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['nullable', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255'],

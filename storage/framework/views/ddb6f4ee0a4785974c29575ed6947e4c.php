@@ -1,4 +1,4 @@
-<?php if (! $__env->hasRenderedOnce('af463754-5f31-4358-b56e-ea31c0edf598')): $__env->markAsRenderedOnce('af463754-5f31-4358-b56e-ea31c0edf598');
+<?php if (! $__env->hasRenderedOnce('53ae3357-3e6e-4b39-a4e5-a07f0ff8ea7f')): $__env->markAsRenderedOnce('53ae3357-3e6e-4b39-a4e5-a07f0ff8ea7f');
 $__env->startPush('styles'); ?>
     <!-- DataTables CSS is now loaded globally in base.blade.php -->
     <style>

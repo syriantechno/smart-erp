@@ -61,6 +61,8 @@
                 class="btn-tonal btn-tonal--info hidden sm:flex"
                 data-tw-toggle="modal"
                 data-tw-target="#employees-filters-slideover"
+                title="Open advanced filters"
+                aria-label="Open advanced filters"
             >
                 <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
@@ -87,13 +89,16 @@
             </button>
 
             <!-- Mobile filters icon -->
-            <button
-                type="button"
-                class="flex items-center justify-center rounded-full border border-slate-200 px-3 py-2 text-slate-600 hover:bg-slate-50 sm:hidden"
-                data-tw-toggle="modal"
-                data-tw-target="#employees-filters-slideover"
-                title="Filters"
-            >
+            <?php if (isset($component)) { $__componentOriginaleaefd826d177068d67dd4af24306c055 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginaleaefd826d177068d67dd4af24306c055 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.tippy.index','data' => ['as' => 'button','type' => 'button','content' => 'Open filters','class' => 'flex items-center justify-center rounded-full border border-slate-200 px-3 py-2 text-slate-600 hover:bg-slate-50 sm:hidden','dataTwToggle' => 'modal','dataTwTarget' => '#employees-filters-slideover']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.tippy'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['as' => 'button','type' => 'button','content' => 'Open filters','class' => 'flex items-center justify-center rounded-full border border-slate-200 px-3 py-2 text-slate-600 hover:bg-slate-50 sm:hidden','data-tw-toggle' => 'modal','data-tw-target' => '#employees-filters-slideover']); ?>
                 <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Filter','class' => 'w-4 h-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -114,13 +119,24 @@
 <?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
-            </button>
+             <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginaleaefd826d177068d67dd4af24306c055)): ?>
+<?php $attributes = $__attributesOriginaleaefd826d177068d67dd4af24306c055; ?>
+<?php unset($__attributesOriginaleaefd826d177068d67dd4af24306c055); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginaleaefd826d177068d67dd4af24306c055)): ?>
+<?php $component = $__componentOriginaleaefd826d177068d67dd4af24306c055; ?>
+<?php unset($__componentOriginaleaefd826d177068d67dd4af24306c055); ?>
+<?php endif; ?>
 
             <button
                 type="button"
                 class="btn-tonal btn-tonal--success"
                 data-tw-toggle="modal"
                 data-tw-target="#create-employee-modal"
+                title="Add a new employee"
+                aria-label="Add a new employee"
             >
                 <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
@@ -275,7 +291,16 @@
 <?php endif; ?>
                             </div>
                             <div class="mt-2 flex flex-wrap gap-2 xl:mt-0">
-                                <button id="employees-filter-go" type="button" class="btn-tonal btn-tonal--info">
+                                <?php if (isset($component)) { $__componentOriginaleaefd826d177068d67dd4af24306c055 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginaleaefd826d177068d67dd4af24306c055 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.tippy.index','data' => ['as' => 'button','id' => 'employees-filter-go','type' => 'button','content' => 'Run filters','class' => 'btn-tonal btn-tonal--info']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.tippy'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['as' => 'button','id' => 'employees-filter-go','type' => 'button','content' => 'Run filters','class' => 'btn-tonal btn-tonal--info']); ?>
                                     <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Search','class' => 'w-4 h-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -297,8 +322,26 @@
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
                                     Go
-                                </button>
-                                <button id="employees-filter-reset" type="button" class="btn-tonal btn-tonal--warning">
+                                 <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginaleaefd826d177068d67dd4af24306c055)): ?>
+<?php $attributes = $__attributesOriginaleaefd826d177068d67dd4af24306c055; ?>
+<?php unset($__attributesOriginaleaefd826d177068d67dd4af24306c055); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginaleaefd826d177068d67dd4af24306c055)): ?>
+<?php $component = $__componentOriginaleaefd826d177068d67dd4af24306c055; ?>
+<?php unset($__componentOriginaleaefd826d177068d67dd4af24306c055); ?>
+<?php endif; ?>
+                                <?php if (isset($component)) { $__componentOriginaleaefd826d177068d67dd4af24306c055 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginaleaefd826d177068d67dd4af24306c055 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.tippy.index','data' => ['as' => 'button','id' => 'employees-filter-reset','type' => 'button','content' => 'Reset filters','class' => 'btn-tonal btn-tonal--warning']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.tippy'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['as' => 'button','id' => 'employees-filter-reset','type' => 'button','content' => 'Reset filters','class' => 'btn-tonal btn-tonal--warning']); ?>
                                     <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'RotateCcw','class' => 'w-4 h-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -320,13 +363,30 @@
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
                                     Reset
-                                </button>
+                                 <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginaleaefd826d177068d67dd4af24306c055)): ?>
+<?php $attributes = $__attributesOriginaleaefd826d177068d67dd4af24306c055; ?>
+<?php unset($__attributesOriginaleaefd826d177068d67dd4af24306c055); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginaleaefd826d177068d67dd4af24306c055)): ?>
+<?php $component = $__componentOriginaleaefd826d177068d67dd4af24306c055; ?>
+<?php unset($__componentOriginaleaefd826d177068d67dd4af24306c055); ?>
+<?php endif; ?>
                             </div>
                         </form>
 
                         <div class="mt-5 flex items-center gap-2 sm:mt-0">
-                            <button id="employees-export" type="button"
-                                class="btn-tonal btn-tonal--info btn-tonal--icon">
+                            <?php if (isset($component)) { $__componentOriginaleaefd826d177068d67dd4af24306c055 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginaleaefd826d177068d67dd4af24306c055 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.tippy.index','data' => ['id' => 'employees-export','as' => 'button','type' => 'button','class' => 'btn-tonal btn-tonal--info btn-tonal--icon','content' => 'Export current view to CSV']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.tippy'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['id' => 'employees-export','as' => 'button','type' => 'button','class' => 'btn-tonal btn-tonal--info btn-tonal--icon','content' => 'Export current view to CSV']); ?>
                                 <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Download','class' => 'h-4 w-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -347,9 +407,107 @@
 <?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
-                            </button>
-                            <button id="employees-refresh" type="button"
-                                class="btn-tonal btn-tonal--success btn-tonal--icon">
+                             <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginaleaefd826d177068d67dd4af24306c055)): ?>
+<?php $attributes = $__attributesOriginaleaefd826d177068d67dd4af24306c055; ?>
+<?php unset($__attributesOriginaleaefd826d177068d67dd4af24306c055); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginaleaefd826d177068d67dd4af24306c055)): ?>
+<?php $component = $__componentOriginaleaefd826d177068d67dd4af24306c055; ?>
+<?php unset($__componentOriginaleaefd826d177068d67dd4af24306c055); ?>
+<?php endif; ?>
+                            <?php if (isset($component)) { $__componentOriginaleaefd826d177068d67dd4af24306c055 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginaleaefd826d177068d67dd4af24306c055 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.tippy.index','data' => ['id' => 'employees-export-pdf','as' => 'button','type' => 'button','class' => 'btn-tonal btn-tonal--danger btn-tonal--icon','content' => 'Export current view to PDF']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.tippy'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['id' => 'employees-export-pdf','as' => 'button','type' => 'button','class' => 'btn-tonal btn-tonal--danger btn-tonal--icon','content' => 'Export current view to PDF']); ?>
+                                <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'FileText','class' => 'h-4 w-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.lucide'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['icon' => 'FileText','class' => 'h-4 w-4']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+                             <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginaleaefd826d177068d67dd4af24306c055)): ?>
+<?php $attributes = $__attributesOriginaleaefd826d177068d67dd4af24306c055; ?>
+<?php unset($__attributesOriginaleaefd826d177068d67dd4af24306c055); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginaleaefd826d177068d67dd4af24306c055)): ?>
+<?php $component = $__componentOriginaleaefd826d177068d67dd4af24306c055; ?>
+<?php unset($__componentOriginaleaefd826d177068d67dd4af24306c055); ?>
+<?php endif; ?>
+                            <?php if (isset($component)) { $__componentOriginaleaefd826d177068d67dd4af24306c055 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginaleaefd826d177068d67dd4af24306c055 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.tippy.index','data' => ['id' => 'employees-import','as' => 'button','type' => 'button','class' => 'btn-tonal btn-tonal--warning btn-tonal--icon','content' => 'Import employees from CSV']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.tippy'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['id' => 'employees-import','as' => 'button','type' => 'button','class' => 'btn-tonal btn-tonal--warning btn-tonal--icon','content' => 'Import employees from CSV']); ?>
+                                <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'UploadCloud','class' => 'h-4 w-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.lucide'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['icon' => 'UploadCloud','class' => 'h-4 w-4']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+                             <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginaleaefd826d177068d67dd4af24306c055)): ?>
+<?php $attributes = $__attributesOriginaleaefd826d177068d67dd4af24306c055; ?>
+<?php unset($__attributesOriginaleaefd826d177068d67dd4af24306c055); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginaleaefd826d177068d67dd4af24306c055)): ?>
+<?php $component = $__componentOriginaleaefd826d177068d67dd4af24306c055; ?>
+<?php unset($__componentOriginaleaefd826d177068d67dd4af24306c055); ?>
+<?php endif; ?>
+                            <input type="file" id="employees-import-input" accept=".csv,text/csv" class="hidden" />
+                            <?php if (isset($component)) { $__componentOriginaleaefd826d177068d67dd4af24306c055 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginaleaefd826d177068d67dd4af24306c055 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.tippy.index','data' => ['id' => 'employees-refresh','as' => 'button','type' => 'button','class' => 'btn-tonal btn-tonal--success btn-tonal--icon','content' => 'Refresh table']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.tippy'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['id' => 'employees-refresh','as' => 'button','type' => 'button','class' => 'btn-tonal btn-tonal--success btn-tonal--icon','content' => 'Refresh table']); ?>
                                 <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'RefreshCcw','class' => 'h-4 w-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -370,7 +528,16 @@
 <?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
-                            </button>
+                             <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginaleaefd826d177068d67dd4af24306c055)): ?>
+<?php $attributes = $__attributesOriginaleaefd826d177068d67dd4af24306c055; ?>
+<?php unset($__attributesOriginaleaefd826d177068d67dd4af24306c055); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginaleaefd826d177068d67dd4af24306c055)): ?>
+<?php $component = $__componentOriginaleaefd826d177068d67dd4af24306c055; ?>
+<?php unset($__componentOriginaleaefd826d177068d67dd4af24306c055); ?>
+<?php endif; ?>
                         </div>
                     </div>
 
@@ -380,7 +547,7 @@
                                 <tr>
                                     <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">#</th>
                                     <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Code</th>
-                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Photo</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 text-center">Photo</th>
                                     <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Full Name</th>
                                     <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Department / Position</th>
                                     <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Email</th>
@@ -619,11 +786,16 @@
                         </div>
 
                         <div class="mt-2 flex justify-end gap-2">
-                            <button
-                                type="button"
-                                class="btn-tonal btn-tonal--warning w-28"
-                                data-tw-dismiss="modal"
-                            >
+                            <?php if (isset($component)) { $__componentOriginaleaefd826d177068d67dd4af24306c055 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginaleaefd826d177068d67dd4af24306c055 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.tippy.index','data' => ['as' => 'button','type' => 'button','content' => 'Close advanced filters','class' => 'btn-tonal btn-tonal--warning w-28','dataTwDismiss' => 'modal']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.tippy'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['as' => 'button','type' => 'button','content' => 'Close advanced filters','class' => 'btn-tonal btn-tonal--warning w-28','data-tw-dismiss' => 'modal']); ?>
                                 <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'X','class' => 'mr-2 h-4 w-4 animate-pulse']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -645,12 +817,26 @@
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
                                 Close
-                            </button>
-                            <button
-                                id="advanced-filter-apply"
-                                type="button"
-                                class="btn-tonal btn-tonal--info w-28"
-                            >
+                             <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginaleaefd826d177068d67dd4af24306c055)): ?>
+<?php $attributes = $__attributesOriginaleaefd826d177068d67dd4af24306c055; ?>
+<?php unset($__attributesOriginaleaefd826d177068d67dd4af24306c055); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginaleaefd826d177068d67dd4af24306c055)): ?>
+<?php $component = $__componentOriginaleaefd826d177068d67dd4af24306c055; ?>
+<?php unset($__componentOriginaleaefd826d177068d67dd4af24306c055); ?>
+<?php endif; ?>
+                            <?php if (isset($component)) { $__componentOriginaleaefd826d177068d67dd4af24306c055 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginaleaefd826d177068d67dd4af24306c055 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.tippy.index','data' => ['as' => 'button','id' => 'advanced-filter-apply','type' => 'button','content' => 'Apply filters','class' => 'btn-tonal btn-tonal--info w-28']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.tippy'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['as' => 'button','id' => 'advanced-filter-apply','type' => 'button','content' => 'Apply filters','class' => 'btn-tonal btn-tonal--info w-28']); ?>
                                 <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Search','class' => 'mr-2 h-4 w-4 animate-pulse']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -672,7 +858,16 @@
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
                                 Apply
-                            </button>
+                             <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginaleaefd826d177068d67dd4af24306c055)): ?>
+<?php $attributes = $__attributesOriginaleaefd826d177068d67dd4af24306c055; ?>
+<?php unset($__attributesOriginaleaefd826d177068d67dd4af24306c055); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginaleaefd826d177068d67dd4af24306c055)): ?>
+<?php $component = $__componentOriginaleaefd826d177068d67dd4af24306c055; ?>
+<?php unset($__componentOriginaleaefd826d177068d67dd4af24306c055); ?>
+<?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -728,15 +923,10 @@
             const filterGoBtn = document.getElementById('employees-filter-go');
             const filterResetBtn = document.getElementById('employees-filter-reset');
             const exportBtn = document.getElementById('employees-export');
+            const exportPdfBtn = document.getElementById('employees-export-pdf');
             const refreshBtn = document.getElementById('employees-refresh');
-
-            // Advanced filters
-            const companyFilter = document.getElementById('company-filter');
-            const departmentFilter = document.getElementById('department-filter');
-            const positionFilter = document.getElementById('position-filter');
-            const advancedFilterApplyBtn = document.getElementById('advanced-filter-apply');
-            const totalEmployeesCount = document.getElementById('total-employees-count');
-            const filteredEmployeesCount = document.getElementById('filtered-employees-count');
+            const importBtn = document.getElementById('employees-import');
+            const importInput = document.getElementById('employees-import-input');
 
             const initialLength = lengthSelect ? parseInt(lengthSelect.value, 10) || 10 : 10;
 
@@ -752,15 +942,6 @@
                     }
                     if (filterValue) {
                         d.filter_value = filterValue.value || '';
-                    }
-                    if (companyFilter) {
-                        d.company_id = companyFilter.value || '';
-                    }
-                    if (departmentFilter) {
-                        d.department_id = departmentFilter.value || '';
-                    }
-                    if (positionFilter) {
-                        d.position_filter = positionFilter.value || '';
                     }
                     d.page_length = lengthSelect ? parseInt(lengthSelect.value, 10) || initialLength : initialLength;
                 },
@@ -800,6 +981,9 @@
                     }
 
                     const info = settings.api().page.info();
+                    const totalEmployeesCount = document.getElementById('total-employees-count');
+                    const filteredEmployeesCount = document.getElementById('filtered-employees-count');
+
                     if (totalEmployeesCount) {
                         totalEmployeesCount.textContent = info.recordsTotal;
                     }
@@ -807,17 +991,9 @@
                         filteredEmployeesCount.textContent = info.recordsDisplay;
                     }
 
-                    const hasFilters = (companyFilter && companyFilter.value) ||
-                                      (departmentFilter && departmentFilter.value) ||
-                                      (positionFilter && positionFilter.value);
-
-                    if (hasFilters && info.recordsTotal !== info.recordsDisplay && typeof window.showToast === 'function') {
-                        window.showToast(`Filtered ${info.recordsDisplay} out of ${info.recordsTotal} employees`, 'success');
-                    }
-
                     const activeFiltersIndicator = document.getElementById('active-filters-indicator');
                     if (activeFiltersIndicator) {
-                        activeFiltersIndicator.classList.toggle('hidden', !hasFilters);
+                        activeFiltersIndicator.classList.toggle('hidden', !hasFilters());
                     }
                 }
             }) : null;
@@ -830,6 +1006,94 @@
                 lengthSelect.addEventListener('change', function () {
                     const newLength = parseInt(this.value, 10) || initialLength;
                     table.page.len(newLength).draw();
+                });
+            }
+
+            if (exportPdfBtn) {
+                exportPdfBtn.addEventListener('click', function () {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '<?php echo e(route("hr.employees.export-pdf")); ?>';
+
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                    if (csrfToken) {
+                        const csrfInput = document.createElement('input');
+                        csrfInput.type = 'hidden';
+                        csrfInput.name = '_token';
+                        csrfInput.value = csrfToken;
+                        form.appendChild(csrfInput);
+                    }
+
+                    const params = {
+                        'filter_field': filterField ? filterField.value : '',
+                        'filter_type': filterType ? filterType.value : '',
+                        'filter_value': filterValue ? filterValue.value : '',
+                        'company_id': companyFilter ? companyFilter.value : '',
+                        'department_id': departmentFilter ? departmentFilter.value : '',
+                        'position_filter': positionFilter ? positionFilter.value : ''
+                    };
+
+                    Object.entries(params).forEach(function ([key, value]) {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = key;
+                        input.value = value || '';
+                        form.appendChild(input);
+                    });
+
+                    document.body.appendChild(form);
+                    form.submit();
+                    document.body.removeChild(form);
+                });
+            }
+
+            if (importBtn && importInput) {
+                importBtn.addEventListener('click', function () {
+                    importInput.click();
+                });
+
+                importInput.addEventListener('change', function () {
+                    const file = this.files[0];
+                    if (!file) {
+                        return;
+                    }
+
+                    if (!file.name.toLowerCase().endsWith('.csv')) {
+                        showToast('Please select a CSV file.', 'error');
+                        this.value = '';
+                        return;
+                    }
+
+                    const formData = new FormData();
+                    formData.append('file', file);
+
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+                    fetch('<?php echo e(route('hr.employees.import')); ?>', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken || '',
+                            'Accept': 'application/json',
+                        },
+                        body: formData,
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                const details = data.data || {};
+                                const summary = `Imported: ${details.created ?? 0}, Updated: ${details.updated ?? 0}`;
+                                showToast(details.message || summary, 'success');
+                                reloadTable();
+                            } else {
+                                showToast(data.message || 'Import failed.', 'error');
+                            }
+                        })
+                        .catch(() => {
+                            showToast('Unable to import the selected file.', 'error');
+                        })
+                        .finally(() => {
+                            importInput.value = '';
+                        });
                 });
             }
 
@@ -864,17 +1128,6 @@
                         lengthSelect.value = String(initialLength);
                         table.page.len(initialLength).draw();
                     }
-                    // Reset advanced filters
-                    if (companyFilter) {
-                        companyFilter.value = '';
-                    }
-                    if (departmentFilter) {
-                        departmentFilter.value = '';
-                    }
-                    if (positionFilter) {
-                        positionFilter.value = '';
-                        loadPositionsForDepartment(''); // Reset positions
-                    }
                     reloadTable();
                 });
             }
@@ -884,6 +1137,11 @@
             }
 
             // Advanced filters event listeners
+            const companyFilter = document.getElementById('company-filter');
+            const departmentFilter = document.getElementById('department-filter');
+            const positionFilter = document.getElementById('position-filter');
+            const advancedFilterApplyBtn = document.getElementById('advanced-filter-apply');
+
             if (advancedFilterApplyBtn) {
                 advancedFilterApplyBtn.addEventListener('click', reloadTable);
             }
@@ -1029,6 +1287,7 @@
                         }
                     });
             };
+
             // Image preview functionality
             const profilePictureInput = document.getElementById('profile_picture');
             const imagePreviewContainer = document.getElementById('image-preview-container');
@@ -1071,6 +1330,25 @@
                 });
             }
 
+            const htmlStripper = document.createElement('div');
+            const stripHtml = function (value) {
+                if (!value) {
+                    return '';
+                }
+                htmlStripper.innerHTML = value;
+                const walker = document.createTreeWalker(htmlStripper, NodeFilter.SHOW_TEXT, null);
+                const parts = [];
+                while (walker.nextNode()) {
+                    const textChunk = walker.currentNode.textContent.replace(/\s+/g, ' ').trim();
+                    if (textChunk) {
+                        parts.push(textChunk);
+                    }
+                }
+                return parts.join(' ')
+                    .replace(/\s*\/\s*/g, ' / ')
+                    .trim();
+            };
+
             if (exportBtn) {
                 exportBtn.addEventListener('click', function () {
                     try {
@@ -1088,8 +1366,8 @@
                                 row.DT_RowIndex,
                                 '"' + (row.code || '').replace(/"/g, '""') + '"',
                                 row.profile_picture ? 'Yes' : 'No', // Photo indicator
-                                '"' + (row.full_name || '').replace(/"/g, '""') + '"',
-                                '"' + (row.department_name || '').replace(/"/g, '""') + '"',
+                                '"' + stripHtml(row.full_name || '').replace(/"/g, '""') + '"',
+                                '"' + stripHtml(row.department_name || '').replace(/"/g, '""') + '"',
                                 '"' + (row.email || '').replace(/"/g, '""') + '"',
                                 row.is_active ? 'Active' : 'Inactive'
                             ];
@@ -1181,6 +1459,7 @@
                 };
             }
         });
+        console.log('[Employees Index] Script loaded - version 2025-11-19-01');
     </script>
 <?php $__env->stopPush(); ?>
 

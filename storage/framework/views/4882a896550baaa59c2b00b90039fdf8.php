@@ -60,32 +60,31 @@
             <!-- BEGIN: Side Menu -->
             <nav id="smart-sidebar" class="side-nav z-[80] mt-0 hidden w-[100px] xl:w-[260px] overflow-y-auto overflow-x-hidden px-5 pb-16 pt-12 md:fixed md:top-2 md:left-2 md:h-screen md:block bg-white/95 rounded-[8px] shadow-lg dark:bg-darkmode-700/80">
                 
+                <?php
+                    $brandName = $appBrandName ?? $appCompany->name ?? config('app.name', 'ERP System');
+                    $brandLogoUrl = $appBrandLogoUrl ?? $appCompanyLogoUrl ?? null;
+                ?>
                 <div class="mb-6 flex items-center justify-center">
-                    <div class="flex flex-col items-center gap-2">
-                        <div class="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-                            <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'layers','class' => 'h-9 w-9 text-primary']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.lucide'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['icon' => 'layers','class' => 'h-9 w-9 text-primary']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
-<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
-<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
-<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
-<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
-<?php endif; ?>
-                        </div>
-                        <div class="text-sm font-semibold text-slate-800 dark:text-slate-100 text-center">
-                            Smart ERP
+                    <div class="flex flex-col items-center gap-2 text-center">
+                        <?php if($brandLogoUrl): ?>
+                            <div class="relative h-16 w-16 overflow-hidden rounded-2xl border border-slate-200 shadow-sm dark:border-darkmode-400">
+                                <img
+                                    src="<?php echo e($brandLogoUrl); ?>"
+                                    alt="<?php echo e($brandName); ?> logo"
+                                    class="h-full w-full object-cover"
+                                >
+                            </div>
+                        <?php else: ?>
+                            <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
+                                <span class="text-lg font-bold text-primary">
+                                    <?php echo e(Str::of($brandName)->substr(0, 2)->upper()); ?>
+
+                                </span>
+                            </div>
+                        <?php endif; ?>
+                        <div class="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                            <?php echo e($brandName); ?>
+
                         </div>
                     </div>
                 </div>
@@ -287,19 +286,19 @@
     </div>
 <?php $__env->stopSection(); ?>
 
-<?php if (! $__env->hasRenderedOnce('d065a125-3fcf-471c-984e-9b7ce23bf855')): $__env->markAsRenderedOnce('d065a125-3fcf-471c-984e-9b7ce23bf855');
+<?php if (! $__env->hasRenderedOnce('31839bbb-0e23-40cd-9894-58e4e62701f2')): $__env->markAsRenderedOnce('31839bbb-0e23-40cd-9894-58e4e62701f2');
 $__env->startPush('styles'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/css/vendors/tippy.css'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/css/themes/enigma/side-nav.css'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/css/themes/enigma/top-nav.css'); ?>
 <?php $__env->stopPush(); endif; ?>
 
-<?php if (! $__env->hasRenderedOnce('eb650a60-d399-4a30-8dc2-dc9fccb9eb74')): $__env->markAsRenderedOnce('eb650a60-d399-4a30-8dc2-dc9fccb9eb74');
+<?php if (! $__env->hasRenderedOnce('948300f0-b3c5-4036-a4f8-94e69d94eee0')): $__env->markAsRenderedOnce('948300f0-b3c5-4036-a4f8-94e69d94eee0');
 $__env->startPush('vendors'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/js/vendors/tippy.js'); ?>
 <?php $__env->stopPush(); endif; ?>
 
-<?php if (! $__env->hasRenderedOnce('4661fb49-8f6e-470c-b19d-54208ea38ce5')): $__env->markAsRenderedOnce('4661fb49-8f6e-470c-b19d-54208ea38ce5');
+<?php if (! $__env->hasRenderedOnce('84c47c6e-1a9c-46a0-966f-9cec1d312b89')): $__env->markAsRenderedOnce('84c47c6e-1a9c-46a0-966f-9cec1d312b89');
 $__env->startPush('scripts'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/js/themes/enigma.js'); ?>
 

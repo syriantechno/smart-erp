@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\CRM;
 
 use App\Http\Controllers\Controller;
-use App\Models\CRM\Company;
+use App\Models\Company;
 use App\Models\CRM\Contact;
 use App\Models\CRM\Lead;
 use Illuminate\Http\Request;
@@ -86,7 +86,7 @@ class LeadController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'company_id' => ['nullable', 'exists:crm_companies,id'],
+            'company_id' => ['nullable', 'exists:companies,id'],
             'contact_id' => ['nullable', 'exists:crm_contacts,id'],
             'title' => ['required', 'string', 'max:255'],
             'status' => ['nullable', 'string', 'max:50'],
@@ -123,7 +123,7 @@ class LeadController extends Controller
     public function update(Request $request, Lead $lead)
     {
         $validated = $request->validate([
-            'company_id' => ['nullable', 'exists:crm_companies,id'],
+            'company_id' => ['nullable', 'exists:companies,id'],
             'contact_id' => ['nullable', 'exists:crm_contacts,id'],
             'title' => ['required', 'string', 'max:255'],
             'status' => ['required', 'string', 'max:50'],

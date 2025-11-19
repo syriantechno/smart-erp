@@ -35,13 +35,41 @@
         /* Status badges - compact and readable */
         #departments-table .inline-flex {
             padding: 0.125rem 0.5rem; /* 2px 8px */
-            font-size: 0.75rem; /* 12px */
             font-weight: 600;
         }
 
         /* Actions column - keep compact */
         #departments-table .px-5.py-1\.5 {
             padding: 0.375rem 1.25rem;
+        }
+
+        #departments-table thead th,
+        #departments-table tbody td {
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        #departments-table .datatable-cell-wrap {
+            text-align: center;
+        }
+
+        #departments-table [class^="stats-card-"],
+        #departments-table [class*=" stats-card-"] {
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-hover-rise {
+            transition: transform 200ms ease;
+        }
+
+        .group:hover .icon-hover-rise {
+            transform: translateY(-2px);
         }
     </style>
 @endpush
@@ -50,15 +78,73 @@
     @include('components.global-notifications')
     <div class="intro-y mt-8 flex items-center">
         <h2 class="mr-auto text-lg font-medium">Departments Management</h2>
-        <x-base.button
-            variant="primary"
-            class="w-40 sm:w-auto sm:ml-4"
+        <button
+            type="button"
+            class="btn-tonal btn-tonal--info w-40 sm:w-auto sm:ml-4 group"
             data-tw-toggle="modal"
             data-tw-target="#create-department-modal"
         >
-            <x-base.lucide icon="Plus" class="w-4 h-4 mr-2" />
+            <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
             Add Department
-        </x-base.button>
+        </button>
+    </div>
+
+    <div class="intro-y mt-6">
+        <div class="box border-primary/10 bg-primary/5 p-5">
+            <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div>
+                    <h3 class="text-base font-semibold text-slate-800 dark:text-slate-100">معاينة النمط الموحد للأزرار</h3>
+                    <p class="text-sm text-slate-500">الأزرار التالية توضح درجات الألوان المتاحة؛ نعدّل الألوان أو الظلال حسب رغبتك قبل التعميم.</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button type="button" class="btn-tonal btn-tonal--info group">
+                        <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
+                        زر 1
+                    </button>
+                    <button type="button" class="btn-tonal btn-tonal--success group">
+                        <x-base.lucide icon="save" class="w-5 h-5 icon-hover-rise" />
+                        زر 2
+                    </button>
+                    <button type="button" class="btn-tonal btn-tonal--warning">زر 3</button>
+                    <button type="button" class="btn-tonal btn-tonal--danger group">
+                        <x-base.lucide icon="trash-2" class="w-5 h-5 icon-hover-rise" />
+                        زر 4
+                    </button>
+                    <button type="button" class="btn-tonal btn-tonal--neutral group">
+                        <x-base.lucide icon="x-circle" class="w-5 h-5 icon-hover-rise" />
+                        زر 5
+                    </button>
+                </div>
+                <div class="mt-3 flex flex-wrap gap-2">
+                    <button type="button" class="btn-tonal btn-tonal--teal group">
+                        <x-base.lucide icon="check-circle" class="w-5 h-5 icon-hover-rise" />
+                        زر 6
+                    </button>
+                    <button type="button" class="btn-tonal btn-tonal--purple group">
+                        <x-base.lucide icon="printer" class="w-5 h-5 icon-hover-rise" />
+                        زر 7
+                    </button>
+                    <button type="button" class="btn-tonal btn-tonal--rose group">
+                        <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
+                        زر 8
+                    </button>
+                </div>
+                <div class="mt-3 flex flex-wrap gap-2">
+                    <button type="button" class="btn-tonal btn-tonal--sky group">
+                        <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
+                        زر 9
+                    </button>
+                    <button type="button" class="btn-tonal btn-tonal--amber group">
+                        <x-base.lucide icon="sun" class="w-5 h-5 icon-hover-rise" />
+                        زر 10
+                    </button>
+                    <button type="button" class="btn-tonal btn-tonal--lime group">
+                        <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
+                        زر 11
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="mt-5 grid grid-cols-12 gap-6">
@@ -124,23 +210,31 @@
                                     <option value="100">100</option>
                                 </x-base.form-select>
                             </div>
-                            <div class="mt-2 xl:mt-0">
-                                <x-base.button id="departments-filter-go" type="button" variant="primary" class="w-full sm:w-16">
+                            <div class="mt-4 flex flex-wrap gap-2 sm:items-center xl:mt-0">
+                                <button id="departments-filter-go" type="button" class="btn-tonal btn-tonal--info w-full sm:w-24 group">
+                                    <x-base.lucide icon="search" class="w-4 h-4 icon-hover-rise" />
                                     Go
-                                </x-base.button>
-                                <x-base.button id="departments-filter-reset" type="button" variant="secondary" class="mt-2 w-full sm:ml-1 sm:mt-0 sm:w-16">
+                                </button>
+                                <button id="departments-filter-reset" type="button" class="btn-tonal btn-tonal--amber w-full sm:w-24 group">
+                                    <x-base.lucide icon="rotate-ccw" class="w-4 h-4 icon-hover-rise" />
                                     Reset
-                                </x-base.button>
+                                </button>
                             </div>
                         </form>
 
-                        <div class="mt-5 flex sm:mt-0">
-                            <x-base.button id="departments-export" variant="outline-secondary" class="mr-2 w-1/2 sm:w-auto">
-                                <x-base.lucide icon="Download" class="mr-2 h-4 w-4" /> Export
-                            </x-base.button>
-                            <x-base.button id="departments-refresh" variant="outline-secondary" class="w-1/2 sm:w-auto">
-                                <x-base.lucide icon="RefreshCcw" class="mr-2 h-4 w-4" /> Refresh
-                            </x-base.button>
+                        <div class="mt-5 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
+                            <button type="button" class="btn-tonal btn-tonal--purple btn-tonal--icon group" title="Print">
+                                <x-base.lucide icon="printer" class="w-5 h-5 icon-hover-rise" />
+                            </button>
+                            <button type="button" class="btn-tonal btn-tonal--rose btn-tonal--icon group" title="Export PDF">
+                                <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
+                            </button>
+                            <button id="departments-export" type="button" class="btn-tonal btn-tonal--lime btn-tonal--icon group" title="Export to Excel">
+                                <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
+                            </button>
+                            <button id="departments-refresh" type="button" class="btn-tonal btn-tonal--sky btn-tonal--icon group" title="Refresh">
+                                <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
+                            </button>
                         </div>
                     </div>
 
@@ -423,6 +517,52 @@
         });
 
         // Use shared CRUD helper for delete
+        window.openDepartmentModal = function (id) {
+            console.log('[Departments] openDepartmentModal triggered', { id });
+            const modalEl = document.getElementById(`edit-department-modal-${id}`);
+
+            if (!modalEl) {
+                console.error('Department modal not found for id', id);
+                return;
+            }
+
+            console.log('[Departments] Found modal element', modalEl);
+
+            let modalInstance = null;
+            if (window.tailwind?.Modal?.getOrCreateInstance) {
+                modalInstance = window.tailwind.Modal.getOrCreateInstance(modalEl);
+            } else if (window.tailwind?.Modal) {
+                try {
+                    modalInstance = new window.tailwind.Modal(modalEl);
+                } catch (error) {
+                    console.warn('Failed to instantiate tailwind.Modal, falling back to manual toggle.', error);
+                }
+            }
+
+            if (modalInstance?.show) {
+                console.log('[Departments] Showing modal via Tailwind instance');
+                modalInstance.show();
+                setTimeout(() => {
+                    if (modalEl.classList.contains('hidden') || !modalEl.classList.contains('show')) {
+                        console.warn('[Departments] Tailwind modal did not become visible, applying manual fallback');
+                        modalEl.classList.remove('hidden');
+                        modalEl.classList.add('show');
+                        modalEl.style.display = 'flex';
+                        modalEl.style.alignItems = 'center';
+                        modalEl.style.justifyContent = 'center';
+                    }
+                }, 100);
+                return;
+            }
+
+            console.warn('[Departments] Falling back to manual show');
+            modalEl.classList.remove('hidden');
+            modalEl.classList.add('show');
+            modalEl.style.display = 'flex';
+            modalEl.style.alignItems = 'center';
+            modalEl.style.justifyContent = 'center';
+        };
+
         if (window.erpCrud) {
             window.erpCrud.handleDelete({
                 urlBuilder: function (id) {

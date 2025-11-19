@@ -4,7 +4,7 @@ namespace App\Http\Controllers\CRM;
 
 use App\Http\Controllers\Controller;
 use App\Models\CRM\Activity;
-use App\Models\CRM\Company;
+use App\Models\Company;
 use App\Models\CRM\Contact;
 use App\Models\CRM\Lead;
 use App\Models\CRM\Opportunity;
@@ -92,7 +92,7 @@ class OpportunityController extends Controller
         $validated = $request->validate([
             'pipeline_id' => ['nullable', 'exists:crm_pipelines,id'],
             'stage_id' => ['nullable', 'exists:crm_pipeline_stages,id'],
-            'company_id' => ['nullable', 'exists:crm_companies,id'],
+            'company_id' => ['nullable', 'exists:companies,id'],
             'contact_id' => ['nullable', 'exists:crm_contacts,id'],
             'lead_id' => ['nullable', 'exists:crm_leads,id'],
             'title' => ['required', 'string', 'max:255'],
@@ -132,7 +132,7 @@ class OpportunityController extends Controller
         $validated = $request->validate([
             'pipeline_id' => ['nullable', 'exists:crm_pipelines,id'],
             'stage_id' => ['nullable', 'exists:crm_pipeline_stages,id'],
-            'company_id' => ['nullable', 'exists:crm_companies,id'],
+            'company_id' => ['nullable', 'exists:companies,id'],
             'contact_id' => ['nullable', 'exists:crm_contacts,id'],
             'lead_id' => ['nullable', 'exists:crm_leads,id'],
             'title' => ['required', 'string', 'max:255'],

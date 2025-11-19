@@ -14,6 +14,11 @@
     >
         @csrf
 
+        @php
+            $palettes = config('theme.palettes', []);
+            $activePalette = setting('theme_palette', config('theme.default_palette'));
+        @endphp
+
         <div class="grid grid-cols-12 gap-6">
             <!-- Dark Mode -->
             <div class="col-span-12 md:col-span-6">
@@ -63,60 +68,51 @@
                 </div>
             </div>
 
-            <!-- Primary Color -->
-            <div class="col-span-12 md:col-span-4">
-                <x-base.form-label>Primary Color</x-base.form-label>
-                <div class="flex items-center gap-2 mt-2">
-                    <input
-                        type="color"
-                        name="primary_color_swatch"
-                        class="w-12 h-9 rounded-md border border-slate-200 dark:border-darkmode-400"
-                        value="{{ primary_color() }}"
-                    >
-                    <x-base.form-input
-                        type="text"
-                        name="primary_color"
-                        class="w-full"
-                        value="{{ primary_color() }}"
-                    />
-                </div>
-            </div>
-
-            <!-- Secondary Color -->
-            <div class="col-span-12 md:col-span-4">
-                <x-base.form-label>Secondary Color</x-base.form-label>
-                <div class="flex items-center gap-2 mt-2">
-                    <input
-                        type="color"
-                        name="secondary_color_swatch"
-                        class="w-12 h-9 rounded-md border border-slate-200 dark:border-darkmode-400"
-                        value="{{ secondary_color() }}"
-                    >
-                    <x-base.form-input
-                        type="text"
-                        name="secondary_color"
-                        class="w-full"
-                        value="{{ secondary_color() }}"
-                    />
-                </div>
-            </div>
-
-            <!-- Accent Color -->
-            <div class="col-span-12 md:col-span-4">
-                <x-base.form-label>Accent Color</x-base.form-label>
-                <div class="flex items-center gap-2 mt-2">
-                    <input
-                        type="color"
-                        name="accent_color_swatch"
-                        class="w-12 h-9 rounded-md border border-slate-200 dark:border-darkmode-400"
-                        value="{{ accent_color() }}"
-                    >
-                    <x-base.form-input
-                        type="text"
-                        name="accent_color"
-                        class="w-full"
-                        value="{{ accent_color() }}"
-                    />
+            <!-- Theme palettes -->
+            <div class="col-span-12">
+                <x-base.form-label>Accent Colors</x-base.form-label>
+                <p class="text-xs text-slate-500 mb-3">Choose a curated palette to keep the UI consistent.</p>
+                <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                    @foreach($palettes as $key => $palette)
+                        @php
+                            $isActive = $activePalette === $key;
+                            $gradient = "linear-gradient(120deg, {$palette['primary']} 0%, {$palette['secondary']} 50%, {$palette['accent']} 100%)";
+                        @endphp
+                        <label
+                            class="relative flex cursor-pointer flex-col rounded-2xl border border-slate-200/80 bg-slate-50 p-4 transition hover:border-primary/60 hover:shadow-lg dark:border-darkmode-500 dark:bg-darkmode-600"
+                            data-palette-card
+                        >
+                            <input
+                                type="radio"
+                                name="theme_palette"
+                                value="{{ $key }}"
+                                class="sr-only"
+                                data-palette-input
+                                {{ $isActive ? 'checked' : '' }}
+                            >
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-semibold text-slate-700 dark:text-slate-100">{{ $palette['label'] }}</p>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400">{{ $palette['description'] }}</p>
+                                </div>
+                                <div class="rounded-xl border border-white/70 shadow-inner" style="background-image: {{ $gradient }}; width: 72px; height: 32px"></div>
+                            </div>
+                            <div class="mt-4 flex gap-2">
+                                <span class="flex-1 rounded-lg border border-white/60 bg-white/80 py-1 text-center text-[11px] font-semibold text-slate-600 dark:text-slate-200" style="color: {{ $palette['primary'] }}">
+                                    {{ $palette['primary'] }}
+                                </span>
+                                <span class="flex-1 rounded-lg border border-white/60 bg-white/80 py-1 text-center text-[11px] font-semibold text-slate-600 dark:text-slate-200" style="color: {{ $palette['secondary'] }}">
+                                    {{ $palette['secondary'] }}
+                                </span>
+                                <span class="flex-1 rounded-lg border border-white/60 bg-white/80 py-1 text-center text-[11px] font-semibold text-slate-600 dark:text-slate-200" style="color: {{ $palette['accent'] }}">
+                                    {{ $palette['accent'] }}
+                                </span>
+                            </div>
+                            <span class="pointer-events-none absolute right-4 top-4 rounded-full border border-primary/20 bg-white/80 p-1 text-primary opacity-0 scale-90 transition" data-palette-check>
+                                <x-base.lucide icon="Check" class="h-4 w-4" />
+                            </span>
+                        </label>
+                    @endforeach
                 </div>
             </div>
 
@@ -145,7 +141,7 @@
                 class="text-xs"
                 onclick="event.preventDefault(); if (confirm('Reset theme colors to default values?')) window.resetThemeSettings && window.resetThemeSettings();"
             >
-                Reset Theme Colors
+                Reset Theme
             </x-base.button>
         </div>
     </form>
@@ -153,28 +149,40 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        function bindColorPair(swatchName, textName) {
-            const swatch = document.querySelector(`input[name="${swatchName}"]`);
-            const text   = document.querySelector(`input[name="${textName}"]`);
+        const paletteInputs = document.querySelectorAll('[data-palette-input]');
+        const paletteCards = document.querySelectorAll('[data-palette-card]');
 
-            if (!swatch || !text) return;
+        function updatePaletteState() {
+            paletteCards.forEach(card => {
+                const input = card.querySelector('[data-palette-input]');
+                const check = card.querySelector('[data-palette-check]');
+                const isActive = input?.checked;
 
-            // From color picker to text input
-            swatch.addEventListener('input', function () {
-                text.value = this.value;
-            });
-
-            // From text input to color picker (when valid hex)
-            text.addEventListener('input', function () {
-                const val = this.value.trim();
-                if (/^#[0-9A-F]{6}$/i.test(val)) {
-                    swatch.value = val;
+                card.classList.toggle('ring-2', !!isActive);
+                card.classList.toggle('ring-primary/60', !!isActive);
+                card.classList.toggle('bg-slate-100/80', !!isActive);
+                card.classList.toggle('dark:bg-darkmode-500/80', !!isActive);
+                if (check) {
+                    check.classList.toggle('opacity-100', !!isActive);
+                    check.classList.toggle('opacity-0', !isActive);
+                    check.classList.toggle('scale-100', !!isActive);
+                    check.classList.toggle('scale-90', !isActive);
                 }
             });
         }
 
-        bindColorPair('primary_color_swatch',   'primary_color');
-        bindColorPair('secondary_color_swatch', 'secondary_color');
-        bindColorPair('accent_color_swatch',    'accent_color');
+        paletteInputs.forEach(input => {
+            input.addEventListener('change', () => {
+                paletteInputs.forEach(other => {
+                    if (other !== input) {
+                        other.checked = false;
+                    }
+                });
+                input.checked = true;
+                updatePaletteState();
+            });
+        });
+
+        updatePaletteState();
     });
 </script>

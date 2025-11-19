@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Warehouse;
 use App\Http\Controllers\Controller;
 use App\Models\Warehouse\Material;
 use App\Models\Warehouse\Category;
+use App\Models\Warehouse\MeasurementUnit;
 use App\Services\DocumentCodeGenerator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -22,7 +23,13 @@ class MaterialController extends Controller
     public function index()
     {
         $categories = Category::active()->select('id', 'name', 'parent_id')->get();
-        return view('warehouse.materials.index', compact('categories'));
+        $units = MeasurementUnit::active()->select('id', 'name', 'symbol')->get();
+        $parentCategories = $categories->whereNull('parent_id');
+        return view('warehouse.materials.index', [
+            'categories' => $categories,
+            'parentCategories' => $parentCategories,
+            'units' => $units,
+        ]);
     }
 
     public function previewCode()
@@ -34,7 +41,10 @@ class MaterialController extends Controller
     public function datatable(Request $request): JsonResponse
     {
         $baseQuery = Material::query()
-            ->with(['category:id,name']);
+            ->with([
+                'category:id,name,parent_id',
+                'unit:id,name,symbol'
+            ]);
 
         // Apply category filter
         if ($request->filled('category_id')) {
@@ -82,6 +92,17 @@ class MaterialController extends Controller
             ->addColumn('category_name', function ($material) {
                 return $material->category ? $material->category->name : 'N/A';
             })
+            ->addColumn('unit_name', function ($material) {
+                if (!$material->unit) {
+                    return 'N/A';
+                }
+
+                if (is_string($material->unit)) {
+                    return e($material->unit);
+                }
+
+                return trim($material->unit->name . ' ' . ($material->unit->symbol ? '(' . $material->unit->symbol . ')' : ''));
+            })
             ->addColumn('status_badge', function ($material) {
                 $badgeClass = $material->is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
                 $statusText = $material->is_active ? 'Active' : 'Inactive';
@@ -107,11 +128,14 @@ class MaterialController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'code' => 'required|string|unique:materials',
+            'code' => 'required|string|max:50|unique:materials,code',
             'name' => 'required|string|max:255',
+            'sku' => 'nullable|string|max:100|unique:materials,sku',
+            'barcode' => 'nullable|string|max:255|unique:materials,barcode',
             'description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
-            'unit' => 'required|string|max:50',
+            'unit_id' => 'required|exists:measurement_units,id',
+            'opening_quantity' => 'nullable|numeric|min:0',
             'price' => 'required|numeric|min:0',
             'is_active' => 'boolean'
         ]);
@@ -126,7 +150,18 @@ class MaterialController extends Controller
         try {
             DB::beginTransaction();
 
-            Material::create($request->all());
+            Material::create($request->only([
+                'code',
+                'name',
+                'sku',
+                'barcode',
+                'description',
+                'category_id',
+                'unit_id',
+                'opening_quantity',
+                'price',
+                'is_active'
+            ]));
 
             DB::commit();
 
@@ -145,7 +180,7 @@ class MaterialController extends Controller
 
     public function show(Material $material): JsonResponse
     {
-        $material->load('category');
+        $material->load(['category', 'unit']);
         return response()->json([
             'success' => true,
             'material' => $material
@@ -155,11 +190,14 @@ class MaterialController extends Controller
     public function update(Request $request, Material $material): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'code' => ['required', 'string', Rule::unique('materials')->ignore($material->id)],
+            'code' => ['required', 'string', 'max:50', Rule::unique('materials')->ignore($material->id)],
             'name' => 'required|string|max:255',
+            'sku' => ['nullable', 'string', 'max:100', Rule::unique('materials')->ignore($material->id)],
+            'barcode' => ['nullable', 'string', 'max:255', Rule::unique('materials')->ignore($material->id)],
             'description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
-            'unit' => 'required|string|max:50',
+            'unit_id' => 'required|exists:measurement_units,id',
+            'opening_quantity' => 'nullable|numeric|min:0',
             'price' => 'required|numeric|min:0',
             'is_active' => 'boolean'
         ]);
@@ -174,7 +212,18 @@ class MaterialController extends Controller
         try {
             DB::beginTransaction();
 
-            $material->update($request->all());
+            $material->update($request->only([
+                'code',
+                'name',
+                'sku',
+                'barcode',
+                'description',
+                'category_id',
+                'unit_id',
+                'opening_quantity',
+                'price',
+                'is_active'
+            ]));
 
             DB::commit();
 

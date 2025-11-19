@@ -35,13 +35,41 @@
         /* Status badges - compact and readable */
         #positions-table .inline-flex {
             padding: 0.125rem 0.5rem; /* 2px 8px */
-            font-size: 0.75rem; /* 12px */
             font-weight: 600;
         }
 
         /* Actions column - keep compact */
         #positions-table .px-5.py-1\.5 {
             padding: 0.375rem 1.25rem;
+        }
+
+        #positions-table thead th,
+        #positions-table tbody td {
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        #positions-table .datatable-cell-wrap {
+            text-align: center;
+        }
+
+        #positions-table [class^="stats-card-"],
+        #positions-table [class*=" stats-card-"] {
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-hover-rise {
+            transition: transform 200ms ease;
+        }
+
+        .group:hover .icon-hover-rise {
+            transform: translateY(-2px);
         }
     </style>
 @endpush
@@ -50,15 +78,15 @@
     @include('components.global-notifications')
     <div class="intro-y mt-8 flex items-center">
         <h2 class="mr-auto text-lg font-medium">Positions Management</h2>
-        <x-base.button
-            variant="primary"
-            class="w-40 sm:w-auto sm:ml-4"
+        <button
+            type="button"
+            class="btn-tonal btn-tonal--info w-40 sm:w-auto sm:ml-4 group"
             data-tw-toggle="modal"
             data-tw-target="#create-position-modal"
         >
-            <x-base.lucide icon="Plus" class="w-4 h-4 mr-2" />
+            <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
             Add Position
-        </x-base.button>
+        </button>
     </div>
 
     <!-- Hidden button to trigger edit modal -->
@@ -107,23 +135,31 @@
                                     <option value="100">100</option>
                                 </x-base.form-select>
                             </div>
-                            <div class="mt-2 xl:mt-0">
-                                <x-base.button id="positions-filter-go" type="button" variant="primary" class="w-full sm:w-16">
+                            <div class="mt-4 flex flex-wrap gap-2 sm:items-center xl:mt-0">
+                                <button id="positions-filter-go" type="button" class="btn-tonal btn-tonal--info w-full sm:w-24 group">
+                                    <x-base.lucide icon="search" class="w-4 h-4 icon-hover-rise" />
                                     Go
-                                </x-base.button>
-                                <x-base.button id="positions-filter-reset" type="button" variant="secondary" class="mt-2 w-full sm:ml-1 sm:mt-0 sm:w-16">
+                                </button>
+                                <button id="positions-filter-reset" type="button" class="btn-tonal btn-tonal--amber w-full sm:w-24 group">
+                                    <x-base.lucide icon="rotate-ccw" class="w-4 h-4 icon-hover-rise" />
                                     Reset
-                                </x-base.button>
+                                </button>
                             </div>
                         </form>
 
-                        <div class="mt-5 flex sm:mt-0">
-                            <x-base.button id="positions-export" variant="outline-secondary" class="mr-2 w-1/2 sm:w-auto">
-                                <x-base.lucide icon="Download" class="mr-2 h-4 w-4" /> Export
-                            </x-base.button>
-                            <x-base.button id="positions-refresh" variant="outline-secondary" class="w-1/2 sm:w-auto">
-                                <x-base.lucide icon="RefreshCcw" class="mr-2 h-4 w-4" /> Refresh
-                            </x-base.button>
+                        <div class="mt-5 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
+                            <button type="button" class="btn-tonal btn-tonal--purple btn-tonal--icon group" title="Print">
+                                <x-base.lucide icon="printer" class="w-5 h-5 icon-hover-rise" />
+                            </button>
+                            <button type="button" class="btn-tonal btn-tonal--rose btn-tonal--icon group" title="Export PDF">
+                                <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
+                            </button>
+                            <button id="positions-export" type="button" class="btn-tonal btn-tonal--lime btn-tonal--icon group" title="Export to Excel">
+                                <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
+                            </button>
+                            <button id="positions-refresh" type="button" class="btn-tonal btn-tonal--sky btn-tonal--icon group" title="Refresh">
+                                <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
+                            </button>
                         </div>
                     </div>
 
@@ -179,12 +215,32 @@
 
                 <div class="col-span-12 md:col-span-6">
                     <x-base.form-label for="edit-salary_range_min">Minimum Salary</x-base.form-label>
-                    <x-base.form-input id="edit-salary_range_min" name="salary_range_min" type="number" step="0.01" min="0" class="w-full" />
+                    <x-base.form-input
+                        id="edit-salary_range_min"
+                        name="salary_range_min"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        class="w-full"
+                        lang="en"
+                        dir="ltr"
+                        inputmode="decimal"
+                    />
                 </div>
 
                 <div class="col-span-12 md:col-span-6">
                     <x-base.form-label for="edit-salary_range_max">Maximum Salary</x-base.form-label>
-                    <x-base.form-input id="edit-salary_range_max" name="salary_range_max" type="number" step="0.01" min="0" class="w-full" />
+                    <x-base.form-input
+                        id="edit-salary_range_max"
+                        name="salary_range_max"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        class="w-full"
+                        lang="en"
+                        dir="ltr"
+                        inputmode="decimal"
+                    />
                 </div>
 
                 <div class="col-span-12">
@@ -197,36 +253,27 @@
                     <x-base.form-textarea id="edit-requirements" name="requirements" rows="3" placeholder="Enter requirements" class="w-full"></x-base.form-textarea>
                 </div>
 
-                <div class="col-span-12">
-                    <x-base.form-check
-                        id="edit-position_is_active"
-                        name="is_active"
-                        label="Active"
-                        type="checkbox"
-                    />
-                </div>
             </div>
         </form>
 
         @slot('footer')
-            <div class="flex justify-end gap-2 w-full">
-                <x-base.button
-                    class="w-24"
-                    data-tw-dismiss="modal"
+            <div class="flex w-full flex-wrap justify-end gap-2">
+                <button
                     type="button"
-                    variant="outline-secondary"
+                    class="btn-tonal btn-tonal--neutral group"
+                    data-tw-dismiss="modal"
                 >
+                    <x-base.lucide icon="x-circle" class="w-5 h-5 icon-hover-rise" />
                     Cancel
-                </x-base.button>
-                <x-base.button
-                    class="w-32"
+                </button>
+                <button
                     type="submit"
                     form="edit-position-form"
-                    variant="primary"
+                    class="btn-tonal btn-tonal--success group"
                 >
-                    <x-base.lucide icon="Save" class="w-4 h-4 mr-2" />
+                    <x-base.lucide icon="save" class="w-5 h-5 icon-hover-rise" />
                     Update
-                </x-base.button>
+                </button>
             </div>
         @endslot
     </x-modal.form>
@@ -484,7 +531,6 @@
             document.getElementById('edit-salary_range_max').value = maxSalary || '';
             document.getElementById('edit-description').value = description || '';
             document.getElementById('edit-requirements').value = requirements || '';
-            document.getElementById('edit-position_is_active').checked = isActive;
 
             // Update form action
             const form = document.getElementById('edit-position-form');

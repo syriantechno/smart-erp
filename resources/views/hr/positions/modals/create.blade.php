@@ -29,47 +29,64 @@
 
                 <div class="col-span-12 md:col-span-6">
                     <x-base.form-label for="salary_range_min">Minimum Salary</x-base.form-label>
-                    <x-base.form-input id="salary_range_min" name="salary_range_min" type="number" step="0.01" min="0" class="w-full" />
+                    <x-base.form-input
+                        id="salary_range_min"
+                        name="salary_range_min"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        class="w-full"
+                        lang="en"
+                        dir="ltr"
+                        inputmode="decimal"
+                    />
                 </div>
 
                 <div class="col-span-12 md:col-span-6">
                     <x-base.form-label for="salary_range_max">Maximum Salary</x-base.form-label>
-                    <x-base.form-input id="salary_range_max" name="salary_range_max" type="number" step="0.01" min="0" class="w-full" />
+                    <x-base.form-input
+                        id="salary_range_max"
+                        name="salary_range_max"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        class="w-full"
+                        lang="en"
+                        dir="ltr"
+                        inputmode="decimal"
+                    />
                 </div>
 
                 <div class="col-span-12">
                     <x-base.form-label for="description">Description</x-base.form-label>
                     <x-base.form-textarea id="description" name="description" rows="3" placeholder="Enter position description" class="w-full"></x-base.form-textarea>
-
+                </div>
 
                 <div class="col-span-12">
                     <x-base.form-label for="requirements">Requirements</x-base.form-label>
                     <x-base.form-textarea id="requirements" name="requirements" rows="3" placeholder="Enter requirements" class="w-full"></x-base.form-textarea>
                 </div>
-
-                 </div>
+            </div>
         </form>
 
         @slot('footer')
-            <div class="flex justify-end gap-2 w-full">
-                <x-base.button
-                    class="w-24"
-                    data-tw-dismiss="modal"
+            <div class="flex w-full flex-wrap justify-end gap-2">
+                <button
                     type="button"
-                    variant="outline-secondary"
+                    class="btn-tonal btn-tonal--neutral group"
+                    data-tw-dismiss="modal"
                 >
-                    <x-base.lucide icon="X" class="w-4 h-4 mr-2" />
+                    <x-base.lucide icon="x-circle" class="w-5 h-5 icon-hover-rise" />
                     Cancel
-                </x-base.button>
-                <x-base.button
-                    class="w-32"
+                </button>
+                <button
                     type="submit"
                     form="create-position-form"
-                    variant="primary"
+                    class="btn-tonal btn-tonal--success group"
                 >
-                    <x-base.lucide icon="Save" class="w-4 h-4 mr-2" />
+                    <x-base.lucide icon="save" class="w-5 h-5 icon-hover-rise" />
                     Save
-                </x-base.button>
+                </button>
             </div>
         @endslot
     </x-modal.form>

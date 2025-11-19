@@ -68,6 +68,34 @@
     --btn-tone-color: #b21a50;
 }
 
+.btn-tonal--neutral {
+    --btn-tone-color: #6b7280;
+}
+
+.btn-tonal--teal {
+    --btn-tone-color: #0d9488;
+}
+
+.btn-tonal--purple {
+    --btn-tone-color: #7c3aed;
+}
+
+.btn-tonal--rose {
+    --btn-tone-color: #be123c;
+}
+
+.btn-tonal--sky {
+    --btn-tone-color: #0284c7;
+}
+
+.btn-tonal--amber {
+    --btn-tone-color: #f97316;
+}
+
+.btn-tonal--lime {
+    --btn-tone-color: #65a30d;
+}
+
 .btn-tonal--icon {
     padding: 0;
     width: 2.75rem;

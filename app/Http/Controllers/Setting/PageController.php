@@ -3,9 +3,13 @@
 namespace App\Http\Controllers\Setting;
 
 use App\Http\Controllers\Controller;
+use App\Models\Approval\ApprovalRequest;
 use App\Models\Document\Document;
+use App\Models\HR\Attendance;
+use App\Models\HR\Department;
 use App\Models\HR\Employee;
 use App\Models\HR\EmployeeDocument;
+use App\Models\HR\Position;
 use Illuminate\View\View;
 
 class PageController extends Controller
@@ -52,6 +56,10 @@ class PageController extends Controller
             $days = 30;
         }
 
+        $today = now();
+        $monthStart = $today->copy()->startOfMonth();
+        $monthEnd = $today->copy()->endOfMonth();
+
         $hrExpiringDocuments = Document::active()
             ->whereNotNull('expiry_date')
             ->expiringSoon($days)
@@ -90,6 +98,58 @@ class PageController extends Controller
             ->limit(5)
             ->get();
 
+        $totalEmployees = Employee::count();
+        $activeEmployees = Employee::active()->count();
+        $newHiresThisMonth = Employee::whereBetween('hire_date', [$monthStart, $monthEnd])
+            ->orderByDesc('hire_date')
+            ->limit(6)
+            ->get();
+        $openPositions = Position::where('is_active', true)->count();
+        $departmentsCount = Department::count();
+        $pendingApprovals = ApprovalRequest::where('status', 'pending')->count();
+
+        $attendanceSummary = Attendance::whereDate('attendance_date', $today)
+            ->selectRaw('status, COUNT(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+        $presentToday = (int) ($attendanceSummary['present'] ?? 0);
+        $onLeaveToday = (int) (($attendanceSummary['vacation'] ?? 0) + ($attendanceSummary['travel'] ?? 0));
+        $presenceRate = $activeEmployees > 0
+            ? round(($presentToday / $activeEmployees) * 100)
+            : 0;
+
+        $upcomingBirthdays = Employee::whereNotNull('birth_date')
+            ->get()
+            ->sortBy(function ($employee) use ($today) {
+                $birthday = $employee->birth_date?->copy()->setYear($today->year);
+                if (!$birthday) {
+                    return PHP_INT_MAX;
+                }
+                if ($birthday->isBefore($today)) {
+                    $birthday->addYear();
+                }
+                return $birthday->timestamp;
+            })
+            ->take(6);
+
+        $upcomingPassports = EmployeeDocument::with(['employee.department'])
+            ->active()
+            ->ofType('passport')
+            ->whereNotNull('expiry_date')
+            ->whereDate('expiry_date', '>=', $today->copy()->subDays(1))
+            ->orderBy('expiry_date')
+            ->limit(10)
+            ->get();
+
+        $upcomingVisas = EmployeeDocument::with(['employee.department'])
+            ->active()
+            ->ofType('visa')
+            ->whereNotNull('expiry_date')
+            ->whereDate('expiry_date', '>=', $today->copy()->subDays(1))
+            ->orderBy('expiry_date')
+            ->limit(10)
+            ->get();
+
         return view('hr.dashboard', [
             'hrExpiringDocuments' => $hrExpiringDocuments,
             'hrExpiryDays' => $days,
@@ -97,6 +157,19 @@ class PageController extends Controller
             'hrEmployeeExpiryDays' => $employeeDays,
             'topRatedEmployees' => $topRatedEmployees,
             'topRewardedEmployees' => $topRewardedEmployees,
+            'totalEmployees' => $totalEmployees,
+            'activeEmployees' => $activeEmployees,
+            'openPositions' => $openPositions,
+            'departmentsCount' => $departmentsCount,
+            'pendingApprovals' => $pendingApprovals,
+            'newHiresThisMonth' => $newHiresThisMonth,
+            'attendanceSummary' => $attendanceSummary,
+            'presenceRate' => $presenceRate,
+            'presentToday' => $presentToday,
+            'onLeaveToday' => $onLeaveToday,
+            'upcomingBirthdays' => $upcomingBirthdays,
+            'upcomingPassports' => $upcomingPassports,
+            'upcomingVisas' => $upcomingVisas,
         ]);
     }
 

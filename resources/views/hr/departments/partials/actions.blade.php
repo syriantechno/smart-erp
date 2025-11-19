@@ -5,9 +5,8 @@
     <x-erp.action-button
         icon="Edit"
         variant="primary"
-        data-tw-toggle="modal"
-        data-tw-target="#edit-department-modal-{{ $department->id }}"
         title="Edit Department"
+        onclick="openDepartmentModal({{ $department->id }})"
     />
 
     <!-- Delete Department -->

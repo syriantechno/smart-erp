@@ -36,6 +36,62 @@ foreach ($attributes->all() as $__key => $__value) {
 
 unset($__defined_vars); ?>
 
+<?php if (! $__env->hasRenderedOnce('b74a0602-b727-46ff-ad32-518a8e2902a1')): $__env->markAsRenderedOnce('b74a0602-b727-46ff-ad32-518a8e2902a1');
+$__env->startPush('styles'); ?>
+    <style>
+        .modal-themed-header {
+            --modal-header-rgb: var(--dt-primary-rgb, var(--primary-rgb, 37 99 235));
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            background: linear-gradient(135deg,
+                    rgba(var(--modal-header-rgb), 0.68),
+                    rgba(var(--modal-header-rgb), 0.38));
+            padding: 1rem 1.5rem;
+            border-top-left-radius: 0.5rem;
+            border-top-right-radius: 0.5rem;
+            color: #f8fafc;
+            box-shadow: 0 15px 35px rgba(var(--modal-header-rgb), 0.25);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .modal-themed-header__title {
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: none;
+            color: #f8fafc;
+        }
+
+        .modal-themed-header__subtitle {
+            font-size: 0.7rem;
+            font-weight: 600;
+            opacity: 0.85;
+        }
+
+        .modal-themed-header__close {
+            margin-left: auto;
+            border: 1px solid rgba(248, 250, 252, 0.35);
+            background-color: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 150ms ease, background-color 150ms ease;
+        }
+
+        .modal-themed-header__close:hover {
+            background-color: rgba(255, 255, 255, 0.18);
+            transform: translateY(-1px);
+        }
+    </style>
+<?php $__env->stopPush(); endif; ?>
+
 <?php if (isset($component)) { $__componentOriginalad7e71e98d6bc7c4deec90df8ba81dfd = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalad7e71e98d6bc7c4deec90df8ba81dfd = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.dialog.index','data' => ['id' => $id,'size' => $size]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -58,30 +114,33 @@ unset($__defined_vars); ?>
 <?php $component->withAttributes([]); ?>
         <?php if (isset($component)) { $__componentOriginalcff2bb8681c24921e5a983f69e36057e = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalcff2bb8681c24921e5a983f69e36057e = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.dialog.title','data' => ['class' => 'flex items-center gap-4 pr-2']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.dialog.title','data' => ['class' => 'modal-themed-header']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.dialog.title'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['class' => 'flex items-center gap-4 pr-2']); ?>
-            <h2 class="font-medium text-lg text-gray-900 dark:text-white flex-1"><?php echo e($title); ?></h2>
+<?php $component->withAttributes(['class' => 'modal-themed-header']); ?>
+            <div class="flex flex-col gap-1">
+                <h2 class="modal-themed-header__title"><?php echo e($title); ?></h2>
+            </div>
             <button
                 type="button"
-                class="text-slate-500 hover:text-slate-400 p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors ml-auto"
+                class="modal-themed-header__close"
                 data-tw-dismiss="modal"
+                title="Close"
             >
                 <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'X','class' => 'w-5 h-5']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'x','class' => 'w-5 h-5']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.lucide'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['icon' => 'X','class' => 'w-5 h-5']); ?>
+<?php $component->withAttributes(['icon' => 'x','class' => 'w-5 h-5']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>

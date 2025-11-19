@@ -144,6 +144,7 @@
                     <x-base.lucide icon="Save" class="w-4 h-4 mr-2" />
                     Save Category
                 </x-base.button>
+              
             </div>
         @endslot
 
