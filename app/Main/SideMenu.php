@@ -97,6 +97,42 @@ class SideMenu
                     ]
                 ]
             ],
+            'crm' => [
+                'icon' => 'building-2',
+                'title' => 'CRM',
+                'sub_menu' => [
+                    'crm-companies' => [
+                        'icon' => 'building',
+                        'title' => 'Companies',
+                        'route_name' => 'crm.companies.index',
+                    ],
+                    'crm-contacts' => [
+                        'icon' => 'user-circle-2',
+                        'title' => 'Contacts',
+                        'route_name' => 'crm.contacts.index',
+                    ],
+                    'crm-leads' => [
+                        'icon' => 'sparkles',
+                        'title' => 'Leads',
+                        'route_name' => 'crm.leads.index',
+                    ],
+                    'crm-opportunities' => [
+                        'icon' => 'target',
+                        'title' => 'Opportunities',
+                        'route_name' => 'crm.opportunities.index',
+                    ],
+                    'crm-activities' => [
+                        'icon' => 'calendar-clock',
+                        'title' => 'Activities',
+                        'route_name' => 'crm.activities.index',
+                    ],
+                    'crm-tasks' => [
+                        'icon' => 'check-square',
+                        'title' => 'Tasks',
+                        'route_name' => 'crm.tasks.index',
+                    ],
+                ],
+            ],
             'accounting' => [
                 'icon' => 'file-text',
                 'route_name' => 'accounting.chart-of-accounts.index',

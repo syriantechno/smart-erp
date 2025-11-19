@@ -8,6 +8,13 @@ use App\Http\Controllers\Setting\SettingsController;
 use App\Http\Controllers\Setting\NotificationController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Mail\UserMailAccountController;
+use App\Http\Controllers\CRM\CompanyController;
+use App\Http\Controllers\CRM\ContactController;
+use App\Http\Controllers\CRM\LeadController;
+use App\Http\Controllers\CRM\OpportunityController;
+use App\Http\Controllers\CRM\ActivityController;
+use App\Http\Controllers\CRM\TaskController;
+use App\Http\Controllers\CRM\FileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -410,6 +417,34 @@ Route::middleware('auth')->group(function () {
         Route::post('/categories', [App\Http\Controllers\Document\DocumentController::class, 'storeCategory'])->name('store-category');
         Route::put('/categories/{category}', [App\Http\Controllers\Document\DocumentController::class, 'updateCategory'])->name('update-category');
         Route::delete('/categories/{category}', [App\Http\Controllers\Document\DocumentController::class, 'destroyCategory'])->name('destroy-category');
+    });
+
+    // CRM Routes
+    Route::prefix('crm')->name('crm.')->group(function () {
+        Route::get('companies/datatable', [CompanyController::class, 'datatable'])->name('companies.datatable');
+        Route::resource('companies', CompanyController::class)->except(['create', 'edit']);
+
+        Route::get('contacts/datatable', [ContactController::class, 'datatable'])->name('contacts.datatable');
+        Route::resource('contacts', ContactController::class)->except(['create', 'edit']);
+
+        Route::get('leads/datatable', [LeadController::class, 'datatable'])->name('leads.datatable');
+        Route::resource('leads', LeadController::class)->except(['create', 'edit']);
+
+        Route::get('opportunities/datatable', [OpportunityController::class, 'datatable'])->name('opportunities.datatable');
+        Route::resource('opportunities', OpportunityController::class)->except(['create', 'edit']);
+
+        Route::get('activities/datatable', [ActivityController::class, 'datatable'])->name('activities.datatable');
+        Route::resource('activities', ActivityController::class)->except(['create', 'edit']);
+
+        Route::get('tasks/datatable', [TaskController::class, 'datatable'])->name('tasks.datatable');
+        Route::resource('tasks', TaskController::class)->except(['create', 'edit']);
+
+        Route::prefix('files')->name('files.')->group(function () {
+            Route::get('/', [FileController::class, 'index'])->name('index');
+            Route::post('/', [FileController::class, 'store'])->name('store');
+            Route::get('/{file}/download', [FileController::class, 'download'])->name('download');
+            Route::delete('/{file}', [FileController::class, 'destroy'])->name('destroy');
+        });
     });
 
     // Manufacturing Routes

@@ -36,6 +36,17 @@ class TopMenu
                     ]
                 ]
             ],
+            'crm' => [
+                'icon' => 'building-2',
+                'title' => 'CRM',
+                'sub_menu' => [
+                    'crm-companies' => [
+                        'icon' => 'building',
+                        'route_name' => 'crm.companies.index',
+                        'title' => 'Companies',
+                    ],
+                ],
+            ],
             'apps' => [
                 'icon' => 'activity',
                 'title' => 'Apps',
