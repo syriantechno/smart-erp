@@ -28,7 +28,7 @@ foreach ($attributes->all() as $__key => $__value) {
 
 unset($__defined_vars); ?>
 
-<?php if (! $__env->hasRenderedOnce('9ded0219-b4fb-4e66-b801-eb6d2ee5de28')): $__env->markAsRenderedOnce('9ded0219-b4fb-4e66-b801-eb6d2ee5de28');
+<?php if (! $__env->hasRenderedOnce('c67fda34-6526-4e96-84eb-c72b4fa0b952')): $__env->markAsRenderedOnce('c67fda34-6526-4e96-84eb-c72b4fa0b952');
 $__env->startPush('vendors'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/js/vendors/modal.js'); ?>
 <?php $__env->stopPush(); endif; ?>
@@ -39,10 +39,11 @@ $__env->startPush('vendors'); ?>
     aria-hidden="true"
     tabindex="-1"
     <?php echo e($attributes->class([
-            'modal group bg-black/60 transition-[visibility,opacity] w-screen h-screen fixed left-0 top-0',
+            'modal group bg-black/60 transition-[visibility,opacity] w-screen h-screen fixed left-0 top-0 flex items-center justify-center',
             '[&:not(.show)]:duration-[0s,0.2s] [&:not(.show)]:delay-[0.2s,0s] [&:not(.show)]:invisible [&:not(.show)]:opacity-0',
             '[&.show]:visible [&.show]:opacity-100 [&.show]:duration-[0s,0.4s]',
-        ])->merge($attributes->whereDoesntStartWith('class')->getAttributes())); ?>
+        ])->merge($attributes->whereDoesntStartWith('class')->getAttributes())); ?>>
+    <?php echo e($slot); ?>
 
-><?php echo e($slot); ?></<?php echo e($as); ?>>
+</<?php echo e($as); ?>>
 <?php /**PATH D:\laravel\smart-erp\resources\views/components/base/dialog/index.blade.php ENDPATH**/ ?>

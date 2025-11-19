@@ -1,10 +1,9 @@
-
 /* Custom Theme Colors */
 :root {
-    --primary-color: #0f1f3d;
+    --primary-color: #122b5aff;
     --secondary-color: #1d3d8f;
     --accent-color: #0998d6;
-    --primary-rgb: 15, 31, 61;
+    --primary-rgb: 0, 0, 0;
     --secondary-rgb: 29, 61, 143;
     --accent-rgb: 9, 152, 214;
 }
@@ -21,8 +20,8 @@
 }
 
 .btn-primary:hover {
-    background-color: #000b29 !important;
-    border-color: #000b29 !important;
+    background-color: #000000 !important;
+    border-color: #000000 !important;
 }
 
 /* Link overrides */
@@ -62,9 +61,9 @@
     color: #ffffff !important;
 }
 
-/* Top bar background (hero area) */
+/* Top bar background */
 .top-bar-pattern {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 40%, var(--accent-color) 100%) !important;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 45%, var(--accent-color) 100%) !important;
     position: relative;
     overflow: hidden;
     box-shadow: 0 35px 80px rgba(var(--primary-rgb), 0.35);
@@ -75,7 +74,7 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background: radial-gradient(circle at 15% 120%, rgba(255, 255, 255, 0.18), transparent 55%),
+    background: radial-gradient(circle at 12% 120%, rgba(255, 255, 255, 0.18), transparent 55%),
         radial-gradient(circle at 70% 130%, rgba(255, 255, 255, 0.1), transparent 50%);
     opacity: 0.6;
 }

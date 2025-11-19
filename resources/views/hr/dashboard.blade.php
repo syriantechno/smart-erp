@@ -56,7 +56,8 @@
             <!-- Hero summary -->
             <div class="intro-y mt-6">
                 <div
-                    class="rounded-2xl border border-white/10 bg-gradient-to-r from-[#0f1f3d] via-[#1d3d8f] to-[#0998d6] text-white shadow-[0_25px_60px_rgba(15,31,61,0.35)]"
+                    class="rounded-2xl border border-white/10 text-white shadow-[0_25px_60px_rgba(15,31,61,0.35)]"
+                    style="background: linear-gradient(135deg, var(--primary-color, #0f1f3d) 0%, var(--secondary-color, #1d3d8f) 45%, var(--accent-color, #0998d6) 100%);"
                 >
                     <div class="flex flex-col gap-4 p-6 lg:flex-row lg:items-center">
                         <div class="flex-1">
@@ -137,20 +138,6 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="flex flex-wrap gap-3 border-t border-white/10 px-6 py-4">
-                        <a href="{{ route('hr.employees.index') }}" class="btn-tonal btn-tonal--info">
-                            <x-base.lucide icon="UserPlus" class="h-4 w-4" /> Add Employee
-                        </a>
-                        <a href="{{ route('hr.attendance.index') }}" class="btn-tonal btn-tonal--warning">
-                            <x-base.lucide icon="CheckCircle" class="h-4 w-4" /> Attendance
-                        </a>
-                        <a href="{{ route('hr.positions.index') }}" class="btn-tonal btn-tonal--purple">
-                            <x-base.lucide icon="Briefcase" class="h-4 w-4" /> Positions
-                        </a>
-                        <a href="{{ route('hr.departments.index') }}" class="btn-tonal btn-tonal--teal">
-                            <x-base.lucide icon="Layers" class="h-4 w-4" /> Departments
-                        </a>
                     </div>
                 </div>
             </div>

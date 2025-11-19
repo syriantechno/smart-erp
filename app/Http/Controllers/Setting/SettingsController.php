@@ -374,15 +374,19 @@ class SettingsController extends Controller
         $secondaryColor = setting('secondary_color', '#7c3aed');
         $accentColor = setting('accent_color', '#06b6d4');
 
-        $css = "
+        $primaryRgb = $this->hexToRgb($primaryColor);
+        $secondaryRgb = $this->hexToRgb($secondaryColor);
+        $accentRgb = $this->hexToRgb($accentColor);
+
+        $css = <<<CSS
 /* Custom Theme Colors */
 :root {
     --primary-color: {$primaryColor};
     --secondary-color: {$secondaryColor};
     --accent-color: {$accentColor};
-    --primary-rgb: " . $this->hexToRgb($primaryColor) . ";
-    --secondary-rgb: " . $this->hexToRgb($secondaryColor) . ";
-    --accent-rgb: " . $this->hexToRgb($accentColor) . ";
+    --primary-rgb: {$primaryRgb};
+    --secondary-rgb: {$secondaryRgb};
+    --accent-rgb: {$accentRgb};
 }
 
 /* Override theme colors */
@@ -397,8 +401,8 @@ class SettingsController extends Controller
 }
 
 .btn-primary:hover {
-    background-color: " . $this->adjustBrightness($primaryColor, -20) . " !important;
-    border-color: " . $this->adjustBrightness($primaryColor, -20) . " !important;
+    background-color: {$this->adjustBrightness($primaryColor, -20)} !important;
+    border-color: {$this->adjustBrightness($primaryColor, -20)} !important;
 }
 
 /* Link overrides */
@@ -437,7 +441,34 @@ class SettingsController extends Controller
     background-color: rgba(255, 255, 255, 0.12) !important;
     color: #ffffff !important;
 }
-";
+
+/* Top bar background */
+.top-bar-pattern {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 45%, var(--accent-color) 100%) !important;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 35px 80px rgba(var(--primary-rgb), 0.35);
+}
+
+.top-bar-pattern::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(circle at 12% 120%, rgba(255, 255, 255, 0.18), transparent 55%),
+        radial-gradient(circle at 70% 130%, rgba(255, 255, 255, 0.1), transparent 50%);
+    opacity: 0.6;
+}
+
+.top-bar-pattern::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(circle at 65% 35%, rgba(255, 255, 255, 0.12), transparent 50%);
+    mix-blend-mode: screen;
+}
+CSS;
 
         // حفظ ملف CSS المخصص
         $cssPath = public_path('css/custom-theme.css');

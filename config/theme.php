@@ -7,7 +7,7 @@ return [
         'hrpulse' => [
             'label' => 'HR Pulse',
             'description' => 'Deep navy to cyan gradient inspired by the HR dashboard hero card.',
-            'primary' => '#0f1f3d',
+            'primary' => '#122b5aff',
             'secondary' => '#1d3d8f',
             'accent' => '#0998d6',
         ],
