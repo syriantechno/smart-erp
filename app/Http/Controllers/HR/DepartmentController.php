@@ -8,6 +8,8 @@ use App\Models\Approval\ApprovalRequest;
 use App\Models\Approval\ApprovalTemplate;
 use App\Services\DocumentCodeGenerator;
 use App\Services\PdfExporter;
+use App\Exports\DepartmentsExport;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -405,5 +407,30 @@ class DepartmentController extends Controller
             notify_error_code(1004, 'Failed to delete department');
             return back()->with('error', 'Error deleting department: ' . $e->getMessage());
         }
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $departments = Department::with(['company', 'manager'])
+            ->withCount('employees')
+            ->get();
+
+        return $this->pdfExporter->stream(
+            'hr.departments.export_pdf',
+            [
+                'departments' => $departments,
+                'exportedAt' => now(),
+            ],
+            'departments.pdf'
+        );
+    }
+
+    public function exportExcel()
+    {
+        $departments = Department::with(['company', 'manager'])
+            ->withCount('employees')
+            ->get();
+
+        return Excel::download(new DepartmentsExport($departments), 'departments.xlsx');
     }
 }

@@ -65,6 +65,10 @@ Route::middleware('auth')->group(function () {
         // DataTable route for departments
         Route::get('departments/datatable', [App\Http\Controllers\HR\DepartmentController::class, 'datatable'])
             ->name('departments.datatable');
+        Route::post('departments/export-pdf', [App\Http\Controllers\HR\DepartmentController::class, 'exportPdf'])
+            ->name('departments.export-pdf');
+        Route::get('departments/export-excel', [App\Http\Controllers\HR\DepartmentController::class, 'exportExcel'])
+            ->name('departments.export-excel');
 
         // Preview generated department code
         Route::get('departments/preview-code', [App\Http\Controllers\HR\DepartmentController::class, 'previewCode'])

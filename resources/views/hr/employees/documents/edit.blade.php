@@ -133,11 +133,16 @@
                             </div>
                         </div>
 
-                        <div class="flex justify-end mt-6">
-                            <x-base.button as="a" href="{{ route('hr.employees.documents.index', ['employee' => $employee->id]) }}" variant="outline-secondary" class="mr-3">
+                        <div class="custom-modal-footer mt-6">
+                            <x-base.button
+                                as="a"
+                                href="{{ route('hr.employees.documents.index', ['employee' => $employee->id]) }}"
+                                tone="warning"
+                            >
+                                <x-base.lucide icon="X" class="w-4 h-4 mr-2" />
                                 Cancel
                             </x-base.button>
-                            <x-base.button type="submit" variant="primary">
+                            <x-base.button type="submit" tone="success">
                                 <x-base.lucide icon="Save" class="w-4 h-4 mr-2" />
                                 Update Document
                             </x-base.button>

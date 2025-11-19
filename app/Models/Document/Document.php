@@ -2,6 +2,9 @@
 
 namespace App\Models\Document;
 
+use App\Models\Company;
+use App\Models\HR\Department;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

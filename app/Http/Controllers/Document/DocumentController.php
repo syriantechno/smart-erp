@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Document;
 
 use App\Http\Controllers\Controller;
-use App\Models\Document;
-use App\Models\DocumentCategory;
-use App\Models\DocumentShare;
+use App\Models\Document\Document;
+use App\Models\Document\DocumentCategory;
+use App\Models\Document\DocumentShare;
 use App\Models\Company;
-use App\Models\Department;
+use App\Models\HR\Department;
 use App\Models\User;
 use App\Services\DocumentCodeGenerator;
 use Illuminate\Http\JsonResponse;
