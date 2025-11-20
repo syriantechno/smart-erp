@@ -108,16 +108,15 @@
 
                 <!-- Add Category Button -->
                 <div class="mt-4 pt-3 border-t border-dashed border-slate-200 dark:border-darkmode-400">
-                    <x-base.button
-                        variant="outline-primary"
-                        size="sm"
-                        class="w-full flex items-center justify-center"
+                    <button
+                        type="button"
+                        class="btn-tonal btn-tonal--info w-full min-h-[38px] px-4 text-sm font-semibold"
                         data-tw-toggle="modal"
                         data-tw-target="#category-modal"
                     >
-                        <x-base.lucide icon="Plus" class="mr-2 h-4 w-4" />
+                        <x-base.lucide icon="Plus" class="mr-2 h-4 w-4 icon-hover-rise" />
                         Manage Categories
-                    </x-base.button>
+                    </button>
                 </div>
             </div>
             <!-- END: Catalog Menu -->
@@ -182,16 +181,15 @@
                                 />
                             </div>
                             <!-- Upload Button -->
-                            <x-base.button
+                            <button
                                 type="button"
-                                variant="primary"
-                                class="flex items-center"
+                                class="btn-tonal btn-tonal--success flex items-center min-h-[40px] px-4 font-semibold"
                                 data-tw-toggle="modal"
                                 data-tw-target="#upload-modal"
                             >
-                                <x-base.lucide icon="Upload" class="w-4 h-4 mr-2" />
+                                <x-base.lucide icon="Upload" class="w-4 h-4 mr-2 icon-hover-rise" />
                                 Upload
-                            </x-base.button>
+                            </button>
                         </div>
                     </div>
 
@@ -240,15 +238,14 @@
                         </div>
 
                         <div class="col-span-12 flex justify-end mt-2">
-                            <x-base.button
+                            <button
                                 type="button"
-                                variant="primary"
-                                size="sm"
+                                class="btn-tonal btn-tonal--info min-h-[38px] px-4 text-sm font-semibold"
                                 onclick="applyFilters()"
                             >
-                                <x-base.lucide icon="Search" class="w-4 h-4 mr-2" />
+                                <x-base.lucide icon="Search" class="w-4 h-4 mr-2 icon-hover-rise" />
                                 Apply Filters
-                            </x-base.button>
+                            </button>
                         </div>
                     </div>
                 </div>

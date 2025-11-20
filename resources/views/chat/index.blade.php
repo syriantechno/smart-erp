@@ -40,26 +40,37 @@
         }
         .conversation-item {
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: background-color 0.2s, transform 0.2s;
+            border-radius: 1rem;
+            background-color: rgba(255, 255, 255, 0.08);
+            padding: 0.75rem;
         }
         .conversation-item:hover {
-            background-color: #f3f4f6;
+            background-color: rgba(255, 255, 255, 0.15);
+            transform: translateX(4px);
         }
         .conversation-item.active {
-            background-color: #e0f2fe;
-            border-right: 3px solid #0ea5e9;
+            background-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 35px rgba(15, 31, 61, 0.35);
         }
         .unread-badge {
-            background-color: #ef4444;
+            background-color: rgba(239, 68, 68, 0.9);
             color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
+            border-radius: 999px;
+            min-width: 22px;
+            height: 22px;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.75rem;
-            font-weight: bold;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0 0.35rem;
+        }
+        #conversation-search {
+            color: #fff;
+        }
+        #conversation-search::placeholder {
+            color: rgba(255, 255, 255, 0.7);
         }
     </style>
 @endpush
@@ -70,40 +81,63 @@
     <div class="mt-8 grid grid-cols-12 gap-6">
         <div class="col-span-12 lg:col-span-3 2xl:col-span-2">
             <h2 class="intro-y mr-auto mt-2 text-lg font-medium">Internal Chat</h2>
-
-            <!-- Start New Chat -->
-            <div class="intro-y box mt-6 bg-primary p-5">
-                <x-base.button
-                    class="mt-1 w-full bg-white text-slate-600 dark:border-darkmode-300 dark:bg-darkmode-300 dark:text-slate-300"
-                    type="button"
-                    onclick="showNewChatModal()"
+            <div class="intro-y mt-6">
+                <div
+                    class="rounded-2xl border border-white/10 text-white shadow-[0_20px_55px_rgba(10,24,55,0.38)]"
+                    style="background: linear-gradient(135deg, var(--primary-color, #0f1f3d) 0%, var(--secondary-color, #1d3d8f) 45%, var(--accent-color, #0998d6) 100%);"
                 >
-                    <x-base.lucide icon="Plus" class="mr-2 h-4 w-4" />
-                    New Chat
-                </x-base.button>
-            </div>
-
-            <!-- Conversations List -->
-            <div class="intro-y box mt-6">
-                <div class="p-5 border-b border-slate-200/60">
-                    <div class="relative text-slate-500">
-                        <x-base.form-input
-                            id="conversation-search"
-                            class="border-transparent bg-slate-100 px-4 py-3 pr-10"
-                            type="text"
-                            placeholder="Search conversations..."
-                        />
-                        <x-base.lucide
-                            class="absolute inset-y-0 right-0 z-10 my-auto mr-3 h-4 w-4 text-slate-500"
-                            icon="Search"
-                        />
-                    </div>
-                </div>
-
-                <div id="conversations-list" class="p-2 max-h-96 overflow-y-auto">
-                    <!-- Conversations will be loaded here -->
-                    <div class="text-center py-8 text-slate-500">
-                        Loading conversations...
+                    <div class="p-6 space-y-5">
+                        <div>
+                            <p class="text-xs uppercase tracking-[0.35em] text-white/70">Chat Control Center</p>
+                            <h3 class="mt-2 text-xl font-semibold leading-tight">Keep every thread aligned</h3>
+                            <p class="mt-2 text-sm text-white/80">Launch new conversations, search histories, and respond faster.</p>
+                        </div>
+                        <button
+                            type="button"
+                            class="flex w-full items-center rounded-xl bg-white/15 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-400/30 transition hover:bg-white/20"
+                            onclick="showNewChatModal()"
+                        >
+                            <x-base.lucide icon="Plus" class="mr-3 h-4 w-4" />
+                            Start New Chat
+                            <span class="ml-auto rounded-full bg-white/20 px-2 py-0.5 text-[11px] tracking-wide">Create</span>
+                        </button>
+                        <div class="space-y-4 border-t border-white/10 pt-4">
+                            <div class="relative text-white">
+                                <x-base.form-input
+                                    id="conversation-search"
+                                    class="w-full border-transparent bg-white/15 px-4 py-3 pr-10 text-sm placeholder-white/70 focus:bg-white/20 focus:ring-0"
+                                    type="text"
+                                    placeholder="Search conversations"
+                                />
+                                <x-base.lucide
+                                    class="absolute inset-y-0 right-0 z-10 my-auto mr-3 h-4 w-4 text-white/70"
+                                    icon="Search"
+                                />
+                            </div>
+                            <div id="conversations-list" class="rounded-2xl border border-white/15 bg-white/10 p-2 max-h-96 overflow-y-auto">
+                                <!-- Conversations will be loaded here -->
+                                <div class="text-center py-8 text-white/70">
+                                    Loading conversations...
+                                </div>
+                            </div>
+                        </div>
+                        <div class="border-t border-white/10 pt-4 space-y-2 text-sm font-semibold text-white/80">
+                            <div class="flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2">
+                                <span class="h-2 w-2 rounded-full bg-emerald-300"></span>
+                                Direct Messages
+                                <span class="ml-auto text-[11px] text-white/60">Focus chats</span>
+                            </div>
+                            <div class="flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2">
+                                <span class="h-2 w-2 rounded-full bg-sky-300"></span>
+                                Project Rooms
+                                <span class="ml-auto text-[11px] text-white/60">Collaboration</span>
+                            </div>
+                            <div class="flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2">
+                                <span class="h-2 w-2 rounded-full bg-amber-300"></span>
+                                Announcements
+                                <span class="ml-auto text-[11px] text-white/60">Broadcast</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -126,13 +160,14 @@
                         </div>
                     </div>
                     <div class="flex items-center">
-                        <x-base.button
-                            variant="outline-secondary"
-                            size="sm"
+                        <button
+                            type="button"
+                            class="btn-tonal btn-tonal--info min-h-[36px] px-3 text-sm font-semibold"
                             onclick="refreshMessages()"
                         >
-                            <x-base.lucide icon="RefreshCw" class="w-4 h-4" />
-                        </x-base.button>
+                            <x-base.lucide icon="RefreshCw" class="w-4 h-4 mr-1 icon-hover-rise" />
+                            Refresh
+                        </button>
                     </div>
                 </div>
 
@@ -159,14 +194,16 @@
                                 </button>
                             </div>
                         </div>
-                        <x-base.button
+                        <button
                             id="send-button"
-                            variant="primary"
+                            type="button"
+                            class="btn-tonal btn-tonal--success min-h-[42px] px-4 text-sm font-semibold group disabled:opacity-60"
                             onclick="sendMessage()"
                             disabled
                         >
-                            <x-base.lucide icon="Send" class="w-4 h-4" />
-                        </x-base.button>
+                            <x-base.lucide icon="Send" class="w-4 h-4 mr-2 icon-hover-rise" />
+                            Send
+                        </button>
                     </div>
                     <div id="file-preview" class="mt-2 hidden">
                         <div class="flex items-center gap-2 p-2 bg-slate-100 rounded">
@@ -185,10 +222,14 @@
                 <x-base.lucide icon="MessageSquare" class="w-16 h-16 text-slate-300 mx-auto mb-4" />
                 <h3 class="text-lg font-medium text-slate-600 dark:text-slate-400 mb-2">No conversation selected</h3>
                 <p class="text-slate-500 mb-4">Choose a conversation from the sidebar to start chatting</p>
-                <x-base.button variant="primary" onclick="showNewChatModal()">
-                    <x-base.lucide icon="Plus" class="w-4 h-4 mr-2" />
+                <button
+                    type="button"
+                    class="btn-tonal btn-tonal--success min-h-[42px] px-4 text-sm font-semibold"
+                    onclick="showNewChatModal()"
+                >
+                    <x-base.lucide icon="Plus" class="w-4 h-4 mr-2 icon-hover-rise" />
                     Start New Chat
-                </x-base.button>
+                </button>
             </div>
         </div>
     </div>
@@ -231,21 +272,22 @@
 
         @slot('footer')
             <div class="flex justify-end w-full gap-2">
-                <x-base.button
+                <button
                     type="button"
-                    variant="outline-secondary"
+                    class="btn-tonal btn-tonal--neutral min-h-[40px] px-4"
                     data-tw-dismiss="modal"
                 >
+                    <x-base.lucide icon="X" class="w-4 h-4 mr-2 icon-hover-rise" />
                     Cancel
-                </x-base.button>
-                <x-base.button
+                </button>
+                <button
                     type="button"
-                    variant="primary"
+                    class="btn-tonal btn-tonal--success min-h-[40px] px-4"
                     onclick="startNewConversation()"
                 >
-                    <x-base.lucide icon="MessageCircle" class="w-4 h-4 mr-2" />
+                    <x-base.lucide icon="MessageCircle" class="w-4 h-4 mr-2 icon-hover-rise" />
                     Start Chat
-                </x-base.button>
+                </button>
             </div>
         @endslot
     </x-modal.form>

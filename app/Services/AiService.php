@@ -4,7 +4,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use App\Models\AiInteraction;
+use App\Models\Chat\AiInteraction;
 use App\Models\AiGeneratedContent;
 
 class AiService

@@ -1,4 +1,10 @@
 <!-- Prefix Settings Content Loaded -->
+@php
+    $documentTypeLabels = [
+        'purchase_requests' => 'Material Requests',
+    ];
+@endphp
+
 <div class="bg-white dark:bg-darkmode-600 rounded-lg shadow-sm border border-slate-200/60 dark:border-darkmode-400 mt-5">
     <div class="flex items-center border-b border-slate-200/60 p-5 dark:border-darkmode-400">
         <h2 class="mr-auto text-base font-medium flex items-center">
@@ -28,7 +34,9 @@
                             @foreach($prefixSettings as $setting)
                             <tr class="border-b dark:border-darkmode-400">
                                 <td class="px-2 py-3">
-                                    <span class="font-medium">{{ ucfirst(str_replace('_', ' ', $setting->document_type)) }}</span>
+                                    <span class="font-medium">
+                                        {{ $documentTypeLabels[$setting->document_type] ?? ucfirst(str_replace('_', ' ', $setting->document_type)) }}
+                                    </span>
                                 </td>
                                 <td class="px-2 py-3">
                                     <x-base.form-input

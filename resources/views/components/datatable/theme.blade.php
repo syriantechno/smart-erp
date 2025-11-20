@@ -4,8 +4,9 @@
             --dt-border-color: rgba(148, 163, 184, 0.25);
             --dt-border-color-strong: rgba(148, 163, 184, 0.45);
             --dt-bg-muted: #f8fafc;
-            --dt-primary-rgb: var(--primary-rgb, 37, 99, 235);
-            --dt-header-bg: rgba(var(--dt-primary-rgb), 1);
+            --dt-primary-color: var(--color-primary, var(--primary-color, #2563eb));
+            --dt-primary-rgb: var(--color-primary-rgb, var(--primary-rgb, 37 99 235));
+            --dt-header-bg: rgb(var(--dt-primary-rgb));
             --dt-text-color: #1f2933;
             --dt-muted: #64748b;
         }
@@ -220,10 +221,19 @@
 
         table[data-erp-table] thead {
             background: linear-gradient(135deg,
-                rgba(var(--dt-primary-rgb), 0.6),
-                rgba(var(--dt-primary-rgb), 0.35)
+                rgb(var(--dt-primary-rgb) / 0.65),
+                rgb(var(--dt-primary-rgb) / 0.35)
             );
             box-shadow: 0 4px 16px rgba(15, 23, 42, 0.12);
+        }
+
+        @supports (background: color-mix(in srgb, red 50%, transparent)) {
+            table[data-erp-table] thead {
+                background: linear-gradient(135deg,
+                    color-mix(in srgb, var(--dt-primary-color) 75%, transparent),
+                    color-mix(in srgb, var(--dt-primary-color) 40%, transparent)
+                );
+            }
         }
 
         table[data-erp-table] thead th {

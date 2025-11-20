@@ -18,26 +18,32 @@
         <h2 class="mr-auto text-lg font-medium">Tasks Management</h2>
 
         <div class="flex items-center gap-2">
-            <x-base.button
-                variant="outline-secondary"
-                class="hidden sm:flex"
+            <button
+                type="button"
+                class="btn-tonal btn-tonal--info hidden sm:inline-flex min-h-[44px] items-center gap-2 px-4 group"
                 data-tw-toggle="modal"
                 data-tw-target="#tasks-filters-slideover"
             >
-                <x-base.lucide icon="Filter" class="w-4 h-4 mr-2" />
+                <x-base.lucide icon="Filter" class="w-4 h-4 icon-hover-rise" />
                 Filters
-                <span id="active-filters-indicator" class="hidden ml-2 px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full">Active</span>
-            </x-base.button>
+                <span
+                    id="active-filters-indicator"
+                    class="hidden items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-xs font-semibold text-emerald-700"
+                >
+                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    Active
+                </span>
+            </button>
 
             <!-- Mobile filters icon -->
             <button
                 type="button"
-                class="flex items-center justify-center rounded-full border border-slate-200 px-3 py-2 text-slate-600 hover:bg-slate-50 sm:hidden"
+                class="btn-tonal btn-tonal--info inline-flex min-h-[44px] items-center justify-center gap-2 px-3 sm:hidden"
                 data-tw-toggle="modal"
                 data-tw-target="#tasks-filters-slideover"
                 title="Filters"
             >
-                <x-base.lucide icon="Filter" class="w-4 h-4" />
+                <x-base.lucide icon="Filter" class="w-4 h-4 icon-hover-rise" />
             </button>
 
             <div class="hidden sm:flex items-center rounded-full bg-slate-100 dark:bg-darkmode-700 px-1 py-1 ml-2">
@@ -61,15 +67,15 @@
                 </button>
             </div>
 
-            <x-base.button
-                variant="primary"
-                class="w-32 sm:w-auto sm:ml-2"
+            <button
+                type="button"
+                class="btn-tonal btn-tonal--success w-36 sm:w-auto sm:ml-2 group"
                 data-tw-toggle="modal"
                 data-tw-target="#create-task-modal"
             >
-                <x-base.lucide icon="Plus" class="w-4 h-4 mr-2" />
+                <x-base.lucide icon="SquarePlus" class="w-4 h-4 icon-hover-rise" />
                 Add Task
-            </x-base.button>
+            </button>
         </div>
     </div>
 
@@ -118,23 +124,43 @@
                                     <option value="100">100</option>
                                 </x-base.form-select>
                             </div>
-                            <div class="mt-2 xl:mt-0">
-                                <x-base.button id="tasks-filter-go" type="button" variant="primary" class="w-full sm:w-16">
+                            <div class="mt-2 xl:mt-0 flex flex-col gap-2">
+                                <button
+                                    id="tasks-filter-go"
+                                    type="button"
+                                    class="btn-tonal btn-tonal--info w-full sm:w-24 group"
+                                >
+                                    <x-base.lucide icon="Search" class="w-4 h-4 icon-hover-rise" />
                                     Go
-                                </x-base.button>
-                                <x-base.button id="tasks-filter-reset" type="button" variant="secondary" class="mt-2 w-full sm:ml-1 sm:mt-0 sm:w-16">
+                                </button>
+                                <button
+                                    id="tasks-filter-reset"
+                                    type="button"
+                                    class="btn-tonal btn-tonal--amber w-full sm:w-24 group"
+                                >
+                                    <x-base.lucide icon="RotateCcw" class="w-4 h-4 icon-hover-rise" />
                                     Reset
-                                </x-base.button>
+                                </button>
                             </div>
                         </form>
 
                         <div class="mt-5 flex sm:mt-0">
-                            <x-base.button id="tasks-export" variant="outline-secondary" class="mr-2 w-1/2 sm:w-auto">
-                                <x-base.lucide icon="Download" class="mr-2 h-4 w-4" /> Export
-                            </x-base.button>
-                            <x-base.button id="tasks-refresh" variant="outline-secondary" class="w-1/2 sm:w-auto">
-                                <x-base.lucide icon="RefreshCcw" class="mr-2 h-4 w-4" /> Refresh
-                            </x-base.button>
+                            <button
+                                id="tasks-export"
+                                type="button"
+                                class="btn-tonal btn-tonal--neutral mr-2 w-1/2 sm:w-auto group"
+                            >
+                                <x-base.lucide icon="Download" class="h-4 w-4 icon-hover-rise" />
+                                Export
+                            </button>
+                            <button
+                                id="tasks-refresh"
+                                type="button"
+                                class="btn-tonal btn-tonal--info w-1/2 sm:w-auto group"
+                            >
+                                <x-base.lucide icon="RefreshCcw" class="h-4 w-4 icon-hover-rise" />
+                                Refresh
+                            </button>
                         </div>
                     </div>
 
@@ -306,24 +332,22 @@
                         </div>
 
                         <div class="mt-2 flex justify-end gap-2">
-                            <x-base.button
+                            <button
                                 type="button"
-                                variant="secondary"
-                                class="w-24"
+                                class="btn-tonal btn-tonal--neutral w-28 group"
                                 data-tw-dismiss="modal"
                             >
-                                <x-base.lucide icon="X" class="mr-2 h-4 w-4 animate-pulse" />
+                                <x-base.lucide icon="X" class="mr-2 h-4 w-4 icon-hover-rise" />
                                 Close
-                            </x-base.button>
-                            <x-base.button
+                            </button>
+                            <button
                                 id="advanced-filter-apply"
                                 type="button"
-                                variant="primary"
-                                class="w-24"
+                                class="btn-tonal btn-tonal--info w-32 group"
                             >
-                                <x-base.lucide icon="Search" class="mr-2 h-4 w-4 animate-pulse" />
-                                Apply
-                            </x-base.button>
+                                <x-base.lucide icon="Search" class="mr-2 h-4 w-4 icon-hover-rise" />
+                                Apply Filters
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -539,10 +563,18 @@
                 }
 
                 // Show filter summary if filters are active
-                const hasFilters = (companyFilter && companyFilter.value) ||
-                                 (departmentFilter && departmentFilter.value) ||
-                                 (employeeFilter && employeeFilter.value) ||
-                                 (statusFilter && statusFilter.value);
+                const basicFiltersActive =
+                    (filterField && filterField.value && filterField.value !== 'all') ||
+                    (filterType && filterType.value && filterType.value !== 'contains') ||
+                    (filterValue && filterValue.value && filterValue.value.trim() !== '');
+
+                const advancedFiltersActive =
+                    (companyFilter && companyFilter.value) ||
+                    (departmentFilter && departmentFilter.value) ||
+                    (employeeFilter && employeeFilter.value) ||
+                    (statusFilter && statusFilter.value);
+
+                const hasFilters = basicFiltersActive || advancedFiltersActive;
 
                 // Show filter summary if filters are active (only once, not on every draw)
                 if (hasFilters && info && info.recordsTotal !== info.recordsDisplay) {

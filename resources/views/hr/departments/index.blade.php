@@ -262,8 +262,10 @@
     </div>
 
     @include('hr.departments.modals.create')
-    @stack('modals')
+    @include('hr.departments.modals.edit')
+    <button id="edit-department-trigger" data-tw-toggle="modal" data-tw-target="#edit-department-modal" class="hidden"></button>
 @endsection
+@stack('modals')
 @include('components.datatable.scripts')
 
 @push('scripts')
@@ -516,52 +518,50 @@
             table.ajax.reload(null, false);
         });
 
-        // Use shared CRUD helper for delete
-        window.openDepartmentModal = function (id) {
-            console.log('[Departments] openDepartmentModal triggered', { id });
-            const modalEl = document.getElementById(`edit-department-modal-${id}`);
+        window.openDepartmentEditModal = function (id, name, companyId, parentId, managerId, description) {
+            const form = document.getElementById('edit-department-form');
+            const trigger = document.getElementById('edit-department-trigger');
 
-            if (!modalEl) {
-                console.error('Department modal not found for id', id);
+            if (!form || !trigger) {
+                console.error('[Departments] Shared edit modal missing form or trigger');
                 return;
             }
 
-            console.log('[Departments] Found modal element', modalEl);
+            document.getElementById('edit-department-current-id').value = id;
+            document.getElementById('edit-department-name').value = name || '';
+            document.getElementById('edit-department-description').value = description || '';
+            document.getElementById('edit-department-company').value = companyId || '';
 
-            let modalInstance = null;
-            if (window.tailwind?.Modal?.getOrCreateInstance) {
-                modalInstance = window.tailwind.Modal.getOrCreateInstance(modalEl);
-            } else if (window.tailwind?.Modal) {
-                try {
-                    modalInstance = new window.tailwind.Modal(modalEl);
-                } catch (error) {
-                    console.warn('Failed to instantiate tailwind.Modal, falling back to manual toggle.', error);
-                }
-            }
-
-            if (modalInstance?.show) {
-                console.log('[Departments] Showing modal via Tailwind instance');
-                modalInstance.show();
-                setTimeout(() => {
-                    if (modalEl.classList.contains('hidden') || !modalEl.classList.contains('show')) {
-                        console.warn('[Departments] Tailwind modal did not become visible, applying manual fallback');
-                        modalEl.classList.remove('hidden');
-                        modalEl.classList.add('show');
-                        modalEl.style.display = 'flex';
-                        modalEl.style.alignItems = 'center';
-                        modalEl.style.justifyContent = 'center';
+            const parentSelect = document.getElementById('edit-department-parent');
+            if (parentSelect) {
+                Array.from(parentSelect.options).forEach((option) => {
+                    if (companyId && option.dataset.company && option.value) {
+                        const shouldShow = option.dataset.company === String(companyId);
+                        option.hidden = !shouldShow;
+                    } else {
+                        option.hidden = false;
                     }
-                }, 100);
-                return;
+                });
+                parentSelect.value = parentId || '';
             }
 
-            console.warn('[Departments] Falling back to manual show');
-            modalEl.classList.remove('hidden');
-            modalEl.classList.add('show');
-            modalEl.style.display = 'flex';
-            modalEl.style.alignItems = 'center';
-            modalEl.style.justifyContent = 'center';
+            document.getElementById('edit-department-manager').value = managerId || '';
+
+            form.action = `{{ route('hr.departments.update', '') }}/${id}`;
+            trigger.click();
         };
+
+        if (window.erpCrud) {
+            window.erpCrud.handleEditForm({
+                formSelector: '#edit-department-form',
+                modalSelector: '#edit-department-modal',
+                onSuccess: function () {
+                    reloadTable();
+                }
+            });
+        }
+
+        // Use shared CRUD helper for delete
 
         if (window.erpCrud) {
             window.erpCrud.handleDelete({

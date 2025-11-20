@@ -48,15 +48,15 @@
     @include('components.global-notifications')
     <div class="intro-y mt-8 flex items-center">
         <h2 class="mr-auto text-lg font-medium">Warehouses Management</h2>
-        <x-base.button
-            variant="primary"
-            class="w-40 sm:w-auto sm:ml-4"
+        <button
+            type="button"
+            class="btn-tonal btn-tonal--success w-40 sm:w-auto sm:ml-4 group"
             data-tw-toggle="modal"
             data-tw-target="#create-warehouse-modal"
         >
-            <x-base.lucide icon="Plus" class="w-4 h-4 mr-2" />
+            <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
             Add Warehouse
-        </x-base.button>
+        </button>
     </div>
 
     <div class="mt-5 grid grid-cols-12 gap-6">
@@ -65,9 +65,9 @@
             <x-base.preview-component class="intro-y box mb-6">
                 <div class="p-5">
                     <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                        <x-base.lucide icon="Filter" class="h-5 w-5"></x-base.lucide>
+                        <x-base.lucide icon="filter" class="h-5 w-5"></x-base.lucide>
                         Advanced Filters
-                        <span id="warehouses-active-filters-indicator" class="hidden ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">Active</span>
+                        <span id="warehouses-active-filters-indicator" class="hidden ml-2 px-2 py-0.5 text-xs bg-emerald-500/15 text-emerald-700 rounded-full">Active</span>
                     </h3>
 
                     <div class="grid grid-cols-12 gap-4">
@@ -98,22 +98,22 @@
 
                         <!-- Filter Actions -->
                         <div class="col-span-12 md:col-span-3 flex items-end gap-2">
-                            <x-base.button
-                                variant="secondary"
-                                class="flex-1"
+                            <button
+                                type="button"
+                                class="btn-tonal btn-tonal--amber flex-1 group"
                                 onclick="clearWarehousesFilters()"
                             >
-                                <x-base.lucide icon="X" class="w-4 h-4 mr-2" />
+                                <x-base.lucide icon="rotate-ccw" class="w-4 h-4 icon-hover-rise" />
                                 Clear
-                            </x-base.button>
-                            <x-base.button
-                                variant="primary"
-                                class="flex-1"
+                            </button>
+                            <button
+                                type="button"
+                                class="btn-tonal btn-tonal--info flex-1 group"
                                 onclick="applyWarehousesFilters()"
                             >
-                                <x-base.lucide icon="Filter" class="w-4 h-4 mr-2" />
+                                <x-base.lucide icon="search" class="w-4 h-4 icon-hover-rise" />
                                 Apply
-                            </x-base.button>
+                            </button>
                         </div>
                     </div>
                 </div>

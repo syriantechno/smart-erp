@@ -15,16 +15,16 @@
     @include('components.global-notifications')
     <div class="intro-y mt-8 flex items-center">
         <h2 class="mr-auto text-lg font-medium">Categories Management</h2>
-        <x-base.button
+        <button
+            type="button"
             id="open-create-category-modal"
-            variant="primary"
-            class="w-40 sm:w-auto sm:ml-4"
+            class="btn-tonal btn-tonal--info w-40 sm:w-auto sm:ml-4 group"
             data-tw-toggle="modal"
             data-tw-target="#create-category-modal"
         >
-            <x-base.lucide icon="Plus" class="w-4 h-4 mr-2" />
+            <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
             Add Category
-        </x-base.button>
+        </button>
     </div>
 
     <div class="mt-5 grid grid-cols-12 gap-6">
@@ -125,26 +125,24 @@
         </form>
 
         @slot('footer')
-            <div class="flex justify-end gap-2 w-full">
-                <x-base.button
-                    class="w-24"
-                    data-tw-dismiss="modal"
+            <div class="flex w-full flex-wrap justify-end gap-2">
+                <button
                     type="button"
-                    variant="outline-secondary"
+                    class="btn-tonal btn-tonal--neutral group"
+                    data-tw-dismiss="modal"
                 >
+                    <x-base.lucide icon="x-circle" class="w-5 h-5 icon-hover-rise" />
                     Cancel
-                </x-base.button>
-                <x-base.button
-                    class="w-32"
+                </button>
+                <button
                     type="submit"
                     form="create-category-form"
                     id="create-category-btn"
-                    variant="primary"
+                    class="btn-tonal btn-tonal--success group"
                 >
-                    <x-base.lucide icon="Save" class="w-4 h-4 mr-2" />
+                    <x-base.lucide icon="save" class="w-5 h-5 icon-hover-rise" />
                     Save Category
-                </x-base.button>
-              
+                </button>
             </div>
         @endslot
 
@@ -294,25 +292,24 @@
         </form>
 
         @slot('footer')
-            <div class="flex justify-end gap-2 w-full">
-                <x-base.button
-                    class="w-24"
-                    data-tw-dismiss="modal"
+            <div class="flex w-full flex-wrap justify-end gap-2">
+                <button
                     type="button"
-                    variant="outline-secondary"
+                    class="btn-tonal btn-tonal--neutral group"
+                    data-tw-dismiss="modal"
                 >
+                    <x-base.lucide icon="x-circle" class="w-5 h-5 icon-hover-rise" />
                     Cancel
-                </x-base.button>
-                <x-base.button
-                    class="w-32"
+                </button>
+                <button
                     type="submit"
                     form="edit-category-form"
                     id="edit-category-btn"
-                    variant="primary"
+                    class="btn-tonal btn-tonal--success group"
                 >
-                    <x-base.lucide icon="Save" class="w-4 h-4 mr-2" />
+                    <x-base.lucide icon="save" class="w-5 h-5 icon-hover-rise" />
                     Update Category
-                </x-base.button>
+                </button>
             </div>
         @endslot
     </x-modal.form>

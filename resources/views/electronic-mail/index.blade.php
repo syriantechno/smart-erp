@@ -9,108 +9,99 @@
     <div class="mt-8 grid grid-cols-12 gap-6">
         <div class="col-span-12 lg:col-span-3 2xl:col-span-2">
             <h2 class="intro-y mr-auto mt-2 text-lg font-medium">Electronic Mail</h2>
-            <!-- BEGIN: Inbox Menu -->
-            <div class="intro-y box mt-6 bg-primary p-5">
-                <x-base.button
-                    class="mt-1 w-full bg-white text-slate-600 dark:border-darkmode-300 dark:bg-darkmode-300 dark:text-slate-300"
-                    type="button"
-                    onclick="openComposeModal(); return false;"
+            <div class="intro-y mt-6">
+                <div
+                    class="rounded-2xl border border-white/10 text-white shadow-[0_20px_45px_rgba(10,24,55,0.35)]"
+                    style="background: linear-gradient(135deg, var(--primary-color, #0f1f3d) 0%, var(--secondary-color, #1d3d8f) 45%, var(--accent-color, #0998d6) 100%);"
                 >
-                    <x-base.lucide
-                        class="mr-2 h-4 w-4"
-                        icon="Edit"
-                    /> Compose
-                </x-base.button>
-                <div class="mt-6 border-t border-white/10 pt-6 text-white dark:border-darkmode-400">
-                    <a
-                        href="javascript:void(0)"
-                        class="js-mail-folder-link flex items-center rounded-md px-3 py-2 font-medium {{ $currentFolder === 'inbox' ? 'bg-white/10 dark:bg-darkmode-700' : '' }}"
-                        data-folder="inbox"
-                        onclick="return changeMailFolder(event, 'inbox')"
-                    >
-                        <x-base.lucide
-                            class="mr-2 h-4 w-4"
-                            icon="Mail"
-                        /> Inbox
-                        @if($inboxCount > 0)
-                            <span class="ml-auto rounded-full bg-white/20 px-2 py-1 text-xs">{{ $inboxCount }}</span>
-                        @endif
-                    </a>
-                    <a
-                        href="javascript:void(0)"
-                        class="js-mail-folder-link mt-2 flex items-center rounded-md px-3 py-2 {{ $currentFolder === 'starred' ? 'bg-white/10 dark:bg-darkmode-700' : '' }}"
-                        data-folder="starred"
-                        onclick="return changeMailFolder(event, 'starred')"
-                    >
-                        <x-base.lucide
-                            class="mr-2 h-4 w-4"
-                            icon="Star"
-                        /> Starred
-                        @if($starredCount > 0)
-                            <span class="ml-auto rounded-full bg-white/20 px-2 py-1 text-xs">{{ $starredCount }}</span>
-                        @endif
-                    </a>
-                    <a
-                        href="javascript:void(0)"
-                        class="js-mail-folder-link mt-2 flex items-center rounded-md px-3 py-2 {{ $currentFolder === 'sent' ? 'bg-white/10 dark:bg-darkmode-700' : '' }}"
-                        data-folder="sent"
-                        onclick="return changeMailFolder(event, 'sent')"
-                    >
-                        <x-base.lucide
-                            class="mr-2 h-4 w-4"
-                            icon="Send"
-                        /> Sent
-                        @if($sentCount > 0)
-                            <span class="ml-auto rounded-full bg-white/20 px-2 py-1 text-xs">{{ $sentCount }}</span>
-                        @endif
-                    </a>
-                    <a
-                        href="javascript:void(0)"
-                        class="js-mail-folder-link mt-2 flex items-center rounded-md px-3 py-2 {{ $currentFolder === 'draft' ? 'bg-white/10 dark:bg-darkmode-700' : '' }}"
-                        data-folder="draft"
-                        onclick="return changeMailFolder(event, 'draft')"
-                    >
-                        <x-base.lucide
-                            class="mr-2 h-4 w-4"
-                            icon="FileText"
-                        /> Draft
-                        @if($draftCount > 0)
-                            <span class="ml-auto rounded-full bg-white/20 px-2 py-1 text-xs">{{ $draftCount }}</span>
-                        @endif
-                    </a>
-                </div>
-                <div class="mt-4 border-t border-white/10 pt-4 text-white dark:border-darkmode-400">
-                    <a
-                        class="flex items-center truncate px-3 py-2"
-                        href="#"
-                    >
-                        <div class="mr-3 h-2 w-2 rounded-full bg-pending"></div>
-                        Work
-                    </a>
-                    <a
-                        class="mt-2 flex items-center truncate rounded-md px-3 py-2"
-                        href="#"
-                    >
-                        <div class="mr-3 h-2 w-2 rounded-full bg-success"></div>
-                        Personal
-                    </a>
-                    <a
-                        class="mt-2 flex items-center truncate rounded-md px-3 py-2"
-                        href="#"
-                    >
-                        <div class="mr-3 h-2 w-2 rounded-full bg-warning"></div>
-                        Important
-                    </a>
-                    <a
-                        class="mt-2 flex items-center truncate rounded-md px-3 py-2"
-                        href="#"
-                    >
-                        <div class="mr-3 h-2 w-2 rounded-full bg-danger"></div>
-                        Urgent
-                    </a>
+                    <div class="p-6 space-y-5">
+                        <div>
+                            <p class="text-xs uppercase tracking-[0.35em] text-white/70">Mail Control Center</p>
+                            <h3 class="mt-2 text-xl font-semibold">Keep inbox momentum</h3>
+                            <p class="mt-2 text-sm text-white/80">
+                                {{ $inboxCount }} unread · {{ $sentCount }} sent · {{ $draftCount }} drafts
+                            </p>
+                        </div>
+                        <button
+                            type="button"
+                            class="flex w-full items-center rounded-xl bg-white/15 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-400/30 transition hover:bg-white/20"
+                            onclick="openComposeModal(); return false;"
+                        >
+                            <x-base.lucide icon="PenSquare" class="mr-3 h-4 w-4" />
+                            Compose
+                            <span class="ml-auto rounded-full bg-white/20 px-2 py-0.5 text-[11px] tracking-wide">New</span>
+                        </button>
+                        <div class="border-t border-white/10 pt-4 space-y-2 text-white">
+                            <a
+                                href="javascript:void(0)"
+                                class="js-mail-folder-link flex items-center rounded-xl px-3 py-2 text-sm font-semibold transition hover:bg-white/15 {{ $currentFolder === 'inbox' ? 'bg-white/15' : 'bg-white/5' }}"
+                                data-folder="inbox"
+                                onclick="return changeMailFolder(event, 'inbox')"
+                            >
+                                <x-base.lucide icon="Mail" class="mr-3 h-4 w-4" /> Inbox
+                                @if($inboxCount > 0)
+                                    <span class="ml-auto rounded-full bg-white/20 px-2 py-0.5 text-[11px]">{{ $inboxCount }}</span>
+                                @endif
+                            </a>
+                            <a
+                                href="javascript:void(0)"
+                                class="js-mail-folder-link flex items-center rounded-xl px-3 py-2 text-sm font-semibold transition hover:bg-white/15 {{ $currentFolder === 'starred' ? 'bg-white/15' : 'bg-white/5' }}"
+                                data-folder="starred"
+                                onclick="return changeMailFolder(event, 'starred')"
+                            >
+                                <x-base.lucide icon="Star" class="mr-3 h-4 w-4" /> Starred
+                                @if($starredCount > 0)
+                                    <span class="ml-auto rounded-full bg-white/20 px-2 py-0.5 text-[11px]">{{ $starredCount }}</span>
+                                @endif
+                            </a>
+                            <a
+                                href="javascript:void(0)"
+                                class="js-mail-folder-link flex items-center rounded-xl px-3 py-2 text-sm font-semibold transition hover:bg-white/15 {{ $currentFolder === 'sent' ? 'bg-white/15' : 'bg-white/5' }}"
+                                data-folder="sent"
+                                onclick="return changeMailFolder(event, 'sent')"
+                            >
+                                <x-base.lucide icon="Send" class="mr-3 h-4 w-4" /> Sent
+                                @if($sentCount > 0)
+                                    <span class="ml-auto rounded-full bg-white/20 px-2 py-0.5 text-[11px]">{{ $sentCount }}</span>
+                                @endif
+                            </a>
+                            <a
+                                href="javascript:void(0)"
+                                class="js-mail-folder-link flex items-center rounded-xl px-3 py-2 text-sm font-semibold transition hover:bg-white/15 {{ $currentFolder === 'draft' ? 'bg-white/15' : 'bg-white/5' }}"
+                                data-folder="draft"
+                                onclick="return changeMailFolder(event, 'draft')"
+                            >
+                                <x-base.lucide icon="FileText" class="mr-3 h-4 w-4" /> Draft
+                                @if($draftCount > 0)
+                                    <span class="ml-auto rounded-full bg-white/20 px-2 py-0.5 text-[11px]">{{ $draftCount }}</span>
+                                @endif
+                            </a>
+                        </div>
+                        <div class="border-t border-white/10 pt-4 space-y-2 text-sm font-semibold text-white/80">
+                            <div class="flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2">
+                                <span class="h-2 w-2 rounded-full bg-pending"></span>
+                                Work
+                                <span class="ml-auto text-[11px] text-white/60">Focus</span>
+                            </div>
+                            <div class="flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2">
+                                <span class="h-2 w-2 rounded-full bg-success"></span>
+                                Personal
+                                <span class="ml-auto text-[11px] text-white/60">0 unread</span>
+                            </div>
+                            <div class="flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2">
+                                <span class="h-2 w-2 rounded-full bg-warning"></span>
+                                Important
+                                <span class="ml-auto text-[11px] text-white/60">Stay alert</span>
+                            </div>
+                            <div class="flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2">
+                                <span class="h-2 w-2 rounded-full bg-danger"></span>
+                                Urgent
+                                <span class="ml-auto text-[11px] text-white/60">Action asap</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <!-- END: Inbox Menu -->
         </div>
         <div class="col-span-12 lg:col-span-9 2xl:col-span-10">
             <!-- BEGIN: Inbox Filter -->
@@ -170,9 +161,14 @@
                     </x-base.menu>
                 </div>
                 <div class="flex w-full sm:w-auto">
-                    <x-base.button class="mr-2 shadow-md" variant="primary" onclick="openComposeModal(); return false;">
+                    <button
+                        type="button"
+                        class="btn-tonal btn-tonal--success mr-2 min-h-[40px] px-4 shadow-md group"
+                        onclick="openComposeModal(); return false;"
+                    >
+                        <x-base.lucide icon="Edit" class="w-4 h-4 mr-2 icon-hover-rise" />
                         Compose
-                    </x-base.button>
+                    </button>
                     <x-base.menu>
                         <x-base.menu.button class="box px-2" as="x-base.button">
                             <span class="flex h-5 w-5 items-center justify-center">
@@ -269,14 +265,14 @@
                         Mail Details
                     </h2>
                     <div class="flex items-center gap-2 mr-4">
-                        <x-base.button type="button" variant="outline-secondary" size="sm" onclick="replyToCurrentMail()">
-                            <x-base.lucide icon="Reply" class="w-4 h-4 mr-1" />
+                        <button type="button" class="btn-tonal btn-tonal--info min-h-[34px] px-3 text-sm group" onclick="replyToCurrentMail()">
+                            <x-base.lucide icon="Reply" class="w-4 h-4 mr-1 icon-hover-rise" />
                             Reply
-                        </x-base.button>
-                        <x-base.button type="button" variant="outline-secondary" size="sm" onclick="forwardCurrentMail()">
-                            <x-base.lucide icon="CornerDownRight" class="w-4 h-4 mr-1" />
+                        </button>
+                        <button type="button" class="btn-tonal btn-tonal--info min-h-[34px] px-3 text-sm group" onclick="forwardCurrentMail()">
+                            <x-base.lucide icon="CornerDownRight" class="w-4 h-4 mr-1 icon-hover-rise" />
                             Forward
-                        </x-base.button>
+                        </button>
                     </div>
                     <button type="button" class="text-slate-400 hover:text-slate-600" onclick="closeViewMailModal()">
                         <x-base.lucide icon="X" class="w-6 h-6" />
@@ -288,9 +284,10 @@
                     </div>
                 </div>
                 <div class="px-5 py-3 border-t border-slate-200/60 dark:border-darkmode-400 flex justify-end gap-2">
-                    <x-base.button type="button" variant="outline-secondary" onclick="closeViewMailModal()">
+                    <button type="button" class="btn-tonal btn-tonal--neutral min-h-[38px] px-4 group" onclick="closeViewMailModal()">
+                        <x-base.lucide icon="X" class="w-4 h-4 mr-2 icon-hover-rise" />
                         Close
-                    </x-base.button>
+                    </button>
                 </div>
             </div>
         </div>
@@ -398,15 +395,30 @@
                         </div>
 
                         <div class="mt-6 flex justify-end gap-2">
-                            <x-base.button type="button" variant="outline-secondary" onclick="closeMailAccountSettingsModal()" class="w-24">
+                            <button
+                                type="button"
+                                class="btn-tonal btn-tonal--neutral min-h-[40px] px-4 group"
+                                onclick="closeMailAccountSettingsModal()"
+                            >
+                                <x-base.lucide icon="X" class="w-4 h-4 mr-2 icon-hover-rise" />
                                 Cancel
-                            </x-base.button>
-                            <x-base.button type="button" variant="outline-secondary" class="w-36" id="test-mail-account-settings-btn">
+                            </button>
+                            <button
+                                type="button"
+                                class="btn-tonal btn-tonal--info min-h-[40px] px-4 group"
+                                id="test-mail-account-settings-btn"
+                            >
+                                <x-base.lucide icon="Activity" class="w-4 h-4 mr-2 icon-hover-rise" />
                                 Test Connection
-                            </x-base.button>
-                            <x-base.button type="button" variant="primary" class="w-32" id="save-mail-account-settings-btn">
+                            </button>
+                            <button
+                                type="button"
+                                class="btn-tonal btn-tonal--success min-h-[40px] px-4 group"
+                                id="save-mail-account-settings-btn"
+                            >
+                                <x-base.lucide icon="Save" class="w-4 h-4 mr-2 icon-hover-rise" />
                                 Save Settings
-                            </x-base.button>
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -587,21 +599,22 @@
 
                         <!-- Actions -->
                         <div class="flex justify-end gap-2 pt-4 border-t">
-                            <x-base.button
-                                variant="outline-secondary"
+                            <button
                                 type="button"
+                                class="btn-tonal btn-tonal--neutral min-h-[40px] px-4 group"
                                 onclick="closeComposeModal()"
                             >
+                                <x-base.lucide icon="X" class="w-4 h-4 mr-2 icon-hover-rise" />
                                 Cancel
-                            </x-base.button>
-                            <x-base.button
-                                variant="primary"
+                            </button>
+                            <button
                                 type="submit"
                                 id="compose-send-mail-btn"
+                                class="btn-tonal btn-tonal--success min-h-[40px] px-4 group"
                             >
-                                <x-base.lucide icon="Send" class="w-4 h-4 mr-2" />
+                                <x-base.lucide icon="Send" class="w-4 h-4 mr-2 icon-hover-rise" />
                                 Send Mail
-                            </x-base.button>
+                            </button>
                         </div>
                     </form>
                 </div>

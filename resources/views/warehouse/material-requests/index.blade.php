@@ -1,7 +1,64 @@
 @extends('../themes/' . $activeTheme . '/' . $activeLayout)
 
+@php
+    $company = $company ?? null;
+    $companies = $companies ?? collect();
+    $warehouses = $warehouses ?? collect();
+    $categories = $categories ?? collect();
+    $materials = $materials ?? collect();
+    $materialCategories = $materialCategories ?? collect();
+
+    $warehousesPayload = $warehouses->map(fn ($warehouse) => [
+        'id' => $warehouse->id,
+        'code' => $warehouse->code,
+        'name' => $warehouse->name,
+        'location' => $warehouse->location,
+    ])->values();
+
+    $materialsPayload = $materials->map(fn ($material) => [
+        'id' => $material['id'] ?? null,
+        'code' => $material['code'] ?? null,
+        'name' => $material['name'] ?? null,
+        'category_id' => $material['category_id'] ?? null,
+        'category_name' => $material['category_name'] ?? null,
+        'unit' => $material['unit'] ?? null,
+        'unit_symbol' => $material['unit_symbol'] ?? null,
+        'price' => $material['price'] ?? 0,
+    ])->values();
+
+    $materialCategoriesPayload = $materialCategories->map(fn ($category) => [
+        'id' => $category['id'] ?? null,
+        'name' => $category['name'] ?? null,
+    ])->values();
+
+    $companiesPayload = $companies->map(fn ($company) => [
+        'id' => $company->id,
+        'name' => $company->name,
+        'address' => $company->address,
+        'logo_url' => $company->logo ? \Illuminate\Support\Facades\Storage::url($company->logo) : null,
+    ])->values();
+
+    $currencySymbol = config('app.currency_symbol', config('app.currency', '$'));
+
+    $defaultCompany = $company ?? $companies->first();
+    $defaultCompanyName = $defaultCompany->name ?? 'Smart ERP';
+    $defaultCompanyAddress = $defaultCompany->address ?? 'Select the warehouse items needed for fulfillment.';
+    $defaultCompanyLogo = $defaultCompany?->logo ? \Illuminate\Support\Facades\Storage::url($defaultCompany->logo) : null;
+    $defaultCompanyId = $defaultCompany->id ?? null;
+
+    $defaultCompanyMeta = [
+        'id' => $defaultCompanyId,
+        'name' => $defaultCompanyName,
+        'address' => $defaultCompanyAddress,
+        'logo_url' => $defaultCompanyLogo
+            ?? 'https://ui-avatars.com/api/?name=' . urlencode($defaultCompanyName)
+            . '&background=1D4ED8&color=fff',
+    ];
+@endphp
+
 @section('subhead')
     <title>Material Requests - {{ config('app.name') }}</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 @endsection
 
 @include('components.datatable.styles')
@@ -16,15 +73,16 @@
 
     <div class="intro-y mt-8 flex items-center">
         <h2 class="mr-auto text-lg font-medium">Material Requests</h2>
-        <x-base.button
-            variant="primary"
-            class="w-40 sm:w-auto sm:ml-4"
-            id="create-material-request-button"
+        <button
             type="button"
+            id="create-material-request-button"
+            class="btn-tonal btn-tonal--success w-40 sm:w-auto sm:ml-4 group"
+            data-tw-toggle="modal"
+            data-tw-target="#material-request-modal"
         >
-            <x-base.lucide icon="Plus" class="w-4 h-4 mr-2" />
+            <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
             New Material Request
-        </x-base.button>
+        </button>
     </div>
 
     <div class="mt-5 grid grid-cols-12 gap-6">
@@ -33,8 +91,9 @@
             <x-base.preview-component class="intro-y box mb-6">
                 <div class="p-5">
                     <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                        <x-base.lucide icon="Filter" class="h-5 w-5" />
+                        <x-base.lucide icon="filter" class="h-5 w-5" />
                         Filters
+                        <span id="material-requests-active-filters" class="hidden ml-2 px-2 py-0.5 text-xs bg-emerald-500/15 text-emerald-700 rounded-full">Active</span>
                     </h3>
 
                     <div class="grid grid-cols-12 gap-4">
@@ -64,24 +123,22 @@
                         </div>
 
                         <div class="col-span-12 md:col-span-4 flex items-end gap-2">
-                            <x-base.button
-                                variant="secondary"
-                                class="flex-1"
+                            <button
                                 type="button"
+                                class="btn-tonal btn-tonal--amber flex-1 group"
                                 onclick="clearFilters()"
                             >
-                                <x-base.lucide icon="X" class="w-4 h-4 mr-2" />
+                                <x-base.lucide icon="rotate-ccw" class="w-4 h-4 icon-hover-rise" />
                                 Clear
-                            </x-base.button>
-                            <x-base.button
-                                variant="primary"
-                                class="flex-1"
+                            </button>
+                            <button
                                 type="button"
+                                class="btn-tonal btn-tonal--info flex-1 group"
                                 onclick="applyFilters()"
                             >
-                                <x-base.lucide icon="Filter" class="w-4 h-4 mr-2" />
+                                <x-base.lucide icon="search" class="w-4 h-4 icon-hover-rise" />
                                 Apply
-                            </x-base.button>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -119,10 +176,32 @@
 
 @include('components.datatable.scripts')
 
+@include('warehouse.material-requests.modals.create-request')
+
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
 
     <script>
+        window.materialRequestPayload = {
+            routes: {
+                store: '{{ route('warehouse.material-requests.store') }}',
+                previewCode: '{{ route('warehouse.material-requests.preview-code') }}'
+            },
+            meta: {
+                csrf: '{{ csrf_token() }}'
+            },
+            data: {
+                companies: @json($companiesPayload),
+                defaultCompany: @json($defaultCompanyMeta),
+                warehouses: @json($warehousesPayload),
+                materials: @json($materialsPayload),
+                categories: @json($materialCategoriesPayload),
+                currencySymbol: @json($currencySymbol)
+            }
+        };
+
+        window.dispatchEvent(new Event('material-request:payload-ready'));
+
         let materialRequestsTable;
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -151,23 +230,39 @@
                     { data: 'title', name: 'title' },
                     { data: 'requested_by_name', name: 'requested_by_name' },
                     { data: 'request_date', name: 'request_date' },
-                    { data: 'total_amount', name: 'total_amount' },
-                    { 
-                        data: 'is_active', 
-                        name: 'is_active',
-                        className: 'text-center',
-                        title: 'Status',
+                    {
+                        data: 'total_amount',
+                        name: 'total_amount',
                         render: function (value) {
-                            if (window.erpCrud && typeof window.erpCrud.renderStatusBadge === 'function') {
-                                return window.erpCrud.renderStatusBadge(value);
+                            if (window.erpCrud && typeof window.erpCrud.formatCurrency === 'function') {
+                                return window.erpCrud.formatCurrency(value);
                             }
-                            return value ? 'Active' : 'Inactive';
+                            return value ?? 0;
                         }
                     },
-                    { data: 'actions', name: 'actions', orderable: false, searchable: false }
+                    {
+                        data: 'status_badge',
+                        name: 'status',
+                        className: 'text-center',
+                        orderable: false,
+                        searchable: false,
+                        render: function (value) {
+                            return value || '';
+                        }
+                    },
+                    {
+                        data: 'actions',
+                        name: 'actions',
+                        orderable: false,
+                        searchable: false,
+                        render: function () {
+                            return '<span class="text-slate-400">Actions</span>';
+                        }
+                    }
                 ],
                 pageLength: 25
             });
+            window.materialRequestsTable = materialRequestsTable;
         }
 
         function setupMaterialRequestsFilters() {

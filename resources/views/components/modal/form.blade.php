@@ -7,21 +7,31 @@
 @pushOnce('styles')
     <style>
         .modal-themed-header {
-            --modal-header-rgb: var(--dt-primary-rgb, var(--primary-rgb, 37 99 235));
+            --modal-header-color: var(--color-primary, var(--primary-color, #2563eb));
+            --modal-header-rgb: var(--color-primary-rgb, var(--primary-rgb, 37 99 235));
             display: flex;
             flex-wrap: wrap;
             align-items: center;
             gap: 1rem;
             background: linear-gradient(135deg,
-                    rgba(var(--modal-header-rgb), 0.68),
-                    rgba(var(--modal-header-rgb), 0.38));
+                    rgb(var(--modal-header-rgb) / 0.68),
+                    rgb(var(--modal-header-rgb) / 0.38));
             padding: 1rem 1.5rem;
-            border-top-left-radius: 0.5rem;
-            border-top-right-radius: 0.5rem;
+            border-top-left-radius: 0.30rem;
+            border-top-right-radius: 0.30rem;
             color: #f8fafc;
             box-shadow: 0 15px 35px rgba(var(--modal-header-rgb), 0.25);
             text-transform: uppercase;
             letter-spacing: 0.08em;
+        }
+
+        @supports (background: color-mix(in srgb, red 50%, transparent)) {
+            .modal-themed-header {
+                background: linear-gradient(135deg,
+                        color-mix(in srgb, var(--modal-header-color) 75%, transparent),
+                        color-mix(in srgb, var(--modal-header-color) 45%, transparent));
+                box-shadow: 0 15px 35px color-mix(in srgb, var(--modal-header-color) 35%, transparent);
+            }
         }
 
         .modal-themed-header__title {

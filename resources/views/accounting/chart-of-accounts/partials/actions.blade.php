@@ -1,30 +1,24 @@
-<div class="flex items-center justify-center space-x-2">
-    <!-- View Account Details -->
-    <button type="button"
-            onclick="viewAccount({{ $account->id }})"
-            class="flex items-center px-2 py-1 text-xs font-medium text-blue-600 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            title="View Account Details">
-        <x-base.lucide icon="Eye" class="w-3 h-3 mr-1" />
-        View
-    </button>
+<div class="flex items-center justify-center gap-2 min-w-[120px]">
+    <x-erp.action-button
+        icon="Eye"
+        title="View Account"
+        variant="info"
+        onclick="viewAccount({{ $account->id }})"
+    />
 
-    <!-- Edit Account -->
-    <button type="button"
-            onclick="editAccount({{ $account->id }}, '{{ $account->name }}', '{{ $account->type }}')"
-            class="flex items-center px-2 py-1 text-xs font-medium text-yellow-600 bg-yellow-100 rounded-md hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
-            title="Edit Account">
-        <x-base.lucide icon="Edit" class="w-3 h-3 mr-1" />
-        Edit
-    </button>
+    <x-erp.action-button
+        icon="Pencil"
+        title="Edit Account"
+        variant="warning"
+        onclick="editAccount({{ $account->id }}, '{{ addslashes($account->name) }}', '{{ $account->type }}')"
+    />
 
-    <!-- Toggle Status -->
-    <button type="button"
-            onclick="toggleAccountStatus({{ $account->id }}, '{{ $account->name }}', {{ $account->is_active ? 'true' : 'false' }})"
-            class="flex items-center px-2 py-1 text-xs font-medium {{ $account->is_active ? 'text-red-600 bg-red-100 hover:bg-red-200 focus:ring-red-500' : 'text-green-600 bg-green-100 hover:bg-green-200 focus:ring-green-500' }} rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2"
-            title="{{ $account->is_active ? 'Deactivate Account' : 'Activate Account' }}">
-        <x-base.lucide icon="{{ $account->is_active ? 'X' : 'Check' }}" class="w-3 h-3 mr-1" />
-        {{ $account->is_active ? 'Deactivate' : 'Activate' }}
-    </button>
+    <x-erp.action-button
+        icon="{{ $account->is_active ? 'Slash' : 'CheckCircle' }}"
+        title="{{ $account->is_active ? 'Deactivate Account' : 'Activate Account' }}"
+        variant="{{ $account->is_active ? 'danger' : 'success' }}"
+        onclick="toggleAccountStatus({{ $account->id }}, '{{ addslashes($account->name) }}', {{ $account->is_active ? 'true' : 'false' }})"
+    />
 </div>
 
 <script>

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Chat;
 
 use App\Http\Controllers\Controller;
-use App\Models\AiInteraction;
+use App\Models\Chat\AiInteraction;
 use App\Models\AiAutomation;
 use App\Models\AiGeneratedContent;
 use App\Services\AiService;

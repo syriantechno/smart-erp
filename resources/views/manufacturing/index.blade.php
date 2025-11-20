@@ -22,12 +22,14 @@
                             </p>
                         </div>
                         <div class="flex space-x-2">
-                            <a href="{{ route('manufacturing.orders.create') }}" class="btn btn-primary">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                </svg>
+                            <button
+                                type="button"
+                                class="btn-tonal btn-tonal--success min-h-[44px] px-4 group"
+                                onclick="window.location.href='{{ route('manufacturing.orders.create') }}'"
+                            >
+                                <x-base.lucide icon="SquarePlus" class="w-4 h-4 mr-2 icon-hover-rise" />
                                 New Production Order
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -169,7 +171,14 @@
                 <div class="p-5">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-base font-medium text-slate-800 dark:text-slate-200">Recent Production Orders</h3>
-                        <a href="{{ route('manufacturing.orders.index') }}" class="text-sm text-blue-600 hover:text-blue-700">View All</a>
+                        <button
+                            type="button"
+                            class="btn-tonal btn-tonal--info min-h-[38px] px-4 text-sm group"
+                            onclick="window.location.href='{{ route('manufacturing.orders.index') }}'"
+                        >
+                            <x-base.lucide icon="Eye" class="w-4 h-4 mr-2 icon-hover-rise" />
+                            View All
+                        </button>
                     </div>
 
                     <div class="overflow-x-auto">
@@ -207,14 +216,13 @@
                                     </td>
                                     <td>{{ $order->start_date->format('M d, Y') }}</td>
                                     <td class="table-report__action">
-                                        <div class="flex items-center">
-                                            <a class="flex items-center mr-3 text-blue-600 hover:text-blue-700" href="{{ route('manufacturing.orders.show', $order) }}">
-                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                                </svg>
-                                                View
-                                            </a>
+                                        <div class="flex items-center justify-center">
+                                            <x-erp.action-button
+                                                icon="Eye"
+                                                title="View Order"
+                                                variant="info"
+                                                onclick="window.location.href='{{ route('manufacturing.orders.show', $order) }}'"
+                                            />
                                         </div>
                                     </td>
                                 </tr>

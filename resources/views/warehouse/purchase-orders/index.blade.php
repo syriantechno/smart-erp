@@ -23,33 +23,34 @@
         <div class="flex items-center gap-2">
             <button
                 type="button"
-                class="btn-tonal btn-tonal--info hidden sm:flex"
+                class="btn-tonal btn-tonal--info hidden sm:flex group"
                 data-tw-toggle="modal"
                 data-tw-target="#purchase-orders-filters-slideover"
             >
-                <x-base.lucide icon="filter" class="w-4 h-4 mr-2" />
+                <x-base.lucide icon="filter" class="w-5 h-5 icon-hover-rise" />
                 Filters
-                <span id="active-filters-indicator" class="hidden ml-2 px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full">Active</span>
+                <span id="active-filters-indicator" class="hidden ml-2 px-2 py-0.5 text-xs bg-white/20 rounded-full">Active</span>
             </button>
 
             <!-- Mobile filters icon -->
             <button
                 type="button"
-                class="flex items-center justify-center rounded-full border border-slate-200 px-3 py-2 text-slate-600 hover:bg-slate-50 sm:hidden"
+                class="btn-tonal btn-tonal--info btn-tonal--icon sm:hidden"
                 data-tw-toggle="modal"
                 data-tw-target="#purchase-orders-filters-slideover"
                 title="Filters"
             >
-                <x-base.lucide icon="filter" class="w-4 h-4" />
+                <x-base.lucide icon="filter" class="w-5 h-5" />
             </button>
 
             <button
                 type="button"
-                class="btn-tonal btn-tonal--success"
+                id="open-create-po-modal"
+                class="btn-tonal btn-tonal--success group"
                 data-tw-toggle="modal"
                 data-tw-target="#create-po-modal"
             >
-                <x-base.lucide icon="plus" class="w-4 h-4 mr-2" />
+                <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
                 Add Purchase Order
             </button>
         </div>
@@ -100,12 +101,12 @@
                                 </x-base.form-select>
                             </div>
                             <div class="mt-2 flex flex-wrap gap-2 xl:mt-0">
-                                <button id="purchase-orders-filter-go" type="button" class="btn-tonal btn-tonal--info">
-                                    <x-base.lucide icon="search" class="w-4 h-4" />
+                                <button id="purchase-orders-filter-go" type="button" class="btn-tonal btn-tonal--info group">
+                                    <x-base.lucide icon="search" class="w-4 h-4 icon-hover-rise" />
                                     Go
                                 </button>
-                                <button id="purchase-orders-filter-reset" type="button" class="btn-tonal btn-tonal--warning">
-                                    <x-base.lucide icon="rotate-ccw" class="w-4 h-4" />
+                                <button id="purchase-orders-filter-reset" type="button" class="btn-tonal btn-tonal--amber group">
+                                    <x-base.lucide icon="rotate-ccw" class="w-4 h-4 icon-hover-rise" />
                                     Reset
                                 </button>
                             </div>
@@ -113,12 +114,12 @@
 
                         <div class="mt-5 flex items-center gap-2 sm:mt-0">
                             <button id="purchase-orders-export" type="button"
-                                class="btn-tonal btn-tonal--info btn-tonal--icon">
-                                <x-base.lucide icon="download" class="h-4 w-4" />
+                                class="btn-tonal btn-tonal--info btn-tonal--icon group">
+                                <x-base.lucide icon="download" class="h-5 w-5 icon-hover-rise" />
                             </button>
                             <button id="purchase-orders-refresh" type="button"
-                                class="btn-tonal btn-tonal--success btn-tonal--icon">
-                                <x-base.lucide icon="refresh-ccw" class="h-4 w-4" />
+                                class="btn-tonal btn-tonal--success btn-tonal--icon group">
+                                <x-base.lucide icon="refresh-ccw" class="h-5 w-5 icon-hover-rise" />
                             </button>
                         </div>
                     </div>
@@ -168,15 +169,7 @@
                 const openBtn = document.getElementById('open-create-po-modal');
                 if (openBtn) {
                     openBtn.addEventListener('click', function () {
-                        const codeInput = document.getElementById('create-po-modal-code');
-                        if (codeInput) {
-                            jq.get('{{ route("warehouse.purchase-orders.preview-code") }}')
-                                .done(function (response) {
-                                    if (response && response.code) {
-                                        codeInput.value = response.code;
-                                    }
-                                });
-                        }
+                        refreshPurchaseOrderCode();
                     });
                 }
             });
@@ -227,6 +220,7 @@
             $('#purchase-orders-filter-go').on('click', function() {
                 purchaseOrdersTable.page.len(parseInt($('#purchase-orders-filter-length').val())).draw();
                 purchaseOrdersTable.ajax.reload();
+                updateActiveFiltersIndicator();
             });
 
             // Reset filters
@@ -237,6 +231,7 @@
                 $('#purchase-orders-filter-length').val('25');
                 purchaseOrdersTable.page.len(25).draw();
                 purchaseOrdersTable.ajax.reload();
+                updateActiveFiltersIndicator();
             });
 
             // Enter key on search
@@ -245,6 +240,11 @@
                     $('#purchase-orders-filter-go').click();
                 }
             });
+
+            $('#purchase-orders-filter-field, #purchase-orders-filter-type').on('change', updateActiveFiltersIndicator);
+            $('#purchase-orders-filter-value').on('input', updateActiveFiltersIndicator);
+
+            updateActiveFiltersIndicator();
 
             // Page length change
             $('#purchase-orders-filter-length').on('change', function() {
@@ -268,9 +268,20 @@
             $.get('{{ route("warehouse.purchase-orders.preview-code") }}')
                 .done(function (response) {
                     if (response && response.code) {
-                        document.getElementById('create-po-modal-code').value = response.code;
+                        const input = document.getElementById('create-po-code');
+                        if (input) {
+                            input.value = response.code;
+                        }
                     }
                 });
+        }
+
+        function updateActiveFiltersIndicator() {
+            const field = $('#purchase-orders-filter-field').val();
+            const value = $('#purchase-orders-filter-value').val() || '';
+            const hasValue = value.trim().length > 0;
+            const hasSpecificField = field && field !== 'all' && hasValue;
+            $('#active-filters-indicator').toggleClass('hidden', !(hasValue || hasSpecificField));
         }
 
         function deletePurchaseOrder(id, name) {

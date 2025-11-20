@@ -10,15 +10,15 @@
 @section('subcontent')
     <div class="intro-y mt-8 flex items-center">
         <h2 class="mr-auto text-lg font-medium">Shift Management</h2>
-        <x-base.button
-            variant="primary"
-            class="w-40 sm:w-auto sm:ml-4"
+        <button
+            type="button"
+            class="btn-tonal btn-tonal--info w-40 sm:w-auto sm:ml-4 group"
             data-tw-toggle="modal"
             data-tw-target="#create-shift-modal"
         >
-            <x-base.lucide icon="Plus" class="w-4 h-4 mr-2" />
+            <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
             Add Shift
-        </x-base.button>
+        </button>
     </div>
 
     <div class="mt-5 grid grid-cols-12 gap-6">
@@ -83,23 +83,28 @@
                                     <option value="100">100</option>
                                 </x-base.form-select>
                             </div>
-                            <div class="mt-2 xl:mt-0">
-                                <x-base.button id="shifts-filter-go" type="button" variant="primary" class="w-full sm:w-16">
-                                    Search
-                                </x-base.button>
-                                <x-base.button id="shifts-filter-reset" type="button" variant="secondary" class="mt-2 w-full sm:ml-1 sm:mt-0 sm:w-16">
+                            <div class="mt-4 flex flex-wrap gap-2 sm:items-center xl:mt-0">
+                                <button id="shifts-filter-go" type="button" class="btn-tonal btn-tonal--info w-full sm:w-24 group">
+                                    <x-base.lucide icon="search" class="w-4 h-4 icon-hover-rise" />
+                                    Go
+                                </button>
+                                <button id="shifts-filter-reset" type="button" class="btn-tonal btn-tonal--amber w-full sm:w-24 group">
+                                    <x-base.lucide icon="rotate-ccw" class="w-4 h-4 icon-hover-rise" />
                                     Reset
-                                </x-base.button>
+                                </button>
                             </div>
                         </form>
 
-                        <div class="mt-5 flex sm:mt-0">
-                            <x-base.button id="shifts-export" variant="primary" class="mr-2 w-1/2 sm:w-auto">
-                                <x-base.lucide icon="Download" class="mr-2 h-4 w-4" /> Export
-                            </x-base.button>
-                            <x-base.button id="shifts-refresh" variant="primary" class="mr-2 w-1/2 sm:w-auto">
-                                <x-base.lucide icon="RefreshCcw" class="mr-2 h-4 w-4" /> Refresh
-                            </x-base.button>
+                        <div class="mt-5 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
+                            <button type="button" class="btn-tonal btn-tonal--purple btn-tonal--icon group" title="Print">
+                                <x-base.lucide icon="printer" class="w-5 h-5 icon-hover-rise" />
+                            </button>
+                            <button id="shifts-export" type="button" class="btn-tonal btn-tonal--lime btn-tonal--icon group" title="Export">
+                                <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
+                            </button>
+                            <button id="shifts-refresh" type="button" class="btn-tonal btn-tonal--sky btn-tonal--icon group" title="Refresh">
+                                <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
+                            </button>
                         </div>
                     </div>
 

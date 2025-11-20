@@ -108,22 +108,23 @@
 
             <!-- Footer -->
             <x-base.dialog.footer>
-                <x-base.button
+                <button
                     type="button"
-                    variant="secondary"
+                    class="btn-tonal btn-tonal--neutral min-h-[42px] px-4 group"
                     x-on:click="$dispatch('close')"
                 >
+                    <x-base.lucide icon="X" class="w-4 h-4 mr-2 icon-hover-rise" />
                     Cancel
-                </x-base.button>
+                </button>
 
-                <x-base.button
+                <button
                     type="submit"
-                    variant="primary"
                     id="submit-account-btn"
+                    class="btn-tonal btn-tonal--success min-h-[42px] px-5 group"
                 >
-                    <x-base.lucide icon="Save" class="w-4 h-4 mr-2" />
+                    <x-base.lucide icon="Save" class="w-4 h-4 mr-2 icon-hover-rise" />
                     Create Account
-                </x-base.button>
+                </button>
             </x-base.dialog.footer>
         </form>
     </x-base.dialog.panel>

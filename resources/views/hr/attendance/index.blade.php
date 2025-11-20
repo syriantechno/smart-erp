@@ -93,7 +93,7 @@
                         <div class="flex items-center gap-2 mb-4 sm:mb-0">
                             <h5 class="font-semibold">Attendance Table - {{ \Carbon\Carbon::create($year, $month)->locale('ar')->monthName }} {{ $year }}</h5>
                         </div>
-                        <div class="flex gap-2">
+                        <div class="flex gap-2 flex-wrap justify-end">
                             <!-- Month/Year Selector -->
                             <div class="flex gap-2">
                                 <select
@@ -117,25 +117,38 @@
                                 </select>
                             </div>
 
-                            {{-- Adjusted order so they render correctly with the layout --}}
-                            <x-base.button variant="primary" size="sm" id="export-btn">
-                                <x-base.lucide icon="Download" class="w-4 h-4 mr-1" />
-                                Export
-                            </x-base.button>
+                            <div class="flex flex-wrap gap-2">
+                                <button
+                                    id="export-btn"
+                                    type="button"
+                                    class="btn-tonal btn-tonal--lime btn-tonal--icon group"
+                                    title="Export attendance"
+                                >
+                                    <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
+                                </button>
 
-                            <x-base.button variant="primary" size="sm" id="load-month-btn">
-                                <x-base.lucide icon="RefreshCw" class="w-4 h-4 mr-1" />
-                                Refresh
-                            </x-base.button>
+                                <button
+                                    id="load-month-btn"
+                                    type="button"
+                                    class="btn-tonal btn-tonal--sky btn-tonal--icon group"
+                                    title="Refresh month"
+                                >
+                                    <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
+                                </button>
 
-                            <x-base.button variant="primary" size="sm" id="add-attendance-btn">
-                                <x-base.lucide icon="Plus" class="w-4 h-4 mr-1" />
-                                Add Attendance
-                            </x-base.button>
+                                <button
+                                    id="add-attendance-btn"
+                                    type="button"
+                                    class="btn-tonal btn-tonal--success group"
+                                >
+                                    <x-base.lucide icon="plus" class="w-5 h-5 icon-hover-rise" />
+                                    Add Attendance
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="mt-4 flex flex-wrap items-center gap-4 text-xs bg-slate-800 text-slate-100 dark:bg-slate-800 dark:text-slate-100 rounded-lg px-4 py-3">
+                    <div class="legend-banner mt-4 flex flex-wrap items-center gap-4 text-xs">
                         <div class="flex items-center gap-2">
                             <span class="text-base">✓</span>
                             <span>Present (Full Day)</span>
@@ -508,6 +521,44 @@
 #attendance-table .font-bold {
     margin: 0 !important;
     line-height: 2.8 !important;
+}
+
+.legend-banner {
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    box-shadow: 0 10px 25px color-mix(in oklch, rgb(var(--dt-primary-rgb, var(--primary-rgb, 37 99 235))), transparent 88%);
+    border: 1px solid color-mix(in oklch, rgb(var(--dt-primary-rgb, var(--primary-rgb, 37 99 235))), transparent 80%);
+    background: color-mix(in oklch, rgb(var(--dt-primary-rgb, var(--primary-rgb, 37 99 235))) 18%, #ffffff);
+    color: color-mix(in oklch, rgb(var(--dt-primary-rgb, var(--primary-rgb, 37 99 235))), black 20%);
+}
+
+:root[data-theme="dark"] .legend-banner,
+.dark .legend-banner {
+    background: color-mix(in oklch, rgb(var(--dt-primary-rgb, var(--primary-rgb, 37 99 235))) 12%, rgb(15 23 42));
+    border-color: color-mix(in oklch, rgb(var(--dt-primary-rgb, var(--primary-rgb, 37 99 235))), transparent 70%);
+    color: color-mix(in oklch, rgb(var(--dt-primary-rgb, var(--primary-rgb, 37 99 235))), white 35%);
+    box-shadow: 0 15px 30px rgba(15, 23, 42, 0.35);
+}
+
+@supports (background: color-mix(in srgb, red 50%, transparent)) {
+    .legend-banner {
+        background: linear-gradient(
+            135deg,
+            color-mix(in srgb, var(--dt-primary-color, var(--primary-color, #2563eb)) 75%, transparent),
+            color-mix(in srgb, var(--dt-primary-color, var(--primary-color, #2563eb)) 40%, transparent)
+        );
+        color: color-mix(in srgb, var(--dt-primary-color, var(--primary-color, #2563eb)), black 15%);
+    }
+
+    :root[data-theme="dark"] .legend-banner,
+    .dark .legend-banner {
+        background: linear-gradient(
+            135deg,
+            color-mix(in srgb, var(--dt-primary-color, var(--primary-color, #2563eb)) 30%, rgb(15 23 42)),
+            color-mix(in srgb, var(--dt-primary-color, var(--primary-color, #2563eb)) 10%, rgb(15 23 42))
+        );
+        color: color-mix(in srgb, var(--dt-primary-color, var(--primary-color, #2563eb)), white 40%);
+    }
 }
 </style>
 @endpush

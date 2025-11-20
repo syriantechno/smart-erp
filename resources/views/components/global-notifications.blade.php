@@ -20,77 +20,28 @@
         }
 
 
-        /* SweetAlert Delete Modal Animated Buttons */
-        .swal-modern-confirm,
-        .swal-modern-cancel {
+        /* SweetAlert Delete Modal Buttons -> reuse btn-tonal styles */
+        .swal-modern-btn {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            gap: 0.35rem;
+            font-weight: 600;
         }
 
-        .swal-modern-confirm::before,
-        .swal-modern-cancel::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
+        .swal-modern-btn .swal-btn-icon {
+            width: 1rem;
+            height: 1rem;
+            display: inline-flex;
         }
 
-        .swal-modern-confirm:hover::before,
-        .swal-modern-cancel:hover::before {
-            width: 300px;
-            height: 300px;
+        .swal-modern-btn svg {
+            width: 100%;
+            height: 100%;
         }
 
-        .swal-modern-confirm {
-            background: #ef4444;
-            border: none;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 6px;
+        .swal-modern-btn.btn-tonal--danger svg {
+            color: #b21a50;
         }
-
-        .swal-modern-confirm:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
-        }
-
-        .swal-modern-cancel {
-            background: #f3f4f6;
-            border: 1px solid #d1d5db;
-            color: #374151;
-            padding: 8px 16px;
-            border-radius: 6px;
-        }
-
-        .swal-modern-cancel:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            background: #e5e7eb;
-        }
-
-        .swal-modern-confirm svg,
-        .swal-modern-cancel svg {
-            transition: transform 0.3s ease;
-        }
-
-        .swal-modern-confirm:hover svg {
-            transform: scale(1.1) rotate(5deg);
-        }
-
-        .swal-modern-cancel:hover svg {
-            transform: scale(1.1) rotate(-5deg);
-        }
-
         @keyframes modalFadeIn {
             from {
                 opacity: 0;
@@ -206,7 +157,7 @@
             border-radius: 1.5rem !important;
             border: 1px solid rgba(148, 163, 184, 0.35);
             box-shadow: 0 30px 60px rgba(15, 23, 42, 0.18);
-            padding: 1.75rem 1.75rem 1.85rem !important;
+            padding: 2.25rem 2.25rem 2.3rem !important;
             background: #ffffff;
         }
 
@@ -219,8 +170,8 @@
         }
 
         .swal-modern-icon {
-            width: 76px;
-            height: 76px;
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
             background: rgba(239, 68, 68, 0.08);
             color: #ef4444;
@@ -232,8 +183,8 @@
         }
 
         .swal-modern-icon svg {
-            width: 34px;
-            height: 34px;
+            width: 24px;
+            height: 24px;
         }
 
         .swal-modern-text {
@@ -584,14 +535,32 @@
                 showCancelButton: true,
                 reverseButtons: true,
                 focusCancel: true,
-                confirmButtonText: 'Yes, delete',
-                cancelButtonText: 'Cancel',
+                confirmButtonText: `
+                    <span class="swal-btn-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                        </svg>
+                    </span>
+                    <span class="swal-btn-label">Delete</span>
+                `,
+                cancelButtonText: `
+                    <span class="swal-btn-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </span>
+                    <span class="swal-btn-label">Cancel</span>
+                `,
                 buttonsStyling: false,
                 customClass: {
                     popup: 'swal-modern-popup',
                     actions: 'swal-modern-actions',
-                    confirmButton: 'swal-modern-confirm',
-                    cancelButton: 'swal-modern-cancel',
+                    confirmButton: 'swal-modern-btn btn-tonal btn-tonal--danger',
+                    cancelButton: 'swal-modern-btn btn-tonal btn-tonal--neutral',
                 },
                 backdrop: 'rgba(15,23,42,0.55)',
             }).then((result) => {

@@ -8,6 +8,7 @@ use RuntimeException;
 
 class DocumentCodeGenerator
 {
+
     public function generate(string $documentType): string
     {
         return $this->resolveCode($documentType, true);
@@ -27,6 +28,7 @@ class DocumentCodeGenerator
         }
 
         if (!$persist) {
+            $this->ensureBaseline($setting);
             return $setting->previewCode();
         }
 
@@ -41,8 +43,10 @@ class DocumentCodeGenerator
 
     protected function generateNextCode(PrefixSetting $setting): string
     {
+        $this->ensureBaseline($setting);
+
         // Use atomic increment with lock to prevent race conditions
-        $newNumber = DB::table('prefix_settings')
+        DB::table('prefix_settings')
             ->where('id', $setting->id)
             ->lockForUpdate()
             ->increment('current_number');
@@ -100,14 +104,57 @@ class DocumentCodeGenerator
             'employees' => 'employees',
             'departments' => 'departments',
             'positions' => 'positions',
+            'leave' => 'leaves',
             'tasks' => 'tasks',
             'projects' => 'projects',
             'materials' => 'materials',
             'warehouses' => 'warehouses',
             'categories' => 'categories',
+            'purchase_requests' => 'purchase_requests',
             // Add more mappings as needed
         ];
 
         return $tableMap[$documentType] ?? null;
+    }
+
+    protected function ensureBaseline(PrefixSetting $setting): void
+    {
+        $tableName = $this->getTableName($setting->document_type);
+
+        if (! $tableName) {
+            return;
+        }
+
+        $lastRecord = DB::table($tableName)
+            ->where('code', 'like', $setting->prefix . '%')
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if ($lastRecord && isset($lastRecord->code)) {
+            $pattern = '/^' . preg_quote($setting->prefix, '/') . '-(?:\d{4}-)?(\d+)$/';
+            if (preg_match($pattern, $lastRecord->code, $matches)) {
+                $lastNumber = (int) $matches[1];
+
+                if ($setting->current_number < $lastNumber) {
+                    DB::table('prefix_settings')
+                        ->where('id', $setting->id)
+                        ->update(['current_number' => $lastNumber]);
+
+                    $setting->current_number = $lastNumber;
+                }
+
+                return;
+            }
+        }
+
+        $baseline = max(0, ($setting->start_number ?? 1) - 1);
+
+        if ($setting->current_number !== $baseline) {
+            DB::table('prefix_settings')
+                ->where('id', $setting->id)
+                ->update(['current_number' => $baseline]);
+
+            $setting->current_number = $baseline;
+        }
     }
 }

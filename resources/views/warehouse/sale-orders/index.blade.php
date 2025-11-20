@@ -16,6 +16,38 @@
 
     <div class="intro-y mt-8 flex items-center">
         <h2 class="mr-auto text-lg font-medium">Sale Orders</h2>
+        <div class="flex items-center gap-2">
+            <button
+                type="button"
+                class="btn-tonal btn-tonal--info hidden sm:flex group"
+                data-tw-toggle="modal"
+                data-tw-target="#sale-orders-filters-slideover"
+            >
+                <x-base.lucide icon="filter" class="w-5 h-5 icon-hover-rise" />
+                Filters
+                <span id="sale-orders-active-filters" class="hidden ml-2 px-2 py-0.5 text-xs bg-white/20 rounded-full">Active</span>
+            </button>
+
+            <button
+                type="button"
+                class="btn-tonal btn-tonal--info btn-tonal--icon sm:hidden"
+                data-tw-toggle="modal"
+                data-tw-target="#sale-orders-filters-slideover"
+                title="Filters"
+            >
+                <x-base.lucide icon="filter" class="w-5 h-5" />
+            </button>
+
+            <button
+                type="button"
+                id="open-create-so-modal"
+                class="btn-tonal btn-tonal--success group"
+                data-tw-toggle="modal"
+            >
+                <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
+                Add Sale Order
+            </button>
+        </div>
     </div>
 
     <div class="mt-5 grid grid-cols-12 gap-6">
@@ -70,23 +102,23 @@
                             />
                         </div>
 
-                        <div class="col-span-12 flex justify-end gap-2 mt-2">
-                            <x-base.button
-                                variant="secondary"
+                        <div class="col-span-12 flex justify-end gap-2 mt-2 flex-wrap">
+                            <button
                                 type="button"
+                                class="btn-tonal btn-tonal--amber group"
                                 onclick="clearSoFilters()"
                             >
-                                <x-base.lucide icon="X" class="w-4 h-4 mr-2" />
+                                <x-base.lucide icon="rotate-ccw" class="w-4 h-4 icon-hover-rise" />
                                 Clear
-                            </x-base.button>
-                            <x-base.button
-                                variant="primary"
+                            </button>
+                            <button
                                 type="button"
+                                class="btn-tonal btn-tonal--info group"
                                 onclick="applySoFilters()"
                             >
-                                <x-base.lucide icon="Filter" class="w-4 h-4 mr-2" />
+                                <x-base.lucide icon="search" class="w-4 h-4 icon-hover-rise" />
                                 Apply
-                            </x-base.button>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -194,12 +226,18 @@
             jq('#so-status-filter, #so-warehouse-filter').on('change', function() {
                 applySoFilters();
             });
+
+            jq('#so-search-filter').on('input', updateSaleOrdersActiveFilters);
+            jq('#so-status-filter, #so-warehouse-filter').on('change', updateSaleOrdersActiveFilters);
+
+            updateSaleOrdersActiveFilters();
         }
 
         function applySoFilters() {
             if (saleOrdersTable) {
                 saleOrdersTable.ajax.reload();
             }
+            updateSaleOrdersActiveFilters();
         }
 
         function clearSoFilters() {
@@ -212,6 +250,19 @@
             jq('#so-warehouse-filter').val('');
             jq('#so-search-filter').val('');
             applySoFilters();
+        }
+
+        function updateSaleOrdersActiveFilters() {
+            const jq = window.jQuery || window.$;
+            if (!jq) {
+                return;
+            }
+
+            const hasStatus = jq('#so-status-filter').val();
+            const hasWarehouse = jq('#so-warehouse-filter').val();
+            const hasSearch = (jq('#so-search-filter').val() || '').trim().length > 0;
+
+            jq('#sale-orders-active-filters').toggleClass('hidden', !(hasStatus || hasWarehouse || hasSearch));
         }
     </script>
 @endpush

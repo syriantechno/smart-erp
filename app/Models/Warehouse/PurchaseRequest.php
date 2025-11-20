@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Setting\Company;
+use App\Models\User;
 
 class PurchaseRequest extends Model
 {
@@ -16,9 +18,12 @@ class PurchaseRequest extends Model
         'title',
         'description',
         'status',
+        'priority',
         'request_date',
         'requested_by',
         'approved_by',
+        'company_id',
+        'warehouse_id',
         'total_amount',
         'is_active'
     ];
@@ -26,6 +31,7 @@ class PurchaseRequest extends Model
     protected $casts = [
         'request_date' => 'date',
         'total_amount' => 'decimal:2',
+        'priority' => 'string',
         'is_active' => 'boolean',
     ];
 
@@ -42,6 +48,16 @@ class PurchaseRequest extends Model
     public function approvedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
+    }
+
+    public function warehouse(): BelongsTo
+    {
+        return $this->belongsTo(Warehouse::class);
     }
 
     public function items(): HasMany

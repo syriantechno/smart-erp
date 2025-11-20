@@ -143,7 +143,11 @@ Route::middleware('auth')->group(function () {
         Route::get('attendance/stats', [App\Http\Controllers\HR\AttendanceController::class, 'getMonthlyStats'])->name('attendance.stats');
         
         // Leave Management
-        Route::get('leave', [App\Http\Controllers\HR\LeaveController::class, 'index'])->name('leave.index');
+        Route::get('leave/datatable', [App\Http\Controllers\HR\LeaveController::class, 'datatable'])->name('leave.datatable');
+        Route::get('leave/summary', [App\Http\Controllers\HR\LeaveController::class, 'summary'])->name('leave.summary');
+        Route::get('leave/preview-code', [App\Http\Controllers\HR\LeaveController::class, 'previewCode'])->name('leave.preview-code');
+        Route::resource('leave', App\Http\Controllers\HR\LeaveController::class)
+            ->only(['index', 'store', 'show', 'update', 'destroy']);
         
         // Payroll
         Route::get('payroll', [App\Http\Controllers\HR\PayrollController::class, 'index'])->name('payroll.index');
@@ -219,6 +223,11 @@ Route::middleware('auth')->group(function () {
             Route::get('/{material}', [App\Http\Controllers\Warehouse\MaterialController::class, 'show'])->name('show');
             Route::put('/{material}', [App\Http\Controllers\Warehouse\MaterialController::class, 'update'])->name('update');
             Route::delete('/{material}', [App\Http\Controllers\Warehouse\MaterialController::class, 'destroy'])->name('destroy');
+        });
+
+        // Measurement Units (quick add support)
+        Route::prefix('measurement-units')->name('measurement-units.')->group(function () {
+            Route::post('/', [App\Http\Controllers\Warehouse\MeasurementUnitController::class, 'store'])->name('store');
         });
 
         // Inventory

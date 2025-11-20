@@ -47,9 +47,6 @@
             outline-offset: 3px;
         }
 
-        .btn-tonal svg {
-            color: color-mix(in oklch, var(--color-primary, #2563eb), black 10%);
-        }
     </style>
 @endpush
 
@@ -154,28 +151,23 @@
                             </div>
                         </form>
 
-                        <div class="mt-5 flex items-center gap-2 sm:mt-0">
-                            <x-base.tippy id="employees-export" as="button" type="button"
-                                class="btn-tonal btn-tonal--info btn-tonal--icon"
-                                content="Export current view to CSV">
-                                <x-base.lucide icon="Download" class="h-4 w-4" />
-                            </x-base.tippy>
-                            <x-base.tippy id="employees-export-pdf" as="button" type="button"
-                                class="btn-tonal btn-tonal--danger btn-tonal--icon"
-                                content="Export current view to PDF">
-                                <x-base.lucide icon="FileText" class="h-4 w-4" />
-                            </x-base.tippy>
-                            <x-base.tippy id="employees-import" as="button" type="button"
-                                class="btn-tonal btn-tonal--warning btn-tonal--icon"
-                                content="Import employees from CSV">
-                                <x-base.lucide icon="UploadCloud" class="h-4 w-4" />
-                            </x-base.tippy>
+                        <div class="mt-5 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
+                            <button type="button" class="btn-tonal btn-tonal--purple btn-tonal--icon group" title="Print">
+                                <x-base.lucide icon="printer" class="w-5 h-5 icon-hover-rise" />
+                            </button>
+                            <button id="employees-export-pdf" type="button" class="btn-tonal btn-tonal--rose btn-tonal--icon group" title="Export PDF">
+                                <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
+                            </button>
+                            <button id="employees-export" type="button" class="btn-tonal btn-tonal--lime btn-tonal--icon group" title="Export to Excel">
+                                <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
+                            </button>
+                            <button id="employees-import" type="button" class="btn-tonal btn-tonal--amber btn-tonal--icon group" title="Import employees">
+                                <x-base.lucide icon="upload-cloud" class="w-5 h-5 icon-hover-rise" />
+                            </button>
                             <input type="file" id="employees-import-input" accept=".csv,text/csv" class="hidden" />
-                            <x-base.tippy id="employees-refresh" as="button" type="button"
-                                class="btn-tonal btn-tonal--success btn-tonal--icon"
-                                content="Refresh table">
-                                <x-base.lucide icon="RefreshCcw" class="h-4 w-4" />
-                            </x-base.tippy>
+                            <button id="employees-refresh" type="button" class="btn-tonal btn-tonal--sky btn-tonal--icon group" title="Refresh">
+                                <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
+                            </button>
                         </div>
                     </div>
 

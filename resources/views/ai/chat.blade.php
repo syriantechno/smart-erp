@@ -157,16 +157,15 @@
                             <option value="analysis">📊 Analysis</option>
                             <option value="generation">✨ Generation</option>
                         </x-base.form-select>
-                        <x-base.button
+                        <button
                             type="button"
-                            variant="outline-secondary"
-                            size="sm"
-                            class="hidden sm:inline-flex"
+                            class="btn-tonal btn-tonal--neutral hidden sm:inline-flex min-h-[36px] px-3 text-xs font-semibold"
                             onclick="clearChat()"
                             title="Clear Conversation"
                         >
-                            <x-base.lucide icon="Trash2" class="w-4 h-4" />
-                        </x-base.button>
+                            <x-base.lucide icon="Trash2" class="w-4 h-4 mr-1 icon-hover-rise" />
+                            Clear
+                        </button>
                     </div>
                 </div>
 
@@ -232,16 +231,15 @@
                                 </div>
                             </div>
                         </div>
-                        <x-base.button
+                        <button
                             id="send-button"
                             type="button"
-                            variant="primary"
-                            class="rounded-full p-3 md:p-3.5 shadow-sm shadow-blue-500/20"
+                            class="btn-tonal btn-tonal--info rounded-full p-3 md:p-3.5 shadow-sm shadow-blue-500/20 group disabled:opacity-60"
                             onclick="sendMessage()"
                             disabled
                         >
-                            <x-base.lucide icon="Send" class="w-4 h-4 md:w-5 md:h-5" />
-                        </x-base.button>
+                            <x-base.lucide icon="Send" class="w-4 h-4 md:w-5 md:h-5 icon-hover-rise" />
+                        </button>
                     </div>
 
                     <!-- Quick Commands -->
@@ -265,6 +263,45 @@
 
         <!-- Sidebar -->
         <div class="col-span-12 xl:col-span-4 space-y-6">
+            <!-- AI Sidebar Hero -->
+            <div class="intro-y">
+                <div
+                    class="rounded-2xl border border-white/10 text-white shadow-[0_20px_50px_rgba(15,31,61,0.35)]"
+                    style="background: linear-gradient(135deg, var(--primary-color, #0f1f3d) 0%, var(--secondary-color, #1d3d8f) 45%, var(--accent-color, #0998d6) 100%);"
+                >
+                    <div class="p-6 space-y-4">
+                        <div>
+                            <p class="text-xs uppercase tracking-[0.35em] text-white/70">AI Control Center</p>
+                            <h3 class="mt-2 text-2xl font-semibold leading-tight">Conversations hub for {{ config('app.name') }}</h3>
+                            <p class="mt-3 text-sm text-white/80">
+                                Stay synced with recent insights, quick modes, and instant resets.
+                            </p>
+                        </div>
+                        <button
+                            type="button"
+                            class="flex w-full items-center rounded-xl bg-white/15 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-400/30 transition hover:bg-white/20"
+                            onclick="clearChat(); return false;"
+                        >
+                            <x-base.lucide icon="RotateCcw" class="mr-3 h-4 w-4" />
+                            New Conversation
+                            <span class="ml-auto rounded-full bg-white/20 px-2 py-0.5 text-[11px] tracking-wide">Reset</span>
+                        </button>
+                    </div>
+                    <div class="grid gap-3 border-t border-white/10 p-6 sm:grid-cols-2">
+                        <div class="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur-md shadow-lg shadow-primary/20">
+                            <p class="text-xs uppercase tracking-wide text-white/70">Active Mode</p>
+                            <p class="mt-1 text-xl font-semibold" id="chat-mode-label">Chat mode</p>
+                            <span class="text-xs text-white/60">Adjust via dropdown</span>
+                        </div>
+                        <div class="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur-md shadow-lg shadow-sky-500/20">
+                            <p class="text-xs uppercase tracking-wide text-white/70">Interactions today</p>
+                            <p class="mt-1 text-xl font-semibold" id="chat-interactions-count">—</p>
+                            <span class="text-xs text-white/60">Live statistics</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Recent Interactions -->
             <div class="bg-white dark:bg-darkmode-600 rounded-2xl p-5 shadow-sm border border-slate-200/70 dark:border-darkmode-400">
                 <div class="flex items-center justify-between mb-4">
@@ -400,6 +437,14 @@
                     'generation': '✨ Generation Mode - Create content'
                 };
                 $('#mode-indicator').text(indicators[mode] || '💬 Chat Mode');
+
+                const heroLabels = {
+                    'chat': 'Conversational',
+                    'command': 'Command Mode',
+                    'analysis': 'Analysis Mode',
+                    'generation': 'Creative Mode'
+                };
+                $('#chat-mode-label').text(heroLabels[mode] || 'Adaptive Mode');
 
                 // Update quick commands based on mode
                 updateQuickCommands(mode);
@@ -628,6 +673,7 @@
             $('#total-interactions').text('Loading...');
             $('#success-rate').text('Loading...');
             $('#tokens-used').text('Loading...');
+            $('#chat-interactions-count').text('Loading...');
         }
 
         function showToast(message, type = 'info') {

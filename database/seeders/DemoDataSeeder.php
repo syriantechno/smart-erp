@@ -147,6 +147,80 @@ class DemoDataSeeder extends Seeder
 
         DB::table('employees')->insert($employees);
 
+        // 4. إنشاء طلبات الإجازة التجريبية
+        $leaves = [
+            [
+                'code' => 'LV-2025-001',
+                'employee_id' => 1,
+                'department_id' => 1,
+                'company_id' => 1,
+                'leave_type' => 'annual',
+                'reason_category' => 'vacation',
+                'start_date' => '2025-10-02',
+                'end_date' => '2025-10-06',
+                'days_count' => 5,
+                'is_paid' => true,
+                'status' => 'approved',
+                'reason_details' => 'إجازة عائلية إلى دبي',
+                'notes' => 'تمت الموافقة من المدير المالي',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'code' => 'LV-2025-002',
+                'employee_id' => 2,
+                'department_id' => 1,
+                'company_id' => 1,
+                'leave_type' => 'sick',
+                'reason_category' => 'medical',
+                'start_date' => '2025-11-12',
+                'end_date' => '2025-11-14',
+                'days_count' => 3,
+                'is_paid' => true,
+                'status' => 'pending',
+                'reason_details' => 'مراجعة طبية خارجية',
+                'notes' => 'بانتظار التقرير الطبي',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'code' => 'LV-2025-003',
+                'employee_id' => 3,
+                'department_id' => 3,
+                'company_id' => 2,
+                'leave_type' => 'emergency',
+                'reason_category' => 'family',
+                'start_date' => '2025-09-21',
+                'end_date' => '2025-09-23',
+                'days_count' => 3,
+                'is_paid' => true,
+                'status' => 'approved',
+                'reason_details' => 'ظرف عائلي طارئ',
+                'notes' => 'تم تعويضه بالمندوب الإقليمي',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'code' => 'LV-2025-004',
+                'employee_id' => 4,
+                'department_id' => 4,
+                'company_id' => 2,
+                'leave_type' => 'unpaid',
+                'reason_category' => 'remote',
+                'start_date' => '2025-08-01',
+                'end_date' => '2025-08-10',
+                'days_count' => 10,
+                'is_paid' => false,
+                'status' => 'rejected',
+                'reason_details' => 'طلب إجازة غير مدفوعة للعمل عن بعد خارج البلاد',
+                'notes' => 'تعارض مع تسليمات حرجة',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ];
+
+        DB::table('leaves')->insert($leaves);
+
         // 4. إنشاء المشاريع
         $projects = [
             [

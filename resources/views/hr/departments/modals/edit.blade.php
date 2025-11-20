@@ -1,193 +1,105 @@
 @php
-$companies = \App\Models\Company::active()->get();
-$managers = \App\Models\HR\Employee::active()->get();
-$departments = \App\Models\HR\Department::where('id', '!=', $department->id)
-    ->where('company_id', $department->company_id)
-    ->where(function($query) use ($department) {
-        $query->whereNull('parent_id')
-            ->orWhere('parent_id', '!=', $department->id);
-    })
-    ->where('is_active', true)
-    ->get();
+    $companies = $companies ?? \App\Models\Setting\Company::active()->get();
+    $managers = $managers ?? \App\Models\HR\Employee::active()->get();
+    $departments = $departments ?? \App\Models\HR\Department::active()->get();
 @endphp
-<x-base.dialog id="edit-department-modal-{{ $department->id }}" size="lg" class="hidden">
-    <x-base.dialog.panel>
-        <x-base.dialog.title>
-            <div class="flex items-center gap-3">
-                <div class="side-menu__icon">
-                    <x-base.lucide icon="layers" />
+
+@push('modals')
+    <x-modal.form id="edit-department-modal" title="Edit Department" class="hidden">
+        <form id="edit-department-form" action="" method="POST">
+            @csrf
+            @method('PUT')
+            <input type="hidden" id="edit-department-current-id" />
+
+            <div class="grid grid-cols-12 gap-4 gap-y-4">
+                <div class="col-span-12 md:col-span-6">
+                    <x-base.form-label for="edit-department-name">Department Name <span class="text-danger">*</span></x-base.form-label>
+                    <x-base.form-input
+                        id="edit-department-name"
+                        name="name"
+                        type="text"
+                        placeholder="Enter department name"
+                        class="w-full"
+                        required
+                    />
                 </div>
-                <h2 class="font-medium text-lg text-white">Edit Department: {{ $department->name }}</h2>
+
+                <div class="col-span-12 md:col-span-6">
+                    <x-base.form-label for="edit-department-company">Company <span class="text-danger">*</span></x-base.form-label>
+                    <x-base.form-select
+                        id="edit-department-company"
+                        name="company_id"
+                        class="w-full"
+                        disabled
+                    >
+                        <option value="">Select Company</option>
+                        @foreach($companies as $company)
+                            <option value="{{ $company->id }}">{{ $company->name }}</option>
+                        @endforeach
+                    </x-base.form-select>
+                </div>
+
+                <div class="col-span-12 md:col-span-6">
+                    <x-base.form-label for="edit-department-parent">Parent Department</x-base.form-label>
+                    <x-base.form-select
+                        id="edit-department-parent"
+                        name="parent_id"
+                        class="w-full"
+                    >
+                        <option value="">Select Parent Department (Optional)</option>
+                        @foreach($departments as $dept)
+                            <option value="{{ $dept->id }}" data-company="{{ $dept->company_id }}">{{ $dept->name }}</option>
+                        @endforeach
+                    </x-base.form-select>
+                </div>
+
+                <div class="col-span-12 md:col-span-6">
+                    <x-base.form-label for="edit-department-manager">Department Manager</x-base-form-label>
+                    <x-base.form-select
+                        id="edit-department-manager"
+                        name="manager_id"
+                        class="w-full"
+                    >
+                        <option value="">Select Manager (Optional)</option>
+                        @foreach($managers as $manager)
+                            <option value="{{ $manager->id }}">{{ $manager->full_name }}</option>
+                        @endforeach
+                    </x-base.form-select>
+                </div>
+
+                <div class="col-span-12">
+                    <x-base.form-label for="edit-department-description">Description</x-base.form-label>
+                    <x-base.form-textarea
+                        id="edit-department-description"
+                        name="description"
+                        rows="3"
+                        placeholder="Enter department description"
+                        class="w-full"
+                    ></x-base.form-textarea>
+                </div>
             </div>
-            <button
-                type="button"
-                class="text-slate-500 hover:text-slate-400"
-                data-tw-dismiss="modal"
-            >
-                <x-base.lucide icon="X" class="w-5 h-5" />
-            </button>
-        </x-base.dialog.title>
+        </form>
 
-        <x-base.dialog.description class="p-5">
-            <form id="edit-department-form-{{ $department->id }}"
-                  action="{{ route('hr.departments.update', $department) }}"
-                  method="POST">
-                @csrf
-                @method('PUT')
-                <div class="grid grid-cols-12 gap-4">
-                    <div class="col-span-12 sm:col-span-6">
-                        <x-base.form-label for="name">Department Name <span class="text-danger">*</span></x-base.form-label>
-                        <x-base.form-input
-                            id="name"
-                            name="name"
-                            type="text"
-                            value="{{ old('name', $department->name) }}"
-                            placeholder="Enter department name"
-                            required
-                        />
-                    </div>
-
-                    <div class="col-span-12 sm:col-span-6">
-                        <x-base.form-label for="company_id">Company <span class="text-danger">*</span></x-base.form-label>
-                        <x-base.form-select
-                            id="company_id"
-                            name="company_id"
-                            class="w-full"
-                            required
-                            disabled
-                        >
-                            <option value="{{ $department->company_id }}" selected>{{ $department->company->name }}</option>
-                        </x-base.form-select>
-                    </div>
-
-                    <div class="col-span-12 sm:col-span-6">
-                        <x-base.form-label for="parent_id">Parent Department</x-base.form-label>
-                        <x-base.form-select
-                            id="parent_id"
-                            name="parent_id"
-                            class="w-full"
-                        >
-                            <option value="">Select Parent Department (Optional)</option>
-                            @foreach($departments as $dept)
-                                <option value="{{ $dept->id }}" {{ $department->parent_id == $dept->id ? 'selected' : '' }}>
-                                    {{ $dept->name }}
-                                </option>
-                            @endforeach
-                        </x-base.form-select>
-                    </div>
-
-                    <div class="col-span-12 sm:col-span-6">
-                        <x-base.form-label for="manager_id">Department Manager</x-base.form-label>
-                        <x-base.form-select
-                            id="manager_id"
-                            name="manager_id"
-                            class="w-full"
-                        >
-                            <option value="">Select Manager (Optional)</option>
-                            @foreach($managers as $manager)
-                                <option value="{{ $manager->id }}" {{ $department->manager_id == $manager->id ? 'selected' : '' }}>
-                                    {{ $manager->full_name }}
-                                </option>
-                            @endforeach
-                        </x-base.form-select>
-                    </div>
-
-                    <div class="col-span-12">
-                        <x-base.form-label for="description">Description</x-base.form-label>
-                        <x-base.form-textarea
-                            id="description"
-                            name="description"
-                            rows="3"
-                            placeholder="Enter department description"
-                        >{{ old('description', $department->description) }}</x-base.form-textarea>
-                    </div>
-                </div>
-            </form>
-        </x-base.dialog.description>
-
-        <x-base.dialog.footer class="border-t border-gray-200 dark:border-dark-5 pt-4 mt-4">
-            <div class="flex justify-end gap-2 w-full">
-                <x-base.button
+        @slot('footer')
+            <div class="flex w-full flex-wrap justify-end gap-2">
+                <button
+                    type="button"
+                    class="btn-tonal btn-tonal--neutral group"
                     data-tw-dismiss="modal"
-                    variant="outline-secondary"
                 >
+                    <x-base.lucide icon="x-circle" class="w-5 h-5 icon-hover-rise" />
                     Cancel
-                </x-base.button>
-                <x-base.button
-                    id="update-department-btn-{{ $department->id }}"
-                    variant="primary"
+                </button>
+                <button
+                    type="submit"
+                    id="update-department-btn"
+                    form="edit-department-form"
+                    class="btn-tonal btn-tonal--success group"
                 >
-                    <x-base.lucide icon="Save" class="w-4 h-4 mr-2" />
+                    <x-base.lucide icon="save" class="w-5 h-5 icon-hover-rise" />
                     Update Department
-                </x-base.button>
+                </button>
             </div>
-        </x-base.dialog.footer>
-    </x-base.dialog.panel>
-</x-base.dialog>
-
-@push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Handle department update
-    const updateBtn = document.getElementById('update-department-btn-{{ $department->id }}');
-    const form = document.getElementById('edit-department-form-{{ $department->id }}');
-
-    if (updateBtn && form) {
-        updateBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-
-            // Get form data
-            const formData = new FormData(form);
-
-            // Send AJAX request
-            fetch(form.action, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json',
-                },
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Close modal
-                    const modal = document.getElementById('edit-department-modal-{{ $department->id }}');
-                    if (modal) {
-                        modal.classList.remove('show');
-                        document.body.classList.remove('overflow-hidden');
-                    }
-
-                    // Show success message
-                    showToast(data.message || 'Department updated successfully', 'update');
-
-                    // Reload table
-                    if (typeof table !== 'undefined') {
-                        table.ajax.reload(null, false);
-                    }
-                } else {
-                    // Show error message
-                    showToast(data.message || 'Failed to update department', 'error');
-
-                    // Handle validation errors
-                    if (data.errors) {
-                        let errorMessages = [];
-                        for (let field in data.errors) {
-                            errorMessages = errorMessages.concat(data.errors[field]);
-                        }
-                        if (errorMessages.length > 0) {
-                            showToast('Please correct the following errors: ' + errorMessages.join(', '), 'error');
-                        }
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showToast('An error occurred while updating the department', 'error');
-            });
-        });
-    }
-});
-</script>
+        @endslot
+    </x-modal.form>
 @endpush

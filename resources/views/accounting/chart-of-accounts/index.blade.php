@@ -17,22 +17,24 @@
     <div class="intro-y mt-8 flex items-center">
         <h2 class="mr-auto text-lg font-medium">Chart of Accounts</h2>
         <div class="flex items-center gap-2">
-            <x-base.button
-                variant="outline-secondary"
+            <button
+                type="button"
+                class="btn-tonal btn-tonal--info min-h-[44px] px-4 group"
                 data-tw-toggle="modal"
                 data-tw-target="#journal-entries-modal"
             >
-                <x-base.lucide icon="BookOpen" class="w-4 h-4 mr-2" />
+                <x-base.lucide icon="BookOpen" class="w-4 h-4 icon-hover-rise" />
                 Journal Entries
-            </x-base.button>
-            <x-base.button
-                variant="primary"
+            </button>
+            <button
+                type="button"
+                class="btn-tonal btn-tonal--success min-h-[44px] px-4 group"
                 data-tw-toggle="modal"
                 data-tw-target="#add-account-modal"
             >
-                <x-base.lucide icon="Plus" class="w-4 h-4 mr-2" />
+                <x-base.lucide icon="SquarePlus" class="w-4 h-4 icon-hover-rise" />
                 Add Account
-            </x-base.button>
+            </button>
         </div>
     </div>
 
@@ -85,7 +87,13 @@
                     <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
                         <x-base.lucide icon="Filter" class="h-5 w-5"></x-base.lucide>
                         Account Filters
-                        <span id="active-filters-indicator" class="hidden ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">Active</span>
+                        <span
+                            id="active-filters-indicator"
+                            class="hidden items-center gap-1 ml-3 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-700"
+                        >
+                            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Active
+                        </span>
                     </h3>
 
                     <div class="grid grid-cols-12 gap-4">
@@ -153,11 +161,28 @@
                     </div>
 
                     <!-- Filter Actions -->
-                    <div class="mt-4 flex justify-end">
-                        <x-base.button id="apply-filters" variant="primary" size="sm">
-                            <x-base.lucide icon="Search" class="w-4 h-4 mr-1" />
-                            Apply Filters
-                        </x-base.button>
+                    <div class="mt-6 flex flex-wrap items-center justify-between gap-3">
+                        <div class="text-sm text-slate-500 dark:text-slate-400">
+                            Use these filters to refine the accounts table. You can reset them anytime.
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <button
+                                type="button"
+                                id="clear-advanced-filters"
+                                class="btn-tonal btn-tonal--amber min-h-[42px] px-4 group"
+                            >
+                                <x-base.lucide icon="RotateCcw" class="w-4 h-4 icon-hover-rise" />
+                                Clear Filters
+                            </button>
+                            <button
+                                type="button"
+                                id="apply-filters"
+                                class="btn-tonal btn-tonal--info min-h-[42px] px-4 group"
+                            >
+                                <x-base.lucide icon="Search" class="w-4 h-4 icon-hover-rise" />
+                                Apply Filters
+                            </button>
+                        </div>
                     </div>
                 </div>
             </x-base.preview-component>
@@ -207,23 +232,43 @@
                                     <option value="100">100</option>
                                 </x-base.form-select>
                             </div>
-                            <div class="mt-2 xl:mt-0">
-                                <x-base.button id="account-filter-go" type="button" variant="primary" class="w-full sm:w-16">
+                            <div class="mt-2 xl:mt-0 flex flex-col gap-2">
+                                <button
+                                    id="account-filter-go"
+                                    type="button"
+                                    class="btn-tonal btn-tonal--info w-full sm:w-24 group"
+                                >
+                                    <x-base.lucide icon="Search" class="w-4 h-4 icon-hover-rise" />
                                     Go
-                                </x-base.button>
-                                <x-base.button id="account-filter-reset" type="button" variant="secondary" class="mt-2 w-full sm:ml-1 sm:mt-0 sm:w-16">
+                                </button>
+                                <button
+                                    id="account-filter-reset"
+                                    type="button"
+                                    class="btn-tonal btn-tonal--amber w-full sm:w-24 group"
+                                >
+                                    <x-base.lucide icon="RotateCcw" class="w-4 h-4 icon-hover-rise" />
                                     Reset
-                                </x-base.button>
+                                </button>
                             </div>
                         </form>
 
                         <div class="mt-5 flex sm:mt-0">
-                            <x-base.button id="account-export" variant="outline-secondary" class="mr-2 w-1/2 sm:w-auto">
-                                <x-base.lucide icon="Download" class="mr-2 h-4 w-4" /> Export
-                            </x-base.button>
-                            <x-base.button id="account-refresh" variant="outline-secondary" class="w-1/2 sm:w-auto">
-                                <x-base.lucide icon="RefreshCcw" class="mr-2 h-4 w-4" /> Refresh
-                            </x-base.button>
+                            <button
+                                id="account-export"
+                                type="button"
+                                class="btn-tonal btn-tonal--neutral mr-2 w-1/2 sm:w-auto group"
+                            >
+                                <x-base.lucide icon="Download" class="h-4 w-4 icon-hover-rise" />
+                                Export
+                            </button>
+                            <button
+                                id="account-refresh"
+                                type="button"
+                                class="btn-tonal btn-tonal--info w-1/2 sm:w-auto group"
+                            >
+                                <x-base.lucide icon="RefreshCcw" class="h-4 w-4 icon-hover-rise" />
+                                Refresh
+                            </button>
                         </div>
                     </div>
 
@@ -276,6 +321,8 @@
             const statusFilter = document.getElementById('status-filter');
             const levelFilter = document.getElementById('level-filter');
             const applyFiltersBtn = document.getElementById('apply-filters');
+            const clearAdvancedFiltersBtn = document.getElementById('clear-advanced-filters');
+            const activeFiltersIndicator = document.getElementById('active-filters-indicator');
 
             // Statistics elements
             const totalAccounts = document.getElementById('total-accounts');
@@ -359,6 +406,7 @@
                         window.Lucide.createIcons();
                     }
                     updateAccountStatistics();
+                    updateActiveFiltersIndicator();
                 }
             });
 
@@ -422,6 +470,33 @@
                 applyFiltersBtn.addEventListener('click', reloadTable);
             }
 
+            if (clearAdvancedFiltersBtn) {
+                clearAdvancedFiltersBtn.addEventListener('click', function () {
+                    if (typeFilter) typeFilter.value = '';
+                    if (categoryFilter) categoryFilter.value = '';
+                    if (statusFilter) statusFilter.value = '';
+                    if (levelFilter) levelFilter.value = '';
+                    reloadTable();
+                });
+            }
+
+            const autoApplyAdvancedFilters = function () {
+                setTimeout(reloadTable, 250);
+            };
+
+            if (typeFilter) {
+                typeFilter.addEventListener('change', autoApplyAdvancedFilters);
+            }
+            if (categoryFilter) {
+                categoryFilter.addEventListener('change', autoApplyAdvancedFilters);
+            }
+            if (statusFilter) {
+                statusFilter.addEventListener('change', autoApplyAdvancedFilters);
+            }
+            if (levelFilter) {
+                levelFilter.addEventListener('change', autoApplyAdvancedFilters);
+            }
+
             // Export functionality
             if (exportBtn) {
                 exportBtn.addEventListener('click', function () {
@@ -470,6 +545,29 @@
                     totalAccounts.textContent = info.recordsTotal || 0;
                 }
                 // Additional statistics would be fetched from server
+            }
+
+            function updateActiveFiltersIndicator() {
+                const basicFiltersActive =
+                    (filterField && filterField.value && filterField.value !== 'all') ||
+                    (filterType && filterType.value && filterType.value !== 'contains') ||
+                    (filterValue && filterValue.value && filterValue.value.trim() !== '');
+
+                const advancedFiltersActive =
+                    (typeFilter && typeFilter.value) ||
+                    (categoryFilter && categoryFilter.value) ||
+                    (statusFilter && statusFilter.value) ||
+                    (levelFilter && levelFilter.value);
+
+                if (activeFiltersIndicator) {
+                    if (basicFiltersActive || advancedFiltersActive) {
+                        activeFiltersIndicator.classList.remove('hidden');
+                        activeFiltersIndicator.classList.add('flex');
+                    } else {
+                        activeFiltersIndicator.classList.add('hidden');
+                        activeFiltersIndicator.classList.remove('flex');
+                    }
+                }
             }
         });
 

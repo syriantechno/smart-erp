@@ -3,7 +3,11 @@
 namespace App\Http\Controllers\Warehouse;
 
 use App\Http\Controllers\Controller;
+use App\Models\Setting\Company;
+use App\Models\Warehouse\Category;
+use App\Models\Warehouse\Material;
 use App\Models\Warehouse\PurchaseRequest;
+use App\Models\Warehouse\Warehouse;
 use App\Services\DocumentCodeGenerator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,7 +24,57 @@ class PurchaseRequestController extends Controller
 
     public function index()
     {
-        return view('warehouse.material-requests.index');
+        $companies = Company::query()
+            ->select('id', 'name', 'logo', 'address')
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        $company = $companies->first();
+
+        $warehouses = Warehouse::query()
+            ->select('id', 'code', 'name', 'location')
+            ->orderBy('name')
+            ->get();
+
+        $categories = Category::with(['children.children'])
+            ->whereNull('parent_id')
+            ->orderBy('name')
+            ->get();
+
+        $materials = Material::with(['category:id,name,parent_id', 'unit:id,name,symbol'])
+            ->select('id', 'code', 'name', 'category_id', 'unit_id', 'price')
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get()
+            ->map(function (Material $material) {
+                return [
+                    'id' => $material->id,
+                    'code' => $material->code,
+                    'name' => $material->name,
+                    'category_id' => $material->category_id,
+                    'category_name' => $material->category?->name,
+                    'unit' => $material->unit?->name,
+                    'unit_symbol' => $material->unit?->symbol,
+                    'price' => (float) $material->price,
+                ];
+            });
+
+        $materialCategories = $materials
+            ->pluck('category_name', 'category_id')
+            ->filter()
+            ->map(function ($name, $id) {
+                return [
+                    'id' => $id,
+                    'name' => $name,
+                ];
+            })
+            ->values();
+
+        return view(
+            'warehouse.material-requests.index',
+            compact('company', 'companies', 'warehouses', 'categories', 'materials', 'materialCategories')
+        );
     }
 
     public function previewCode()
@@ -59,12 +113,15 @@ class PurchaseRequestController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'code' => 'required|string|unique:purchase_requests',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'priority' => 'nullable|in:normal,high,urgent',
             'request_date' => 'required|date',
-            'total_amount' => 'required|numeric|min:0',
-            'is_active' => 'boolean'
+            'company_id' => 'required|exists:companies,id',
+            'warehouse_id' => 'required|exists:warehouses,id',
+            'status' => 'nullable|in:pending,approved,rejected,completed',
+            'is_active' => 'boolean',
+            'items' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -74,21 +131,108 @@ class PurchaseRequestController extends Controller
             ], 422);
         }
 
+        $itemsPayload = json_decode($request->input('items', '[]'), true);
+
+        if (!is_array($itemsPayload) || empty($itemsPayload)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please add at least one material to the request.'
+            ], 422);
+        }
+
+        $materialIds = collect($itemsPayload)
+            ->pluck('material_id')
+            ->filter()
+            ->unique()
+            ->values();
+
+        if ($materialIds->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid material selection submitted.'
+            ], 422);
+        }
+
+        $materials = Material::query()
+            ->whereIn('id', $materialIds)
+            ->get()
+            ->keyBy('id');
+
+        if ($materials->count() !== $materialIds->count()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'One or more selected materials are no longer available.'
+            ], 422);
+        }
+
+        $itemsData = collect($itemsPayload)
+            ->map(function ($item) use ($materials) {
+                $materialId = (int) ($item['material_id'] ?? 0);
+                if (!$materialId || !$materials->has($materialId)) {
+                    return null;
+                }
+
+                $quantity = max(1, (float) ($item['quantity'] ?? 1));
+                $material = $materials->get($materialId);
+                $unitPrice = (float) ($material->price ?? 0);
+
+                return [
+                    'material_id' => $materialId,
+                    'quantity' => $quantity,
+                    'unit_price' => $unitPrice,
+                    'notes' => $item['notes'] ?? null,
+                ];
+            })
+            ->filter()
+            ->values();
+
+        if ($itemsData->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No valid materials were provided.'
+            ], 422);
+        }
+
+        $totalAmount = $itemsData->reduce(function ($carry, $item) {
+            return $carry + ($item['quantity'] * $item['unit_price']);
+        }, 0);
+
+        if ($totalAmount <= 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Calculated total cannot be zero.'
+            ], 422);
+        }
+
         try {
-            DB::beginTransaction();
+            $purchaseRequest = DB::transaction(function () use ($request, $itemsData, $totalAmount) {
+                $code = $this->codeGenerator->generate('purchase_requests');
 
-            PurchaseRequest::create(array_merge($request->all(), [
-                'requested_by' => auth()->id(),
-            ]));
+                $purchaseRequest = PurchaseRequest::create([
+                    'code' => $code,
+                    'title' => $request->input('title'),
+                    'description' => $request->input('description'),
+                    'priority' => $request->input('priority', 'normal'),
+                    'request_date' => $request->input('request_date'),
+                    'requested_by' => auth()->id(),
+                    'company_id' => $request->input('company_id'),
+                    'warehouse_id' => $request->input('warehouse_id'),
+                    'status' => $request->input('status', 'pending'),
+                    'total_amount' => $totalAmount,
+                    'is_active' => $request->boolean('is_active', true),
+                ]);
 
-            DB::commit();
+                $purchaseRequest->items()->createMany($itemsData->toArray());
+
+                return $purchaseRequest;
+            });
 
             return response()->json([
                 'success' => true,
-                'message' => 'Purchase request created successfully'
+                'message' => 'Purchase request created successfully',
+                'code' => $purchaseRequest->code
             ]);
         } catch (\Exception $e) {
-            DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to create purchase request: ' . $e->getMessage()
@@ -96,12 +240,28 @@ class PurchaseRequestController extends Controller
         }
     }
 
-    public function show(PurchaseRequest $purchaseRequest): JsonResponse
+    public function show(Request $request, PurchaseRequest $purchaseRequest)
     {
-        $purchaseRequest->load(['requestedBy', 'approvedBy', 'items.material']);
-        return response()->json([
-            'success' => true,
-            'purchase_request' => $purchaseRequest
+        $purchaseRequest->load([
+            'company',
+            'warehouse',
+            'requestedBy',
+            'approvedBy',
+            'items.material.unit',
+        ]);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'purchase_request' => $purchaseRequest
+            ]);
+        }
+
+        $currencySymbol = config('app.currency_symbol', config('app.currency', '$'));
+
+        return view('warehouse.material-requests.show', [
+            'purchaseRequest' => $purchaseRequest,
+            'currencySymbol' => $currencySymbol,
         ]);
     }
 

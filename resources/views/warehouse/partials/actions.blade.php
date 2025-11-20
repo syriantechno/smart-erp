@@ -1,17 +1,15 @@
-<div class="flex items-center gap-2">
-    <button
-        class="btn-tonal btn-tonal--warning btn-tonal--icon"
-        onclick="editWarehouse({{ $warehouse->id }})"
+<div class="flex items-center justify-center gap-1 min-w-[80px]">
+    <x-erp.action-button
+        icon="Edit"
+        variant="primary"
         title="Edit Warehouse"
-    >
-        <x-base.lucide icon="edit" class="w-4 h-4" />
-    </button>
+        onclick="editWarehouse({{ $warehouse->id }})"
+    />
 
-    <button
-        class="btn-tonal btn-tonal--danger btn-tonal--icon"
-        onclick="deleteWarehouse({{ $warehouse->id }}, '{{ addslashes($warehouse->name) }}')"
+    <x-erp.action-button
+        icon="Trash2"
+        variant="danger"
         title="Delete Warehouse"
-    >
-        <x-base.lucide icon="trash-2" class="w-4 h-4" />
-    </button>
+        onclick="deleteWarehouse({{ $warehouse->id }}, '{{ addslashes($warehouse->name) }}')"
+    />
 </div>

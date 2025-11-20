@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Mail;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
-use App\Models\Department;
+use App\Models\HR\Department;
 use App\Models\Mail\ElectronicMail;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;

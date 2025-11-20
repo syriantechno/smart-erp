@@ -17,21 +17,21 @@
     <div class="intro-y mt-8 flex items-center">
         <h2 class="mr-auto text-lg font-medium">Materials Management</h2>
         <div class="flex items-center gap-2">
-            <x-base.button
-                variant="outline-secondary"
-                class="hidden sm:flex"
+            <button
+                type="button"
+                class="btn-tonal btn-tonal--info hidden sm:flex group"
                 data-tw-toggle="modal"
                 data-tw-target="#materials-filters-slideover"
             >
-                <x-base.lucide icon="Filter" class="w-4 h-4 mr-2" />
+                <x-base.lucide icon="filter" class="w-4 h-4 icon-hover-rise" />
                 Filters
-                <span id="active-filters-indicator" class="hidden ml-2 px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full">Active</span>
-            </x-base.button>
+                <span id="active-filters-indicator" class="hidden ml-2 px-2 py-0.5 text-xs bg-white/20 rounded-full">Active</span>
+            </button>
 
             <!-- Mobile filters icon -->
             <button
                 type="button"
-                class="flex items-center justify-center rounded-full border border-slate-200 px-3 py-2 text-slate-600 hover:bg-slate-50 sm:hidden"
+                class="btn-tonal btn-tonal--info btn-tonal--icon sm:hidden"
                 data-tw-toggle="modal"
                 data-tw-target="#materials-filters-slideover"
                 title="Filters"
@@ -39,16 +39,16 @@
                 <x-base.lucide icon="filter" class="w-4 h-4" />
             </button>
 
-            <x-base.button
+            <button
+                type="button"
                 id="open-create-material-modal"
-                variant="primary"
-                class="w-32 sm:w-auto sm:ml-2"
+                class="btn-tonal btn-tonal--success w-32 sm:w-auto sm:ml-2 group"
                 data-tw-toggle="modal"
                 data-tw-target="#create-material-modal"
             >
-                <x-base.lucide icon="plus" class="w-4 h-4 mr-2" />
+                <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
                 Add Material
-            </x-base.button>
+            </button>
         </div>
     </div>
 
@@ -145,26 +145,24 @@
                     </div>
                 </div>
 
-                <div class="mt-5 flex justify-end gap-2">
-                    <x-base.button
+                <div class="mt-5 flex justify-end gap-2 flex-wrap">
+                    <button
                         type="button"
-                        variant="secondary"
-                        class="w-24"
+                        class="btn-tonal btn-tonal--amber w-full sm:w-auto group"
                         onclick="clearFilters()"
                     >
-                        <x-base.lucide icon="X" class="mr-2 h-4 w-4" />
+                        <x-base.lucide icon="rotate-ccw" class="mr-2 h-4 w-4" />
                         Clear
-                    </x-base.button>
-                    <x-base.button
+                    </button>
+                    <button
                         id="materials-filter-apply"
                         type="button"
-                        variant="primary"
-                        class="w-24"
+                        class="btn-tonal btn-tonal--info w-full sm:w-auto group"
                         onclick="applyFilters()"
                     >
-                        <x-base.lucide icon="Search" class="mr-2 h-4 w-4" />
+                        <x-base.lucide icon="search" class="mr-2 h-4 w-4" />
                         Apply
-                    </x-base.button>
+                    </button>
                 </div>
             </x-base.slideover.description>
         </x-base.slideover.panel>
@@ -187,6 +185,7 @@
 
     <script>
         let materialsTable;
+        const unitStoreUrl = '{{ route("warehouse.measurement-units.store") }}';
 
         document.addEventListener('DOMContentLoaded', function () {
             const jq = window.jQuery || window.$;
@@ -198,6 +197,7 @@
             jq(function () {
                 initializeDataTable();
                 setupEventListeners();
+                initUnitQuickAdd();
 
                 // Auto-generate material code when opening create modal (unified code system)
                 const openBtn = document.getElementById('open-create-material-modal');
@@ -235,7 +235,7 @@
                     { data: 'code', name: 'code' },
                     { data: 'name', name: 'name' },
                     { data: 'category_name', name: 'category_name' },
-                    { data: 'unit', name: 'unit' },
+                    { data: 'unit_name', name: 'unit_name' },
                     { data: 'price', name: 'price', render: function(data) { return '{{ config("app.currency", "$") }}' + parseFloat(data).toFixed(2); } },
                     { 
                         data: 'is_active', 
@@ -277,6 +277,163 @@
             $('#category-filter, #status-filter').on('change', function() {
                 applyFilters();
             });
+        }
+
+        function initUnitQuickAdd() {
+            const jq = window.jQuery || window.$;
+            if (!jq) {
+                console.error('jQuery not available for unit quick add.');
+                return;
+            }
+
+            const $ = jq;
+
+            $('[data-unit-quick-add-toggle]').off('click.unitQuickAdd').on('click.unitQuickAdd', function () {
+                const targetSelector = $(this).data('target');
+                if (!targetSelector) {
+                    return;
+                }
+
+                const $target = $(targetSelector);
+                if (!$target.length) {
+                    return;
+                }
+
+                $target.toggleClass('hidden');
+                if (!$target.hasClass('hidden')) {
+                    const firstInput = $target.find('[data-unit-field="code"], input[name="code"]').first();
+                    if (firstInput.length) {
+                        firstInput.trigger('focus');
+                    }
+                }
+            });
+
+            $('[data-unit-quick-add]').each(function () {
+                const $container = $(this);
+                if ($container.data('unitQuickAddBound')) {
+                    return;
+                }
+                $container.data('unitQuickAddBound', true);
+
+                setupUnitQuickAddContainer($container, $);
+            });
+        }
+
+        function setupUnitQuickAddContainer($container, $) {
+            const $formWrapper = $container.find('[data-unit-quick-add-form]');
+            const targetSelectSelector = $formWrapper.data('unit-select');
+            const $cancelBtn = $container.find('[data-unit-quick-add-cancel]');
+            const $submitBtn = $container.find('[data-unit-quick-add-submit]');
+
+            const getField = (name) => $formWrapper.find(`[data-unit-field="${name}"]`);
+
+            const resetFields = () => {
+                getField('code').val('');
+                getField('name').val('');
+                getField('symbol').val('');
+            };
+
+            $cancelBtn.on('click', function () {
+                resetFields();
+                $container.addClass('hidden');
+            });
+
+            $submitBtn.on('click', function () {
+                const payload = {
+                    code: getField('code').val().trim(),
+                    name: getField('name').val().trim(),
+                    symbol: getField('symbol').val().trim(),
+                    is_active: getField('is_active').val() || 1,
+                };
+
+                if (!payload.code || !payload.name) {
+                    if (typeof window.showError === 'function') {
+                        window.showError('Please enter both unit code and name.');
+                    }
+                    return;
+                }
+
+                const originalHtml = $submitBtn.html();
+                $submitBtn.prop('disabled', true)
+                    .html('<i class="w-4 h-4 mr-2 animate-spin" data-lucide="loader"></i> Saving');
+
+                $.ajax({
+                    url: unitStoreUrl,
+                    method: 'POST',
+                    data: {
+                        ...payload,
+                        _token: $('meta[name="csrf-token"]').attr('content'),
+                    },
+                    success: function (response) {
+                        if (response.success && response.unit) {
+                            updateUnitSelects(response.unit);
+                            if (targetSelectSelector) {
+                                const $targetSelect = $(targetSelectSelector);
+                                if ($targetSelect.length) {
+                                    $targetSelect.val(response.unit.id).trigger('change');
+                                }
+                            }
+
+                            if (typeof window.showSuccess === 'function') {
+                                window.showSuccess(response.message || 'Unit created successfully');
+                            }
+
+                            resetFields();
+                            $container.addClass('hidden');
+                        } else if (typeof window.showError === 'function') {
+                            window.showError(response.message || 'Failed to create unit.');
+                        }
+                    },
+                    error: function (xhr) {
+                        let message = xhr.responseJSON?.message || 'Failed to create unit.';
+                        if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                            message = Object.values(xhr.responseJSON.errors).flat().join('\n');
+                        }
+
+                        if (typeof window.showError === 'function') {
+                            window.showError(message);
+                        }
+                    },
+                    complete: function () {
+                        $submitBtn.prop('disabled', false).html(originalHtml);
+                        if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+                            lucide.createIcons();
+                        }
+                    }
+                });
+            });
+        }
+
+        function updateUnitSelects(unit) {
+            const jq = window.jQuery || window.$;
+            if (!jq) {
+                return;
+            }
+
+            const $ = jq;
+            const label = formatUnitLabel(unit);
+            ['#create-unit', '#edit-unit'].forEach(function (selector) {
+                const $select = $(selector);
+                if (!$select.length) {
+                    return;
+                }
+
+                let $option = $select.find(`option[value="${unit.id}"]`);
+                if (!$option.length) {
+                    const newOption = new Option(label, unit.id, false, false);
+                    $select.append(newOption);
+                } else {
+                    $option.text(label);
+                }
+            });
+        }
+
+        function formatUnitLabel(unit) {
+            if (!unit) {
+                return '';
+            }
+
+            return unit.symbol ? `${unit.name} (${unit.symbol})` : unit.name;
         }
 
         function applyFilters() {

@@ -45,13 +45,48 @@
                 </div>
 
                 <div class="col-span-12 md:col-span-6">
-                    <x-base.form-label for="create-unit">Unit</x-base.form-label>
-                    <x-base.form-select id="create-unit" name="unit" class="w-full" required>
-                        <option value="piece">Piece</option>
-                        <option value="kg">Kilogram</option>
-                        <option value="liter">Liter</option>
-                        <option value="meter">Meter</option>
+                    <div class="flex items-center justify-between">
+                        <x-base.form-label for="create-unit">Unit</x-base.form-label>
+                        <button
+                            type="button"
+                            class="btn-tonal btn-tonal--primary btn-tonal--icon h-8 w-8"
+                            data-unit-quick-add-toggle
+                            data-target="#create-unit-quick-add"
+                            title="Add Unit"
+                        >
+                            <x-base.lucide icon="Plus" class="h-4 w-4" />
+                        </button>
+                    </div>
+                    <x-base.form-select id="create-unit" name="unit_id" class="w-full" required>
+                        <option value="">Select Unit</option>
+                        @foreach(($units ?? []) as $unit)
+                            <option value="{{ $unit->id }}">
+                                {{ $unit->name }}{{ $unit->symbol ? ' (' . $unit->symbol . ')' : '' }}
+                            </option>
+                        @endforeach
                     </x-base.form-select>
+                    <div id="create-unit-quick-add" class="mt-3 hidden" data-unit-quick-add>
+                        <div class="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-3 dark:border-darkmode-400 dark:bg-darkmode-700/40">
+                            <div data-unit-quick-add-form data-unit-select="#create-unit">
+                                <div class="grid gap-2">
+                                    <input type="text" data-unit-field="code" class="form-input w-full" placeholder="Code (e.g. PCS)" autocomplete="off" />
+                                    <input type="text" data-unit-field="name" class="form-input w-full" placeholder="Unit Name" autocomplete="off" />
+                                    <input type="text" data-unit-field="symbol" class="form-input w-full" placeholder="Symbol (optional)" autocomplete="off" />
+                                    <input type="hidden" data-unit-field="is_active" value="1" />
+                                    <div class="flex justify-end gap-2">
+                                        <button type="button" class="btn-tonal btn-tonal--neutral" data-unit-quick-add-cancel>
+                                            <x-base.lucide icon="X" class="h-4 w-4" />
+                                            Cancel
+                                        </button>
+                                        <button type="button" class="btn-tonal btn-tonal--success" data-unit-quick-add-submit>
+                                            <x-base.lucide icon="Save" class="h-4 w-4" />
+                                            Save Unit
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="col-span-12 md:col-span-6">
@@ -91,26 +126,24 @@
     </form>
 
     @slot('footer')
-        <div class="flex justify-end gap-2 w-full">
-            <x-base.button
-                class="w-24"
-                data-tw-dismiss="modal"
+        <div class="flex w-full flex-wrap justify-end gap-2">
+            <button
                 type="button"
-                variant="outline-secondary"
-                icon="X"
+                class="btn-tonal btn-tonal--neutral group"
+                data-tw-dismiss="modal"
             >
+                <x-base.lucide icon="x-circle" class="w-5 h-5 icon-hover-rise" />
                 Cancel
-            </x-base.button>
-            <x-base.button
-                class="w-32"
+            </button>
+            <button
                 type="submit"
                 form="create-material-form"
                 id="create-material-btn"
-                variant="primary"
-                icon="Save"
+                class="btn-tonal btn-tonal--success group"
             >
+                <x-base.lucide icon="save" class="w-5 h-5 icon-hover-rise" />
                 Save
-            </x-base.button>
+            </button>
         </div>
     @endslot
 

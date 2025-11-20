@@ -137,23 +137,22 @@
 
     @slot('footer')
         <div class="flex justify-end gap-2 w-full">
-            <x-base.button
-                class="w-24"
-                data-tw-dismiss="modal"
+            <button
                 type="button"
-                variant="outline-secondary"
+                data-tw-dismiss="modal"
+                class="btn-tonal btn-tonal--neutral w-28 group"
             >
+                <x-base.lucide icon="X" class="w-4 h-4 mr-2 icon-hover-rise" />
                 Cancel
-            </x-base.button>
-            <x-base.button
-                class="w-32"
+            </button>
+            <button
                 type="submit"
                 form="edit-task-form"
-                variant="primary"
+                class="btn-tonal btn-tonal--success w-36 group"
             >
-                <x-base.lucide icon="Save" class="w-4 h-4 mr-2" />
-                Update
-            </x-base.button>
+                <x-base.lucide icon="Save" class="w-4 h-4 mr-2 icon-hover-rise" />
+                Update Task
+            </button>
         </div>
     @endslot
 
