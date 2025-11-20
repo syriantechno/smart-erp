@@ -65,6 +65,7 @@
                             <label class="form-label">Type</label>
                             <select id="type" name="type" class="form-control" required>
                                 <option value="">Select Type</option>
+                                <option value="material_request">Material Request</option>
                                 <option value="invoice">Invoice</option>
                                 <option value="purchase_order">Purchase Order</option>
                                 <option value="expense">Expense</option>
@@ -112,177 +113,185 @@
 
 @push('scripts')
 <script>
-let levelCounter = 0;
-let table;
+(function () {
+    const jq = window.jQuery || window.$;
+    if (!jq) {
+        console.error('jQuery not available on approval templates page.');
+        return;
+    }
 
-$(document).ready(function() {
-    // Initialize DataTable
-    table = window.erpCrud.initDataTable({
-        tableSelector: '#templates-table',
-        ajaxUrl: '{{ route("approval-system.templates.datatable") }}',
-        columns: [
-            { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-            { data: 'name', name: 'name' },
-            { data: 'type', name: 'type' },
-            { data: 'levels_count', name: 'levels_count', orderable: false },
-            { data: 'status', name: 'is_active' },
-            { data: 'actions', name: 'actions', orderable: false, searchable: false }
-        ]
-    });
+    let levelCounter = 0;
+    let table;
 
-    // Form submit
-    $('#template-form').on('submit', function(e) {
-        e.preventDefault();
-        
-        const formData = {
-            id: $('#template-id').val(),
-            name: $('#name').val(),
-            type: $('#type').val(),
-            description: $('#description').val(),
-            is_active: $('#is_active').is(':checked'),
-            levels: getLevelsData()
-        };
-
-        const url = formData.id 
-            ? '{{ route("approval-system.templates.update", ":id") }}'.replace(':id', formData.id)
-            : '{{ route("approval-system.templates.store") }}';
-        
-        const method = formData.id ? 'PUT' : 'POST';
-
-        $.ajax({
-            url: url,
-            method: method,
-            data: formData,
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function(response) {
-                if (response.success) {
-                    Swal.fire('Success!', response.message, 'success');
-                    table.ajax.reload();
-                    $('[data-tw-dismiss="modal"]').click();
-                }
-            },
-            error: function(xhr) {
-                Swal.fire('Error!', xhr.responseJSON?.message || 'Something went wrong', 'error');
-            }
+    jq(function() {
+        // Initialize DataTable
+        table = window.erpCrud.initDataTable({
+            tableSelector: '#templates-table',
+            ajaxUrl: '{{ route("approval-system.templates.datatable") }}',
+            columns: [
+                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                { data: 'name', name: 'name' },
+                { data: 'type', name: 'type' },
+                { data: 'levels_count', name: 'levels_count', orderable: false },
+                { data: 'status', name: 'is_active' },
+                { data: 'actions', name: 'actions', orderable: false, searchable: false }
+            ]
         });
-    });
-});
 
-function openCreateModal() {
-    $('#modal-title').text('Create Template');
-    $('#template-form')[0].reset();
-    $('#template-id').val('');
-    $('#levels-container').empty();
-    levelCounter = 0;
-    addLevel(); // Add first level
-    tailwind.Modal.getOrCreateInstance(document.querySelector('#template-modal')).show();
-}
+        // Form submit
+        jq('#template-form').on('submit', function(e) {
+            e.preventDefault();
 
-function editTemplate(id) {
-    $.get('{{ route("approval-system.templates.show", ":id") }}'.replace(':id', id), function(data) {
-        $('#modal-title').text('Edit Template');
-        $('#template-id').val(data.id);
-        $('#name').val(data.name);
-        $('#type').val(data.type);
-        $('#description').val(data.description);
-        $('#is_active').prop('checked', data.is_active);
-        
-        $('#levels-container').empty();
-        levelCounter = 0;
-        
-        if (data.levels && data.levels.length > 0) {
-            data.levels.forEach(level => {
-                addLevel(level);
-            });
-        } else {
-            addLevel();
-        }
-        
-        tailwind.Modal.getOrCreateInstance(document.querySelector('#template-modal')).show();
-    });
-}
+            const formData = {
+                id: jq('#template-id').val(),
+                name: jq('#name').val(),
+                type: jq('#type').val(),
+                description: jq('#description').val(),
+                is_active: jq('#is_active').is(':checked') ? 1 : 0,
+                levels: getLevelsData()
+            };
 
-function addLevel(levelData = null) {
-    levelCounter++;
-    const levelHtml = `
-        <div class="level-item border rounded p-3" data-level="${levelCounter}">
-            <div class="flex items-start gap-3">
-                <div class="flex-1 grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="text-sm">Level Name</label>
-                        <input type="text" class="form-control level-name" placeholder="e.g., Department Manager" 
-                               value="${levelData?.name || 'Level ' + levelCounter}">
-                    </div>
-                    <div>
-                        <label class="text-sm">Approver</label>
-                        <select class="form-control level-approver" required>
-                            <option value="">Select User</option>
-                            @foreach($users as $user)
-                                <option value="{{ $user->id }}" ${levelData?.approver_id == {{ $user->id }} ? 'selected' : ''}>
-                                    {{ $user->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <button type="button" class="btn btn-sm btn-danger mt-6" onclick="removeLevel(${levelCounter})">
-                    <x-base.lucide icon="Trash2" class="w-3 h-3" />
-                </button>
-            </div>
-        </div>
-    `;
-    $('#levels-container').append(levelHtml);
-}
+            const url = formData.id 
+                ? '{{ route("approval-system.templates.update", ":id") }}'.replace(':id', formData.id)
+                : '{{ route("approval-system.templates.store") }}';
 
-function removeLevel(id) {
-    $(`.level-item[data-level="${id}"]`).remove();
-}
+            const method = formData.id ? 'PUT' : 'POST';
 
-function getLevelsData() {
-    const levels = [];
-    let levelNum = 1;
-    
-    $('.level-item').each(function() {
-        levels.push({
-            level: levelNum++,
-            name: $(this).find('.level-name').val(),
-            approver_id: parseInt($(this).find('.level-approver').val()),
-            can_reject: true,
-            is_required: true
-        });
-    });
-    
-    return levels;
-}
-
-function deleteTemplate(id) {
-    Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            $.ajax({
-                url: '{{ route("approval-system.templates.destroy", ":id") }}'.replace(':id', id),
-                method: 'DELETE',
+            jq.ajax({
+                url: url,
+                method: method,
+                data: formData,
                 headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    'X-CSRF-TOKEN': jq('meta[name="csrf-token"]').attr('content')
                 },
                 success: function(response) {
                     if (response.success) {
-                        Swal.fire('Deleted!', response.message, 'success');
+                        Swal.fire('Success!', response.message, 'success');
                         table.ajax.reload();
+                        jq('[data-tw-dismiss="modal"]').click();
                     }
+                },
+                error: function(xhr) {
+                    Swal.fire('Error!', xhr.responseJSON?.message || 'Something went wrong', 'error');
                 }
             });
-        }
+        });
     });
-}
+
+    window.openCreateModal = function () {
+        jq('#modal-title').text('Create Template');
+        jq('#template-form')[0].reset();
+        jq('#template-id').val('');
+        jq('#levels-container').empty();
+        levelCounter = 0;
+        addLevel(); // Add first level
+        tailwind.Modal.getOrCreateInstance(document.querySelector('#template-modal')).show();
+    };
+
+    window.editTemplate = function (id) {
+        jq.get('{{ route("approval-system.templates.show", ":id") }}'.replace(':id', id), function(data) {
+            jq('#modal-title').text('Edit Template');
+            jq('#template-id').val(data.id);
+            jq('#name').val(data.name);
+            jq('#type').val(data.type);
+            jq('#description').val(data.description);
+            jq('#is_active').prop('checked', data.is_active);
+
+            jq('#levels-container').empty();
+            levelCounter = 0;
+
+            if (data.levels && data.levels.length > 0) {
+                data.levels.forEach(level => {
+                    addLevel(level);
+                });
+            } else {
+                addLevel();
+            }
+
+            tailwind.Modal.getOrCreateInstance(document.querySelector('#template-modal')).show();
+        });
+    };
+
+    window.addLevel = function (levelData = null) {
+        levelCounter++;
+        const levelHtml = `
+            <div class="level-item border rounded p-3" data-level="${levelCounter}">
+                <div class="flex items-start gap-3">
+                    <div class="flex-1 grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-sm">Level Name</label>
+                            <input type="text" class="form-control level-name" placeholder="e.g., Department Manager" 
+                                   value="${levelData?.name || 'Level ' + levelCounter}">
+                        </div>
+                        <div>
+                            <label class="text-sm">Approver</label>
+                            <select class="form-control level-approver" required>
+                                <option value="">Select User</option>
+                                @foreach($users as $user)
+                                    <option value="{{ $user->id }}" ${levelData?.approver_id == {{ $user->id }} ? 'selected' : ''}>
+                                        {{ $user->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-danger mt-6" onclick="removeLevel(${levelCounter})">
+                        <x-base.lucide icon="Trash2" class="w-3 h-3" />
+                    </button>
+                </div>
+            </div>
+        `;
+        jq('#levels-container').append(levelHtml);
+    };
+
+    window.removeLevel = function (id) {
+        jq(`.level-item[data-level="${id}"]`).remove();
+    };
+
+    function getLevelsData() {
+        const levels = [];
+        let levelNum = 1;
+
+        jq('.level-item').each(function() {
+            levels.push({
+                level: levelNum++,
+                name: jq(this).find('.level-name').val(),
+                approver_id: parseInt(jq(this).find('.level-approver').val()),
+                can_reject: true,
+                is_required: true
+            });
+        });
+
+        return levels;
+    }
+
+    window.deleteTemplate = function (id) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                jq.ajax({
+                    url: '{{ route("approval-system.templates.destroy", ":id") }}'.replace(':id', id),
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': jq('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire('Deleted!', response.message, 'success');
+                            table.ajax.reload();
+                        }
+                    }
+                });
+            }
+        });
+    };
+})();
 </script>
 @endpush

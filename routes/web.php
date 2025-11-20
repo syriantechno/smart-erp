@@ -327,11 +327,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/create', [App\Http\Controllers\Approval\ApprovalController::class, 'create'])->name('create');
         Route::get('/datatable', [App\Http\Controllers\Approval\ApprovalController::class, 'datatable'])->name('datatable');
         Route::post('/', [App\Http\Controllers\Approval\ApprovalController::class, 'store'])->name('store');
-        Route::get('/{approvalRequest}', [App\Http\Controllers\Approval\ApprovalController::class, 'show'])->name('show');
-        Route::post('/{approvalRequest}/approve', [App\Http\Controllers\Approval\ApprovalController::class, 'approve'])->name('approve');
-        Route::post('/{approvalRequest}/reject', [App\Http\Controllers\Approval\ApprovalController::class, 'reject'])->name('reject');
         Route::get('/stats', [App\Http\Controllers\Approval\ApprovalController::class, 'getStats'])->name('stats');
-        
+
         // Templates Management
         Route::prefix('templates')->name('templates.')->group(function () {
             Route::get('/', [App\Http\Controllers\Approval\ApprovalTemplateController::class, 'index'])->name('index');
@@ -341,6 +338,16 @@ Route::middleware('auth')->group(function () {
             Route::put('/{id}', [App\Http\Controllers\Approval\ApprovalTemplateController::class, 'update'])->name('update');
             Route::delete('/{id}', [App\Http\Controllers\Approval\ApprovalTemplateController::class, 'destroy'])->name('destroy');
         });
+
+        Route::get('/{approvalRequest}', [App\Http\Controllers\Approval\ApprovalController::class, 'show'])
+            ->whereNumber('approvalRequest')
+            ->name('show');
+        Route::post('/{approvalRequest}/approve', [App\Http\Controllers\Approval\ApprovalController::class, 'approve'])
+            ->whereNumber('approvalRequest')
+            ->name('approve');
+        Route::post('/{approvalRequest}/reject', [App\Http\Controllers\Approval\ApprovalController::class, 'reject'])
+            ->whereNumber('approvalRequest')
+            ->name('reject');
     });
 
     // Chat System Routes

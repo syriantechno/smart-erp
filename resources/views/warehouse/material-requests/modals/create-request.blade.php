@@ -119,6 +119,15 @@
                             </x-base.form-select>
                         </div>
                         <div class="col-span-12">
+                            <x-base.form-label for="material-request-approval-template">Approval Template</x-base.form-label>
+                            <x-base.form-select id="material-request-approval-template" name="approval_template_id" required>
+                                <option value="">Select approval template</option>
+                                @foreach ($approvalTemplates as $template)
+                                    <option value="{{ $template->id }}">{{ $template->name }}</option>
+                                @endforeach
+                            </x-base.form-select>
+                        </div>
+                        <div class="col-span-12">
                             <x-base.form-label for="material-request-description">Notes</x-base.form-label>
                             <x-base.form-textarea
                                 id="material-request-description"
@@ -265,6 +274,7 @@
                 const submitBtn = document.getElementById('material-request-submit');
                 const modalEl = document.getElementById('material-request-modal');
                 const companySelect = document.getElementById('material-request-company');
+                const templateSelect = document.getElementById('material-request-approval-template');
                 const companyLogoEl = document.getElementById('material-request-company-logo');
                 const companyNameEl = document.getElementById('material-request-company-name');
                 const companyAddressEl = document.getElementById('material-request-company-address');
@@ -490,6 +500,12 @@
 
                     if (!state.selected.size) {
                         showError('Please add at least one material to the request.');
+                        return;
+                    }
+
+                    if (templateSelect && !templateSelect.value) {
+                        showError('Please select an approval template.');
+                        templateSelect.focus();
                         return;
                     }
 

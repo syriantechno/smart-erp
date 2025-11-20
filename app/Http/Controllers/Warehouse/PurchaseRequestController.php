@@ -3,7 +3,11 @@
 namespace App\Http\Controllers\Warehouse;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\NotificationController;
+use App\Models\Approval\ApprovalRequest;
+use App\Models\Approval\ApprovalTemplate;
 use App\Models\Setting\Company;
+use App\Models\User;
 use App\Models\Warehouse\Category;
 use App\Models\Warehouse\Material;
 use App\Models\Warehouse\PurchaseRequest;
@@ -14,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Yajra\DataTables\Facades\DataTables;
 
 class PurchaseRequestController extends Controller
@@ -71,9 +76,16 @@ class PurchaseRequestController extends Controller
             })
             ->values();
 
+        $approvalTemplates = ApprovalTemplate::query()
+            ->active()
+            ->byType('material_request')
+            ->select('id', 'name', 'description', 'levels')
+            ->orderBy('name')
+            ->get();
+
         return view(
             'warehouse.material-requests.index',
-            compact('company', 'companies', 'warehouses', 'categories', 'materials', 'materialCategories')
+            compact('company', 'companies', 'warehouses', 'categories', 'materials', 'materialCategories', 'approvalTemplates')
         );
     }
 
@@ -86,7 +98,7 @@ class PurchaseRequestController extends Controller
     public function datatable(Request $request): JsonResponse
     {
         $baseQuery = PurchaseRequest::query()
-            ->with(['requestedBy:id,name', 'approvedBy:id,name']);
+            ->with(['requestedBy:id,name', 'approvedBy:id,name', 'approvalRequest']);
 
         // Apply status filter
         if ($request->filled('status')) {
@@ -103,10 +115,39 @@ class PurchaseRequestController extends Controller
             ->addColumn('status_badge', function ($pr) {
                 return '<span class="px-2 py-1 text-xs font-medium rounded-full ' . $pr->getStatusBadgeClass() . '">' . ucfirst($pr->status) . '</span>';
             })
+            ->addColumn('approval_progress', function ($pr) {
+                if (!$pr->approvalRequest) {
+                    return '<span class="text-xs text-slate-400">—</span>';
+                }
+
+                static $approverCache = [];
+                $approvalRequest = $pr->approvalRequest;
+                $levels = collect($approvalRequest->approval_levels ?? [])->map(function ($level, $index) use ($approvalRequest, &$approverCache) {
+                    $levelNumber = $level['level'] ?? ($index + 1);
+                    $approverId = $level['approver_id'] ?? null;
+
+                    if ($approverId && !array_key_exists($approverId, $approverCache)) {
+                        $approverCache[$approverId] = User::find($approverId)?->name;
+                    }
+
+                    return [
+                        'number' => $levelNumber,
+                        'name' => $level['name'] ?? 'Level ' . $levelNumber,
+                        'approver' => $level['approver_name'] ?? $approverCache[$approverId] ?? __('Approver'),
+                        'is_completed' => $levelNumber < ($approvalRequest->current_level ?? 1) || $approvalRequest->status === 'approved',
+                        'is_current' => $approvalRequest->status === 'pending' && ($approvalRequest->current_level ?? 1) === $levelNumber,
+                        'is_rejected' => $approvalRequest->status === 'rejected' && ($approvalRequest->current_level ?? 1) === $levelNumber,
+                    ];
+                })->toArray();
+
+                return view('warehouse.material-requests.partials.approval-progress', [
+                    'levels' => $levels,
+                ])->render();
+            })
             ->addColumn('actions', function ($pr) {
                 return view('warehouse.material-requests.partials.actions', compact('pr'))->render();
             })
-            ->rawColumns(['status_badge', 'actions'])
+            ->rawColumns(['status_badge', 'approval_progress', 'actions'])
             ->make(true);
     }
 
@@ -121,7 +162,13 @@ class PurchaseRequestController extends Controller
             'warehouse_id' => 'required|exists:warehouses,id',
             'status' => 'nullable|in:pending,approved,rejected,completed',
             'is_active' => 'boolean',
-            'items' => 'required'
+            'items' => 'required',
+            'approval_template_id' => [
+                'required',
+                Rule::exists('approval_templates', 'id')->where(function ($query) {
+                    $query->where('type', 'material_request')->where('is_active', true);
+                }),
+            ],
         ]);
 
         if ($validator->fails()) {
@@ -204,8 +251,26 @@ class PurchaseRequestController extends Controller
             ], 422);
         }
 
+        $approvalTemplate = ApprovalTemplate::active()
+            ->byType('material_request')
+            ->find($request->input('approval_template_id'));
+
+        if (!$approvalTemplate) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Selected approval template is no longer available.',
+            ], 422);
+        }
+
+        if (empty($approvalTemplate->levels)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Selected approval template does not have any approvers configured.',
+            ], 422);
+        }
+
         try {
-            $purchaseRequest = DB::transaction(function () use ($request, $itemsData, $totalAmount) {
+            $purchaseRequest = DB::transaction(function () use ($request, $itemsData, $totalAmount, $approvalTemplate) {
                 $code = $this->codeGenerator->generate('purchase_requests');
 
                 $purchaseRequest = PurchaseRequest::create([
@@ -223,6 +288,13 @@ class PurchaseRequestController extends Controller
                 ]);
 
                 $purchaseRequest->items()->createMany($itemsData->toArray());
+
+                $this->startApprovalWorkflow(
+                    $purchaseRequest,
+                    $approvalTemplate,
+                    $totalAmount,
+                    $itemsData->count()
+                );
 
                 return $purchaseRequest;
             });
@@ -248,7 +320,28 @@ class PurchaseRequestController extends Controller
             'requestedBy',
             'approvedBy',
             'items.material.unit',
+            'approvalRequest.logs.user',
+            'approvalRequest.currentApprover',
         ]);
+
+        $approvalRequest = $purchaseRequest->approvalRequest;
+        $approverNames = collect();
+
+        if ($approvalRequest) {
+            $approverIds = collect($approvalRequest->approval_levels ?? [])
+                ->pluck('approver_id')
+                ->filter()
+                ->unique()
+                ->values();
+
+            if ($approverIds->isNotEmpty()) {
+                $approverNames = User::query()
+                    ->select('id', 'name')
+                    ->whereIn('id', $approverIds)
+                    ->get()
+                    ->keyBy('id');
+            }
+        }
 
         if ($request->wantsJson()) {
             return response()->json([
@@ -262,6 +355,8 @@ class PurchaseRequestController extends Controller
         return view('warehouse.material-requests.show', [
             'purchaseRequest' => $purchaseRequest,
             'currencySymbol' => $currencySymbol,
+            'approvalRequest' => $approvalRequest,
+            'approverNames' => $approverNames,
         ]);
     }
 
@@ -324,5 +419,98 @@ class PurchaseRequestController extends Controller
                 'message' => 'Failed to delete purchase request: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    private function startApprovalWorkflow(
+        PurchaseRequest $purchaseRequest,
+        ApprovalTemplate $template,
+        float $totalAmount,
+        int $itemsCount
+    ): ApprovalRequest {
+        $levels = collect($template->levels ?? [])
+            ->filter(function ($level) {
+                return !empty($level['approver_id']);
+            })
+            ->values()
+            ->map(function ($level, $index) {
+                return [
+                    'level' => $level['level'] ?? ($index + 1),
+                    'name' => $level['name'] ?? 'Level ' . ($index + 1),
+                    'approver_id' => (int) $level['approver_id'],
+                    'role' => $level['role'] ?? null,
+                ];
+            })
+            ->toArray();
+
+        if (empty($levels)) {
+            throw ValidationException::withMessages([
+                'approval_template_id' => 'Selected approval template does not have any approvers configured.',
+            ]);
+        }
+
+        $currentApproverId = $levels[0]['approver_id'] ?? null;
+
+        $approvalRequest = ApprovalRequest::create([
+            'code' => $this->generateUniqueApprovalCode(),
+            'title' => $purchaseRequest->title,
+            'description' => $purchaseRequest->description ?? 'Material request approval',
+            'type' => 'material_request',
+            'status' => 'pending',
+            'priority' => $purchaseRequest->priority ?? 'normal',
+            'request_data' => [
+                'purchase_request_id' => $purchaseRequest->id,
+                'purchase_request_code' => $purchaseRequest->code,
+                'items_count' => $itemsCount,
+            ],
+            'amount' => $totalAmount,
+            'requester_id' => $purchaseRequest->requested_by,
+            'current_approver_id' => $currentApproverId,
+            'company_id' => $purchaseRequest->company_id,
+            'approval_template_id' => $template->id,
+            'approvable_type' => PurchaseRequest::class,
+            'approvable_id' => $purchaseRequest->id,
+            'approval_levels' => $levels,
+            'current_level' => 1,
+        ]);
+
+        $approvalRequest->logs()->create([
+            'action' => 'submitted',
+            'user_id' => $purchaseRequest->requested_by,
+            'level' => 1,
+        ]);
+
+        $purchaseRequest->update([
+            'approval_template_id' => $template->id,
+            'approval_request_id' => $approvalRequest->id,
+        ]);
+
+        if ($currentApproverId) {
+            NotificationController::sendToUser(
+                $currentApproverId,
+                'Material Request Approval Needed',
+                'Material request ' . $purchaseRequest->code . ' is pending your approval.',
+                'info',
+                route('warehouse.material-requests.show', $purchaseRequest)
+            );
+        }
+
+        return $approvalRequest;
+    }
+
+    private function generateUniqueApprovalCode(): string
+    {
+        $attempts = 0;
+        do {
+            $code = $this->codeGenerator->generate('approval_requests');
+            $exists = ApprovalRequest::where('code', $code)->exists();
+            $attempts++;
+        } while ($exists && $attempts < 5);
+
+        if ($exists) {
+            // Fallback to timestamp-based code if generator keeps colliding
+            $code = 'APR-' . now()->format('Ymd-His-u');
+        }
+
+        return $code;
     }
 }

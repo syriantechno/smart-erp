@@ -25,7 +25,9 @@ class PurchaseRequest extends Model
         'company_id',
         'warehouse_id',
         'total_amount',
-        'is_active'
+        'is_active',
+        'approval_template_id',
+        'approval_request_id',
     ];
 
     protected $casts = [
@@ -63,6 +65,16 @@ class PurchaseRequest extends Model
     public function items(): HasMany
     {
         return $this->hasMany(PurchaseRequestItem::class);
+    }
+
+    public function approvalTemplate(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Approval\ApprovalTemplate::class);
+    }
+
+    public function approvalRequest(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Approval\ApprovalRequest::class);
     }
 
     public function getStatusBadgeClass(): string

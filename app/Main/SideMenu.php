@@ -120,8 +120,19 @@ class SideMenu
             ],
             'approval-system' => [
                 'icon' => 'check-circle',
-                'route_name' => 'approval-system.index',
-                'title' => 'Approval System'
+                'title' => 'Approval System',
+                'sub_menu' => [
+                    'approval-system-requests' => [
+                        'icon' => 'list-checks',
+                        'route_name' => 'approval-system.index',
+                        'title' => 'Requests',
+                    ],
+                    'approval-system-templates' => [
+                        'icon' => 'layers',
+                        'route_name' => 'approval-system.templates.index',
+                        'title' => 'Templates',
+                    ],
+                ],
             ],
             'work' => [
                 'icon' => 'briefcase',

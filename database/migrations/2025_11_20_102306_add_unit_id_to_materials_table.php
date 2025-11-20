@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-       Schema::table('materials', function (Blueprint $table) {
-    $table->unsignedBigInteger('unit_id')->after('category_id');
-    $table->foreign('unit_id')
-          ->references('id')
-          ->on('measurement_units')
-          ->onDelete('restrict');
-});
+        Schema::table('materials', function (Blueprint $table) {
+            if (!Schema::hasColumn('materials', 'unit_id')) {
+                $table->unsignedBigInteger('unit_id')->after('category_id');
+                $table->foreign('unit_id')
+                    ->references('id')
+                    ->on('measurement_units')
+                    ->onDelete('restrict');
+            }
+        });
     }
 
     /**
@@ -26,8 +28,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('materials', function (Blueprint $table) {
-    $table->dropForeign(['unit_id']);
-    $table->dropColumn('unit_id');
-});
+            if (Schema::hasColumn('materials', 'unit_id')) {
+                $table->dropForeign(['unit_id']);
+                $table->dropColumn('unit_id');
+            }
+        });
     }
 };

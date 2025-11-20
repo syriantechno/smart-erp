@@ -7,6 +7,7 @@
     $categories = $categories ?? collect();
     $materials = $materials ?? collect();
     $materialCategories = $materialCategories ?? collect();
+    $approvalTemplates = $approvalTemplates ?? collect();
 
     $warehousesPayload = $warehouses->map(fn ($warehouse) => [
         'id' => $warehouse->id,
@@ -29,6 +30,13 @@
     $materialCategoriesPayload = $materialCategories->map(fn ($category) => [
         'id' => $category['id'] ?? null,
         'name' => $category['name'] ?? null,
+    ])->values();
+
+    $approvalTemplatesPayload = $approvalTemplates->map(fn ($template) => [
+        'id' => $template->id,
+        'name' => $template->name,
+        'description' => $template->description,
+        'levels' => $template->levels,
     ])->values();
 
     $companiesPayload = $companies->map(fn ($company) => [
@@ -161,6 +169,7 @@
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Requested By</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Request Date</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Total Amount</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Approvals</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Status</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Actions</th>
                                 </tr>
@@ -196,6 +205,7 @@
                 warehouses: @json($warehousesPayload),
                 materials: @json($materialsPayload),
                 categories: @json($materialCategoriesPayload),
+                approvalTemplates: @json($approvalTemplatesPayload),
                 currencySymbol: @json($currencySymbol)
             }
         };
@@ -240,6 +250,7 @@
                             return value ?? 0;
                         }
                     },
+                    { data: 'approval_progress', name: 'approval_progress', orderable: false, searchable: false },
                     {
                         data: 'status_badge',
                         name: 'status',
