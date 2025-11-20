@@ -392,15 +392,7 @@
                             return value || '';
                         }
                     },
-                    {
-                        data: 'actions',
-                        name: 'actions',
-                        orderable: false,
-                        searchable: false,
-                        render: function () {
-                            return '<span class="text-slate-400">Actions</span>';
-                        }
-                    }
+                    { data: 'actions', name: 'actions', orderable: false, searchable: false }
                 ],
                 pageLength: 25
             });
