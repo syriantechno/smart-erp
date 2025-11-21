@@ -4,7 +4,12 @@
 
 @push('modals')
     <x-modal.form id="create-position-modal" title="Create New Position">
-        <form id="create-position-form" action="{{ route('hr.positions.store') }}" method="POST">
+        <form
+            id="create-position-form"
+            action="{{ route('hr.positions.store') }}"
+            method="POST"
+            data-preview-url="{{ route('hr.positions.preview-code') }}"
+        >
             @csrf
             <div class="grid grid-cols-12 gap-4 gap-y-4">
                 <div class="col-span-12 md:col-span-6">

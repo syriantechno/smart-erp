@@ -29,53 +29,14 @@
 @include('components.datatable.styles')
 @include('components.datatable.theme')
 
-@push('styles')
-    <style>
-        #leave-table th,
-        #leave-table td {
-            font-size: 0.9rem;
-        }
-
-        .leave-status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            padding: 0.1rem 0.65rem;
-            border-radius: 999px;
-            font-size: 0.78rem;
-            font-weight: 600;
-            letter-spacing: 0.02em;
-        }
-
-        .leave-status-badge--pending {
-            color: color-mix(in oklch, #c98028, black 25%);
-            background: color-mix(in oklch, #c98028 20%, #fff);
-        }
-
-        .leave-status-badge--approved {
-            color: color-mix(in oklch, #1b7a4a, black 20%);
-            background: color-mix(in oklch, #1b7a4a 18%, #fff);
-        }
-
-        .leave-status-badge--rejected {
-            color: color-mix(in oklch, #b21a50, black 20%);
-            background: color-mix(in oklch, #b21a50 18%, #fff);
-        }
-
-        .leave-reason-chip {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.1rem 0.55rem;
-            border-radius: 0.4rem;
-            background: rgba(15, 23, 42, 0.05);
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: #475569;
-        }
-    </style>
-@endpush
-
 @section('subcontent')
+<div
+    id="leave-page"
+    data-leave-datatable-url="{{ route('hr.leave.datatable') }}"
+    data-leave-summary-url="{{ route('hr.leave.summary') }}"
+    data-leave-preview-url="{{ route('hr.leave.preview-code') }}"
+    data-leave-base-url="{{ route('hr.leave.index') }}"
+>
 <div class="grid grid-cols-12 gap-6">
     <div class="col-span-12">
         <div class="grid grid-cols-12 gap-6">
@@ -299,44 +260,8 @@
     @include('hr.leave.modals.edit', compact('leaveTypes', 'leaveReasons', 'leaveStatuses', 'employees'))
     <button id="open-edit-leave-modal" data-tw-toggle="modal" data-tw-target="#edit-leave-modal" class="hidden"></button>
 </div>
+</div>
 @endsection
 
 @stack('modals')
 @include('components.datatable.scripts')
-
-@push('scripts')
-    <script>
-        window.leaveConfig = {
-            routes: {
-                datatable: '{{ route('hr.leave.datatable') }}',
-                summary: '{{ route('hr.leave.summary') }}',
-                previewCode: '{{ route('hr.leave.preview-code') }}',
-                base: '{{ route('hr.leave.index') }}'
-            },
-            selectors: {
-                table: '#leave-table',
-                filterField: '#leave-filter-field',
-                filterType: '#leave-filter-type',
-                filterValue: '#leave-filter-value',
-                typeSelect: '#leave-filter-type-select',
-                statusSelect: '#leave-filter-status',
-                fromInput: '#leave-filter-from',
-                toInput: '#leave-filter-to',
-                filterApply: '#leave-filter-apply',
-                filterReset: '#leave-filter-reset',
-                refreshButton: '#leave-refresh',
-                exportButton: '#leave-export',
-                pdfButton: '#leave-pdf',
-                summaryButton: '#leave-export-summary',
-                createForm: '#create-leave-form',
-                editForm: '#edit-leave-form',
-                createEmployeeMeta: '#create-leave-employee-meta',
-                editEmployeeMeta: '#edit-leave-employee-meta'
-            },
-            meta: {
-                csrf: '{{ csrf_token() }}'
-            }
-        };
-    </script>
-    @vite('resources/js/pages/leave.js')
-@endpush

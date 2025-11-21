@@ -1,5 +1,11 @@
 <!-- Generate Payroll Modal -->
-<x-base.dialog id="generate-payroll-modal" size="lg">
+<x-base.dialog
+    id="generate-payroll-modal"
+    size="lg"
+    data-payroll-generate-url="{{ route('hr.payroll.generate') }}"
+    data-payroll-process-url="{{ route('hr.payroll.process') }}"
+    data-payroll-departments-url="{{ url('/hr/departments/api/company') }}"
+>
     <x-base.dialog.panel>
         <!-- Header -->
         <x-base.dialog.title>
@@ -33,7 +39,7 @@
                         <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                             Company (Optional)
                         </label>
-                        <x-base.form-select id="generate-company-filter" class="w-full">
+                        <x-base.form-select id="generate-company-filter" class="w-full" data-payroll-company-select>
                             <option value="">All Companies</option>
                             @foreach($companies ?? [] as $company)
                                 <option value="{{ $company->id }}">{{ $company->name }}</option>
@@ -47,7 +53,7 @@
                         <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                             Department (Optional)
                         </label>
-                        <x-base.form-select id="generate-department-filter" class="w-full">
+                        <x-base.form-select id="generate-department-filter" class="w-full" data-payroll-department-select>
                             <option value="">All Departments</option>
                         </x-base.form-select>
                         <p class="mt-1 text-xs text-slate-500">Leave empty to generate for all departments</p>
@@ -164,249 +170,3 @@
     </form>
     </x-base.dialog.panel>
 </x-base.dialog>
-
-<script>
-// Payroll Generation Modal Functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const generatePreviewBtn = document.getElementById('generate-preview-btn');
-    const processPayrollBtn = document.getElementById('process-payroll-btn');
-    const payrollPreview = document.getElementById('payroll-preview');
-    const payrollEmptyState = document.getElementById('payroll-empty-state');
-    const payrollDetailsTable = document.getElementById('payroll-details-table');
-
-    // Generate Preview
-    if (generatePreviewBtn) {
-        generatePreviewBtn.addEventListener('click', function() {
-            generatePayrollPreview();
-        });
-    }
-
-    // Process Payroll
-    if (processPayrollBtn) {
-        processPayrollBtn.addEventListener('click', function() {
-            processPayroll();
-        });
-    }
-
-    // Auto-load departments when company changes
-    const companyFilter = document.getElementById('generate-company-filter');
-    const departmentFilter = document.getElementById('generate-department-filter');
-
-    if (companyFilter) {
-        companyFilter.addEventListener('change', function() {
-            loadDepartmentsForCompany(this.value, departmentFilter);
-        });
-    }
-
-    function generatePayrollPreview() {
-        const month = document.getElementById('generate-month').value;
-        const companyId = companyFilter.value;
-        const departmentId = departmentFilter.value;
-        const includeInactive = document.getElementById('include-inactive').checked;
-
-        if (!month) {
-            showToast('Please select a payroll month', 'error');
-            return;
-        }
-
-        // Show loading state
-        generatePreviewBtn.disabled = true;
-        generatePreviewBtn.innerHTML = '<x-base.lucide icon="Loader" class="w-4 h-4 mr-1 animate-spin"></x-base.lucide>Generating...';
-
-        fetch('{{ route("hr.payroll.generate") }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-                month: month,
-                company_id: companyId || null,
-                department_id: departmentId || null,
-                include_inactive: includeInactive
-            }),
-            credentials: 'same-origin'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                displayPayrollPreview(data.data);
-                processPayrollBtn.classList.remove('hidden');
-            } else {
-                showToast(data.message || 'Failed to generate payroll preview', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error generating payroll preview:', error);
-            showToast('An error occurred while generating payroll preview', 'error');
-        })
-        .finally(() => {
-            generatePreviewBtn.disabled = false;
-            generatePreviewBtn.innerHTML = '<x-base.lucide icon="RefreshCw" class="w-4 h-4 mr-1"></x-base.lucide>Generate Preview';
-        });
-    }
-
-    function displayPayrollPreview(data) {
-        // Hide empty state and show preview
-        payrollEmptyState.classList.add('hidden');
-        payrollPreview.classList.remove('hidden');
-
-        // Update summary stats
-        document.getElementById('preview-employee-count').textContent = data.total_employees;
-        document.getElementById('preview-total-amount').textContent = '$' + parseFloat(data.total_amount).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        document.getElementById('preview-avg-salary').textContent = '$' + (data.total_employees > 0 ? (data.total_amount / data.total_employees).toFixed(2) : '0.00');
-        document.getElementById('preview-month-display').textContent = new Date(data.month + '-01').toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
-
-        // Clear and populate details table
-        payrollDetailsTable.innerHTML = '';
-
-        if (data.payroll_data && data.payroll_data.length > 0) {
-            data.payroll_data.forEach(employee => {
-                const row = document.createElement('tr');
-                row.className = 'hover:bg-slate-50 dark:hover:bg-darkmode-600';
-                row.innerHTML = `
-                    <td class="px-4 py-3 text-sm font-medium text-slate-900 dark:text-white">
-                        ${employee.employee_name} (${employee.employee_code})
-                    </td>
-                    <td class="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">
-                        ${employee.position || 'N/A'}
-                    </td>
-                    <td class="px-4 py-3 text-sm text-green-600 font-medium">
-                        $${parseFloat(employee.base_salary).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-                    </td>
-                    <td class="px-4 py-3">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            Ready
-                        </span>
-                    </td>
-                `;
-                payrollDetailsTable.appendChild(row);
-            });
-        } else {
-            const emptyRow = document.createElement('tr');
-            emptyRow.innerHTML = `
-                <td colspan="4" class="px-4 py-8 text-center text-slate-500">
-                    No employees found for the selected criteria
-                </td>
-            `;
-            payrollDetailsTable.appendChild(emptyRow);
-        }
-    }
-
-    function processPayroll() {
-        const payrollData = Array.from(payrollDetailsTable.querySelectorAll('tr')).map(row => {
-            const cells = row.querySelectorAll('td');
-            if (cells.length >= 3) {
-                const nameCode = cells[0].textContent.split('(');
-                const employeeName = nameCode[0].trim();
-                const employeeCode = nameCode[1] ? nameCode[1].replace(')', '').trim() : '';
-                const baseSalary = cells[2].textContent.replace('$', '').replace(',', '');
-
-                return {
-                    employee_name: employeeName,
-                    employee_code: employeeCode,
-                    base_salary: baseSalary
-                };
-            }
-            return null;
-        }).filter(item => item);
-
-        const month = document.getElementById('generate-month').value;
-
-        if (!payrollData.length) {
-            showToast('No payroll data to process', 'error');
-            return;
-        }
-
-        // Show loading state
-        processPayrollBtn.disabled = true;
-        processPayrollBtn.innerHTML = '<x-base.lucide icon="Loader" class="w-4 h-4 mr-2 animate-spin"></x-base.lucide>Processing...';
-
-        fetch('{{ route("hr.payroll.process") }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-                payroll_data: payrollData,
-                month: month
-            }),
-            credentials: 'same-origin'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showToast(data.message || 'Payroll processed successfully', 'success');
-
-                // Close modal and refresh table
-                const modal = document.getElementById('generate-payroll-modal');
-                if (modal) {
-                    modal.__tippy?.hide();
-                }
-
-                // Reset form
-                document.getElementById('generate-payroll-form').reset();
-                payrollPreview.classList.add('hidden');
-                payrollEmptyState.classList.remove('hidden');
-                processPayrollBtn.classList.add('hidden');
-
-                // Refresh main table
-                if (window.payrollTable) {
-                    window.payrollTable.ajax.reload(null, false);
-                }
-            } else {
-                showToast(data.message || 'Failed to process payroll', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error processing payroll:', error);
-            showToast('An error occurred while processing payroll', 'error');
-        })
-        .finally(() => {
-            processPayrollBtn.disabled = false;
-            processPayrollBtn.innerHTML = '<x-base.lucide icon="CheckCircle" class="w-4 h-4 mr-2"></x-base.lucide>Process Payroll';
-        });
-    }
-
-    function loadDepartmentsForCompany(companyId, departmentSelect) {
-        if (!departmentSelect) return;
-
-        departmentSelect.innerHTML = '<option value="">Loading departments...</option>';
-
-        if (!companyId) {
-            departmentSelect.innerHTML = '<option value="">All Departments</option>';
-            return;
-        }
-
-        fetch(`/hr/departments/api/company/${companyId}`, {
-            credentials: 'same-origin',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            departmentSelect.innerHTML = '<option value="">All Departments</option>';
-            if (data && Array.isArray(data)) {
-                data.forEach(dept => {
-                    const option = document.createElement('option');
-                    option.value = dept.id;
-                    option.textContent = dept.name;
-                    departmentSelect.appendChild(option);
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Error loading departments:', error);
-            departmentSelect.innerHTML = '<option value="">Error loading departments</option>';
-        });
-    }
-});
-</script>

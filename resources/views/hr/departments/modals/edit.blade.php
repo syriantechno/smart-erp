@@ -6,7 +6,12 @@
 
 @push('modals')
     <x-modal.form id="edit-department-modal" title="Edit Department" class="hidden">
-        <form id="edit-department-form" action="" method="POST">
+        <form
+            id="edit-department-form"
+            action=""
+            method="POST"
+            data-update-url-base="{{ url('hr/departments') }}"
+        >
             @csrf
             @method('PUT')
             <input type="hidden" id="edit-department-current-id" />

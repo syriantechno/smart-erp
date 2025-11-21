@@ -7,7 +7,11 @@
             Add New Candidate
         </x-base.dialog.title>
 
-        <form id="add-recruitment-form">
+        <form
+            id="add-recruitment-form"
+            data-store-url="{{ route('hr.recruitment.store') }}"
+            data-departments-url="{{ url('/hr/departments/api/company') }}"
+        >
             <!-- Modal Body -->
             <div class="px-5 py-3">
                 <div class="space-y-6">
@@ -221,143 +225,3 @@
         </form>
     </x-base.dialog.panel>
 </x-base.dialog>
-
-<script>
-// Recruitment Form Handling
-document.addEventListener('DOMContentLoaded', function() {
-    const recruitmentForm = document.getElementById('add-recruitment-form');
-    const companySelect = document.getElementById('company_id');
-    const departmentSelect = document.getElementById('department_id');
-
-    // Load departments when company changes
-    if (companySelect) {
-        companySelect.addEventListener('change', function() {
-            loadDepartmentsForCompany(this.value, departmentSelect);
-        });
-    }
-
-    // Form submission
-    if (recruitmentForm) {
-        recruitmentForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const submitBtn = document.getElementById('submit-recruitment-btn');
-            const originalText = submitBtn.innerHTML;
-
-            // Show loading state
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<x-base.lucide icon="Loader" class="w-4 h-4 mr-2 animate-spin"></x-base.lucide>Adding...';
-
-            const formData = new FormData(recruitmentForm);
-
-            // Debug: Log form data
-            console.log('Form data being sent:');
-            for (let [key, value] of formData.entries()) {
-                console.log(key + ': ' + value);
-            }
-
-            // Convert FormData to JSON for better handling
-            const data = {};
-            for (let [key, value] of formData.entries()) {
-                if (key === 'skills') {
-                    // Handle skills as array
-                    data[key] = value ? value.split(',').map(s => s.trim()) : [];
-                } else {
-                    data[key] = value;
-                }
-            }
-
-            console.log('Converted data:', data);
-
-            fetch('{{ route("hr.recruitment.store") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(data),
-                credentials: 'same-origin'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showToast(data.message || 'Candidate added successfully', 'success');
-
-                    // Reset form and close modal
-                    recruitmentForm.reset();
-                    const modal = document.getElementById('add-recruitment-modal');
-                    if (modal) {
-                        modal.__tippy?.hide();
-                    }
-
-                    // Reload table
-                    if (window.recruitmentTable) {
-                        window.recruitmentTable.ajax.reload(null, false);
-                    }
-                } else {
-                    // Show validation errors
-                    if (data.errors) {
-                        let errorMessage = 'Validation errors:\n';
-                        Object.values(data.errors).forEach(errors => {
-                            if (Array.isArray(errors)) {
-                                errors.forEach(error => errorMessage += '• ' + error + '\n');
-                            } else {
-                                errorMessage += '• ' + errors + '\n';
-                            }
-                        });
-                        showToast(errorMessage, 'error');
-                    } else {
-                        showToast(data.message || 'Failed to add candidate', 'error');
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error adding candidate:', error);
-                showToast('An error occurred while adding the candidate', 'error');
-            })
-            .finally(() => {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalText;
-            });
-        });
-    }
-
-    function loadDepartmentsForCompany(companyId, departmentSelect) {
-        if (!departmentSelect) return;
-
-        departmentSelect.innerHTML = '<option value="">Loading departments...</option>';
-
-        if (!companyId) {
-            departmentSelect.innerHTML = '<option value="">Select Department</option>';
-            return;
-        }
-
-        fetch(`/hr/departments/api/company/${companyId}`, {
-            credentials: 'same-origin',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            departmentSelect.innerHTML = '<option value="">Select Department</option>';
-            if (data && Array.isArray(data)) {
-                data.forEach(dept => {
-                    const option = document.createElement('option');
-                    option.value = dept.id;
-                    option.textContent = dept.name;
-                    departmentSelect.appendChild(option);
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Error loading departments:', error);
-            departmentSelect.innerHTML = '<option value="">Error loading departments</option>';
-        });
-    }
-});
-</script>

@@ -197,6 +197,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/', [App\Http\Controllers\Warehouse\CategoryController::class, 'index'])->name('index');
             Route::get('/datatable', [App\Http\Controllers\Warehouse\CategoryController::class, 'datatable'])->name('datatable');
             Route::get('/preview-code', [App\Http\Controllers\Warehouse\CategoryController::class, 'previewCode'])->name('preview-code');
+            Route::get('/children', [App\Http\Controllers\Warehouse\CategoryController::class, 'children'])->name('children');
             Route::post('/', [App\Http\Controllers\Warehouse\CategoryController::class, 'store'])->name('store');
             Route::get('/{category}', [App\Http\Controllers\Warehouse\CategoryController::class, 'show'])->name('show');
             Route::put('/{category}', [App\Http\Controllers\Warehouse\CategoryController::class, 'update'])->name('update');
@@ -245,6 +246,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/', [App\Http\Controllers\Warehouse\PurchaseRequestController::class, 'index'])->name('index');
             Route::get('/datatable', [App\Http\Controllers\Warehouse\PurchaseRequestController::class, 'datatable'])->name('datatable');
             Route::get('/preview-code', [App\Http\Controllers\Warehouse\PurchaseRequestController::class, 'previewCode'])->name('preview-code');
+            Route::get('/materials', [App\Http\Controllers\Warehouse\PurchaseRequestController::class, 'materials'])->name('materials');
             Route::post('/', [App\Http\Controllers\Warehouse\PurchaseRequestController::class, 'store'])->name('store');
             Route::get('/{purchaseRequest}', [App\Http\Controllers\Warehouse\PurchaseRequestController::class, 'show'])->name('show');
             Route::put('/{purchaseRequest}', [App\Http\Controllers\Warehouse\PurchaseRequestController::class, 'update'])->name('update');

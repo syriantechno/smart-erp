@@ -32,6 +32,15 @@
         'name' => $category['name'] ?? null,
     ])->values();
 
+    $catalogsPayload = $categories->map(fn ($category) => [
+        'id' => $category->id,
+        'name' => $category->name,
+        'children' => $category->children->map(fn ($child) => [
+            'id' => $child->id,
+            'name' => $child->name,
+        ])->values(),
+    ])->values();
+
     $approvalTemplatesPayload = $approvalTemplates->map(fn ($template) => [
         'id' => $template->id,
         'name' => $template->name,
@@ -194,7 +203,9 @@
         window.materialRequestPayload = {
             routes: {
                 store: '{{ route('warehouse.material-requests.store') }}',
-                previewCode: '{{ route('warehouse.material-requests.preview-code') }}'
+                previewCode: '{{ route('warehouse.material-requests.preview-code') }}',
+                materials: '{{ route('warehouse.material-requests.materials') }}',
+                categoryChildren: '{{ route('warehouse.categories.children') }}'
             },
             meta: {
                 csrf: '{{ csrf_token() }}'
@@ -205,6 +216,7 @@
                 warehouses: @json($warehousesPayload),
                 materials: @json($materialsPayload),
                 categories: @json($materialCategoriesPayload),
+                catalogs: @json($catalogsPayload),
                 approvalTemplates: @json($approvalTemplatesPayload),
                 currencySymbol: @json($currencySymbol)
             }

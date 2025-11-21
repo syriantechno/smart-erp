@@ -151,6 +151,124 @@ class PurchaseRequestController extends Controller
             ->make(true);
     }
 
+    public function materials(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'warehouse_id' => 'required|exists:warehouses,id',
+            'catalog_id' => [
+                'required',
+                Rule::exists('categories', 'id')->where(fn ($query) => $query->whereNull('parent_id')),
+            ],
+            'sub_catalog_id' => [
+                'nullable',
+                Rule::exists('categories', 'id'),
+            ],
+            'search' => 'nullable|string|max:255',
+            'page' => 'nullable|integer|min:1',
+            'per_page' => 'nullable|integer|min:1|max:50',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $validated = $validator->validated();
+
+        $catalog = Category::query()
+            ->whereKey($validated['catalog_id'])
+            ->whereNull('parent_id')
+            ->firstOrFail();
+
+        $subCatalog = null;
+        if (!empty($validated['sub_catalog_id'])) {
+            $subCatalog = Category::query()
+                ->whereKey($validated['sub_catalog_id'])
+                ->where('parent_id', $catalog->id)
+                ->first();
+
+            if (! $subCatalog) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Selected sub catalog does not belong to the chosen catalog.',
+                ], 422);
+            }
+        }
+
+        $warehouseId = (int) $validated['warehouse_id'];
+        $perPage = min((int) ($validated['per_page'] ?? 12), 50);
+        $search = trim((string) ($validated['search'] ?? ''));
+
+        $categoryIds = [];
+        if ($subCatalog) {
+            $categoryIds[] = $subCatalog->id;
+        } else {
+            $categoryIds[] = $catalog->id;
+            $childIds = Category::query()
+                ->where('parent_id', $catalog->id)
+                ->pluck('id')
+                ->all();
+            $categoryIds = array_merge($categoryIds, $childIds);
+        }
+
+        $materialsQuery = Material::query()
+            ->select([
+                'materials.id',
+                'materials.code',
+                'materials.name',
+                'materials.category_id',
+                'materials.unit_id',
+                'materials.price',
+                'materials.image_path',
+            ])
+            ->selectRaw('COALESCE(inv.quantity, 0) as available_quantity')
+            ->leftJoin('inventories as inv', function ($join) use ($warehouseId) {
+                $join->on('inv.material_id', '=', 'materials.id')
+                    ->where('inv.warehouse_id', $warehouseId);
+            })
+            ->where('materials.is_active', true)
+            ->whereIn('materials.category_id', $categoryIds)
+            ->with('unit:id,name,symbol')
+            ->orderBy('materials.name');
+
+        if ($search !== '') {
+            $materialsQuery->where(function ($query) use ($search) {
+                $query->where('materials.name', 'like', "%{$search}%")
+                    ->orWhere('materials.code', 'like', "%{$search}%");
+            });
+        }
+
+        $materials = $materialsQuery->paginate($perPage);
+
+        $items = $materials->getCollection()->map(function (Material $material) {
+            return [
+                'id' => $material->id,
+                'code' => $material->code,
+                'name' => $material->name,
+                'unit_name' => $material->unit?->name,
+                'unit_symbol' => $material->unit?->symbol,
+                'price' => (float) $material->price,
+                'available_quantity' => (float) ($material->available_quantity ?? 0),
+                'image_url' => $material->image_url,
+            ];
+        })->values();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'items' => $items,
+                'pagination' => [
+                    'total' => $materials->total(),
+                    'per_page' => $materials->perPage(),
+                    'current_page' => $materials->currentPage(),
+                    'last_page' => $materials->lastPage(),
+                ],
+            ],
+        ]);
+    }
+
     public function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [

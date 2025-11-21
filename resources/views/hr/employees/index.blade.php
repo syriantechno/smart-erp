@@ -10,44 +10,6 @@
 @push('styles')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-    <style>
-        /* Make employees table rows more compact */
-        #employees-table tbody tr {
-            height: 2.25rem; /* ~36px */
-        }
-
-        #employees-table td {
-            padding-top: 0.375rem;  /* 6px */
-            padding-bottom: 0.375rem;
-        }
-
-        .btn-tonal {
-            --btn-surface: color-mix(in oklch, var(--color-primary, #2563eb) 20%, #ffffff);
-            --btn-border: color-mix(in oklch, var(--color-primary, #2563eb), transparent 80%);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-            padding: 0.5rem 1.15rem;
-            border-radius: 9999px;
-            border: 1px solid var(--btn-border);
-            background-color: var(--btn-surface);
-            color: color-mix(in oklch, var(--color-primary, #2563eb), black 20%);
-            font-weight: 600;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.08);
-        }
-
-        .btn-tonal:hover {
-            transform: translateY(-1px) scale(1.02);
-            box-shadow: 0 15px 25px rgba(37, 99, 235, 0.12);
-        }
-
-        .btn-tonal:focus-visible {
-            outline: 2px solid color-mix(in oklch, var(--color-primary, #2563eb), transparent 60%);
-            outline-offset: 3px;
-        }
-
-    </style>
 @endpush
 
 @section('subcontent')

@@ -9,5 +9,6 @@
             $size == 'sm' ? 'sm:w-[300px]' : null,
             $size == 'lg' ? 'sm:w-[600px]' : null,
             $size == 'xl' ? 'sm:w-[600px] lg:w-[900px]' : null,
+            $size == 'xxl' ? 'sm:w-[680px] lg:w-[1100px]' : null,
         ])->merge($attributes->whereDoesntStartWith('class')->getAttributes()) }}
 >{{ $slot }}</{{ $as }}>

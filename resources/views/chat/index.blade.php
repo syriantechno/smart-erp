@@ -80,8 +80,8 @@
 
     <div class="mt-8 grid grid-cols-12 gap-6">
         <div class="col-span-12 lg:col-span-3 2xl:col-span-2">
-            <h2 class="intro-y mr-auto mt-2 text-lg font-medium">Internal Chat</h2>
-            <div class="intro-y mt-6">
+            
+            <div class="intro-y">
                 <div
                     class="rounded-2xl border border-white/10 text-white shadow-[0_20px_55px_rgba(10,24,55,0.38)]"
                     style="background: linear-gradient(135deg, var(--primary-color, #0f1f3d) 0%, var(--secondary-color, #1d3d8f) 45%, var(--accent-color, #0998d6) 100%);"
@@ -291,6 +291,16 @@
             </div>
         @endslot
     </x-modal.form>
+
+    <x-base.button
+        type="button"
+        id="open-new-chat-modal-btn"
+        class="hidden"
+        data-tw-toggle="modal"
+        data-tw-target="#new-chat-modal"
+    >
+        Open New Chat Modal
+    </x-base.button>
 @endsection
 
 @push('scripts')
@@ -300,6 +310,16 @@
 
         // Ensure jQuery alias `$` is available even if jQuery is in noConflict mode
         const $ = window.jQuery || window.$;
+        const CSRF_TOKEN = '{{ csrf_token() }}';
+
+        if ($ && CSRF_TOKEN) {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': CSRF_TOKEN,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+        }
 
         if ($) {
             $(document).ready(function() {
@@ -509,7 +529,10 @@
                     if (response.success) {
                         $('#message-input').val('');
                         clearFile();
-                        // Message will be appended via real-time update
+                        // Refresh messages immediately in case realtime isn't configured
+                        if (currentConversationId) {
+                            loadMessages(currentConversationId);
+                        }
                     }
                 },
                 error: function(xhr) {
@@ -535,9 +558,14 @@
 
         function showNewChatModal() {
             loadUsersForChat();
+            const trigger = document.getElementById('open-new-chat-modal-btn');
+            if (trigger) {
+                trigger.click();
+                return;
+            }
             const modalEl = document.getElementById('new-chat-modal');
-            if (modalEl) {
-                modalEl.dispatchEvent(new CustomEvent('open-modal'));
+            if (modalEl && window.tailwind?.Modal) {
+                window.tailwind.Modal.getOrCreateInstance(modalEl).show();
             }
         }
 

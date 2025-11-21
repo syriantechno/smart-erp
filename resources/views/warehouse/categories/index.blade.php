@@ -43,6 +43,7 @@
                                 <tr>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Code</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Name</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Parent</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Description</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Status</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Actions</th>
@@ -360,6 +361,13 @@
                 columns: [
                     { data: 'code', name: 'code' },
                     { data: 'name', name: 'name' },
+                    {
+                        data: 'parent_name',
+                        name: 'parent_name',
+                        render: function(value) {
+                            return value || 'Root';
+                        }
+                    },
                     { data: 'description', name: 'description' },
                     { 
                         data: 'is_active', 

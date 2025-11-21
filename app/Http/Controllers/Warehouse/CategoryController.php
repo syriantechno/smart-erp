@@ -149,4 +149,23 @@ class CategoryController extends Controller
             ], 500);
         }
     }
+
+    public function children(Request $request): JsonResponse
+    {
+        $request->validate([
+            'parent_id' => 'nullable|exists:categories,id',
+        ]);
+
+        $query = Category::query()
+            ->select('id', 'name', 'parent_id')
+            ->orderBy('name');
+
+        if ($request->filled('parent_id')) {
+            $query->where('parent_id', $request->input('parent_id'));
+        } else {
+            $query->whereNull('parent_id');
+        }
+
+        return response()->json($query->get());
+    }
 }

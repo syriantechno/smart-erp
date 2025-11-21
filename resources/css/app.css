@@ -37,6 +37,212 @@
 
 }
 
+#employees-table tbody tr {
+    height: 2.25rem;
+}
+
+#employees-table td {
+    padding-top: 0.375rem;
+    padding-bottom: 0.375rem;
+}
+
+#departments-table {
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+#departments-table tbody tr {
+    height: 2.25rem;
+}
+
+#departments-table th {
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.5rem 1.25rem;
+}
+
+#departments-table td {
+    padding: 0.375rem 1.25rem;
+}
+
+#departments-table .inline-flex {
+    padding: 0.125rem 0.5rem;
+    font-weight: 600;
+}
+
+#departments-table .px-5.py-1\.5 {
+    padding: 0.375rem 1.25rem;
+}
+
+#departments-table thead th,
+#departments-table tbody td {
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+#departments-table .datatable-cell-wrap {
+    text-align: center;
+}
+
+#positions-table {
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+#positions-table tbody tr {
+    height: 2.25rem;
+}
+
+#positions-table th {
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.5rem 1.25rem;
+}
+
+#positions-table td {
+    padding: 0.375rem 1.25rem;
+}
+
+#positions-table .inline-flex {
+    padding: 0.125rem 0.5rem;
+    font-weight: 600;
+}
+
+#positions-table .px-5.py-1\.5 {
+    padding: 0.375rem 1.25rem;
+}
+
+#positions-table thead th,
+#positions-table tbody td {
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+#positions-table .datatable-cell-wrap {
+    text-align: center;
+}
+
+#attendanceEntryModal,
+#statusLegendModal {
+    z-index: 99999 !important;
+    position: fixed !important;
+}
+
+.modal-backdrop {
+    z-index: 99998 !important;
+}
+
+#attendanceEntryModal .modal-content,
+#statusLegendModal .modal-content {
+    z-index: 100000 !important;
+    position: relative !important;
+}
+
+.modal.show {
+    z-index: 99999 !important;
+}
+
+#attendance-table {
+    line-height: 2.5;
+}
+
+#attendance-table th,
+#attendance-table td {
+    line-height: 2.2;
+    margin: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+#attendance-table .avatar {
+    margin-right: 0.5rem;
+}
+
+#attendance-table .font-bold {
+    margin: 0;
+    line-height: 2.8;
+}
+
+.leave-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.1rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.leave-status-badge--pending {
+    color: color-mix(in oklch, #c98028, black 25%);
+    background: color-mix(in oklch, #c98028 20%, #fff);
+}
+
+.leave-status-badge--approved {
+    color: color-mix(in oklch, #1b7a4a, black 20%);
+    background: color-mix(in oklch, #1b7a4a 18%, #fff);
+}
+
+.leave-status-badge--rejected {
+    color: color-mix(in oklch, #b21a50, black 20%);
+    background: color-mix(in oklch, #b21a50 18%, #fff);
+}
+
+.leave-reason-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.1rem 0.55rem;
+    border-radius: 0.4rem;
+    background: rgba(15, 23, 42, 0.05);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+#leave-table th,
+#leave-table td {
+    font-size: 0.9rem;
+}
+
+.legend-banner {
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    box-shadow: 0 10px 25px color-mix(in oklch, rgb(var(--dt-primary-rgb, var(--primary-rgb, 37 99 235))), transparent 88%);
+    border: 1px solid color-mix(in oklch, rgb(var(--dt-primary-rgb, var(--primary-rgb, 37 99 235))), transparent 80%);
+    background: color-mix(in oklch, rgb(var(--dt-primary-rgb, var(--primary-rgb, 37 99 235))) 18%, #ffffff);
+    color: color-mix(in oklch, rgb(var(--dt-primary-rgb, var(--primary-rgb, 37 99 235))), black 20%);
+}
+
+:root[data-theme="dark"] .legend-banner,
+.dark .legend-banner {
+    background: color-mix(in oklch, rgb(var(--dt-primary-rgb, var(--primary-rgb, 37 99 235))) 12%, rgb(15 23 42));
+    border-color: color-mix(in oklch, rgb(var(--dt-primary-rgb, var(--primary-rgb, 37 99 235))), transparent 70%);
+    color: color-mix(in oklch, rgb(var(--dt-primary-rgb, var(--primary-rgb, 37 99 235))), white 35%);
+    box-shadow: 0 15px 30px rgba(15, 23, 42, 0.35);
+}
+
+@supports (background: color-mix(in srgb, red 50%, transparent)) {
+    .legend-banner {
+        background: linear-gradient(
+            135deg,
+            color-mix(in srgb, var(--dt-primary-color, var(--primary-color, #2563eb)) 75%, transparent),
+            color-mix(in srgb, var(--dt-primary-color, var(--primary-color, #2563eb)) 40%, transparent)
+        );
+        color: color-mix(in srgb, var(--dt-primary-color, var(--primary-color, #2563eb)), black 15%);
+    }
+
+    :root[data-theme="dark"] .legend-banner,
+    .dark .legend-banner {
+        background: linear-gradient(
+            135deg,
+            color-mix(in srgb, var(--dt-primary-color, var(--primary-color, #2563eb)) 30%, rgb(15 23 42)),
+            color-mix(in srgb, var(--dt-primary-color, var(--primary-color, #2563eb)) 10%, rgb(15 23 42))
+        );
+        color: color-mix(in srgb, var(--dt-primary-color, var(--primary-color, #2563eb)), white 40%);
+    }
+}
+
 .btn-tonal {
     --btn-tone-color: var(--color-primary, #2563eb);
     display: inline-flex;
@@ -319,6 +525,109 @@
 /* Prevent layout shift when modals/slideover toggle body scroll */
 html {
     overflow-y: scroll;
+}
+
+/* Projects table compaction */
+#projects-table tbody tr {
+    height: 2.25rem;
+}
+
+#projects-table td {
+    padding-top: 0.375rem;
+    padding-bottom: 0.375rem;
+}
+
+/* Custom modal styling used on project pages */
+.custom-modal {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(15, 23, 42, 0.6);
+    display: none;
+    z-index: 1050;
+    animation: projects-modal-fade-in 0.25s ease-out;
+}
+
+.custom-modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.custom-modal-dialog {
+    background: #fff;
+    border-radius: 0.75rem;
+    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.45);
+    max-width: 1400px;
+    width: min(96%, 1400px);
+    max-height: 93vh;
+    overflow-y: auto;
+    animation: projects-modal-slide-in 0.25s ease-out;
+}
+
+.custom-modal-header {
+    padding: 1rem 1.75rem;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.custom-modal-body {
+    padding: 1.5rem 1.75rem;
+}
+
+.custom-modal-footer {
+    padding: 1rem 1.75rem;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+.custom-modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.btn-close-custom {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 999px;
+    line-height: 1;
+    transition: background-color 0.2s ease;
+}
+
+.btn-close-custom:hover {
+    background-color: #e5e7eb;
+}
+
+@keyframes projects-modal-fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes projects-modal-slide-in {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 /*

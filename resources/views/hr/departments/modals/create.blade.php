@@ -6,7 +6,12 @@
 
 @push('modals')
     <x-modal.form id="create-department-modal" title="Create New Department" class="hidden">
-        <form id="create-department-form" action="{{ route('hr.departments.store') }}" method="POST">
+        <form
+            id="create-department-form"
+            action="{{ route('hr.departments.store') }}"
+            method="POST"
+            data-preview-url="{{ route('hr.departments.preview-code') }}"
+        >
             @csrf
             <div class="grid grid-cols-12 gap-4 gap-y-4">
                 <!-- Department Information -->

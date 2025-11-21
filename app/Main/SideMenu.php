@@ -83,12 +83,12 @@ class SideMenu
                     ],
                     'employee-performance' => [
                         'icon' => 'star',
-                        'title' => 'Employee Performance',
+                        'title' => 'Performance',
                         'route_name' => 'hr.employee-evaluations.index',
                     ],
                     'employee-rewards' => [
                         'icon' => 'award',
-                        'title' => 'Employee Rewards',
+                        'title' => 'Rewards',
                         'route_name' => 'hr.employee-rewards.index',
                     ],
                     'attendance' => [
@@ -103,7 +103,7 @@ class SideMenu
                     ],
                     'leave' => [
                         'icon' => 'calendar',
-                        'title' => 'Leave Management',
+                        'title' => 'Leave',
                         'route_name' => 'hr.leave.index'
                     ],
                     'payroll' => [
