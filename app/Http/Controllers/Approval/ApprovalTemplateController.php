@@ -14,40 +14,58 @@ class ApprovalTemplateController extends Controller
 {
     public function index()
     {
-        $users = User::select('id', 'name')->get();
-        
-        return view('approval-system.templates.index', compact('users'));
+        $users = User::select('id', 'name')->orderBy('name')->get();
+
+        $stats = [
+            'total' => ApprovalTemplate::count(),
+            'active' => ApprovalTemplate::where('is_active', true)->count(),
+            'material_request' => ApprovalTemplate::where('type', 'material_request')->count(),
+        ];
+
+        $recentTemplates = ApprovalTemplate::latest('updated_at')
+            ->take(3)
+            ->get(['id', 'name', 'type', 'is_active', 'updated_at']);
+
+        return view('approval-system.templates.index', compact('users', 'stats', 'recentTemplates'));
     }
 
     public function datatable(Request $request): JsonResponse
     {
         $query = ApprovalTemplate::query();
 
+        if ($request->filled('type')) {
+            $query->where('type', $request->string('type'));
+        }
+
+        if ($request->filled('filter_status')) {
+            if ($request->filter_status === 'active') {
+                $query->where('is_active', true);
+            } elseif ($request->filter_status === 'inactive') {
+                $query->where('is_active', false);
+            }
+        }
+
+        if ($request->filled('search_value')) {
+            $search = trim($request->search_value);
+            $query->where(function ($builder) use ($search) {
+                $builder->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
         return DataTables::of($query)
             ->addIndexColumn()
             ->addColumn('levels_count', function ($template) {
                 $count = count($template->levels ?? []);
-                return '<span class="badge bg-primary">' . $count . ' Levels</span>';
-            })
-            ->addColumn('status', function ($template) {
-                if ($template->is_active) {
-                    return '<span class="badge bg-success">Active</span>';
-                }
-                return '<span class="badge bg-secondary">Inactive</span>';
+                return '<span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                    <i data-lucide="git-branch" class="w-3.5 h-3.5"></i>
+                    ' . $count . ' Levels
+                </span>';
             })
             ->addColumn('actions', function ($template) {
-                return '
-                    <div class="flex gap-2">
-                        <button onclick="editTemplate(' . $template->id . ')" class="btn btn-sm btn-primary">
-                            <i data-lucide="edit" class="w-4 h-4"></i>
-                        </button>
-                        <button onclick="deleteTemplate(' . $template->id . ')" class="btn btn-sm btn-danger">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-                ';
+                return view('approval-system.templates.partials.actions', compact('template'))->render();
             })
-            ->rawColumns(['levels_count', 'status', 'actions'])
+            ->rawColumns(['levels_count', 'actions'])
             ->make(true);
     }
 

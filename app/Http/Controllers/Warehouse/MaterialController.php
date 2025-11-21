@@ -10,6 +10,7 @@ use App\Services\DocumentCodeGenerator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Yajra\DataTables\Facades\DataTables;
@@ -44,7 +45,9 @@ class MaterialController extends Controller
             ->with([
                 'category:id,name,parent_id',
                 'unit:id,name,symbol'
-            ]);
+            ])
+            ->leftJoin('measurement_units as mu', 'materials.unit_id', '=', 'mu.id')
+            ->select('materials.*', 'mu.name as measurement_unit_name', 'mu.symbol as measurement_unit_symbol');
 
         // Apply category filter
         if ($request->filled('category_id')) {
@@ -93,15 +96,50 @@ class MaterialController extends Controller
                 return $material->category ? $material->category->name : 'N/A';
             })
             ->addColumn('unit_name', function ($material) {
-                if (!$material->unit) {
-                    return 'N/A';
+                // Prefer joined measurement unit info
+                $joinedName = $material->measurement_unit_name ?? null;
+                $joinedSymbol = $material->measurement_unit_symbol ?? null;
+
+                if ($joinedName && $joinedSymbol) {
+                    return trim($joinedName . ' (' . $joinedSymbol . ')');
                 }
 
-                if (is_string($material->unit)) {
+                if ($joinedName || $joinedSymbol) {
+                    return $joinedName ?: $joinedSymbol;
+                }
+
+                // Fallback to relationship (for cached/loaded models without join)
+                $relation = $material->unit;
+                if ($relation) {
+                    $unitName = $relation->name ?? null;
+                    $unitSymbol = $relation->symbol ?? null;
+
+                    if ($unitName && $unitSymbol) {
+                        return trim($unitName . ' (' . $unitSymbol . ')');
+                    }
+
+                    if ($unitName || $unitSymbol) {
+                        return $unitName ?: $unitSymbol;
+                    }
+                }
+
+                // Fallback to unit columns stored directly on materials (legacy data)
+                $inlineName = $material->unit_name ?? $material->unit_label ?? null;
+                $inlineSymbol = $material->unit_symbol ?? null;
+
+                if ($inlineName && $inlineSymbol) {
+                    return trim($inlineName . ' (' . $inlineSymbol . ')');
+                }
+
+                if ($inlineName) {
+                    return $inlineName;
+                }
+
+                if (is_string($material->unit) && $material->unit !== '') {
                     return e($material->unit);
                 }
 
-                return trim($material->unit->name . ' ' . ($material->unit->symbol ? '(' . $material->unit->symbol . ')' : ''));
+                return 'N/A';
             })
             ->addColumn('status_badge', function ($material) {
                 $badgeClass = $material->is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
@@ -137,7 +175,8 @@ class MaterialController extends Controller
             'unit_id' => 'required|exists:measurement_units,id',
             'opening_quantity' => 'nullable|numeric|min:0',
             'price' => 'required|numeric|min:0',
-            'is_active' => 'boolean'
+            'is_active' => 'boolean',
+            'image' => 'nullable|image|max:5120',
         ]);
 
         if ($validator->fails()) {
@@ -150,7 +189,7 @@ class MaterialController extends Controller
         try {
             DB::beginTransaction();
 
-            Material::create($request->only([
+            $materialData = $request->only([
                 'code',
                 'name',
                 'sku',
@@ -160,8 +199,16 @@ class MaterialController extends Controller
                 'unit_id',
                 'opening_quantity',
                 'price',
-                'is_active'
-            ]));
+                'is_active',
+            ]);
+
+            $materialData['opening_quantity'] = $materialData['opening_quantity'] ?? 0;
+
+            if ($request->hasFile('image')) {
+                $materialData['image_path'] = $request->file('image')->store('materials', 'public');
+            }
+
+            Material::create($materialData);
 
             DB::commit();
 
@@ -199,7 +246,9 @@ class MaterialController extends Controller
             'unit_id' => 'required|exists:measurement_units,id',
             'opening_quantity' => 'nullable|numeric|min:0',
             'price' => 'required|numeric|min:0',
-            'is_active' => 'boolean'
+            'is_active' => 'boolean',
+            'image' => 'nullable|image|max:5120',
+            'remove_image' => 'nullable|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -212,7 +261,7 @@ class MaterialController extends Controller
         try {
             DB::beginTransaction();
 
-            $material->update($request->only([
+            $materialData = $request->only([
                 'code',
                 'name',
                 'sku',
@@ -223,7 +272,24 @@ class MaterialController extends Controller
                 'opening_quantity',
                 'price',
                 'is_active'
-            ]));
+            ]);
+
+            $materialData['opening_quantity'] = $materialData['opening_quantity'] ?? 0;
+
+            if ($request->hasFile('image')) {
+                $newPath = $request->file('image')->store('materials', 'public');
+                if ($material->image_path && Storage::disk('public')->exists($material->image_path)) {
+                    Storage::disk('public')->delete($material->image_path);
+                }
+                $materialData['image_path'] = $newPath;
+            } elseif ($request->boolean('remove_image')) {
+                if ($material->image_path && Storage::disk('public')->exists($material->image_path)) {
+                    Storage::disk('public')->delete($material->image_path);
+                }
+                $materialData['image_path'] = null;
+            }
+
+            $material->update($materialData);
 
             DB::commit();
 
@@ -243,6 +309,10 @@ class MaterialController extends Controller
     public function destroy(Material $material): JsonResponse
     {
         try {
+            if ($material->image_path && Storage::disk('public')->exists($material->image_path)) {
+                Storage::disk('public')->delete($material->image_path);
+            }
+
             $material->delete();
 
             return response()->json([

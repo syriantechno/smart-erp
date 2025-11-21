@@ -390,7 +390,7 @@
                                 <p class="font-semibold">${item.name}</p>
                                 <p class="text-xs text-slate-500">${item.code}</p>
                             </td>
-                            <td class="px-4 py-3">${item.unit || '-'}</td>
+                            <td class="px-4 py-3">${item.unit || item.unit_symbol || '-'}</td>
                             <td class="px-4 py-3">
                                 <input type="number" min="1" step="1" value="${item.quantity}" data-qty="${item.material_id}" class="w-20 rounded-lg border border-slate-200 px-2 py-1 text-sm" />
                             </td>

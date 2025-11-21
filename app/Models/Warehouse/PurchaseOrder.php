@@ -22,6 +22,8 @@ class PurchaseOrder extends Model
         'order_date',
         'expected_delivery_date',
         'supplier_id',
+        'approval_template_id',
+        'approval_request_id',
         'created_by',
         'approved_by',
         'total_amount',
@@ -55,14 +57,19 @@ class PurchaseOrder extends Model
         return $this->belongsTo(\App\Models\Supplier\Vendor::class, 'supplier_id');
     }
 
+    public function approvalTemplate(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Approval\ApprovalTemplate::class);
+    }
+
+    public function approvalRequest(): BelongsTo
+    {
+        return $this->belongsTo(ApprovalRequest::class);
+    }
+
     public function items(): HasMany
     {
         return $this->hasMany(PurchaseOrderItem::class);
-    }
-
-    public function approvalRequest(): MorphOne
-    {
-        return $this->morphOne(ApprovalRequest::class, 'approvable');
     }
 
     public function getStatusBadgeClass(): string

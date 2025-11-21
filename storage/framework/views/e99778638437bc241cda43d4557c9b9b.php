@@ -1,29 +1,77 @@
 
 
+<?php
+    use Illuminate\Support\Str;
+?>
+
 <?php $__env->startSection('subhead'); ?>
     <title>Approval Templates - <?php echo e(config('app.name')); ?></title>
 <?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('components.datatable.styles', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+<?php echo $__env->make('components.datatable.theme', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+
+<?php $__env->startPush('styles'); ?>
+    <style>
+        #templates-table {
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        #templates-table tbody tr {
+            height: 2.25rem;
+        }
+
+        #templates-table th {
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.5rem 1.25rem;
+        }
+
+        #templates-table td {
+            padding: 0.375rem 1.25rem;
+        }
+
+        #templates-table thead th,
+        #templates-table tbody td {
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        #templates-table .datatable-cell-wrap {
+            text-align: center;
+        }
+
+        .icon-hover-rise {
+            transition: transform 200ms ease;
+        }
+
+        .group:hover .icon-hover-rise {
+            transform: translateY(-2px);
+        }
+    </style>
+<?php $__env->stopPush(); ?>
 
 <?php $__env->startSection('subcontent'); ?>
+    <?php echo $__env->make('components.global-notifications', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+
     <div class="intro-y mt-8 flex items-center">
         <h2 class="mr-auto text-lg font-medium">Approval Templates</h2>
         <button
             type="button"
-            class="btn btn-primary"
+            class="btn-tonal btn-tonal--info w-40 sm:w-auto sm:ml-4 group"
             onclick="openCreateModal()"
         >
             <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Plus','class' => 'w-4 h-4 mr-2']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'plus-circle','class' => 'w-5 h-5 icon-hover-rise']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.lucide'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['icon' => 'Plus','class' => 'w-4 h-4 mr-2']); ?>
+<?php $component->withAttributes(['icon' => 'plus-circle','class' => 'w-5 h-5 icon-hover-rise']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
@@ -34,72 +82,596 @@
 <?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
-            New Template
+            Add Template
         </button>
     </div>
 
-    <?php echo $__env->make('components.global-notifications', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+    <div class="mt-5 grid grid-cols-12 gap-6">
+        <div class="intro-y col-span-12">
+            <?php if (isset($component)) { $__componentOriginal1e00c22da64774fd0d873cb958c26686 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal1e00c22da64774fd0d873cb958c26686 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.preview-component.index','data' => ['class' => 'intro-y box']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.preview-component'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'intro-y box']); ?>
+                <div class="p-5">
+                    <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
+                        <form id="templates-filter-form" class="w-full sm:mr-auto xl:flex">
+                            <div class="items-center sm:mr-4 sm:flex">
+                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
+                                    Type
+                                </label>
+                                <?php if (isset($component)) { $__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-select.index','data' => ['id' => 'template-filter-type','class' => 'mt-2 w-full sm:mt-0 sm:w-auto']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.form-select'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['id' => 'template-filter-type','class' => 'mt-2 w-full sm:mt-0 sm:w-auto']); ?>
+                                    <option value="">All Types</option>
+                                    <option value="material_request">Material Request</option>
+                                    <option value="invoice">Invoice</option>
+                                    <option value="purchase_order">Purchase Order</option>
+                                    <option value="expense">Expense</option>
+                                    <option value="leave_request">Leave Request</option>
+                                    <option value="other">Other</option>
+                                 <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a)): ?>
+<?php $attributes = $__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a; ?>
+<?php unset($__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a)): ?>
+<?php $component = $__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a; ?>
+<?php unset($__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a); ?>
+<?php endif; ?>
+                            </div>
+                            <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
+                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
+                                    Status
+                                </label>
+                                <?php if (isset($component)) { $__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-select.index','data' => ['id' => 'template-filter-status','class' => 'mt-2 w-full sm:mt-0 sm:w-auto']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.form-select'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['id' => 'template-filter-status','class' => 'mt-2 w-full sm:mt-0 sm:w-auto']); ?>
+                                    <option value="">All</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                 <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a)): ?>
+<?php $attributes = $__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a; ?>
+<?php unset($__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a)): ?>
+<?php $component = $__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a; ?>
+<?php unset($__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a); ?>
+<?php endif; ?>
+                            </div>
+                            <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
+                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
+                                    Search
+                                </label>
+                                <?php if (isset($component)) { $__componentOriginal40054831fd8fc1521987609af4b37cc0 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal40054831fd8fc1521987609af4b37cc0 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-input.index','data' => ['id' => 'template-filter-search','type' => 'text','placeholder' => 'Search...','class' => 'mt-2 w-full sm:mt-0 sm:w-48 2xl:w-full']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.form-input'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['id' => 'template-filter-search','type' => 'text','placeholder' => 'Search...','class' => 'mt-2 w-full sm:mt-0 sm:w-48 2xl:w-full']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal40054831fd8fc1521987609af4b37cc0)): ?>
+<?php $attributes = $__attributesOriginal40054831fd8fc1521987609af4b37cc0; ?>
+<?php unset($__attributesOriginal40054831fd8fc1521987609af4b37cc0); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal40054831fd8fc1521987609af4b37cc0)): ?>
+<?php $component = $__componentOriginal40054831fd8fc1521987609af4b37cc0; ?>
+<?php unset($__componentOriginal40054831fd8fc1521987609af4b37cc0); ?>
+<?php endif; ?>
+                            </div>
+                            <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
+                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
+                                    Show
+                                </label>
+                                <?php if (isset($component)) { $__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-select.index','data' => ['id' => 'template-filter-length','class' => 'mt-2 w-full sm:mt-0 sm:w-auto']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.form-select'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['id' => 'template-filter-length','class' => 'mt-2 w-full sm:mt-0 sm:w-auto']); ?>
+                                    <option value="10">10</option>
+                                    <option value="25" selected>25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                 <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a)): ?>
+<?php $attributes = $__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a; ?>
+<?php unset($__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a)): ?>
+<?php $component = $__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a; ?>
+<?php unset($__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a); ?>
+<?php endif; ?>
+                            </div>
+                            <div class="mt-4 flex flex-wrap gap-2 sm:items-center xl:mt-0">
+                                <button id="template-filter-go" type="button" class="btn-tonal btn-tonal--info w-full sm:w-24 group">
+                                    <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'search','class' => 'w-4 h-4 icon-hover-rise']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.lucide'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['icon' => 'search','class' => 'w-4 h-4 icon-hover-rise']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+                                    Go
+                                </button>
+                                <button id="template-filter-reset" type="button" class="btn-tonal btn-tonal--amber w-full sm:w-24 group">
+                                    <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'rotate-ccw','class' => 'w-4 h-4 icon-hover-rise']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.lucide'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['icon' => 'rotate-ccw','class' => 'w-4 h-4 icon-hover-rise']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+                                    Reset
+                                </button>
+                            </div>
+                        </form>
 
-    <div class="intro-y box mt-5">
-        <div class="p-5">
-            <table id="templates-table" class="display table w-full">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Type</th>
-                        <th>Levels</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-            </table>
+                        <div class="mt-5 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
+                            <button type="button" class="btn-tonal btn-tonal--purple btn-tonal--icon group" id="template-export" title="Export">
+                                <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'file-spreadsheet','class' => 'w-5 h-5 icon-hover-rise']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.lucide'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['icon' => 'file-spreadsheet','class' => 'w-5 h-5 icon-hover-rise']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+                            </button>
+                            <button type="button" class="btn-tonal btn-tonal--sky btn-tonal--icon group" id="template-refresh" title="Refresh">
+                                <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'refresh-cw','class' => 'w-5 h-5 icon-hover-rise']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.lucide'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['icon' => 'refresh-cw','class' => 'w-5 h-5 icon-hover-rise']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mt-5 overflow-x-auto sm:overflow-visible" data-erp-table-wrapper>
+                        <table
+                            id="templates-table"
+                            data-tw-merge
+                            data-erp-table
+                            class="datatable-default w-full min-w-full table-auto text-left text-sm"
+                        >
+                            <thead>
+                                <tr>
+                                    <th class="font-semibold px-5 py-2 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">#</th>
+                                    <th class="font-semibold px-5 py-2 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Name</th>
+                                    <th class="font-semibold px-5 py-2 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Type</th>
+                                    <th class="font-semibold px-5 py-2 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Levels</th>
+                                    <th class="font-semibold px-5 py-2 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Status</th>
+                                    <th class="font-semibold px-5 py-2 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+             <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal1e00c22da64774fd0d873cb958c26686)): ?>
+<?php $attributes = $__attributesOriginal1e00c22da64774fd0d873cb958c26686; ?>
+<?php unset($__attributesOriginal1e00c22da64774fd0d873cb958c26686); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal1e00c22da64774fd0d873cb958c26686)): ?>
+<?php $component = $__componentOriginal1e00c22da64774fd0d873cb958c26686; ?>
+<?php unset($__componentOriginal1e00c22da64774fd0d873cb958c26686); ?>
+<?php endif; ?>
         </div>
     </div>
 
     <!-- Create/Edit Modal -->
-    <?php if (isset($component)) { $__componentOriginalad7e71e98d6bc7c4deec90df8ba81dfd = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalad7e71e98d6bc7c4deec90df8ba81dfd = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.dialog.index','data' => ['id' => 'template-modal','size' => 'xl']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.dialog'); ?>
+    <?php if (isset($component)) { $__componentOriginal8ffb2951ef6cc6f4f3162130bd0a3e82 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal8ffb2951ef6cc6f4f3162130bd0a3e82 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.modal.form','data' => ['id' => 'template-modal','title' => 'Create Template','size' => 'xl']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('modal.form'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['id' => 'template-modal','size' => 'xl']); ?>
-        <?php if (isset($component)) { $__componentOriginal231386b9e8f52ce181634663542c77d5 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal231386b9e8f52ce181634663542c77d5 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.dialog.panel','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.dialog.panel'); ?>
+<?php $component->withAttributes(['id' => 'template-modal','title' => 'Create Template','size' => 'xl']); ?>
+        <form id="template-form">
+            <?php echo csrf_field(); ?>
+            <input type="hidden" id="template-id" name="id">
+
+            <div class="grid grid-cols-12 gap-4 gap-y-4">
+                <div class="col-span-12 md:col-span-6">
+                    <?php if (isset($component)) { $__componentOriginal0b5a207e31917d1ae3d42744188acbdf = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'name']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.form-label'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes([]); ?>
-            <?php if (isset($component)) { $__componentOriginalcff2bb8681c24921e5a983f69e36057e = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalcff2bb8681c24921e5a983f69e36057e = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.dialog.title','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.dialog.title'); ?>
+<?php $component->withAttributes(['for' => 'name']); ?>Template Name <span class="text-danger">*</span> <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal0b5a207e31917d1ae3d42744188acbdf)): ?>
+<?php $attributes = $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf; ?>
+<?php unset($__attributesOriginal0b5a207e31917d1ae3d42744188acbdf); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal0b5a207e31917d1ae3d42744188acbdf)): ?>
+<?php $component = $__componentOriginal0b5a207e31917d1ae3d42744188acbdf; ?>
+<?php unset($__componentOriginal0b5a207e31917d1ae3d42744188acbdf); ?>
+<?php endif; ?>
+                    <?php if (isset($component)) { $__componentOriginal40054831fd8fc1521987609af4b37cc0 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal40054831fd8fc1521987609af4b37cc0 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-input.index','data' => ['id' => 'name','name' => 'name','type' => 'text','placeholder' => 'Enter template name','class' => 'w-full','required' => true]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.form-input'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes([]); ?>
-                <h2 id="modal-title" class="text-lg font-medium">Create Template</h2>
-                <button type="button" class="text-slate-400" data-tw-dismiss="modal">
+<?php $component->withAttributes(['id' => 'name','name' => 'name','type' => 'text','placeholder' => 'Enter template name','class' => 'w-full','required' => true]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal40054831fd8fc1521987609af4b37cc0)): ?>
+<?php $attributes = $__attributesOriginal40054831fd8fc1521987609af4b37cc0; ?>
+<?php unset($__attributesOriginal40054831fd8fc1521987609af4b37cc0); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal40054831fd8fc1521987609af4b37cc0)): ?>
+<?php $component = $__componentOriginal40054831fd8fc1521987609af4b37cc0; ?>
+<?php unset($__componentOriginal40054831fd8fc1521987609af4b37cc0); ?>
+<?php endif; ?>
+                </div>
+
+                <div class="col-span-12 md:col-span-6">
+                    <?php if (isset($component)) { $__componentOriginal0b5a207e31917d1ae3d42744188acbdf = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'type']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.form-label'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['for' => 'type']); ?>Type <span class="text-danger">*</span> <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal0b5a207e31917d1ae3d42744188acbdf)): ?>
+<?php $attributes = $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf; ?>
+<?php unset($__attributesOriginal0b5a207e31917d1ae3d42744188acbdf); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal0b5a207e31917d1ae3d42744188acbdf)): ?>
+<?php $component = $__componentOriginal0b5a207e31917d1ae3d42744188acbdf; ?>
+<?php unset($__componentOriginal0b5a207e31917d1ae3d42744188acbdf); ?>
+<?php endif; ?>
+                    <?php if (isset($component)) { $__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-select.index','data' => ['id' => 'type','name' => 'type','class' => 'w-full','required' => true]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.form-select'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['id' => 'type','name' => 'type','class' => 'w-full','required' => true]); ?>
+                        <option value="">Select Type</option>
+                        <option value="material_request">Material Request</option>
+                        <option value="invoice">Invoice</option>
+                        <option value="purchase_order">Purchase Order</option>
+                        <option value="expense">Expense</option>
+                        <option value="leave_request">Leave Request</option>
+                        <option value="other">Other</option>
+                     <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a)): ?>
+<?php $attributes = $__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a; ?>
+<?php unset($__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a)): ?>
+<?php $component = $__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a; ?>
+<?php unset($__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a); ?>
+<?php endif; ?>
+                </div>
+
+                <div class="col-span-12">
+                    <?php if (isset($component)) { $__componentOriginal0b5a207e31917d1ae3d42744188acbdf = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'description']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.form-label'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['for' => 'description']); ?>Description <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal0b5a207e31917d1ae3d42744188acbdf)): ?>
+<?php $attributes = $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf; ?>
+<?php unset($__attributesOriginal0b5a207e31917d1ae3d42744188acbdf); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal0b5a207e31917d1ae3d42744188acbdf)): ?>
+<?php $component = $__componentOriginal0b5a207e31917d1ae3d42744188acbdf; ?>
+<?php unset($__componentOriginal0b5a207e31917d1ae3d42744188acbdf); ?>
+<?php endif; ?>
+                    <?php if (isset($component)) { $__componentOriginal29dbcf960a4ade6d0a2b790c04ae12cf = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal29dbcf960a4ade6d0a2b790c04ae12cf = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-textarea.index','data' => ['id' => 'description','name' => 'description','rows' => '3','placeholder' => 'Describe this approval flow','class' => 'w-full']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.form-textarea'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['id' => 'description','name' => 'description','rows' => '3','placeholder' => 'Describe this approval flow','class' => 'w-full']); ?> <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal29dbcf960a4ade6d0a2b790c04ae12cf)): ?>
+<?php $attributes = $__attributesOriginal29dbcf960a4ade6d0a2b790c04ae12cf; ?>
+<?php unset($__attributesOriginal29dbcf960a4ade6d0a2b790c04ae12cf); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal29dbcf960a4ade6d0a2b790c04ae12cf)): ?>
+<?php $component = $__componentOriginal29dbcf960a4ade6d0a2b790c04ae12cf; ?>
+<?php unset($__componentOriginal29dbcf960a4ade6d0a2b790c04ae12cf); ?>
+<?php endif; ?>
+                </div>
+
+                <div class="col-span-12">
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                            <p class="text-sm font-semibold text-slate-700">Approval Levels</p>
+                            <p class="text-xs text-slate-500">Add approvers in the order they must approve.</p>
+                        </div>
+                        <button type="button" class="btn-tonal btn-tonal--info group" onclick="addLevel()">
+                            <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'plus','class' => 'w-4 h-4 icon-hover-rise']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.lucide'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['icon' => 'plus','class' => 'w-4 h-4 icon-hover-rise']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+                            Add Level
+                        </button>
+                    </div>
+                    <div id="levels-container" class="mt-4 space-y-3"></div>
+
+                    <template id="approval-level-template">
+                        <div class="level-item rounded-2xl border border-dashed border-slate-200 bg-white p-4 shadow-sm" data-level="__LEVEL__">
+                            <div class="grid grid-cols-12 gap-4 gap-y-4">
+                                <div class="col-span-12 md:col-span-6">
+                                    <?php if (isset($component)) { $__componentOriginal0b5a207e31917d1ae3d42744188acbdf = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['class' => 'uppercase tracking-wide text-xs font-semibold text-slate-500']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.form-label'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'uppercase tracking-wide text-xs font-semibold text-slate-500']); ?>Level Name <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal0b5a207e31917d1ae3d42744188acbdf)): ?>
+<?php $attributes = $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf; ?>
+<?php unset($__attributesOriginal0b5a207e31917d1ae3d42744188acbdf); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal0b5a207e31917d1ae3d42744188acbdf)): ?>
+<?php $component = $__componentOriginal0b5a207e31917d1ae3d42744188acbdf; ?>
+<?php unset($__componentOriginal0b5a207e31917d1ae3d42744188acbdf); ?>
+<?php endif; ?>
+                                    <?php if (isset($component)) { $__componentOriginal40054831fd8fc1521987609af4b37cc0 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal40054831fd8fc1521987609af4b37cc0 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-input.index','data' => ['type' => 'text','class' => 'level-name mt-1 w-full','placeholder' => 'e.g., Department Manager']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.form-input'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['type' => 'text','class' => 'level-name mt-1 w-full','placeholder' => 'e.g., Department Manager']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal40054831fd8fc1521987609af4b37cc0)): ?>
+<?php $attributes = $__attributesOriginal40054831fd8fc1521987609af4b37cc0; ?>
+<?php unset($__attributesOriginal40054831fd8fc1521987609af4b37cc0); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal40054831fd8fc1521987609af4b37cc0)): ?>
+<?php $component = $__componentOriginal40054831fd8fc1521987609af4b37cc0; ?>
+<?php unset($__componentOriginal40054831fd8fc1521987609af4b37cc0); ?>
+<?php endif; ?>
+                                </div>
+                                <div class="col-span-12 md:col-span-6">
+                                    <?php if (isset($component)) { $__componentOriginal0b5a207e31917d1ae3d42744188acbdf = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['class' => 'uppercase tracking-wide text-xs font-semibold text-slate-500']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.form-label'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'uppercase tracking-wide text-xs font-semibold text-slate-500']); ?>Approver <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal0b5a207e31917d1ae3d42744188acbdf)): ?>
+<?php $attributes = $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf; ?>
+<?php unset($__attributesOriginal0b5a207e31917d1ae3d42744188acbdf); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal0b5a207e31917d1ae3d42744188acbdf)): ?>
+<?php $component = $__componentOriginal0b5a207e31917d1ae3d42744188acbdf; ?>
+<?php unset($__componentOriginal0b5a207e31917d1ae3d42744188acbdf); ?>
+<?php endif; ?>
+                                    <?php if (isset($component)) { $__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-select.index','data' => ['class' => 'level-approver mt-1 w-full','required' => true]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.form-select'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'level-approver mt-1 w-full','required' => true]); ?>
+                                        <option value="">Select User</option>
+                                        <?php $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <option value="<?php echo e($user->id); ?>"><?php echo e($user->name); ?></option>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                     <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a)): ?>
+<?php $attributes = $__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a; ?>
+<?php unset($__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a)): ?>
+<?php $component = $__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a; ?>
+<?php unset($__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a); ?>
+<?php endif; ?>
+                                </div>
+                                <div class="col-span-12 flex justify-end">
+                                    <button type="button" class="btn-tonal btn-tonal--danger group" data-remove-level>
+                                        <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'trash-2','class' => 'w-4 h-4 icon-hover-rise']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.lucide'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['icon' => 'trash-2','class' => 'w-4 h-4 icon-hover-rise']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+                                        Remove Level
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <div class="col-span-12 flex items-center">
+                    <label class="inline-flex items-center gap-2 text-sm">
+                        <input type="checkbox" id="is_active" name="is_active" class="form-check-input" checked>
+                        <span>Active template</span>
+                    </label>
+                </div>
+            </div>
+        </form>
+
+        <?php $__env->slot('footer'); ?>
+            <div class="flex w-full flex-wrap justify-end gap-2">
+                <button
+                    type="button"
+                    class="btn-tonal btn-tonal--neutral group"
+                    data-tw-dismiss="modal"
+                >
                     <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'X','class' => 'w-4 h-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'x-circle','class' => 'w-5 h-5 icon-hover-rise']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.lucide'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['icon' => 'X','class' => 'w-4 h-4']); ?>
+<?php $component->withAttributes(['icon' => 'x-circle','class' => 'w-5 h-5 icon-hover-rise']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
@@ -110,74 +682,23 @@
 <?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
+                    Cancel
                 </button>
-             <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginalcff2bb8681c24921e5a983f69e36057e)): ?>
-<?php $attributes = $__attributesOriginalcff2bb8681c24921e5a983f69e36057e; ?>
-<?php unset($__attributesOriginalcff2bb8681c24921e5a983f69e36057e); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginalcff2bb8681c24921e5a983f69e36057e)): ?>
-<?php $component = $__componentOriginalcff2bb8681c24921e5a983f69e36057e; ?>
-<?php unset($__componentOriginalcff2bb8681c24921e5a983f69e36057e); ?>
-<?php endif; ?>
-
-            <?php if (isset($component)) { $__componentOriginalddd13be32d44d36d335ddd0d0d16868a = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalddd13be32d44d36d335ddd0d0d16868a = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.dialog.description','data' => ['class' => 'p-5']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.dialog.description'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['class' => 'p-5']); ?>
-                <form id="template-form">
-                    <?php echo csrf_field(); ?>
-                    <input type="hidden" id="template-id" name="id">
-
-                    <div class="grid grid-cols-1 gap-4">
-                        <!-- Name -->
-                        <div>
-                            <label class="form-label">Template Name</label>
-                            <input type="text" id="name" name="name" class="form-control" required>
-                        </div>
-
-                        <!-- Type -->
-                        <div>
-                            <label class="form-label">Type</label>
-                            <select id="type" name="type" class="form-control" required>
-                                <option value="">Select Type</option>
-                                <option value="material_request">Material Request</option>
-                                <option value="invoice">Invoice</option>
-                                <option value="purchase_order">Purchase Order</option>
-                                <option value="expense">Expense</option>
-                                <option value="leave_request">Leave Request</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-
-                        <!-- Description -->
-                        <div>
-                            <label class="form-label">Description</label>
-                            <textarea id="description" name="description" class="form-control" rows="2"></textarea>
-                        </div>
-
-                        <!-- Levels -->
-                        <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <label class="form-label mb-0">Approval Levels</label>
-                                <button type="button" class="btn btn-sm btn-primary" onclick="addLevel()">
-                                    <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+                <button
+                    type="submit"
+                    form="template-form"
+                    class="btn-tonal btn-tonal--success group"
+                >
+                    <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Plus','class' => 'w-3 h-3 mr-1']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'save','class' => 'w-5 h-5 icon-hover-rise']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.lucide'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['icon' => 'Plus','class' => 'w-3 h-3 mr-1']); ?>
+<?php $component->withAttributes(['icon' => 'save','class' => 'w-5 h-5 icon-hover-rise']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
@@ -188,55 +709,19 @@
 <?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
-                                    Add Level
-                                </button>
-                            </div>
-                            <div id="levels-container" class="space-y-3">
-                                <!-- Levels will be added here -->
-                            </div>
-                        </div>
-
-                        <!-- Active -->
-                        <div class="flex items-center">
-                            <input type="checkbox" id="is_active" name="is_active" class="form-check-input" checked>
-                            <label for="is_active" class="form-check-label ml-2">Active</label>
-                        </div>
-                    </div>
-
-                    <div class="mt-5 flex justify-end gap-2">
-                        <button type="button" class="btn btn-secondary" data-tw-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save Template</button>
-                    </div>
-                </form>
-             <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginalddd13be32d44d36d335ddd0d0d16868a)): ?>
-<?php $attributes = $__attributesOriginalddd13be32d44d36d335ddd0d0d16868a; ?>
-<?php unset($__attributesOriginalddd13be32d44d36d335ddd0d0d16868a); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginalddd13be32d44d36d335ddd0d0d16868a)): ?>
-<?php $component = $__componentOriginalddd13be32d44d36d335ddd0d0d16868a; ?>
-<?php unset($__componentOriginalddd13be32d44d36d335ddd0d0d16868a); ?>
-<?php endif; ?>
-         <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal231386b9e8f52ce181634663542c77d5)): ?>
-<?php $attributes = $__attributesOriginal231386b9e8f52ce181634663542c77d5; ?>
-<?php unset($__attributesOriginal231386b9e8f52ce181634663542c77d5); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal231386b9e8f52ce181634663542c77d5)): ?>
-<?php $component = $__componentOriginal231386b9e8f52ce181634663542c77d5; ?>
-<?php unset($__componentOriginal231386b9e8f52ce181634663542c77d5); ?>
-<?php endif; ?>
+                    Save
+                </button>
+            </div>
+        <?php $__env->endSlot(); ?>
      <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginalad7e71e98d6bc7c4deec90df8ba81dfd)): ?>
-<?php $attributes = $__attributesOriginalad7e71e98d6bc7c4deec90df8ba81dfd; ?>
-<?php unset($__attributesOriginalad7e71e98d6bc7c4deec90df8ba81dfd); ?>
+<?php if (isset($__attributesOriginal8ffb2951ef6cc6f4f3162130bd0a3e82)): ?>
+<?php $attributes = $__attributesOriginal8ffb2951ef6cc6f4f3162130bd0a3e82; ?>
+<?php unset($__attributesOriginal8ffb2951ef6cc6f4f3162130bd0a3e82); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginalad7e71e98d6bc7c4deec90df8ba81dfd)): ?>
-<?php $component = $__componentOriginalad7e71e98d6bc7c4deec90df8ba81dfd; ?>
-<?php unset($__componentOriginalad7e71e98d6bc7c4deec90df8ba81dfd); ?>
+<?php if (isset($__componentOriginal8ffb2951ef6cc6f4f3162130bd0a3e82)): ?>
+<?php $component = $__componentOriginal8ffb2951ef6cc6f4f3162130bd0a3e82; ?>
+<?php unset($__componentOriginal8ffb2951ef6cc6f4f3162130bd0a3e82); ?>
 <?php endif; ?>
 <?php $__env->stopSection(); ?>
 
@@ -249,25 +734,112 @@
         return;
     }
 
+    window.templatesTable = null;
     let levelCounter = 0;
-    let table;
+
+    const filterType = jq('#template-filter-type');
+    const filterStatus = jq('#template-filter-status');
+    const filterSearch = jq('#template-filter-search');
+    const lengthSelect = jq('#template-filter-length');
+    const filterGoBtn = jq('#template-filter-go');
+    const filterResetBtn = jq('#template-filter-reset');
+    const exportBtn = jq('#template-export');
+    const refreshBtn = jq('#template-refresh');
 
     jq(function() {
-        // Initialize DataTable
-        table = window.erpCrud.initDataTable({
+        initializeTemplatesTable();
+        bindTemplateFilters();
+        bindTemplateForm();
+    });
+
+    function initializeTemplatesTable() {
+        const initialLength = parseInt(lengthSelect.val(), 10) || 25;
+
+        window.templatesTable = window.erpCrud.initDataTable({
             tableSelector: '#templates-table',
             ajaxUrl: '<?php echo e(route("approval-system.templates.datatable")); ?>',
+            ajaxData: function (d) {
+                d.type = filterType.val();
+                d.filter_status = filterStatus.val();
+                d.page_length = parseInt(lengthSelect.val(), 10) || initialLength;
+                d.search_value = filterSearch.val();
+            },
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
                 { data: 'name', name: 'name' },
                 { data: 'type', name: 'type' },
-                { data: 'levels_count', name: 'levels_count', orderable: false },
-                { data: 'status', name: 'is_active' },
+                { data: 'levels_count', name: 'levels_count', orderable: false, searchable: false },
+                {
+                    data: 'is_active',
+                    name: 'is_active',
+                    orderable: false,
+                    searchable: false,
+                    className: 'text-center',
+                    render: function (value) {
+                        if (window.erpCrud && typeof window.erpCrud.renderStatusBadge === 'function') {
+                            return window.erpCrud.renderStatusBadge(value, {
+                                labels: { active: 'ACTIVE', inactive: 'INACTIVE' }
+                            });
+                        }
+                        return value ? 'ACTIVE' : 'INACTIVE';
+                    }
+                },
                 { data: 'actions', name: 'actions', orderable: false, searchable: false }
-            ]
+            ],
+            pageLength: initialLength,
+            drawCallback: function(settings) {
+                const info = templatesTable?.page?.info?.call(templatesTable) ?? null;
+                if (info) {
+                    document.getElementById('templates-count').textContent = info.recordsTotal;
+                }
+            }
         });
 
-        // Form submit
+        lengthSelect.on('change', function () {
+            const newLength = parseInt(jq(this).val(), 10) || initialLength;
+            templatesTable?.page.len(newLength).draw();
+        });
+    }
+
+    function bindTemplateFilters() {
+        const applyFilters = () => {
+            const searchTerm = filterSearch.val() || '';
+            templatesTable?.search(searchTerm).draw();
+            templatesTable?.ajax.reload(null, false);
+        };
+
+        filterGoBtn.on('click', applyFilters);
+
+        filterSearch.on('keyup', function (e) {
+            if (e.key === 'Enter') {
+                applyFilters();
+            }
+        });
+
+        filterType.on('change', applyFilters);
+        filterStatus.on('change', applyFilters);
+
+        filterResetBtn.on('click', function () {
+            filterType.val('');
+            filterStatus.val('');
+            filterSearch.val('');
+            lengthSelect.val('25');
+            templatesTable?.search('').draw();
+            templatesTable?.ajax.reload();
+        });
+
+        exportBtn.on('click', function () {
+            if (window.erpCrud && typeof window.erpCrud.exportDataTable === 'function') {
+                window.erpCrud.exportDataTable(templatesTable, 'approval-templates');
+            }
+        });
+
+        refreshBtn.on('click', function () {
+            templatesTable?.ajax.reload();
+        });
+    }
+
+    function bindTemplateForm() {
         jq('#template-form').on('submit', function(e) {
             e.preventDefault();
 
@@ -296,8 +868,8 @@
                 success: function(response) {
                     if (response.success) {
                         Swal.fire('Success!', response.message, 'success');
-                        table.ajax.reload();
-                        jq('[data-tw-dismiss="modal"]').click();
+                        templatesTable?.ajax.reload();
+                        jq('[data-tw-dismiss="modal"]').trigger('click');
                     }
                 },
                 error: function(xhr) {
@@ -305,7 +877,7 @@
                 }
             });
         });
-    });
+    }
 
     window.openCreateModal = function () {
         jq('#modal-title').text('Create Template');
@@ -313,7 +885,7 @@
         jq('#template-id').val('');
         jq('#levels-container').empty();
         levelCounter = 0;
-        addLevel(); // Add first level
+        addLevel();
         tailwind.Modal.getOrCreateInstance(document.querySelector('#template-modal')).show();
     };
 
@@ -330,9 +902,7 @@
             levelCounter = 0;
 
             if (data.levels && data.levels.length > 0) {
-                data.levels.forEach(level => {
-                    addLevel(level);
-                });
+                data.levels.forEach(level => addLevel(level));
             } else {
                 addLevel();
             }
@@ -342,55 +912,33 @@
     };
 
     window.addLevel = function (levelData = null) {
-        levelCounter++;
-        const levelHtml = `
-            <div class="level-item border rounded p-3" data-level="${levelCounter}">
-                <div class="flex items-start gap-3">
-                    <div class="flex-1 grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="text-sm">Level Name</label>
-                            <input type="text" class="form-control level-name" placeholder="e.g., Department Manager" 
-                                   value="${levelData?.name || 'Level ' + levelCounter}">
-                        </div>
-                        <div>
-                            <label class="text-sm">Approver</label>
-                            <select class="form-control level-approver" required>
-                                <option value="">Select User</option>
-                                <?php $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                    <option value="<?php echo e($user->id); ?>" ${levelData?.approver_id == <?php echo e($user->id); ?> ? 'selected' : ''}>
-                                        <?php echo e($user->name); ?>
+        const template = document.getElementById('approval-level-template');
+        if (!template) {
+            return;
+        }
 
-                                    </option>
-                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                            </select>
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-sm btn-danger mt-6" onclick="removeLevel(${levelCounter})">
-                        <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Trash2','class' => 'w-3 h-3']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.lucide'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['icon' => 'Trash2','class' => 'w-3 h-3']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
-<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
-<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
-<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
-<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
-<?php endif; ?>
-                    </button>
-                </div>
-            </div>
-        `;
-        jq('#levels-container').append(levelHtml);
+        levelCounter++;
+
+        const fragment = template.content.cloneNode(true);
+        const levelItem = fragment.querySelector('.level-item');
+        levelItem.dataset.level = levelCounter;
+
+        const nameInput = fragment.querySelector('.level-name');
+        if (nameInput) {
+            nameInput.value = levelData?.name || `Level ${levelCounter}`;
+        }
+
+        const approverSelect = fragment.querySelector('.level-approver');
+        if (approverSelect) {
+            approverSelect.value = levelData?.approver_id || '';
+        }
+
+        const removeBtn = fragment.querySelector('[data-remove-level]');
+        if (removeBtn) {
+            removeBtn.setAttribute('onclick', `removeLevel(${levelCounter})`);
+        }
+
+        document.getElementById('levels-container').appendChild(fragment);
     };
 
     window.removeLevel = function (id) {
@@ -434,7 +982,7 @@
                     success: function(response) {
                         if (response.success) {
                             Swal.fire('Deleted!', response.message, 'success');
-                            table.ajax.reload();
+                            templatesTable?.ajax.reload();
                         }
                     }
                 });

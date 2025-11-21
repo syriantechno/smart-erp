@@ -21,7 +21,12 @@ class Material extends Model
         'unit_id',
         'opening_quantity',
         'price',
-        'is_active'
+        'is_active',
+        'image_path',
+    ];
+
+    protected $appends = [
+        'image_url',
     ];
 
     protected $casts = [
@@ -48,6 +53,11 @@ class Material extends Model
     public function inventories(): HasMany
     {
         return $this->hasMany(Inventory::class);
+    }
+
+    public function getImageUrlAttribute(): ?string
+    {
+        return $this->image_path ? asset('storage/' . $this->image_path) : null;
     }
 
     public function purchaseRequestItems(): HasMany

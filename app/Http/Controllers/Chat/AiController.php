@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Chat;
 
 use App\Http\Controllers\Controller;
 use App\Models\Chat\AiInteraction;
-use App\Models\AiAutomation;
-use App\Models\AiGeneratedContent;
+use App\Models\Chat\AiAutomation;
+use App\Models\Chat\AiGeneratedContent;
 use App\Services\AiService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
