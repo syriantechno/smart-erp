@@ -130,32 +130,59 @@
                             <?php $__currentLoopData = ($approvalRequest->approval_levels ?? []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $level): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <?php
                                     $levelNumber = $level['level'] ?? $loop->iteration;
-                                    $isCompleted = $approvalRequest->current_level > $levelNumber || $approvalRequest->status === 'approved';
-                                    $isCurrent = $approvalRequest->current_level === $levelNumber && $approvalRequest->status === 'pending';
-                                    $isRejected = $approvalRequest->status === 'rejected' && $approvalRequest->current_level === $levelNumber;
                                     $approverName = $approverNames->get($level['approver_id'] ?? null)?->name ?? 'Approver';
+
+                                    $state = 'pending';
+                                    if ($approvalRequest->status === 'approved' || ($approvalRequest->current_level ?? 1) > $levelNumber) {
+                                        $state = 'approved';
+                                    } elseif ($approvalRequest->status === 'rejected' && ($approvalRequest->current_level ?? 1) === $levelNumber) {
+                                        $state = 'rejected';
+                                    } elseif ($approvalRequest->status === 'pending' && ($approvalRequest->current_level ?? 1) === $levelNumber) {
+                                        $state = 'in_progress';
+                                    }
+
+                                    $stateMeta = [
+                                        'approved' => [
+                                            'wrapper' => 'border-emerald-500 bg-emerald-50 text-emerald-600',
+                                            'icon' => 'CheckCircle',
+                                            'connector' => 'bg-emerald-500'
+                                        ],
+                                        'rejected' => [
+                                            'wrapper' => 'border-rose-500 bg-rose-50 text-rose-600',
+                                            'icon' => 'XCircle',
+                                            'connector' => 'bg-rose-500'
+                                        ],
+                                        'in_progress' => [
+                                            'wrapper' => 'border-sky-500 bg-sky-50 text-sky-600',
+                                            'icon' => 'RefreshCw',
+                                            'connector' => 'bg-sky-500'
+                                        ],
+                                        'pending' => [
+                                            'wrapper' => 'border-amber-400 bg-amber-50 text-amber-600',
+                                            'icon' => 'Clock',
+                                            'connector' => 'bg-amber-300'
+                                        ],
+                                    ];
+
+                                    $styles = $stateMeta[$state];
+                                    $iconClasses = 'w-5 h-5';
+                                    if ($state === 'in_progress') {
+                                        $iconClasses .= ' animate-spin';
+                                    }
                                 ?>
                                 <div class="flex items-center <?php echo e(!$loop->last ? 'flex-1' : ''); ?>">
                                     <div class="flex flex-col items-center text-center">
-                                        <div class="flex items-center justify-center w-12 h-12 rounded-full border-2
-                                            <?php echo e($isCompleted ? 'border-success bg-success/10 text-success' : ''); ?>
-
-                                            <?php echo e($isCurrent ? 'border-warning bg-warning/10 text-warning' : ''); ?>
-
-                                            <?php echo e($isRejected ? 'border-danger bg-danger/10 text-danger' : ''); ?>
-
-                                            <?php echo e((!$isCompleted && !$isCurrent && !$isRejected) ? 'border-slate-200 bg-slate-50 text-slate-400' : ''); ?>">
-                                            <?php if($isCompleted): ?>
-                                                <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+                                        <div class="flex items-center justify-center w-12 h-12 rounded-full border-2 <?php echo e($styles['wrapper']); ?>">
+                                            <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'CheckCircle','class' => 'w-5 h-5']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => ''.e($styles['icon']).'','class' => ''.e($iconClasses).'']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.lucide'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['icon' => 'CheckCircle','class' => 'w-5 h-5']); ?>
+<?php $component->withAttributes(['icon' => ''.e($styles['icon']).'','class' => ''.e($iconClasses).'']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
@@ -166,76 +193,12 @@
 <?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
-                                            <?php elseif($isCurrent): ?>
-                                                <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Clock','class' => 'w-5 h-5']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.lucide'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['icon' => 'Clock','class' => 'w-5 h-5']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
-<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
-<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
-<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
-<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
-<?php endif; ?>
-                                            <?php elseif($isRejected): ?>
-                                                <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'XCircle','class' => 'w-5 h-5']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.lucide'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['icon' => 'XCircle','class' => 'w-5 h-5']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
-<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
-<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
-<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
-<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
-<?php endif; ?>
-                                            <?php else: ?>
-                                                <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Circle','class' => 'w-5 h-5']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.lucide'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['icon' => 'Circle','class' => 'w-5 h-5']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
-<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
-<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
-<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
-<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
-<?php endif; ?>
-                                            <?php endif; ?>
                                         </div>
                                         <p class="mt-2 text-sm font-medium text-slate-700"><?php echo e($level['name'] ?? "Level {$levelNumber}"); ?></p>
                                         <p class="text-xs text-slate-500"><?php echo e($approverName); ?></p>
                                     </div>
                                     <?php if (! ($loop->last)): ?>
-                                        <div class="flex-1 h-0.5 mx-4 <?php echo e($isCompleted ? 'bg-success' : 'bg-slate-200'); ?>"></div>
+                                        <div class="flex-1 h-0.5 mx-4 <?php echo e($styles['connector']); ?>"></div>
                                     <?php endif; ?>
                                 </div>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>

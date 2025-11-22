@@ -274,6 +274,77 @@
                 </div>
             </div>
 
+            <!-- HR Analytics Charts -->
+            <div class="grid grid-cols-12 gap-6">
+                <div class="intro-y col-span-12 xl:col-span-8">
+                    <div class="box h-full rounded-2xl p-5">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-base font-semibold">Attendance Trend</h3>
+                                <p class="text-xs text-slate-500">Last <?php echo e(($attendanceTrendLabels ?? []) ? count($attendanceTrendLabels) : 7); ?> days</p>
+                            </div>
+                            <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Activity','class' => 'h-5 w-5 text-emerald-500']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.lucide'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['icon' => 'Activity','class' => 'h-5 w-5 text-emerald-500']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+                        </div>
+                        <div class="mt-5 h-[260px]">
+                            <canvas id="hr-attendance-chart" class="w-full h-full"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="intro-y col-span-12 xl:col-span-4">
+                    <div class="box h-full rounded-2xl p-5">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-base font-semibold">Workforce by Department</h3>
+                                <p class="text-xs text-slate-500">Active employees distribution</p>
+                            </div>
+                            <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'PieChart','class' => 'h-5 w-5 text-sky-500']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.lucide'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['icon' => 'PieChart','class' => 'h-5 w-5 text-sky-500']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+                        </div>
+                        <div class="mt-5 h-[260px]">
+                            <canvas id="hr-departments-chart" class="w-full h-full"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="grid grid-cols-12 gap-6">
                 <!-- Attendance snapshot -->
                 <div class="intro-y col-span-12 xl:col-span-6">
@@ -1232,5 +1303,135 @@
         </div>
     </div>
 <?php $__env->stopSection(); ?>
+
+<?php $__env->startPush('scripts'); ?>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Attendance trend line chart
+            const attendanceCanvas = document.getElementById('hr-attendance-chart');
+            if (attendanceCanvas && typeof Chart !== 'undefined') {
+                const attendanceLabels = <?php echo json_encode($attendanceTrendLabels ?? [], 15, 512) ?>;
+                const attendanceData = <?php echo json_encode($attendanceTrendData ?? [], 15, 512) ?>;
+
+                if (attendanceLabels.length && attendanceData.length) {
+                    const ctx = attendanceCanvas.getContext('2d');
+
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: attendanceLabels,
+                            datasets: [
+                                {
+                                    label: 'Presence rate %',
+                                    data: attendanceData,
+                                    borderColor: 'rgba(34, 197, 94, 1)', // emerald-500
+                                    backgroundColor: 'rgba(34, 197, 94, 0.15)',
+                                    borderWidth: 2,
+                                    fill: true,
+                                    tension: 0.35,
+                                    pointRadius: 3,
+                                    pointBackgroundColor: 'rgba(34, 197, 94, 1)',
+                                },
+                            ],
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    max: 100,
+                                    ticks: {
+                                        callback: function (value) {
+                                            return value + '%';
+                                        },
+                                    },
+                                },
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false,
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (context) {
+                                            return context.parsed.y + '% presence';
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    });
+                }
+            }
+
+            // Workforce by department donut chart
+            const departmentCanvas = document.getElementById('hr-departments-chart');
+            if (departmentCanvas && typeof Chart !== 'undefined') {
+                const departmentLabels = <?php echo json_encode($departmentDistributionLabels ?? [], 15, 512) ?>;
+                const departmentData = <?php echo json_encode($departmentDistributionData ?? [], 15, 512) ?>;
+
+                if (departmentLabels.length && departmentData.length) {
+                    const ctx = departmentCanvas.getContext('2d');
+
+                    const baseColors = [
+                        '#0ea5e9', // sky-500
+                        '#6366f1', // indigo-500
+                        '#f97316', // orange-500
+                        '#22c55e', // green-500
+                        '#ec4899', // pink-500
+                        '#eab308', // yellow-500
+                    ];
+
+                    const colors = departmentLabels.map((_, index) => {
+                        return baseColors[index % baseColors.length];
+                    });
+
+                    new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: departmentLabels,
+                            datasets: [
+                                {
+                                    data: departmentData,
+                                    backgroundColor: colors.map(color => color + 'CC'),
+                                    borderColor: colors,
+                                    borderWidth: 2,
+                                },
+                            ],
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        usePointStyle: true,
+                                        padding: 16,
+                                    },
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (context) {
+                                            const label = context.label || '';
+                                            const value = context.parsed;
+                                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            const percentage = total ? Math.round((value / total) * 100) : 0;
+                                            return `${label}: ${value} (${percentage}%)`;
+                                        },
+                                    },
+                                },
+                            },
+                            cutout: '65%',
+                        },
+                    });
+                }
+            }
+        });
+    </script>
+<?php $__env->stopPush(); ?>
 
 <?php echo $__env->make('../themes/' . $activeTheme . '/' . $activeLayout, array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH E:\ERP System\Source\resources\views/hr/dashboard.blade.php ENDPATH**/ ?>

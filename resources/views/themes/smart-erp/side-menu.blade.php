@@ -41,7 +41,7 @@
                         @else
                             <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
                                 <span class="text-lg font-bold text-primary">
-                                    {{ Str::of($brandName)->substr(0, 2)->upper() }}
+                                    {{ \Illuminate\Support\Str::of($brandName)->substr(0, 2)->upper() }}
                                 </span>
                             </div>
                         @endif

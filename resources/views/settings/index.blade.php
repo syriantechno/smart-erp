@@ -45,6 +45,11 @@
                     @include('settings.partials.permissions')
                 </div>
 
+                <!-- Taxes Settings Tab -->
+                <div class="settings-content hidden intro-y" id="taxes-content">
+                    @include('settings.partials.taxes')
+                </div>
+
                 <!-- Email Settings Tab -->
                 <div class="settings-content hidden intro-y" id="email-content">
                     @include('settings.partials.email')

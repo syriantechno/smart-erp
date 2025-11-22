@@ -190,8 +190,31 @@
     </div>
 
     <div class="mt-5 grid grid-cols-12 gap-6">
-        <div class="intro-y col-span-12">
-            <x-base.preview-component class="intro-y box">
+        <!-- Persistent side tree column -->
+        <div class="intro-y col-span-12 lg:col-span-3 xl:col-span-3">
+            <x-base.preview-component class="intro-y box h-full">
+                <div class="p-4 lg:p-5 flex flex-col h-full">
+                    <div class="mb-3 flex items-center justify-between gap-2">
+                        <h3 class="flex items-center gap-2 text-sm font-semibold text-slate-800 dark:text-white">
+                            <x-base.lucide icon="FolderTree" class="h-4 w-4" />
+                            <span>Accounts Tree</span>
+                        </h3>
+                        <span class="rounded-full bg-slate-50 px-2 py-0.5 text-[10px] font-medium text-slate-500 dark:bg-darkmode-600 dark:text-slate-300">
+                            Hierarchy
+                        </span>
+                    </div>
+                    <div id="accounts-tree" class="mt-1 flex-1 overflow-y-auto text-sm text-slate-700 dark:text-slate-300 custom-scrollbar thin-scrollbar max-h-[540px]">
+                        <div class="text-xs text-slate-500 dark:text-slate-400">
+                            Loading accounts tree...
+                        </div>
+                    </div>
+                </div>
+            </x-base.preview-component>
+        </div>
+
+        <!-- Main table column -->
+        <div class="intro-y col-span-12 lg:col-span-9 xl:col-span-9">
+            <x-base.preview-component class="intro-y box h-full">
                 <div class="p-5">
                     <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
                         <form id="account-filter-form" class="w-full sm:mr-auto xl:flex">
@@ -569,6 +592,124 @@
                     }
                 }
             }
+
+            // Accounts Tree rendering
+            const treeContainer = document.getElementById('accounts-tree');
+
+            function renderAccountsTree(nodes, container, level = 0) {
+                if (!container) {
+                    return;
+                }
+
+                container.innerHTML = '';
+
+                if (!Array.isArray(nodes) || !nodes.length) {
+                    const empty = document.createElement('div');
+                    empty.className = 'text-xs text-slate-500 dark:text-slate-400';
+                    empty.textContent = 'No accounts found.';
+                    container.appendChild(empty);
+                    return;
+                }
+
+                const list = document.createElement('ul');
+                list.className = 'space-y-0.5';
+
+                nodes.forEach((node) => {
+                    const hasChildren = Array.isArray(node.children) && node.children.length > 0;
+
+                    const item = document.createElement('li');
+                    item.className = 'group';
+
+                    const row = document.createElement('div');
+                    row.className = 'flex items-center rounded-md px-2 py-1 cursor-pointer hover:bg-slate-100 dark:hover:bg-darkmode-600 text-[13px]';
+
+                    const indentLevel = Math.max((node.level || level || 1) - 1, 0);
+                    row.style.marginLeft = `${indentLevel * 1.0}rem`;
+
+                    const toggle = document.createElement('button');
+                    toggle.type = 'button';
+                    toggle.className = 'mr-1 flex h-4 w-4 items-center justify-center text-[11px] text-slate-400 group-hover:text-slate-600';
+                    toggle.textContent = hasChildren ? '▾' : '·';
+
+                    const icon = document.createElement('span');
+                    icon.className = 'mr-2 text-slate-500 flex items-center justify-center';
+                    icon.setAttribute('data-lucide', hasChildren ? 'folder' : 'file');
+                    icon.style.width = '14px';
+                    icon.style.height = '14px';
+
+                    const label = document.createElement('span');
+                    label.className = 'truncate text-[12px] text-slate-700 dark:text-slate-200';
+                    label.textContent = `${node.code || ''}${node.code && node.name ? ' - ' : ' '}${node.name || ''}`.trim();
+
+                    row.appendChild(toggle);
+                    row.appendChild(icon);
+                    row.appendChild(label);
+
+                    if (!node.is_active) {
+                        const inactive = document.createElement('span');
+                        inactive.className = 'ml-2 text-[10px] uppercase tracking-wide text-rose-500';
+                        inactive.textContent = 'inactive';
+                        row.appendChild(inactive);
+                    }
+
+                    item.appendChild(row);
+
+                    if (hasChildren) {
+                        const childrenContainer = document.createElement('div');
+                        childrenContainer.className = 'mt-0.5 space-y-0.5 border-l border-slate-200 dark:border-darkmode-500 ml-3 pl-2';
+                        renderAccountsTree(node.children, childrenContainer, (node.level || level || 1) + 1);
+
+                        let expanded = true;
+
+                        toggle.addEventListener('click', (event) => {
+                            event.stopPropagation();
+                            expanded = !expanded;
+                            childrenContainer.style.display = expanded ? '' : 'none';
+                            toggle.textContent = expanded ? '▾' : '▸';
+                        });
+
+                        item.appendChild(childrenContainer);
+                    }
+
+                    list.appendChild(item);
+                });
+
+                container.appendChild(list);
+
+                // Re-init Lucide icons for dynamically added nodes
+                if (window.lucide && typeof window.lucide.createIcons === 'function') {
+                    window.lucide.createIcons();
+                }
+            }
+
+            function loadAccountsTree() {
+                if (!treeContainer) {
+                    return;
+                }
+
+                fetch('{{ route("accounting.chart-of-accounts.tree") }}', {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    credentials: 'same-origin',
+                })
+                    .then((response) => response.json())
+                    .then((payload) => {
+                        if (!payload || payload.success === false) {
+                            throw new Error(payload?.message || 'Failed to load accounts tree');
+                        }
+                        renderAccountsTree(payload.data || [], treeContainer);
+                    })
+                    .catch((error) => {
+                        console.error('Error loading accounts tree:', error);
+                        if (treeContainer) {
+                            treeContainer.innerHTML = '<div class="text-xs text-red-500">Failed to load accounts tree.</div>';
+                        }
+                    });
+            }
+
+            loadAccountsTree();
         });
 
     } catch (error) {

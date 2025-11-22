@@ -101,8 +101,10 @@ class DocumentCodeGenerator
     protected function getTableName(string $documentType): ?string
     {
         $tableMap = [
+            'department' => 'departments',
             'employees' => 'employees',
             'departments' => 'departments',
+            'position' => 'positions',
             'positions' => 'positions',
             'leave' => 'leaves',
             'tasks' => 'tasks',

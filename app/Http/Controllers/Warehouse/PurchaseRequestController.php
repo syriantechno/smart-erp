@@ -83,9 +83,37 @@ class PurchaseRequestController extends Controller
             ->orderBy('name')
             ->get();
 
+        // Status statistics for dashboard cards
+        $requests = PurchaseRequest::query()
+            ->with('approvalRequest')
+            ->select('id', 'status', 'approval_request_id')
+            ->get();
+
+        $groupedByStatus = $requests->groupBy(function (PurchaseRequest $request) {
+            return $request->effective_status;
+        });
+
+        $statusStats = [
+            'total' => $requests->count(),
+            'pending' => $groupedByStatus->get('pending')?->count() ?? 0,
+            'in_progress' => $groupedByStatus->get('in_progress')?->count() ?? 0,
+            'approved' => $groupedByStatus->get('approved')?->count() ?? 0,
+            'rejected' => $groupedByStatus->get('rejected')?->count() ?? 0,
+            'completed' => $groupedByStatus->get('completed')?->count() ?? 0,
+        ];
+
         return view(
             'warehouse.material-requests.index',
-            compact('company', 'companies', 'warehouses', 'categories', 'materials', 'materialCategories', 'approvalTemplates')
+            compact(
+                'company',
+                'companies',
+                'warehouses',
+                'categories',
+                'materials',
+                'materialCategories',
+                'approvalTemplates',
+                'statusStats'
+            )
         );
     }
 
@@ -100,18 +128,49 @@ class PurchaseRequestController extends Controller
         $baseQuery = PurchaseRequest::query()
             ->with(['requestedBy:id,name', 'approvedBy:id,name', 'approvalRequest', 'company:id,name']);
 
-        // Apply status filter considering approval workflow status
+        // Apply status filter using effective status logic
         if ($request->filled('status')) {
             $statusFilter = $request->status;
+
             $baseQuery->where(function ($query) use ($statusFilter) {
-                $query->where('status', $statusFilter)
-                    ->orWhereHas('approvalRequest', function ($approvalQuery) use ($statusFilter) {
-                        $approvalQuery->where('status', $statusFilter);
+                if ($statusFilter === 'pending') {
+                    // Pending: no approval yet and PR status pending, OR approval pending at first level
+                    $query->where(function ($q) {
+                        $q->whereNull('approval_request_id')
+                            ->where('status', 'pending');
+                    })->orWhereHas('approvalRequest', function ($approvalQuery) {
+                        $approvalQuery->where('status', 'pending')
+                            ->where(function ($levelQuery) {
+                                $levelQuery->whereNull('current_level')->orWhere('current_level', 1);
+                            });
                     });
+                } elseif ($statusFilter === 'in_progress') {
+                    // In progress: approval workflow running beyond first level
+                    $query->whereHas('approvalRequest', function ($approvalQuery) {
+                        $approvalQuery->where('status', 'pending')
+                            ->where('current_level', '>', 1);
+                    });
+                } else {
+                    // Approved / rejected / completed: match either PR status or approvalRequest status
+                    $query->where(function ($q) use ($statusFilter) {
+                        $q->where('status', $statusFilter)
+                            ->orWhereHas('approvalRequest', function ($approvalQuery) use ($statusFilter) {
+                                $approvalQuery->where('status', $statusFilter);
+                            });
+                    });
+                }
             });
         }
 
         return DataTables::of($baseQuery)
+            ->editColumn('code', function ($pr) {
+                $url = route('warehouse.material-requests.show', $pr);
+                return '<a href="' . e($url) . '" class="block">' . e($pr->code) . '</a>';
+            })
+            ->editColumn('title', function ($pr) {
+                $url = route('warehouse.material-requests.show', $pr);
+                return '<a href="' . e($url) . '" class="block">' . e($pr->title) . '</a>';
+            })
             ->addColumn('requested_by_name', function ($pr) {
                 return $pr->requestedBy ? $pr->requestedBy->name : 'N/A';
             })
@@ -159,7 +218,7 @@ class PurchaseRequestController extends Controller
             ->addColumn('actions', function ($pr) {
                 return view('warehouse.material-requests.partials.actions', compact('pr'))->render();
             })
-            ->rawColumns(['status_badge', 'approval_progress', 'actions'])
+            ->rawColumns(['code', 'title', 'status_badge', 'approval_progress', 'actions'])
             ->make(true);
     }
 

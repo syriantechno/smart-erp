@@ -119,19 +119,172 @@
         </button>
     </div>
 
+    <!-- Compact filters bar -->
+    <div class="intro-y mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <?php
+            $stats = $statusStats ?? [
+                'total' => 0,
+                'pending' => 0,
+                'in_progress' => 0,
+                'approved' => 0,
+                'rejected' => 0,
+                'completed' => 0,
+            ];
+        ?>
+
+        <!-- Modern status cards with counts -->
+        <div class="flex w-full overflow-x-auto gap-2 text-xs sm:max-w-xl">
+            <button
+                type="button"
+                data-status=""
+                onclick="filterByStatus('')"
+                class="status-card flex min-w-[100px] flex-col rounded-xl border border-slate-200 bg-white/80 px-3 py-2 text-left shadow-sm hover:border-primary/40 hover:bg-primary/5 transition"
+            >
+                <span class="text-[0.7rem] font-medium text-slate-500">All</span>
+                <span class="mt-1 text-base font-semibold text-slate-800"><?php echo e(number_format($stats['total'])); ?></span>
+            </button>
+
+            <button
+                type="button"
+                data-status="pending"
+                onclick="filterByStatus('pending')"
+                class="status-card flex min-w-[110px] flex-col rounded-xl border border-amber-100 bg-amber-50/80 px-3 py-2 text-left shadow-sm hover:border-amber-300 hover:bg-amber-50 transition"
+            >
+                <span class="inline-flex items-center gap-1 text-[0.7rem] font-medium text-amber-700">
+                    <span class="inline-block h-1.5 w-1.5 rounded-full bg-amber-400"></span>
+                    Pending
+                </span>
+                <span class="mt-1 text-base font-semibold text-amber-800"><?php echo e(number_format($stats['pending'])); ?></span>
+            </button>
+
+            <button
+                type="button"
+                data-status="in_progress"
+                onclick="filterByStatus('in_progress')"
+                class="status-card flex min-w-[120px] flex-col rounded-xl border border-sky-100 bg-sky-50/80 px-3 py-2 text-left shadow-sm hover:border-sky-300 hover:bg-sky-50 transition"
+            >
+                <span class="inline-flex items-center gap-1 text-[0.7rem] font-medium text-sky-700">
+                    <span class="inline-block h-1.5 w-1.5 rounded-full bg-sky-400"></span>
+                    In progress
+                </span>
+                <span class="mt-1 text-base font-semibold text-sky-800"><?php echo e(number_format($stats['in_progress'])); ?></span>
+            </button>
+
+            <button
+                type="button"
+                data-status="approved"
+                onclick="filterByStatus('approved')"
+                class="status-card flex min-w-[110px] flex-col rounded-xl border border-emerald-100 bg-emerald-50/80 px-3 py-2 text-left shadow-sm hover:border-emerald-300 hover:bg-emerald-50 transition"
+            >
+                <span class="inline-flex items-center gap-1 text-[0.7rem] font-medium text-emerald-700">
+                    <span class="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+                    Approved
+                </span>
+                <span class="mt-1 text-base font-semibold text-emerald-800"><?php echo e(number_format($stats['approved'])); ?></span>
+            </button>
+
+            <button
+                type="button"
+                data-status="rejected"
+                onclick="filterByStatus('rejected')"
+                class="status-card flex min-w-[110px] flex-col rounded-xl border border-rose-100 bg-rose-50/80 px-3 py-2 text-left shadow-sm hover:border-rose-300 hover:bg-rose-50 transition"
+            >
+                <span class="inline-flex items-center gap-1 text-[0.7rem] font-medium text-rose-700">
+                    <span class="inline-block h-1.5 w-1.5 rounded-full bg-rose-400"></span>
+                    Rejected
+                </span>
+                <span class="mt-1 text-base font-semibold text-rose-800"><?php echo e(number_format($stats['rejected'])); ?></span>
+            </button>
+
+            <button
+                type="button"
+                data-status="completed"
+                onclick="filterByStatus('completed')"
+                class="status-card flex min-w-[120px] flex-col rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-2 text-left shadow-sm hover:border-slate-400 hover:bg-slate-50 transition"
+            >
+                <span class="inline-flex items-center gap-1 text-[0.7rem] font-medium text-slate-700">
+                    <span class="inline-block h-1.5 w-1.5 rounded-full bg-slate-500"></span>
+                    Completed
+                </span>
+                <span class="mt-1 text-base font-semibold text-slate-800"><?php echo e(number_format($stats['completed'])); ?></span>
+            </button>
+        </div>
+
+        <!-- Quick search + advanced toggle -->
+        <div class="flex w-full items-center gap-2 sm:w-auto">
+            <div class="relative flex-1 sm:w-56">
+                <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-400">
+                    <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'search','class' => 'w-3.5 h-3.5']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.lucide'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['icon' => 'search','class' => 'w-3.5 h-3.5']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+                </span>
+                <input
+                    id="quick-search"
+                    type="text"
+                    placeholder="Quick search..."
+                    class="w-full rounded-full border border-slate-200 bg-white py-1.5 pl-8 pr-3 text-xs text-slate-700 placeholder:text-slate-400 focus:border-primary focus:ring-0"
+                />
+            </div>
+            <button
+                type="button"
+                onclick="toggleAdvancedFilters()"
+                class="hidden sm:inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[0.72rem] font-medium text-slate-700 hover:bg-slate-50"
+            >
+                <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'sliders','class' => 'w-3.5 h-3.5 mr-1']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.lucide'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['icon' => 'sliders','class' => 'w-3.5 h-3.5 mr-1']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+                Advanced
+            </button>
+        </div>
+    </div>
+
     <div class="mt-5 grid grid-cols-12 gap-6">
         <div class="intro-y col-span-12">
-            <!-- Filters -->
+            <!-- Advanced filters -->
             <?php if (isset($component)) { $__componentOriginal1e00c22da64774fd0d873cb958c26686 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal1e00c22da64774fd0d873cb958c26686 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.preview-component.index','data' => ['class' => 'intro-y box mb-6']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.preview-component.index','data' => ['id' => 'advanced-filters-panel','class' => 'intro-y box mb-6 hidden']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.preview-component'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['class' => 'intro-y box mb-6']); ?>
+<?php $component->withAttributes(['id' => 'advanced-filters-panel','class' => 'intro-y box mb-6 hidden']); ?>
                 <div class="p-5">
                     <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
                         <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
@@ -175,6 +328,7 @@
 <?php $component->withAttributes(['id' => 'status-filter','class' => 'w-full']); ?>
                                 <option value="">All Status</option>
                                 <option value="pending">Pending</option>
+                                <option value="in_progress">In progress</option>
                                 <option value="approved">Approved</option>
                                 <option value="rejected">Rejected</option>
                                 <option value="completed">Completed</option>
@@ -434,6 +588,15 @@
             $('#status-filter').on('change', function() {
                 applyFilters();
             });
+
+            // Quick search input in compact bar
+            $('#quick-search').on('keypress', function(e) {
+                if (e.which === 13) {
+                    const value = $(this).val();
+                    $('#search-filter').val(value);
+                    applyFilters();
+                }
+            });
         }
 
         function applyFilters() {
@@ -445,9 +608,69 @@
         function clearFilters() {
             $('#status-filter').val('');
             $('#search-filter').val('');
+            $('#quick-search').val('');
             applyFilters();
         }
 
+        window.filterByStatus = function (status) {
+            const statusSelect = $('#status-filter');
+            if (!statusSelect.length) {
+                return;
+            }
+
+            statusSelect.val(status || '');
+            $('#search-filter').val('');
+            applyFilters();
+        };
+
+        window.toggleAdvancedFilters = function () {
+            const panel = document.getElementById('advanced-filters-panel');
+            if (!panel) return;
+            panel.classList.toggle('hidden');
+        };
+
+        function deleteMaterialRequest(id, code) {
+            if (!window.confirmDelete || !window.showError || !window.showToast) {
+                console.error('Global notification helpers are not available.');
+                return;
+            }
+
+            window.confirmDelete(code, function () {
+                const jq = window.jQuery || window.$;
+                if (!jq) {
+                    console.error('jQuery is not available for deleteMaterialRequest.');
+                    return;
+                }
+
+                jq.ajax({
+                    url: '<?php echo e(route('warehouse.material-requests.destroy', ':id')); ?>'.replace(':id', id),
+                    type: 'POST',
+                    data: {
+                        _method: 'DELETE',
+                        _token: '<?php echo e(csrf_token()); ?>'
+                    }
+                })
+                .done(function (response) {
+                    const message = response.message || 'Material request deleted successfully.';
+                    window.showToast(message, 'delete');
+                    if (window.materialRequestsTable) {
+                        window.materialRequestsTable.ajax.reload(null, false);
+                    }
+                })
+                .fail(function (xhr) {
+                    const message = xhr.responseJSON?.message || 'Failed to delete material request.';
+                    window.showError(message);
+                });
+            });
+        }
+
+        function openMaterialRequestEditModal(id) {
+            // Placeholder for Ajax-powered edit modal; implementation will
+            // reuse the create modal structure and populate it with data.
+            // For now, simply navigate to the show page with edit flag
+            // to avoid breaking the UI until the full edit modal is wired.
+            window.location.href = '<?php echo e(route('warehouse.material-requests.show', ':id')); ?>'.replace(':id', id) + '?edit=1';
+        }
     </script>
 <?php $__env->stopPush(); ?>
 

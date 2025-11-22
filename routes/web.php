@@ -51,6 +51,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/settings/attendance', [SettingsController::class, 'updateAttendance'])->name('settings.attendance.update');
     Route::post('/settings/notifications', [SettingsController::class, 'updateNotifications'])->name('settings.notifications.update');
     Route::post('/settings/ai', [SettingsController::class, 'updateAiSettings'])->name('settings.ai.update');
+    Route::post('/settings/taxes', [SettingsController::class, 'storeTax'])->name('settings.taxes.store');
 
     // Notifications API
     Route::get('notifications/recent', [NotificationController::class, 'recent'])->name('notifications.recent');
@@ -407,6 +408,10 @@ Route::middleware('auth')->group(function () {
         Route::get('chart-of-accounts/export', [App\Http\Controllers\Accounting\AccountingController::class, 'export'])
             ->name('chart-of-accounts.export');
 
+        // Hierarchical tree data for Chart of Accounts
+        Route::get('chart-of-accounts/tree', [App\Http\Controllers\Accounting\AccountingController::class, 'tree'])
+            ->name('chart-of-accounts.tree');
+
         // Journal Entries page & data
         Route::get('journal-entries', [App\Http\Controllers\Accounting\AccountingController::class, 'journalEntries'])
             ->name('journal-entries.index');
@@ -416,6 +421,36 @@ Route::middleware('auth')->group(function () {
 
         Route::get('journal-entries/stats', [App\Http\Controllers\Accounting\AccountingController::class, 'journalEntriesStats'])
             ->name('journal-entries.stats');
+
+        // Cash Boxes
+        Route::get('cash-boxes', [App\Http\Controllers\Accounting\CashBoxController::class, 'index'])
+            ->name('cash-boxes.index');
+        Route::post('cash-boxes', [App\Http\Controllers\Accounting\CashBoxController::class, 'store'])
+            ->name('cash-boxes.store');
+
+        // Bank Accounts
+        Route::get('bank-accounts', [App\Http\Controllers\Accounting\BankAccountController::class, 'index'])
+            ->name('bank-accounts.index');
+        Route::post('bank-accounts', [App\Http\Controllers\Accounting\BankAccountController::class, 'store'])
+            ->name('bank-accounts.store');
+
+        // Invoices
+        Route::get('invoices', [App\Http\Controllers\Accounting\InvoiceController::class, 'index'])
+            ->name('invoices.index');
+        Route::post('invoices', [App\Http\Controllers\Accounting\InvoiceController::class, 'store'])
+            ->name('invoices.store');
+
+        // Payment Vouchers
+        Route::get('payment-vouchers', [App\Http\Controllers\Accounting\PaymentVoucherController::class, 'index'])
+            ->name('payment-vouchers.index');
+        Route::post('payment-vouchers', [App\Http\Controllers\Accounting\PaymentVoucherController::class, 'store'])
+            ->name('payment-vouchers.store');
+
+        // Receipt Vouchers
+        Route::get('receipt-vouchers', [App\Http\Controllers\Accounting\ReceiptVoucherController::class, 'index'])
+            ->name('receipt-vouchers.index');
+        Route::post('receipt-vouchers', [App\Http\Controllers\Accounting\ReceiptVoucherController::class, 'store'])
+            ->name('receipt-vouchers.store');
     });
 
     // Document Management Routes

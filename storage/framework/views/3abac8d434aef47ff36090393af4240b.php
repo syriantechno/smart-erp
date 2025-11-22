@@ -77,7 +77,7 @@
                         <?php else: ?>
                             <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
                                 <span class="text-lg font-bold text-primary">
-                                    <?php echo e(Str::of($brandName)->substr(0, 2)->upper()); ?>
+                                    <?php echo e(\Illuminate\Support\Str::of($brandName)->substr(0, 2)->upper()); ?>
 
                                 </span>
                             </div>
@@ -286,19 +286,19 @@
     </div>
 <?php $__env->stopSection(); ?>
 
-<?php if (! $__env->hasRenderedOnce('57880e28-af8f-4920-a52b-9ec1bc9777d4')): $__env->markAsRenderedOnce('57880e28-af8f-4920-a52b-9ec1bc9777d4');
+<?php if (! $__env->hasRenderedOnce('173dcbae-d5ab-469a-97ed-93b80dc4d398')): $__env->markAsRenderedOnce('173dcbae-d5ab-469a-97ed-93b80dc4d398');
 $__env->startPush('styles'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/css/vendors/tippy.css'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/css/themes/enigma/side-nav.css'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/css/themes/enigma/top-nav.css'); ?>
 <?php $__env->stopPush(); endif; ?>
 
-<?php if (! $__env->hasRenderedOnce('48cfac23-5fa0-44ea-b5b3-6784073353de')): $__env->markAsRenderedOnce('48cfac23-5fa0-44ea-b5b3-6784073353de');
+<?php if (! $__env->hasRenderedOnce('5bd4d98c-fad5-4136-8101-2dc3a1b629b5')): $__env->markAsRenderedOnce('5bd4d98c-fad5-4136-8101-2dc3a1b629b5');
 $__env->startPush('vendors'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/js/vendors/tippy.js'); ?>
 <?php $__env->stopPush(); endif; ?>
 
-<?php if (! $__env->hasRenderedOnce('0f2e45be-c5d6-4106-b4de-3aab8c09f72a')): $__env->markAsRenderedOnce('0f2e45be-c5d6-4106-b4de-3aab8c09f72a');
+<?php if (! $__env->hasRenderedOnce('c9771bfe-05e3-44b0-840f-be8f24fe6936')): $__env->markAsRenderedOnce('c9771bfe-05e3-44b0-840f-be8f24fe6936');
 $__env->startPush('scripts'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/js/themes/enigma.js'); ?>
 

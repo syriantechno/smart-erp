@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\Setting\Setting;
 use App\Models\Setting\PrefixSetting;
 use App\Models\Setting\Company;
+use App\Models\Accounting\Accounting;
+use App\Models\Accounting\Tax;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
@@ -21,6 +23,8 @@ class SettingsController extends Controller
         $prefixSettings = PrefixSetting::all();
         $companies = Company::orderBy('name')->get();
         $company = $companies->first();
+        $taxes = Tax::with(['company', 'salesAccount', 'purchaseAccount'])->orderBy('name')->get();
+        $accounts = Accounting::orderBy('code')->get();
         $roles = Role::with('permissions')->get();
         $permissions = Permission::all();
 
@@ -31,7 +35,43 @@ class SettingsController extends Controller
             'companies' => $companies,
             'roles' => $roles,
             'permissions' => $permissions,
+            'taxes' => $taxes,
+            'accounts' => $accounts,
         ]);
+    }
+
+    public function storeTax(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'company_id' => ['nullable', 'exists:companies,id'],
+            'name' => ['required', 'string', 'max:255'],
+            'code' => ['nullable', 'string', 'max:50'],
+            'rate' => ['required', 'numeric', 'min:0', 'max:100'],
+            'type' => ['required', 'in:value_added,withholding,other'],
+            'sales_account_id' => ['nullable', 'exists:accountings,id'],
+            'purchase_account_id' => ['nullable', 'exists:accountings,id'],
+            'is_default' => ['nullable', 'boolean'],
+            'is_active' => ['nullable', 'boolean'],
+            'description' => ['nullable', 'string'],
+        ]);
+
+        // Store rate as percentage value (e.g. 15 = 15%)
+        $data['is_default'] = $request->boolean('is_default', false);
+        $data['is_active'] = $request->boolean('is_active', true);
+
+        // If a default tax is set, unset previous defaults for the same company (or global)
+        if ($data['is_default']) {
+            Tax::where('company_id', $data['company_id'] ?? null)->update(['is_default' => false]);
+        }
+
+        Tax::create($data);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return redirect()->route('settings.index', ['#taxes'])
+                ->with('success', 'Tax created successfully.');
+        }
+
+        return redirect()->route('settings.index')->with('success', 'Tax created successfully.');
     }
 
     public function updateRolePermissions(Request $request, Role $role)

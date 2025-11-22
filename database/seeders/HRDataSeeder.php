@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Company;
-use App\Models\Department;
-use App\Models\Position;
+use App\Models\Setting\Company;
+use App\Models\HR\Department;
+use App\Models\HR\Position;
 
 class HRDataSeeder extends Seeder
 {

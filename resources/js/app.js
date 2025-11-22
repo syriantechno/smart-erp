@@ -18,7 +18,9 @@ if (token) {
     window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
 }
 
+// Expose page initializers on window so they can be called from layout scripts
 window.initializeDepartmentsPage = window.initializeDepartmentsPage || initializeDepartmentsPage;
+window.initializePositionsPage = window.initializePositionsPage || initializePositionsPage;
 
 function initializeAttendancePage() {
     const pageEl = document.getElementById('attendance-page');
@@ -962,6 +964,188 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+function initializePositionsPage() {
+    const tableEl = document.getElementById('positions-table');
+
+    if (!tableEl) {
+        return;
+    }
+
+    const datatableUrl = tableEl.dataset.positionsDatatableUrl;
+    const deleteUrlBase = tableEl.dataset.positionsDeleteUrlBase;
+    const filterField = document.getElementById('positions-filter-field');
+    const filterType = document.getElementById('positions-filter-type');
+    const filterValue = document.getElementById('positions-filter-value');
+    const lengthSelect = document.getElementById('positions-filter-length');
+    const filterGoBtn = document.getElementById('positions-filter-go');
+    const filterResetBtn = document.getElementById('positions-filter-reset');
+    const exportBtn = document.getElementById('positions-export');
+    const refreshBtn = document.getElementById('positions-refresh');
+    const createForm = document.getElementById('create-position-form');
+    const codeInput = createForm?.querySelector('#position-code');
+
+    const waitForDependencies = () => {
+        if (typeof window.jQuery === 'undefined' || typeof window.erpCrud?.initDataTable !== 'function') {
+            setTimeout(waitForDependencies, 100);
+            return;
+        }
+
+        const $ = window.jQuery;
+        const initialLength = lengthSelect ? parseInt(lengthSelect.value, 10) || 25 : 25;
+
+        const tableInstance = window.erpCrud.initDataTable({
+            tableSelector: '#positions-table',
+            ajaxUrl: datatableUrl,
+            ajaxData: function (d) {
+                d.filter_field = filterField?.value || 'all';
+                d.filter_type = filterType?.value || 'contains';
+                d.filter_value = filterValue?.value || '';
+                d.page_length = lengthSelect ? parseInt(lengthSelect.value, 10) || initialLength : initialLength;
+            },
+            pageLength: initialLength,
+            columns: [
+                { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'px-5 py-1.5 border-b dark:border-darkmode-300 whitespace-nowrap text-center font-medium', orderable: false },
+                { data: 'code', name: 'code', className: 'px-5 py-1.5 border-b dark:border-darkmode-300 font-medium text-slate-700 whitespace-nowrap', defaultContent: '-' },
+                { data: 'title', name: 'title', className: 'px-5 py-1.5 border-b dark:border-darkmode-300 font-medium text-slate-700 datatable-cell-wrap' },
+                {
+                    data: 'department',
+                    name: 'department.name',
+                    className: 'px-5 py-1.5 border-b dark:border-darkmode-300 datatable-cell-wrap',
+                    render: (data) => (data && data.name ? data.name : '-')
+                },
+                {
+                    data: 'salary_range',
+                    name: 'salary_range_min',
+                    className: 'px-5 py-1.5 border-b dark:border-darkmode-300 datatable-cell-wrap',
+                },
+                {
+                    data: 'is_active',
+                    name: 'is_active',
+                    className: 'text-center',
+                    render: (value) => (window.erpCrud?.renderStatusBadge ? window.erpCrud.renderStatusBadge(value) : (value ? 'Active' : 'Inactive'))
+                },
+                { data: 'actions', name: 'actions', className: 'px-5 py-1.5 border-b dark:border-darkmode-300 text-center', orderable: false, searchable: false }
+            ]
+        });
+
+        if (!tableInstance) {
+            return;
+        }
+
+        const reloadTable = () => tableInstance.ajax.reload(null, false);
+
+        lengthSelect?.addEventListener('change', () => {
+            const newLength = parseInt(lengthSelect.value, 10) || initialLength;
+            tableInstance.page.len(newLength).draw();
+        });
+
+        filterGoBtn?.addEventListener('click', reloadTable);
+        filterValue?.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                reloadTable();
+            }
+        });
+        filterResetBtn?.addEventListener('click', () => {
+            if (filterField) filterField.value = 'all';
+            if (filterType) filterType.value = 'contains';
+            if (filterValue) filterValue.value = '';
+            if (lengthSelect) {
+                lengthSelect.value = '25';
+                tableInstance.page.len(25).draw();
+            }
+            reloadTable();
+        });
+        refreshBtn?.addEventListener('click', reloadTable);
+
+        const createPreviewUrl = createForm?.dataset.previewUrl;
+
+        const refreshPositionCode = () => {
+            if (!createPreviewUrl || !codeInput) {
+                return;
+            }
+
+            fetch(createPreviewUrl)
+                .then((response) => (response.ok ? response.json() : Promise.reject(new Error('Preview code failed'))))
+                .then((data) => {
+                    codeInput.value = data.code || '';
+                })
+                .catch(() => {
+                    codeInput.value = '';
+                });
+        };
+
+        if (createForm) {
+            refreshPositionCode();
+
+            document.addEventListener('show.tw.modal', (event) => {
+                if (event.target?.id === 'create-position-modal') {
+                    refreshPositionCode();
+                }
+            });
+        }
+
+        if (window.erpCrud) {
+            window.erpCrud.handleCreateForm({
+                formSelector: '#create-position-form',
+                modalSelector: '#create-position-modal',
+                onSuccess: () => {
+                    refreshPositionCode();
+                    reloadTable();
+                }
+            });
+
+            window.erpCrud.handleEditForm({
+                formSelector: '#edit-position-form',
+                modalSelector: '#edit-position-modal',
+                onSuccess: () => reloadTable()
+            });
+
+            window.erpCrud.handleDelete({
+                urlBuilder: (id) => `${deleteUrlBase}/${id}`,
+                onSuccess: () => reloadTable()
+            });
+        }
+
+        exportBtn?.addEventListener('click', () => {
+            try {
+                const rows = tableInstance.rows({ search: 'applied' }).data().toArray();
+                if (!rows.length) {
+                    window.showToast?.('No data available for export', 'error');
+                    return;
+                }
+
+                const headers = ['#', 'Code', 'Title', 'Department', 'Salary Range', 'Status'];
+                const csvRows = [headers.join(',')];
+
+                rows.forEach((row) => {
+                    csvRows.push([
+                        row.DT_RowIndex,
+                        `"${(row.code || '').replace(/"/g, '""')}"`,
+                        `"${(row.title || '').replace(/"/g, '""')}"`,
+                        `"${((row.department && row.department.name) ? row.department.name : '').replace(/"/g, '""')}"`,
+                        `"${(row.salary_range || '').replace(/"/g, '""')}"`,
+                        row.is_active ? 'Active' : 'Inactive'
+                    ].join(','));
+                });
+
+                const blob = new Blob(['\ufeff' + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'positions_export.csv';
+                link.click();
+                URL.revokeObjectURL(link.href);
+
+                window.showToast?.('Data exported successfully', 'success');
+            } catch (error) {
+                console.error('[Positions] Export failed:', error);
+                window.showToast?.('Failed to export data', 'error');
+            }
+        });
+    };
+
+    waitForDependencies();
+}
+
 function initializeDepartmentsPage() {
     const tableEl = document.getElementById('departments-table');
 
@@ -1067,7 +1251,7 @@ function initializeDepartmentsPage() {
             }
 
             fetch(createPreviewUrl)
-                .then((response) => response.ok ? response.json() : Promise.reject(new Error('Preview code failed')))
+                .then((response) => (response.ok ? response.json() : Promise.reject(new Error('Preview code failed'))))
                 .then((data) => {
                     codeInput.value = data.code || '';
                 })
@@ -1076,7 +1260,10 @@ function initializeDepartmentsPage() {
                 });
         };
 
+        // Refresh code immediately on page load when the create form exists
         if (createForm) {
+            refreshDepartmentCode();
+
             document.addEventListener('show.tw.modal', (event) => {
                 if (event.target?.id === 'create-department-modal') {
                     refreshDepartmentCode();

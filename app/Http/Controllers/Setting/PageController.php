@@ -150,6 +150,44 @@ class PageController extends Controller
             ->limit(10)
             ->get();
 
+        // Attendance trend for the last 7 days
+        $trendDays = 7;
+        $attendanceTrendLabels = [];
+        $attendanceTrendData = [];
+
+        for ($i = $trendDays - 1; $i >= 0; $i--) {
+            $date = $today->copy()->subDays($i);
+            $label = $date->format(setting('date_format', 'Y-m-d'));
+
+            $dailySummary = Attendance::whereDate('attendance_date', $date)
+                ->selectRaw('status, COUNT(*) as total')
+                ->groupBy('status')
+                ->pluck('total', 'status');
+
+            $presentCount = (int) ($dailySummary['present'] ?? 0);
+            $dailyPresenceRate = $activeEmployees > 0
+                ? round(($presentCount / $activeEmployees) * 100)
+                : 0;
+
+            $attendanceTrendLabels[] = $label;
+            $attendanceTrendData[] = $dailyPresenceRate;
+        }
+
+        // Active employees distribution by department
+        $departmentDistributionLabels = [];
+        $departmentDistributionData = [];
+
+        $departments = Department::withCount(['employees' => function ($query) {
+            $query->active();
+        }])->get();
+
+        foreach ($departments as $department) {
+            if ($department->employees_count > 0) {
+                $departmentDistributionLabels[] = $department->name;
+                $departmentDistributionData[] = $department->employees_count;
+            }
+        }
+
         return view('hr.dashboard', [
             'hrExpiringDocuments' => $hrExpiringDocuments,
             'hrExpiryDays' => $days,
@@ -170,6 +208,10 @@ class PageController extends Controller
             'upcomingBirthdays' => $upcomingBirthdays,
             'upcomingPassports' => $upcomingPassports,
             'upcomingVisas' => $upcomingVisas,
+            'attendanceTrendLabels' => $attendanceTrendLabels,
+            'attendanceTrendData' => $attendanceTrendData,
+            'departmentDistributionLabels' => $departmentDistributionLabels,
+            'departmentDistributionData' => $departmentDistributionData,
         ]);
     }
 

@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Accounting;
 
 use App\Http\Controllers\Controller;
-use App\Models\Accounting;
-use App\Models\JournalEntry;
-use App\Models\JournalEntryLine;
+use App\Models\Accounting\Accounting;
+use App\Models\Accounting\JournalEntry;
+use App\Models\Accounting\JournalEntryLine;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
@@ -71,6 +71,56 @@ class AccountingController extends Controller
 
             return response()->json([
                 'error' => 'Database error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get hierarchical tree of accounts for tree view UI
+     */
+    public function tree(Request $request): JsonResponse
+    {
+        try {
+            $accounts = Accounting::select(['id', 'code', 'name', 'type', 'category', 'parent_id', 'level', 'is_active'])
+                ->orderBy('code')
+                ->get();
+
+            $grouped = $accounts->groupBy('parent_id');
+
+            $buildTree = function ($parentId) use (&$buildTree, $grouped) {
+                $nodes = [];
+
+                foreach ($grouped->get($parentId, collect()) as $account) {
+                    $nodes[] = [
+                        'id' => $account->id,
+                        'code' => $account->code,
+                        'name' => $account->name,
+                        'type' => $account->type,
+                        'category' => $account->category,
+                        'level' => $account->level,
+                        'is_active' => (bool) $account->is_active,
+                        'children' => $buildTree($account->id),
+                    ];
+                }
+
+                return $nodes;
+            };
+
+            $tree = $buildTree(null);
+
+            return response()->json([
+                'success' => true,
+                'data' => $tree,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Accounting tree error:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to build accounts tree',
             ], 500);
         }
     }

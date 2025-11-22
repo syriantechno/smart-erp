@@ -208,8 +208,44 @@ class SideMenu
             ],
             'accounting' => [
                 'icon' => 'file-text',
-                'route_name' => 'accounting.chart-of-accounts.index',
-                'title' => 'Accounting'
+                'title' => 'Accounting',
+                'sub_menu' => [
+                    'accounting-chart-of-accounts' => [
+                        'icon' => 'layers',
+                        'route_name' => 'accounting.chart-of-accounts.index',
+                        'title' => 'Chart of Accounts',
+                    ],
+                    'accounting-journal-entries' => [
+                        'icon' => 'book-open',
+                        'route_name' => 'accounting.journal-entries.index',
+                        'title' => 'Journal Entries',
+                    ],
+                    'accounting-invoices' => [
+                        'icon' => 'file-text',
+                        'route_name' => 'accounting.invoices.index',
+                        'title' => 'Invoices',
+                    ],
+                    'accounting-payment-vouchers' => [
+                        'icon' => 'corner-down-right',
+                        'route_name' => 'accounting.payment-vouchers.index',
+                        'title' => 'Payment Vouchers',
+                    ],
+                    'accounting-receipt-vouchers' => [
+                        'icon' => 'corner-up-right',
+                        'route_name' => 'accounting.receipt-vouchers.index',
+                        'title' => 'Receipt Vouchers',
+                    ],
+                    'accounting-cash-boxes' => [
+                        'icon' => 'wallet',
+                        'route_name' => 'accounting.cash-boxes.index',
+                        'title' => 'Cash Boxes',
+                    ],
+                    'accounting-bank-accounts' => [
+                        'icon' => 'banknote',
+                        'route_name' => 'accounting.bank-accounts.index',
+                        'title' => 'Bank Accounts',
+                    ],
+                ],
             ],
             'settings' => [
                 'icon' => 'settings',

@@ -79,7 +79,19 @@ class PurchaseRequest extends Model
 
     public function getEffectiveStatusAttribute(): string
     {
-        return $this->approvalRequest?->status ?? $this->status ?? 'pending';
+        $status = $this->approvalRequest?->status ?? $this->status ?? 'pending';
+
+        // When the approval request is pending but has moved beyond the first
+        // level, treat it as "in_progress" so the UI can distinguish it from
+        // a simple pending state.
+        if ($this->approvalRequest && $status === 'pending') {
+            $currentLevel = $this->approvalRequest->current_level ?? 1;
+            if ($currentLevel > 1) {
+                $status = 'in_progress';
+            }
+        }
+
+        return $status;
     }
 
     public function getStatusBadgeClass(): string
@@ -88,7 +100,8 @@ class PurchaseRequest extends Model
             'approved' => 'text-emerald-600',
             'rejected' => 'text-rose-600',
             'completed' => 'text-slate-700',
-            default => 'text-amber-600',
+            'in_progress' => 'text-sky-600',
+            default => 'text-amber-600', // pending
         };
     }
 
@@ -99,6 +112,7 @@ class PurchaseRequest extends Model
             'approved' => __('Approved'),
             'rejected' => __('Rejected'),
             'completed' => __('Completed'),
+            'in_progress' => __('In progress'),
             default => __('Pending'),
         };
 
@@ -106,6 +120,7 @@ class PurchaseRequest extends Model
             'approved' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
             'rejected' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>',
             'completed' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>',
+            'in_progress' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9"/><polyline points="12 7 12 12 15 15"/></svg>',
             default => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l3 3"/></svg>',
         };
 

@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             HRDataSeeder::class, // Add HR data seeder
             DemoDataSeeder::class, // Add demo data seeder
             VendorSeeder::class, // Add vendor seeder
+            AccountingSeeder::class, // Seed default chart of accounts
             // Add other seeders here
         ]);
 

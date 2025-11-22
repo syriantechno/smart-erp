@@ -43,6 +43,11 @@
                     <?php echo $__env->make('settings.partials.permissions', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
                 </div>
 
+                <!-- Taxes Settings Tab -->
+                <div class="settings-content hidden intro-y" id="taxes-content">
+                    <?php echo $__env->make('settings.partials.taxes', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+                </div>
+
                 <!-- Email Settings Tab -->
                 <div class="settings-content hidden intro-y" id="email-content">
                     <?php echo $__env->make('settings.partials.email', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
