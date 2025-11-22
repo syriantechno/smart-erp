@@ -18,6 +18,8 @@ if (token) {
     window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
 }
 
+window.initializeDepartmentsPage = window.initializeDepartmentsPage || initializeDepartmentsPage;
+
 function initializeAttendancePage() {
     const pageEl = document.getElementById('attendance-page');
 
@@ -940,23 +942,23 @@ function initializePayrollModal() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (typeof initializeProjectsPage === 'function') {
-        initializeProjectsPage();
+    if (typeof window.initializeProjectsPage === 'function') {
+        window.initializeProjectsPage();
     }
-    if (typeof initializeDepartmentsPage === 'function') {
-        initializeDepartmentsPage();
+    if (typeof window.initializeDepartmentsPage === 'function') {
+        window.initializeDepartmentsPage();
     }
-    if (typeof initializePositionsPage === 'function') {
-        initializePositionsPage();
+    if (typeof window.initializePositionsPage === 'function') {
+        window.initializePositionsPage();
     }
-    if (typeof initializeAttendancePage === 'function') {
-        initializeAttendancePage();
+    if (typeof window.initializeAttendancePage === 'function') {
+        window.initializeAttendancePage();
     }
-    if (typeof initializeLeavePage === 'function') {
-        initializeLeavePage();
+    if (typeof window.initializeLeavePage === 'function') {
+        window.initializeLeavePage();
     }
-    if (typeof initializePayrollModal === 'function') {
-        initializePayrollModal();
+    if (typeof window.initializePayrollModal === 'function') {
+        window.initializePayrollModal();
     }
 });
 

@@ -4,9 +4,46 @@
     <title>Material Request {{ $purchaseRequest->code }} - {{ config('app.name') }}</title>
 @endsection
 
+@php
+    $company = $purchaseRequest->company;
+    $companyName = $company->name ?? 'Smart ERP';
+    $companyAddress = $company->address ?? '—';
+    $companyEmail = $company->email ?? '—';
+    $companyPhone = $company->phone ?? '—';
+    $companyLogo = $company?->logo ? \Illuminate\Support\Facades\Storage::url($company->logo) : 'https://ui-avatars.com/api/?name=' . urlencode($companyName) . '&background=1D4ED8&color=fff';
+
+    $effectiveStatus = $approvalRequest->status ?? $purchaseRequest->status;
+    $showApprovedStamp = $effectiveStatus === 'approved';
+    $showRejectedStamp = $effectiveStatus === 'rejected';
+    $stampLabel = strtoupper($showApprovedStamp ? 'Approved' : 'Rejected');
+    $stampColor = $showApprovedStamp ? '#10b981' : '#dc2626';
+    $stampBgColor = $showApprovedStamp ? '#ecfdf5' : '#fee2e2';
+@endphp
+
+@push('styles')
+    <style>
+        .mr-approval-stamp {
+            letter-spacing: 0.35em;
+            text-indent: 0.35em;
+            font-size: 15px;
+            font-weight: 900;
+            text-transform: uppercase;
+            background-image: radial-gradient(circle at center, transparent 60%, rgba(0, 0, 0, 0.08));
+        }
+
+        @media print {
+            .mr-approval-stamp {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+    </style>
+@endpush
+
 @section('subcontent')
-    <div class="intro-y mt-8">
-        <div class="flex items-center justify-between mb-6">
+    <div class="intro-y mt-8 space-y-6">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
                 <p class="text-xs uppercase tracking-[0.3em] text-slate-500">Material Request</p>
                 <h1 class="text-2xl font-semibold text-slate-800 dark:text-slate-100">
@@ -18,6 +55,33 @@
             </a>
         </div>
 
+        <div class="flex flex-col gap-3 rounded-2xl border border-slate-200/70 bg-slate-50/60 p-4 dark:border-darkmode-400 dark:bg-darkmode-600/30">
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="h-14 w-14 overflow-hidden rounded-2xl border border-white/60 bg-white shadow-sm flex items-center justify-center">
+                    <img src="{{ $companyLogo }}" alt="{{ $companyName }} Logo" class="h-full w-full object-cover">
+                </div>
+                <div class="flex-1 min-w-[200px]">
+                    <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">Company</p>
+                    <h3 class="text-lg font-semibold text-slate-800.dark:text-slate-100">
+                        {{ $companyName }}
+                    </h3>
+                    <p class="text-sm text-slate-500">
+                        {{ $companyAddress }}
+                    </p>
+                </div>
+                <div class="text-sm text-slate-500 space-y-1">
+                    <p class="flex items-center gap-1">
+                        <x-base.lucide icon="Mail" class="h-4 w-4" />
+                        <span>{{ $companyEmail }}</span>
+                    </p>
+                    <p class="flex items-center gap-1">
+                        <x-base.lucide icon="Phone" class="h-4 w-4" />
+                        <span>{{ $companyPhone }}</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
         <div class="grid grid-cols-12 gap-6">
             <div class="col-span-12 lg:col-span-8 space-y-6">
                 @if ($approvalRequest)
@@ -27,33 +91,56 @@
                             @foreach (($approvalRequest->approval_levels ?? []) as $level)
                                 @php
                                     $levelNumber = $level['level'] ?? $loop->iteration;
-                                    $isCompleted = $approvalRequest->current_level > $levelNumber || $approvalRequest->status === 'approved';
-                                    $isCurrent = $approvalRequest->current_level === $levelNumber && $approvalRequest->status === 'pending';
-                                    $isRejected = $approvalRequest->status === 'rejected' && $approvalRequest->current_level === $levelNumber;
                                     $approverName = $approverNames->get($level['approver_id'] ?? null)?->name ?? 'Approver';
+
+                                    $state = 'pending';
+                                    if ($approvalRequest->status === 'approved' || ($approvalRequest->current_level ?? 1) > $levelNumber) {
+                                        $state = 'approved';
+                                    } elseif ($approvalRequest->status === 'rejected' && ($approvalRequest->current_level ?? 1) === $levelNumber) {
+                                        $state = 'rejected';
+                                    } elseif ($approvalRequest->status === 'pending' && ($approvalRequest->current_level ?? 1) === $levelNumber) {
+                                        $state = 'in_progress';
+                                    }
+
+                                    $stateMeta = [
+                                        'approved' => [
+                                            'wrapper' => 'border-emerald-500 bg-emerald-50 text-emerald-600',
+                                            'icon' => 'CheckCircle',
+                                            'connector' => 'bg-emerald-500'
+                                        ],
+                                        'rejected' => [
+                                            'wrapper' => 'border-rose-500 bg-rose-50 text-rose-600',
+                                            'icon' => 'XCircle',
+                                            'connector' => 'bg-rose-500'
+                                        ],
+                                        'in_progress' => [
+                                            'wrapper' => 'border-sky-500 bg-sky-50 text-sky-600',
+                                            'icon' => 'RefreshCw',
+                                            'connector' => 'bg-sky-500'
+                                        ],
+                                        'pending' => [
+                                            'wrapper' => 'border-amber-400 bg-amber-50 text-amber-600',
+                                            'icon' => 'Clock',
+                                            'connector' => 'bg-amber-300'
+                                        ],
+                                    ];
+
+                                    $styles = $stateMeta[$state];
+                                    $iconClasses = 'w-5 h-5';
+                                    if ($state === 'in_progress') {
+                                        $iconClasses .= ' animate-spin';
+                                    }
                                 @endphp
                                 <div class="flex items-center {{ !$loop->last ? 'flex-1' : '' }}">
                                     <div class="flex flex-col items-center text-center">
-                                        <div class="flex items-center justify-center w-12 h-12 rounded-full border-2
-                                            {{ $isCompleted ? 'border-success bg-success/10 text-success' : '' }}
-                                            {{ $isCurrent ? 'border-warning bg-warning/10 text-warning' : '' }}
-                                            {{ $isRejected ? 'border-danger bg-danger/10 text-danger' : '' }}
-                                            {{ (!$isCompleted && !$isCurrent && !$isRejected) ? 'border-slate-200 bg-slate-50 text-slate-400' : '' }}">
-                                            @if ($isCompleted)
-                                                <x-base.lucide icon="CheckCircle" class="w-5 h-5" />
-                                            @elseif ($isCurrent)
-                                                <x-base.lucide icon="Clock" class="w-5 h-5" />
-                                            @elseif ($isRejected)
-                                                <x-base.lucide icon="XCircle" class="w-5 h-5" />
-                                            @else
-                                                <x-base.lucide icon="Circle" class="w-5 h-5" />
-                                            @endif
+                                        <div class="flex items-center justify-center w-12 h-12 rounded-full border-2 {{ $styles['wrapper'] }}">
+                                            <x-base.lucide icon="{{ $styles['icon'] }}" class="{{ $iconClasses }}" />
                                         </div>
                                         <p class="mt-2 text-sm font-medium text-slate-700">{{ $level['name'] ?? "Level {$levelNumber}" }}</p>
                                         <p class="text-xs text-slate-500">{{ $approverName }}</p>
                                     </div>
                                     @unless($loop->last)
-                                        <div class="flex-1 h-0.5 mx-4 {{ $isCompleted ? 'bg-success' : 'bg-slate-200' }}"></div>
+                                        <div class="flex-1 h-0.5 mx-4 {{ $styles['connector'] }}"></div>
                                     @endunless
                                 </div>
                             @endforeach
@@ -94,31 +181,40 @@
 
                 <div class="box p-6">
                     <h2 class="text-sm font-semibold text-slate-600 mb-4">General Information</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                        <div>
-                            <p class="text-xs text-slate-500">Company</p>
-                            <p class="font-medium">{{ $purchaseRequest->company?->name ?? '—' }}</p>
+                    <div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+                        <div class="grid flex-1 grid-cols-1 gap-4 text-sm md:grid-cols-2">
+                            <div>
+                                <p class="text-xs text-slate-500">Warehouse</p>
+                                <p class="font-medium">{{ $purchaseRequest->warehouse?->name ?? '—' }}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-500">Request Date</p>
+                                <p class="font-medium">{{ optional($purchaseRequest->request_date)->format('Y-m-d') ?? '—' }}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-500">Priority</p>
+                                <p class="font-medium capitalize">{{ $purchaseRequest->priority ?? 'normal' }}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-500">Requested By</p>
+                                <p class="font-medium">{{ $purchaseRequest->requestedBy?->name ?? '—' }}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-500">Approved By</p>
+                                <p class="font-medium">{{ $purchaseRequest->approvedBy?->name ?? '—' }}</p>
+                            </div>
                         </div>
-                        <div>
-                            <p class="text-xs text-slate-500">Warehouse</p>
-                            <p class="font-medium">{{ $purchaseRequest->warehouse?->name ?? '—' }}</p>
-                        </div>
-                        <div>
-                            <p class="text-xs text-slate-500">Request Date</p>
-                            <p class="font-medium">{{ optional($purchaseRequest->request_date)->format('Y-m-d') ?? '—' }}</p>
-                        </div>
-                        <div>
-                            <p class="text-xs text-slate-500">Priority</p>
-                            <p class="font-medium capitalize">{{ $purchaseRequest->priority ?? 'normal' }}</p>
-                        </div>
-                        <div>
-                            <p class="text-xs text-slate-500">Requested By</p>
-                            <p class="font-medium">{{ $purchaseRequest->requestedBy?->name ?? '—' }}</p>
-                        </div>
-                        <div>
-                            <p class="text-xs text-slate-500">Approved By</p>
-                            <p class="font-medium">{{ $purchaseRequest->approvedBy?->name ?? '—' }}</p>
-                        </div>
+
+                        @if ($showApprovedStamp || $showRejectedStamp)
+                            <div class="flex justify-center lg:justify-end">
+                                <div
+                                    class="mr-approval-stamp inline-flex h-36 w-36 items-center justify-center rounded-full border-[6px]"
+                                    style="transform: rotate(-8deg); border-color: {{ $stampColor }}; color: {{ $stampColor }}; background-color: {{ $stampBgColor }};"
+                                >
+                                    {{ $stampLabel }}
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
 

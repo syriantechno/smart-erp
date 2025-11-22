@@ -1,51 +1,44 @@
-<div class="flex items-center justify-center gap-2">
-    <a
-        href="<?php echo e(route('warehouse.material-requests.show', $pr)); ?>"
-        class="text-primary hover:text-primary/80"
-        title="View details"
-    >
-        <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Eye','class' => 'w-4 h-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.lucide'); ?>
+<div class="flex items-center justify-center gap-1 min-w-[90px]">
+    <?php if (isset($component)) { $__componentOriginal032f83e94ea583b9c58157a8acdf0a87 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal032f83e94ea583b9c58157a8acdf0a87 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.erp.action-button','data' => ['icon' => 'Eye','variant' => 'primary','title' => 'View details','onclick' => 'window.location.href=\''.e(route('warehouse.material-requests.show', $pr)).'\'']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('erp.action-button'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['icon' => 'Eye','class' => 'w-4 h-4']); ?>
+<?php $component->withAttributes(['icon' => 'Eye','variant' => 'primary','title' => 'View details','onclick' => 'window.location.href=\''.e(route('warehouse.material-requests.show', $pr)).'\'']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
-<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
-<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php if (isset($__attributesOriginal032f83e94ea583b9c58157a8acdf0a87)): ?>
+<?php $attributes = $__attributesOriginal032f83e94ea583b9c58157a8acdf0a87; ?>
+<?php unset($__attributesOriginal032f83e94ea583b9c58157a8acdf0a87); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
-<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
-<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php if (isset($__componentOriginal032f83e94ea583b9c58157a8acdf0a87)): ?>
+<?php $component = $__componentOriginal032f83e94ea583b9c58157a8acdf0a87; ?>
+<?php unset($__componentOriginal032f83e94ea583b9c58157a8acdf0a87); ?>
 <?php endif; ?>
-    </a>
-    <button type="button" class="text-danger hover:text-danger/80" title="Delete" disabled>
-        <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Trash2','class' => 'w-4 h-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.lucide'); ?>
+
+    <?php if (isset($component)) { $__componentOriginal032f83e94ea583b9c58157a8acdf0a87 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal032f83e94ea583b9c58157a8acdf0a87 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.erp.action-button','data' => ['icon' => 'Trash2','variant' => 'danger','title' => 'Delete','disabled' => true]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('erp.action-button'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['icon' => 'Trash2','class' => 'w-4 h-4']); ?>
+<?php $component->withAttributes(['icon' => 'Trash2','variant' => 'danger','title' => 'Delete','disabled' => true]); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
-<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
-<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php if (isset($__attributesOriginal032f83e94ea583b9c58157a8acdf0a87)): ?>
+<?php $attributes = $__attributesOriginal032f83e94ea583b9c58157a8acdf0a87; ?>
+<?php unset($__attributesOriginal032f83e94ea583b9c58157a8acdf0a87); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
-<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
-<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php if (isset($__componentOriginal032f83e94ea583b9c58157a8acdf0a87)): ?>
+<?php $component = $__componentOriginal032f83e94ea583b9c58157a8acdf0a87; ?>
+<?php unset($__componentOriginal032f83e94ea583b9c58157a8acdf0a87); ?>
 <?php endif; ?>
-    </button>
 </div>
 <?php /**PATH E:\ERP System\Source\resources\views/warehouse/material-requests/partials/actions.blade.php ENDPATH**/ ?>

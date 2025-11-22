@@ -2,9 +2,46 @@
     <title>Material Request <?php echo e($purchaseRequest->code); ?> - <?php echo e(config('app.name')); ?></title>
 <?php $__env->stopSection(); ?>
 
+<?php
+    $company = $purchaseRequest->company;
+    $companyName = $company->name ?? 'Smart ERP';
+    $companyAddress = $company->address ?? '—';
+    $companyEmail = $company->email ?? '—';
+    $companyPhone = $company->phone ?? '—';
+    $companyLogo = $company?->logo ? \Illuminate\Support\Facades\Storage::url($company->logo) : 'https://ui-avatars.com/api/?name=' . urlencode($companyName) . '&background=1D4ED8&color=fff';
+
+    $effectiveStatus = $approvalRequest->status ?? $purchaseRequest->status;
+    $showApprovedStamp = $effectiveStatus === 'approved';
+    $showRejectedStamp = $effectiveStatus === 'rejected';
+    $stampLabel = strtoupper($showApprovedStamp ? 'Approved' : 'Rejected');
+    $stampColor = $showApprovedStamp ? '#10b981' : '#dc2626';
+    $stampBgColor = $showApprovedStamp ? '#ecfdf5' : '#fee2e2';
+?>
+
+<?php $__env->startPush('styles'); ?>
+    <style>
+        .mr-approval-stamp {
+            letter-spacing: 0.35em;
+            text-indent: 0.35em;
+            font-size: 15px;
+            font-weight: 900;
+            text-transform: uppercase;
+            background-image: radial-gradient(circle at center, transparent 60%, rgba(0, 0, 0, 0.08));
+        }
+
+        @media print {
+            .mr-approval-stamp {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+    </style>
+<?php $__env->stopPush(); ?>
+
 <?php $__env->startSection('subcontent'); ?>
-    <div class="intro-y mt-8">
-        <div class="flex items-center justify-between mb-6">
+    <div class="intro-y mt-8 space-y-6">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
                 <p class="text-xs uppercase tracking-[0.3em] text-slate-500">Material Request</p>
                 <h1 class="text-2xl font-semibold text-slate-800 dark:text-slate-100">
@@ -15,6 +52,73 @@
             <a href="<?php echo e(route('warehouse.material-requests.index')); ?>" class="btn btn-outline-secondary">
                 Back to list
             </a>
+        </div>
+
+        <div class="flex flex-col gap-3 rounded-2xl border border-slate-200/70 bg-slate-50/60 p-4 dark:border-darkmode-400 dark:bg-darkmode-600/30">
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="h-14 w-14 overflow-hidden rounded-2xl border border-white/60 bg-white shadow-sm flex items-center justify-center">
+                    <img src="<?php echo e($companyLogo); ?>" alt="<?php echo e($companyName); ?> Logo" class="h-full w-full object-cover">
+                </div>
+                <div class="flex-1 min-w-[200px]">
+                    <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">Company</p>
+                    <h3 class="text-lg font-semibold text-slate-800.dark:text-slate-100">
+                        <?php echo e($companyName); ?>
+
+                    </h3>
+                    <p class="text-sm text-slate-500">
+                        <?php echo e($companyAddress); ?>
+
+                    </p>
+                </div>
+                <div class="text-sm text-slate-500 space-y-1">
+                    <p class="flex items-center gap-1">
+                        <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Mail','class' => 'h-4 w-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.lucide'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['icon' => 'Mail','class' => 'h-4 w-4']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+                        <span><?php echo e($companyEmail); ?></span>
+                    </p>
+                    <p class="flex items-center gap-1">
+                        <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Phone','class' => 'h-4 w-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.lucide'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['icon' => 'Phone','class' => 'h-4 w-4']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+                        <span><?php echo e($companyPhone); ?></span>
+                    </p>
+                </div>
+            </div>
         </div>
 
         <div class="grid grid-cols-12 gap-6">
@@ -246,31 +350,41 @@
 
                 <div class="box p-6">
                     <h2 class="text-sm font-semibold text-slate-600 mb-4">General Information</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                        <div>
-                            <p class="text-xs text-slate-500">Company</p>
-                            <p class="font-medium"><?php echo e($purchaseRequest->company?->name ?? '—'); ?></p>
+                    <div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+                        <div class="grid flex-1 grid-cols-1 gap-4 text-sm md:grid-cols-2">
+                            <div>
+                                <p class="text-xs text-slate-500">Warehouse</p>
+                                <p class="font-medium"><?php echo e($purchaseRequest->warehouse?->name ?? '—'); ?></p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-500">Request Date</p>
+                                <p class="font-medium"><?php echo e(optional($purchaseRequest->request_date)->format('Y-m-d') ?? '—'); ?></p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-500">Priority</p>
+                                <p class="font-medium capitalize"><?php echo e($purchaseRequest->priority ?? 'normal'); ?></p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-500">Requested By</p>
+                                <p class="font-medium"><?php echo e($purchaseRequest->requestedBy?->name ?? '—'); ?></p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-500">Approved By</p>
+                                <p class="font-medium"><?php echo e($purchaseRequest->approvedBy?->name ?? '—'); ?></p>
+                            </div>
                         </div>
-                        <div>
-                            <p class="text-xs text-slate-500">Warehouse</p>
-                            <p class="font-medium"><?php echo e($purchaseRequest->warehouse?->name ?? '—'); ?></p>
-                        </div>
-                        <div>
-                            <p class="text-xs text-slate-500">Request Date</p>
-                            <p class="font-medium"><?php echo e(optional($purchaseRequest->request_date)->format('Y-m-d') ?? '—'); ?></p>
-                        </div>
-                        <div>
-                            <p class="text-xs text-slate-500">Priority</p>
-                            <p class="font-medium capitalize"><?php echo e($purchaseRequest->priority ?? 'normal'); ?></p>
-                        </div>
-                        <div>
-                            <p class="text-xs text-slate-500">Requested By</p>
-                            <p class="font-medium"><?php echo e($purchaseRequest->requestedBy?->name ?? '—'); ?></p>
-                        </div>
-                        <div>
-                            <p class="text-xs text-slate-500">Approved By</p>
-                            <p class="font-medium"><?php echo e($purchaseRequest->approvedBy?->name ?? '—'); ?></p>
-                        </div>
+
+                        <?php if($showApprovedStamp || $showRejectedStamp): ?>
+                            <div class="flex justify-center lg:justify-end">
+                                <div
+                                    class="mr-approval-stamp inline-flex h-36 w-36 items-center justify-center rounded-full border-[6px]"
+                                    style="transform: rotate(-8deg); border-color: <?php echo e($stampColor); ?>; color: <?php echo e($stampColor); ?>; background-color: <?php echo e($stampBgColor); ?>;"
+                                >
+                                    <?php echo e($stampLabel); ?>
+
+                                </div>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
 

@@ -176,6 +176,7 @@
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Code</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Title</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Requested By</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Company</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Request Date</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Total Amount</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Approvals</th>
@@ -251,6 +252,7 @@
                     { data: 'code', name: 'code' },
                     { data: 'title', name: 'title' },
                     { data: 'requested_by_name', name: 'requested_by_name' },
+                    { data: 'company_name', name: 'company_name' },
                     { data: 'request_date', name: 'request_date' },
                     {
                         data: 'total_amount',
@@ -303,5 +305,6 @@
             $('#search-filter').val('');
             applyFilters();
         }
+
     </script>
 @endpush

@@ -77,14 +77,43 @@ class PurchaseRequest extends Model
         return $this->belongsTo(\App\Models\Approval\ApprovalRequest::class);
     }
 
+    public function getEffectiveStatusAttribute(): string
+    {
+        return $this->approvalRequest?->status ?? $this->status ?? 'pending';
+    }
+
     public function getStatusBadgeClass(): string
     {
-        return match($this->status) {
-            'completed' => 'bg-green-100 text-green-700',
-            'approved' => 'bg-blue-100 text-blue-700',
-            'pending' => 'bg-yellow-100 text-yellow-700',
-            'rejected' => 'bg-red-100 text-red-700',
-            default => 'bg-gray-100 text-gray-700',
+        return match($this->effective_status) {
+            'approved' => 'text-emerald-600',
+            'rejected' => 'text-rose-600',
+            'completed' => 'text-slate-700',
+            default => 'text-amber-600',
         };
+    }
+
+    public function getStatusBadgeHtmlAttribute(): string
+    {
+        $status = $this->effective_status;
+        $label = match($status) {
+            'approved' => __('Approved'),
+            'rejected' => __('Rejected'),
+            'completed' => __('Completed'),
+            default => __('Pending'),
+        };
+
+        $icon = match($status) {
+            'approved' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
+            'rejected' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>',
+            'completed' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>',
+            default => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l3 3"/></svg>',
+        };
+
+        return sprintf(
+            '<span class="inline-flex items-center gap-1.5 text-sm font-semibold %s">%s<span>%s</span></span>',
+            $this->getStatusBadgeClass(),
+            $icon,
+            e($label)
+        );
     }
 }

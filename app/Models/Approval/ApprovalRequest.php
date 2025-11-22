@@ -6,6 +6,7 @@ use App\Http\Controllers\NotificationController;
 use App\Models\HR\Department;
 use App\Models\Setting\Company;
 use App\Models\User;
+use App\Models\Warehouse\PurchaseRequest;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -218,6 +219,10 @@ class ApprovalRequest extends Model
 
         $this->save();
 
+        if ($wasFinalApproval) {
+            $this->syncMaterialRequestStatus('approved', $userId);
+        }
+
         // Notify next approver or finalize entity
         if ($nextApproverId) {
             NotificationController::sendToUser(
@@ -245,6 +250,8 @@ class ApprovalRequest extends Model
         $this->rejection_reason = $reason;
         $this->current_approver_id = null;
         $this->save();
+
+        $this->syncMaterialRequestStatus('rejected', $userId);
 
         $this->onRejected();
     }
@@ -329,5 +336,20 @@ class ApprovalRequest extends Model
                 route('approval-system.index')
             );
         }
+    }
+
+    protected function syncMaterialRequestStatus(string $status, ?int $userId = null): void
+    {
+        if (!$this->approvable instanceof PurchaseRequest) {
+            return;
+        }
+
+        $updates = ['status' => $status];
+
+        if ($status === 'approved' && $userId && !$this->approvable->approved_by) {
+            $updates['approved_by'] = $userId;
+        }
+
+        $this->approvable->fill($updates)->save();
     }
 }

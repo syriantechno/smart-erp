@@ -823,11 +823,16 @@
                 }
 
                 syncCompanySelection();
+                fetchCode();
 
                 openButton?.addEventListener('click', () => {
                     fetchCode();
                     syncCompanySelection();
                     titleInput.focus();
+                });
+
+                modalEl?.addEventListener('shown.tw.modal', () => {
+                    fetchCode();
                 });
 
                 const submitRequest = (event) => {

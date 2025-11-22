@@ -98,11 +98,17 @@ class PurchaseRequestController extends Controller
     public function datatable(Request $request): JsonResponse
     {
         $baseQuery = PurchaseRequest::query()
-            ->with(['requestedBy:id,name', 'approvedBy:id,name', 'approvalRequest']);
+            ->with(['requestedBy:id,name', 'approvedBy:id,name', 'approvalRequest', 'company:id,name']);
 
-        // Apply status filter
+        // Apply status filter considering approval workflow status
         if ($request->filled('status')) {
-            $baseQuery->where('status', $request->status);
+            $statusFilter = $request->status;
+            $baseQuery->where(function ($query) use ($statusFilter) {
+                $query->where('status', $statusFilter)
+                    ->orWhereHas('approvalRequest', function ($approvalQuery) use ($statusFilter) {
+                        $approvalQuery->where('status', $statusFilter);
+                    });
+            });
         }
 
         return DataTables::of($baseQuery)
@@ -112,8 +118,14 @@ class PurchaseRequestController extends Controller
             ->addColumn('approved_by_name', function ($pr) {
                 return $pr->approvedBy ? $pr->approvedBy->name : 'N/A';
             })
+            ->addColumn('company_name', function ($pr) {
+                return $pr->company?->name ?? '—';
+            })
+            ->addColumn('request_date', function ($pr) {
+                return $pr->request_date ? $pr->request_date->format('Y-m-d') : '—';
+            })
             ->addColumn('status_badge', function ($pr) {
-                return '<span class="px-2 py-1 text-xs font-medium rounded-full ' . $pr->getStatusBadgeClass() . '">' . ucfirst($pr->status) . '</span>';
+                return $pr->status_badge_html;
             })
             ->addColumn('approval_progress', function ($pr) {
                 if (!$pr->approvalRequest) {
