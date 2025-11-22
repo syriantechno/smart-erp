@@ -4,426 +4,618 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HR Dashboard – Crextio Replica</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-start: #e6e3dc;
-            --bg-mid: #efe4cf;
-            --bg-end: #f8dc8b;
-            --card-shadow: 0 20px 45px rgba(15, 23, 42, 0.10);
+            --bg-start: #f3f2ee;
+            --bg-end: #f8dc8c;
+            --text-dark: #111115;
+            --text-muted: #7b7b7b;
+            --card-bg: rgba(255,255,255,0.92);
+            --card-shadow: 0 28px 48px rgba(0,0,0,0.08);
+            --radius-lg: 34px;
+            --radius-md: 22px;
         }
+        * { box-sizing: border-box; }
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-mid) 45%, var(--bg-end) 100%);
+            margin: 0;
             min-height: 100vh;
-            color: #111827;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--bg-start) 0%, #f0e5d1 45%, var(--bg-end) 100%);
+            color: var(--text-dark);
         }
-        .nav-pill button {
-            transition: all 0.2s ease;
+        .dashboard-shell {
+            max-width: 1150px;
+            margin: 0 auto;
+            padding: 32px 28px 60px;
         }
-        .metric-number {
-            font-size: 2.8rem;
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+        }
+        .brand-pill {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .brand-pill span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 54px;
+            height: 54px;
+            border-radius: 16px;
+            background: radial-gradient(circle at 30% 30%, #ffffff 0%, #d2d1d6 60%, #555770 100%);
             font-weight: 600;
-            letter-spacing: -0.04em;
+            color: #0d0d0f;
         }
-        .metric-label {
-            font-size: 0.62rem;
-            letter-spacing: 0.24em;
+        .nav-tabs {
+            background: rgba(255,255,255,0.6);
+            border-radius: 999px;
+            padding: 6px;
+            display: flex;
+            gap: 4px;
+            box-shadow: inset 0 1px 2px rgba(255,255,255,0.6), 0 8px 18px rgba(0,0,0,0.08);
+        }
+        .nav-tabs button {
+            border: none;
+            background: transparent;
+            padding: 8px 18px;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            color: #666;
+            cursor: pointer;
+        }
+        .nav-tabs button.active {
+            background: #11121A;
+            color: #fff;
+            font-weight: 600;
+        }
+        .nav-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .nav-actions button {
+            width: 40px;
+            height: 40px;
+            border-radius: 999px;
+            border: 1px solid #d7d5d1;
+            background: rgba(255,255,255,0.7);
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        .hero {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 24px;
+            margin-bottom: 26px;
+        }
+        .hero h1 {
+            font-size: 3rem;
+            margin: 0;
+            letter-spacing: -0.02em;
+        }
+        .hero-label {
             text-transform: uppercase;
-            color: #7c7c7c;
+            letter-spacing: 0.35em;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+        .metric-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 28px;
+        }
+        .metric {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
         .metric-icon {
-            width: 42px;
-            height: 42px;
-            border-radius: 999px;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
             background: rgba(0,0,0,0.08);
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .lite-card {
-            border-radius: 28px;
-            background: rgba(255,255,255,0.92);
-            box-shadow: var(--card-shadow);
-        }
-        .funnel-pill {
-            border-radius: 999px;
-            height: 36px;
-            padding: 0 18px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.78rem;
+        .metric-number {
+            font-size: 3rem;
             font-weight: 600;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.35);
+            letter-spacing: -0.04em;
+            margin: 0;
         }
-        .project-pill {
+        .metric-label {
+            text-transform: uppercase;
+            letter-spacing: 0.22em;
+            font-size: 0.6rem;
+            color: var(--text-muted);
+        }
+        .status-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 32px;
+        }
+        .pill-dark { background: #11121a; color: #fff; }
+        .pill-gold { background: #f3d16c; color: #2f2100; }
+        .pill-light { background: #dfdad1; color: #4a4a4a; }
+        .status-pill {
             border-radius: 999px;
-            height: 36px;
-            padding: 0 18px;
-            background: #ded8cf;
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 0.78rem;
+            padding: 8px 22px;
             font-weight: 600;
-            color: #5a5a5a;
+            font-size: 0.85rem;
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.35);
         }
-        .project-pill span {
-            display: inline-flex;
+        .striped-pill {
+            display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 14px;
+            padding: 10px 22px;
+            border-radius: 999px;
+            background: #dcd6cd;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #5f5b55;
         }
-        .project-bar {
+        .striped-pill span.bar {
             width: 180px;
             height: 12px;
             border-radius: 999px;
-            background: #cbbfb1;
+            background: #c4bbaf;
             position: relative;
             overflow: hidden;
         }
-        .project-bar::after {
+        .striped-pill span.bar::after {
             content: '';
             position: absolute;
             inset: 0;
-            background: repeating-linear-gradient(135deg, rgba(255,255,255,0.7) 0, rgba(255,255,255,0.7) 8px, transparent 8px, transparent 16px);
+            background: repeating-linear-gradient(135deg, rgba(255,255,255,0.75) 0, rgba(255,255,255,0.75) 9px, transparent 9px, transparent 18px);
         }
-        .project-bar-fill {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(90deg, rgba(255,255,255,0.25), rgba(255,255,255,0.8));
-            width: 60%;
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1.6fr 1.2fr 0.9fr;
+            gap: 24px;
+        }
+        .card {
+            border-radius: var(--radius-lg);
+            background: var(--card-bg);
+            box-shadow: var(--card-shadow);
+            padding: 26px;
         }
         .profile-card {
-            border-radius: 36px;
-            background: linear-gradient(135deg, #fdfdfb, #f3ebe0);
-            box-shadow: var(--card-shadow);
+            display: flex;
+            gap: 22px;
+            align-items: stretch;
         }
-        .dark-task-card {
-            border-radius: 40px;
-            background: linear-gradient(180deg, #121826 0%, #080b15 100%);
-            box-shadow: 0 30px 50px rgba(2, 6, 23, 0.55);
+        .profile-card .photo {
+            flex: 1;
+            border-radius: 30px;
+            background-size: cover;
+            background-position: center;
+            min-height: 260px;
         }
-        .calendar-grid span {
+        .profile-meta {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .salary-pill {
+            align-self: flex-start;
+            padding: 10px 26px;
+            background: linear-gradient(135deg, #e2c590, #c0874f);
+            border-radius: 999px;
+            color: #fff;
+            font-weight: 600;
+            box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+        }
+        .detail-list {
+            display: grid;
+            gap: 14px;
+            font-size: 0.9rem;
+        }
+        .detail-list .item {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            padding-bottom: 10px;
+        }
+        .progress-card {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .progress-bars {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            height: 140px;
+        }
+        .progress-bars .bar {
+            width: 18px;
             border-radius: 18px;
-            padding: 0.3rem 0;
+            background: linear-gradient(180deg, #11121a, #585c66);
+            position: relative;
+        }
+        .progress-bars .bar.gold {
+            width: 24px;
+            background: linear-gradient(180deg, #f7d35f, #c59a1c);
+        }
+        .progress-bars span {
+            position: absolute;
+            bottom: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        .time-card {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .dial {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            position: relative;
+            margin: 0 auto;
+        }
+        .dial svg {
+            width: 100%;
+            height: 100%;
+        }
+        .dial .center-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        .time-controls {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+        .time-controls button {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 1px solid #d4d1cd;
+            background: #fff;
+            font-size: 0.85rem;
+        }
+        .time-controls button.play {
+            background: #11121a;
+            color: #fff;
+        }
+        .onboarding-card {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .onboarding-stats {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        .toggle-row {
+            display: flex;
+            gap: 10px;
+        }
+        .toggle-row button {
+            flex: 1;
+            border: none;
+            border-radius: 999px;
+            padding: 8px 0;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        .toggle-row button.primary {
+            background: #f3d16c;
+            color: #332200;
+            font-weight: 600;
+        }
+        .toggle-row button.dark { background: #11121a; color: #fff; }
+        .toggle-row button.gray { background: #c4c1bd; color: #4d4b4c; }
+        .task-card {
+            border-radius: 40px;
+            padding: 26px;
+            background: linear-gradient(180deg, #11131a 0%, #07070c 100%);
+            color: #fff;
+            box-shadow: 0 40px 55px rgba(0,0,0,0.35);
+        }
+        .task-card .task {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .task-card .task:last-child { margin-bottom: 0; }
+        .task-card .dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.45);
+        }
+        .task-card .dot.done {
+            background: #f3d16c;
+            border-color: #f3d16c;
+        }
+        .calendar-card {
+            margin-top: 28px;
+            border-radius: var(--radius-lg);
+            background: var(--card-bg);
+            box-shadow: var(--card-shadow);
+            padding: 28px;
+        }
+        .calendar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0,1fr));
+            gap: 6px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #5b5b5b;
+        }
+        .calendar-days span {
+            padding: 6px 0;
+            border-radius: 18px;
+        }
+        .calendar-days span.active {
+            background: #11121a;
+            color: #fff;
+        }
+        .schedule-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            font-size: 0.78rem;
+            color: #5f5f5f;
+        }
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            margin-top: 6px;
+        }
+        .chip.dark {
+            background: #11121a;
+            color: #fff;
+        }
+        .chip.gold {
+            background: #f4e2b3;
+            color: #2d2d2d;
+        }
+        @media (max-width: 1100px) {
+            .main-grid { grid-template-columns: 1fr; }
+            .profile-card { flex-direction: column; }
+            .profile-card .photo { width: 100%; min-height: 200px; }
         }
     </style>
 </head>
 <body>
-    <div class="max-w-6xl mx-auto px-6 py-6 space-y-6">
-        <!-- Top navigation -->
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-[18px] bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white text-lg font-semibold flex items-center justify-center">C</div>
+    <div class="dashboard-shell">
+        <header class="top-bar">
+            <div class="brand-pill">
+                <span>C</span>
                 <div>
-                    <p class="text-sm text-gray-500 tracking-[0.4em] uppercase">Crextio</p>
-                    <p class="text-xl font-semibold text-gray-900">HR Platform</p>
+                    <strong style="font-size:1.15rem">Crextio</strong><br>
+                    <small style="color:#6d6d6d">People Platform</small>
                 </div>
             </div>
-            <div class="hidden md:flex items-center gap-1 nav-pill">
-                <button class="px-4 py-1.5 rounded-full text-xs font-semibold bg-gray-900 text-white shadow">Dashboard</button>
-                <button class="px-4 py-1.5 rounded-full text-xs text-gray-600">People</button>
-                <button class="px-4 py-1.5 rounded-full text-xs text-gray-600">Hiring</button>
-                <button class="px-4 py-1.5 rounded-full text-xs text-gray-600">Devices</button>
-                <button class="px-4 py-1.5 rounded-full text-xs text-gray-600">Apps</button>
-                <button class="px-4 py-1.5 rounded-full text-xs text-gray-600">Salary</button>
-                <button class="px-4 py-1.5 rounded-full text-xs text-gray-600">Calendar</button>
-                <button class="px-4 py-1.5 rounded-full text-xs text-gray-600">Reviews</button>
-                <button class="px-4 py-1.5 rounded-full text-xs text-gray-600 flex items-center gap-1">
-                    Setting
-                    <span class="w-4 h-4 rounded-full border border-gray-400 flex items-center justify-center text-[10px]">⚙</span>
-                </button>
+            <nav class="nav-tabs">
+                <button class="active">Dashboard</button>
+                <button>People</button>
+                <button>Hiring</button>
+                <button>Devices</button>
+                <button>Apps</button>
+                <button>Salary</button>
+                <button>Calendar</button>
+                <button>Reviews</button>
+                <button>Setting</button>
+            </nav>
+            <div class="nav-actions">
+                <button>?</button>
+                <button>🔔</button>
+                <button>OP</button>
             </div>
-            <div class="flex items-center gap-3 text-gray-600">
-                <button class="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center">?</button>
-                <button class="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center">🔔</button>
-                <button class="w-10 h-10 rounded-full bg-gray-900 text-white text-xs flex items-center justify-center">OP</button>
-            </div>
-        </div>
+        </header>
 
-        <!-- Welcome & metrics -->
-        <div class="flex flex-wrap items-center justify-between gap-6">
+        <section class="hero">
             <div>
-                <p class="text-xs uppercase tracking-[0.35em] text-gray-500">Dashboard</p>
-                <h1 class="text-[2.75rem] font-semibold text-gray-900">Welcome in, Nixtio</h1>
+                <p class="hero-label">Dashboard</p>
+                <h1>Welcome in, Nixtio</h1>
             </div>
-            <div class="flex flex-wrap items-center gap-6">
-                <div class="flex items-center gap-3 flex-wrap">
-                    <div class="funnel-pill bg-gray-900 text-white">15%</div>
-                    <div class="funnel-pill bg-amber-300 text-gray-900">15%</div>
-                    <div class="project-pill">
-                        <span>Project time</span>
-                        <div class="project-bar">
-                            <div class="project-bar-fill"></div>
-                        </div>
-                        <span>60%</span>
+            <div class="metric-row">
+                <div class="metric">
+                    <div class="metric-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.6"><path d="M17 20v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M20 8v6"/><path d="M22 11h-4"/></svg>
                     </div>
-                    <div class="funnel-pill bg-gray-200 text-gray-700">10%</div>
+                    <div>
+                        <p class="metric-number">78</p>
+                        <p class="metric-label">Employee</p>
+                    </div>
                 </div>
-                <div class="flex flex-wrap items-end gap-6">
-                    <div class="flex items-end gap-3">
-                        <div class="metric-icon">
-                            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M17 20v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2m6-10a4 4 0 100-8 4 4 0 000 8zm9-4h3m-1.5-1.5v3" />
-                            </svg>
-                        </div>
+                <div class="metric">
+                    <div class="metric-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.6"><path d="M16 14v-2a4 4 0 0 0-8 0v2"/><circle cx="12" cy="7" r="4"/><path d="M22 11h-4"/><path d="M20 9v4"/></svg>
+                    </div>
+                    <div>
+                        <p class="metric-number">56</p>
+                        <p class="metric-label">Hirings</p>
+                    </div>
+                </div>
+                <div class="metric">
+                    <div class="metric-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.6"><path d="M9 17l3 3L22 7"/><path d="M2 12h7l3-8 4 12h6"/></svg>
+                    </div>
+                    <div>
+                        <p class="metric-number">203</p>
+                        <p class="metric-label">Projects</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="status-row">
+            <div class="status-pill pill-dark">Interviews · 15%</div>
+            <div class="status-pill pill-gold">Hired · 15%</div>
+            <div class="striped-pill">
+                <span>Project time</span>
+                <span class="bar"></span>
+                <span>60%</span>
+            </div>
+            <div class="status-pill pill-light">Output · 10%</div>
+        </div>
+
+        <div class="main-grid">
+            <div style="display:flex; flex-direction:column; gap:22px;">
+                <div class="card profile-card">
+                    <div class="photo" style="background-image:url('https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=800');"></div>
+                    <div class="profile-meta">
                         <div>
-                            <p class="metric-number">78</p>
-                            <p class="metric-label">Employee</p>
+                            <h2 style="margin:0; font-size:1.5rem;">Lora Piterson</h2>
+                            <p style="margin:4px 0 0; color:#6d6d6d;">UX/UI Designer</p>
+                        </div>
+                        <div class="salary-pill">$1,200</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="detail-list">
+                        <div class="item"><span>Pension contributions</span><strong>Updated 2024</strong></div>
+                        <div class="item"><span>Devices</span><strong>MacBook Air · M1</strong></div>
+                        <div class="item"><span>Compensation Summary</span><strong>Annual Review</strong></div>
+                        <div class="item" style="border-bottom:none; padding-bottom:0;"><span>Employee Benefits</span><strong>Health · Dental · PTO</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:22px;">
+                <div class="card progress-card">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div>
+                            <p style="margin:0; color:#84827b;">Progress</p>
+                            <h3 style="margin:6px 0 0; font-size:2.6rem;">6.1 h</h3>
+                            <small style="color:#b1aea5;">Work Time this week</small>
+                        </div>
+                        <div style="text-align:right;">
+                            <span style="display:inline-block; padding:6px 16px; border-radius:999px; background:#11121a; color:#fff; font-size:0.7rem;">5h 25m</span>
                         </div>
                     </div>
-                    <div class="flex items-end gap-3">
-                        <div class="metric-icon">
-                            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M16 14v-2a4 4 0 00-3-3.87M8 14v-2a4 4 0 013-3.87M18 5a2 2 0 11-4 0 2 2 0 014 0zM8 5a2 2 0 11-4 0 2 2 0 014 0zM8 5v1a7 7 0 006 6.93" />
-                            </svg>
-                        </div>
+                    <div class="progress-bars">
+                        <div class="bar" style="height:70px;"><span>M</span></div>
+                        <div class="bar" style="height:90px;"><span>T</span></div>
+                        <div class="bar" style="height:110px;"><span>W</span></div>
+                        <div class="bar gold" style="height:130px;"><span>F</span></div>
+                        <div class="bar" style="height:95px;"><span>S</span></div>
+                        <div class="bar" style="height:60px;"><span>S</span></div>
+                    </div>
+                </div>
+                <div class="card time-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
                         <div>
-                            <p class="metric-number">56</p>
-                            <p class="metric-label">Hirings</p>
+                            <p style="margin:0; color:#84827b;">Time tracker</p>
+                            <small style="color:#b1aea5;">Work time</small>
+                        </div>
+                        <button style="border:none; background:#fff; width:34px; height:34px; border-radius:50%; box-shadow:0 5px 12px rgba(0,0,0,0.15);">↗</button>
+                    </div>
+                    <div class="dial">
+                        <svg viewBox="0 0 120 120">
+                            <circle cx="60" cy="60" r="50" stroke="#ede8df" stroke-width="10" fill="none" />
+                            <circle cx="60" cy="60" r="50" stroke="#f4c957" stroke-width="10" fill="none" stroke-dasharray="280" stroke-dashoffset="90" stroke-linecap="round" />
+                        </svg>
+                        <div class="center-text">
+                            <span style="font-size:2.4rem;">02.35</span>
+                            <small style="color:#8a867d;">Work Time</small>
                         </div>
                     </div>
-                    <div class="flex items-end gap-3">
-                        <div class="metric-icon">
-                            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M9 17l3 3L22 7M2 12h7l3-8 4 12h6" />
-                            </svg>
-                        </div>
+                    <div class="time-controls">
+                        <button class="play">▶</button>
+                        <button>⏸</button>
+                        <button>⏹</button>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:22px;">
+                <div class="card onboarding-card">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                         <div>
-                            <p class="metric-number">203</p>
-                            <p class="metric-label">Projects</p>
+                            <p style="margin:0; color:#84827b;">Onboarding</p>
+                            <h3 style="margin:4px 0 0; font-size:2.4rem;">18%</h3>
+                        </div>
+                        <div class="onboarding-stats">
+                            <div>30% <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#f3d16c;"></span></div>
+                            <div>25% <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#11121a;"></span></div>
+                            <div>0% <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#bcb7b0;"></span></div>
                         </div>
                     </div>
+                    <div class="toggle-row">
+                        <button class="primary">Task</button>
+                        <button class="dark">Team</button>
+                        <button class="gray">Other</button>
+                    </div>
+                </div>
+                <div class="task-card">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
+                        <strong>Onboarding Task</strong>
+                        <span style="color:#b8b7ba;">2 / 8</span>
+                    </div>
+                    <div class="task"><span class="dot"></span><div><div>Interview</div><small style="color:#b8b7ba;">Sep 13 · 08:30</small></div></div>
+                    <div class="task"><span class="dot done"></span><div><div>Team Meeting</div><small style="color:#b8b7ba;">Sep 13 · 10:30</small></div></div>
+                    <div class="task"><span class="dot"></span><div><div>Project Update</div><small style="color:#b8b7ba;">Sep 14 · 09:00</small></div></div>
+                    <div class="task"><span class="dot"></span><div><div>Discuss Q3 Goals</div><small style="color:#b8b7ba;">Sep 15 · 14:45</small></div></div>
+                    <div class="task"><span class="dot"></span><div><div>HR Policy Review</div><small style="color:#b8b7ba;">Sep 16 · 16:30</small></div></div>
                 </div>
             </div>
         </div>
 
-        <!-- Main grid -->
-        <div class="grid grid-cols-12 gap-6">
-            <!-- Left Column -->
-            <div class="col-span-5 space-y-5">
-                <div class="profile-card p-6 flex gap-5">
-                    <div class="rounded-[30px] overflow-hidden w-2/3 aspect-[4/3] bg-center bg-cover" style="background-image:url('https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=800');"></div>
-                    <div class="flex-1 flex flex-col justify-between">
-                        <div>
-                            <p class="text-lg font-semibold text-gray-900">Lora Piterson</p>
-                            <p class="text-sm text-gray-500">UX/UI Designer</p>
-                        </div>
-                        <div class="self-start rounded-full bg-white/80 px-4 py-1 text-gray-800 text-sm font-semibold shadow">$1,200</div>
-                    </div>
+        <div class="calendar-card">
+            <div class="calendar-header">
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <button style="border:none; background:#11121a; color:#fff; border-radius:999px; padding:6px 16px; font-size:0.75rem;">August</button>
+                    <strong>September 2024</strong>
+                    <button style="border:none; background:#e9e4d9; color:#5a5a5a; border-radius:999px; padding:6px 16px; font-size:0.75rem;">October</button>
                 </div>
-                <div class="lite-card p-6 space-y-4">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-500 text-sm">Pension contributions</p>
-                            <p class="font-semibold text-gray-800">Updated 2024</p>
-                        </div>
-                        <span class="text-xs text-gray-400">View</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-500 text-sm">Devices</p>
-                            <p class="font-semibold text-gray-800">MacBook Air · M1</p>
-                        </div>
-                        <span class="text-xs text-gray-400">Version M1</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-500 text-sm">Compensation Summary</p>
-                            <p class="font-semibold text-gray-800">Annual review</p>
-                        </div>
-                        <span class="text-xs text-gray-400">PDF</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-500 text-sm">Employee Benefits</p>
-                            <p class="font-semibold text-gray-800">Health, Dental, PTO</p>
-                        </div>
-                        <span class="text-xs text-gray-400">Details</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Center Column -->
-            <div class="col-span-4 space-y-5">
-                <div class="lite-card p-6">
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <p class="text-sm text-gray-500">Progress</p>
-                            <p class="text-3xl font-semibold text-gray-900">6.1 h</p>
-                            <p class="text-xs text-gray-400">Work time this week</p>
-                        </div>
-                        <div class="text-right text-xs text-gray-500">
-                            <p class="px-3 py-1 rounded-full bg-gray-900 text-white text-[10px]">5h 25m</p>
-                            <button class="mt-3 w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center">↗</button>
-                        </div>
-                    </div>
-                    <div class="mt-6 flex items-end justify-between h-28">
-                        <div class="flex flex-col items-center gap-1 text-[11px] text-gray-400">
-                            <div class="w-2 rounded-full bg-gray-300 h-10"></div>
-                            <span>M</span>
-                        </div>
-                        <div class="flex flex-col items-center gap-1 text-[11px] text-gray-400">
-                            <div class="w-2 rounded-full bg-gray-400 h-16"></div>
-                            <span>T</span>
-                        </div>
-                        <div class="flex flex-col items-center gap-1 text-[11px] text-gray-400">
-                            <div class="w-2 rounded-full bg-gray-500 h-20"></div>
-                            <span>W</span>
-                        </div>
-                        <div class="flex flex-col items-center gap-1 text-[11px] text-gray-900">
-                            <div class="w-3 rounded-[999px] bg-amber-300 h-24"></div>
-                            <span>F</span>
-                        </div>
-                        <div class="flex flex-col items-center gap-1 text-[11px] text-gray-400">
-                            <div class="w-2 rounded-full bg-gray-400 h-16"></div>
-                            <span>S</span>
-                        </div>
-                        <div class="flex flex-col items-center gap-1 text-[11px] text-gray-400">
-                            <div class="w-2 rounded-full bg-gray-300 h-8"></div>
-                            <span>S</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="lite-card p-6">
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <p class="text-sm text-gray-500">Time tracker</p>
-                            <p class="text-xs text-gray-400">Work time</p>
-                        </div>
-                        <button class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center">↗</button>
-                    </div>
-                    <div class="flex justify-center py-6">
-                        <div class="relative w-36 h-36">
-                            <svg class="absolute inset-0" viewBox="0 0 120 120">
-                                <circle cx="60" cy="60" r="50" stroke="#f1f1f1" stroke-width="10" fill="none" />
-                                <circle cx="60" cy="60" r="50" stroke="#f9c045" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="220" stroke-dashoffset="70" />
-                            </svg>
-                            <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-900">
-                                <p class="text-3xl font-semibold">02.35</p>
-                                <p class="text-xs text-gray-500">Work Time</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex justify-center gap-3 text-xs text-gray-600">
-                        <button class="w-9 h-9 rounded-full bg-gray-900 text-white flex items-center justify-center">▶</button>
-                        <button class="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center">⏸</button>
-                        <button class="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center">⏹</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Column -->
-            <div class="col-span-3 space-y-5">
-                <div class="lite-card p-5 space-y-4">
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <p class="text-xs text-gray-500">Onboarding</p>
-                            <p class="text-3xl font-semibold text-gray-900">18%</p>
-                        </div>
-                        <div class="text-[10px] text-gray-500 space-y-1">
-                            <div class="flex items-center gap-2">
-                                <span>30%</span><span class="inline-block w-3 h-3 rounded-full bg-amber-300"></span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span>25%</span><span class="inline-block w-3 h-3 rounded-full bg-gray-900"></span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span>0%</span><span class="inline-block w-3 h-3 rounded-full bg-gray-400"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2 text-xs">
-                        <button class="flex-1 py-1.5 rounded-full bg-amber-300 text-gray-900 font-semibold">Task</button>
-                        <button class="flex-1 py-1.5 rounded-full bg-gray-900 text-white">Team</button>
-                        <button class="flex-1 py-1.5 rounded-full bg-gray-400 text-white">Other</button>
-                    </div>
-                </div>
-
-                <div class="dark-task-card p-6 text-white">
-                    <div class="flex items-center justify-between text-sm mb-4">
-                        <p>Onboarding Task</p>
-                        <p class="text-gray-400">2/8</p>
-                    </div>
-                    <div class="space-y-3 text-sm">
-                        <div class="flex items-center gap-3">
-                            <span class="w-5 h-5 rounded-full border border-gray-500"></span>
-                            <div>
-                                <p>Interview</p>
-                                <p class="text-[11px] text-gray-400">Sep 13 · 08:30</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="w-5 h-5 rounded-full bg-amber-300 text-gray-900 text-xs flex items-center justify-center">✓</span>
-                            <div>
-                                <p>Team Meeting</p>
-                                <p class="text-[11px] text-gray-400">Sep 13 · 10:30</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="w-5 h-5 rounded-full border border-gray-500"></span>
-                            <div>
-                                <p>Project Update</p>
-                                <p class="text-[11px] text-gray-400">Sep 14 · 09:00</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="w-5 h-5 rounded-full border border-gray-500"></span>
-                            <div>
-                                <p>Discuss Q3 Goals</p>
-                                <p class="text-[11px] text-gray-400">Sep 15 · 14:45</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="w-5 h-5 rounded-full border border-gray-500"></span>
-                            <div>
-                                <p>HR Policy Review</p>
-                                <p class="text-[11px] text-gray-400">Sep 16 · 16:30</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Calendar Row -->
-        <div class="lite-card p-6">
-            <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
-                <div class="flex items-center gap-2">
-                    <button class="px-3 py-1 rounded-full bg-gray-900 text-white text-xs">August</button>
-                    <span class="text-gray-400">September 2024</span>
-                    <button class="px-3 py-1 rounded-full bg-gray-200 text-xs">October</button>
-                </div>
-                <div class="flex items-center gap-3 text-xs">
+                <div style="display:flex; gap:12px; font-size:0.8rem;">
                     <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
                 </div>
             </div>
-            <div class="calendar-grid grid grid-cols-7 gap-1 text-center text-sm text-gray-600 mb-6">
+            <div class="calendar-days">
                 <span>22</span>
                 <span>23</span>
-                <span class="bg-gray-900 text-white">24</span>
+                <span class="active">24</span>
                 <span>25</span>
                 <span>26</span>
                 <span>27</span>
                 <span>28</span>
             </div>
-            <div class="flex items-center justify-between text-xs text-gray-600">
+            <div class="schedule-row">
                 <div>
-                    <p class="text-gray-400 mb-1">8:00 am</p>
-                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-900 text-white">
-                        <span>Weekly Team Sync</span>
-                        <span class="w-6 h-6 rounded-full bg-amber-300 text-gray-900 flex items-center justify-center text-[10px]">+3</span>
-                    </div>
+                    <p>8:00 am</p>
+                    <div class="chip dark">Weekly Team Sync <span style="background:#f3d16c; color:#111; border-radius:50%; width:22px; height:22px; display:inline-flex; align-items:center; justify-content:center;">+3</span></div>
                 </div>
-                <div class="text-right">
-                    <p class="text-gray-400 mb-1">13:00 pm</p>
-                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-100 text-gray-900">
-                        <span>Onboarding Session</span>
-                        <span class="w-6 h-6 rounded-full bg-gray-900 text-amber-200 flex items-center justify-center text-[10px]">+2</span>
-                    </div>
+                <div style="text-align:right;">
+                    <p>13:00 pm</p>
+                    <div class="chip gold">Onboarding Session <span style="background:#111; color:#f3d16c; border-radius:50%; width:22px; height:22px; display:inline-flex; align-items:center; justify-content:center;">+2</span></div>
                 </div>
             </div>
         </div>
