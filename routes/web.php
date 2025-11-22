@@ -156,6 +156,11 @@ Route::middleware('auth')->group(function () {
         // Recruitment
         Route::get('recruitment', [App\Http\Controllers\HR\RecruitmentController::class, 'index'])->name('recruitment.index');
         
+        // Dashboard New Demo
+        Route::get('dashboard-new-demo', function () {
+            return view('hr.dashboard-new');
+        })->name('dashboard-new.demo');
+        
         // Shifts (under HR namespace)
         Route::get('shifts/datatable', [App\Http\Controllers\HR\ShiftController::class, 'datatable'])->name('shifts.datatable');
         Route::get('shifts/preview-code', [App\Http\Controllers\HR\ShiftController::class, 'previewCode'])->name('shifts.preview-code');
