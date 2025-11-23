@@ -14,51 +14,67 @@
 
 @section('subcontent')
     @include('components.global-notifications')
-    <div class="intro-y mt-8 flex items-center">
-        <h2 class="mr-auto text-lg font-medium">Employees Management</h2>
-        <div class="flex items-center gap-2">
-            <button
-                type="button"
-                class="btn-tonal btn-tonal--info hidden sm:flex"
-                data-tw-toggle="modal"
-                data-tw-target="#employees-filters-slideover"
-                title="Open advanced filters"
-                aria-label="Open advanced filters"
-            >
-                <x-base.lucide icon="Filter" class="w-4 h-4 mr-2" />
-                Filters
-                <span id="active-filters-indicator" class="hidden ml-2 px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full">Active</span>
-            </button>
 
-            <!-- Mobile filters icon -->
-            <x-base.tippy
-                as="button"
-                type="button"
-                content="Open filters"
-                class="flex items-center justify-center rounded-full border border-slate-200 px-3 py-2 text-slate-600 hover:bg-slate-50 sm:hidden"
-                data-tw-toggle="modal"
-                data-tw-target="#employees-filters-slideover"
-            >
-                <x-base.lucide icon="Filter" class="w-4 h-4" />
-            </x-base.tippy>
+    {{-- Heading + top stats strip on the same row (Employees template matches Positions) --}}
+    <div class="intro-y mt-6 mb-2 flex flex-col gap-1 text-[#3a2a1a]">
+        <div class="flex items-baseline justify-between gap-6">
+            <h2 class="flex items-center gap-2 text-2xl md:text-3xl font-semibold text-royalDark tracking-wide">
+                <x-base.lucide icon="users" class="w-7 h-7" />
+                <span>Employees Management</span>
+            </h2>
 
-            <button
-                type="button"
-                class="btn-tonal btn-tonal--success"
-                data-tw-toggle="modal"
-                data-tw-target="#create-employee-modal"
-                title="Add a new employee"
-                aria-label="Add a new employee"
-            >
-                <x-base.lucide icon="user-plus" class="w-4 h-4 mr-2" />
-                Add Employee
-            </button>
+            <div class="flex flex-row items-end gap-8 md:gap-12 justify-end">
+                {{-- Inactive employees --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="pause-circle" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $employeesInactive ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Inactive
+                    </div>
+                </div>
+
+                {{-- Active employees --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="check-circle-2" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $employeesActive ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Active
+                    </div>
+                </div>
+
+                {{-- Total employees --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="users" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $employeesTotal ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Employees
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="mt-5 grid grid-cols-12 gap-6">
         <div class="intro-y col-span-12">
-            <x-base.preview-component class="intro-y box">
+            <x-base.preview-component class="intro-y box bg-white/80 border border-slate-200/70 shadow-[0_18px_45px_rgba(15,23,42,0.10)]">
                 <div class="p-5">
                     <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
                         <form id="employees-filter-form" class="w-full sm:mr-auto xl:flex">
@@ -102,11 +118,11 @@
                                 </x-base.form-select>
                             </div>
                             <div class="mt-2 flex flex-wrap gap-2 xl:mt-0">
-                                <x-base.tippy as="button" id="employees-filter-go" type="button" content="Run filters" class="btn-tonal btn-tonal--info">
+                                <x-base.tippy as="button" id="employees-filter-go" type="button" content="Run filters" class="btn-royal btn-royal--dark btn-royal--sm">
                                     <x-base.lucide icon="Search" class="w-4 h-4" />
                                     Go
                                 </x-base.tippy>
-                                <x-base.tippy as="button" id="employees-filter-reset" type="button" content="Reset filters" class="btn-tonal btn-tonal--warning">
+                                <x-base.tippy as="button" id="employees-filter-reset" type="button" content="Reset filters" class="btn-royal btn-royal--outline btn-royal--sm">
                                     <x-base.lucide icon="RotateCcw" class="w-4 h-4" />
                                     Reset
                                 </x-base.tippy>
@@ -114,22 +130,47 @@
                         </form>
 
                         <div class="mt-5 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
-                            <button type="button" class="btn-tonal btn-tonal--purple btn-tonal--icon group" title="Print">
-                                <x-base.lucide icon="printer" class="w-5 h-5 icon-hover-rise" />
-                            </button>
-                            <button id="employees-export-pdf" type="button" class="btn-tonal btn-tonal--rose btn-tonal--icon group" title="Export PDF">
-                                <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
-                            </button>
-                            <button id="employees-export" type="button" class="btn-tonal btn-tonal--lime btn-tonal--icon group" title="Export to Excel">
-                                <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
-                            </button>
-                            <button id="employees-import" type="button" class="btn-tonal btn-tonal--amber btn-tonal--icon group" title="Import employees">
-                                <x-base.lucide icon="upload-cloud" class="w-5 h-5 icon-hover-rise" />
-                            </button>
+                            <x-base.tippy content="Print" placement="bottom">
+                                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark" title="Print">
+                                    <x-base.lucide icon="printer" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+                            <x-base.tippy content="Export PDF" placement="bottom">
+                                <button id="employees-export-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark" title="Export PDF">
+                                    <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+                            <x-base.tippy content="Export to Excel" placement="bottom">
+                                <button id="employees-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark" title="Export to Excel">
+                                    <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+                            <x-base.tippy content="Import employees" placement="bottom">
+                                <button id="employees-import" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark" title="Import employees">
+                                    <x-base.lucide icon="upload-cloud" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
                             <input type="file" id="employees-import-input" accept=".csv,text/csv" class="hidden" />
-                            <button id="employees-refresh" type="button" class="btn-tonal btn-tonal--sky btn-tonal--icon group" title="Refresh">
-                                <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
-                            </button>
+                            <x-base.tippy content="Refresh" placement="bottom">
+                                <button id="employees-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark" title="Refresh">
+                                    <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+
+                            {{-- Add Employee button at the right end of the toolbar --}}
+                            <x-base.tippy content="Add new employee" placement="bottom">
+                                <button
+                                    type="button"
+                                    class="btn-royal btn-royal--gold btn-royal--sm sm:btn-royal--lg group"
+                                    data-tw-toggle="modal"
+                                    data-tw-target="#create-employee-modal"
+                                    title="Add a new employee"
+                                    aria-label="Add a new employee"
+                                >
+                                    <x-base.lucide icon="user-plus" class="w-4 h-4 mr-2 icon-hover-rise" />
+                                    <span class="hidden sm:inline">Add</span>
+                                </button>
+                            </x-base.tippy>
                         </div>
                     </div>
 

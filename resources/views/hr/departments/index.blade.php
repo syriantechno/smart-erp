@@ -14,72 +14,59 @@
 
 @section('subcontent')
     @include('components.global-notifications')
-    <div class="intro-y mt-8 flex items-center">
-        <h2 class="mr-auto text-lg font-medium">Departments Management</h2>
-        <button
-            type="button"
-            class="btn-tonal btn-tonal--info w-40 sm:w-auto sm:ml-4 group"
-            data-tw-toggle="modal"
-            data-tw-target="#create-department-modal"
-        >
-            <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
-            Add Department
-        </button>
-    </div>
 
-    <div class="intro-y mt-6">
-        <div class="box border-primary/10 bg-primary/5 p-5">
-            <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                <div>
-                    <h3 class="text-base font-semibold text-slate-800 dark:text-slate-100">معاينة النمط الموحد للأزرار</h3>
-                    <p class="text-sm text-slate-500">الأزرار التالية توضح درجات الألوان المتاحة؛ نعدّل الألوان أو الظلال حسب رغبتك قبل التعميم.</p>
+    {{-- Heading + top stats strip on the same row (Departments template matches Positions) --}}
+    <div class="intro-y mt-6 mb-2 flex flex-col gap-1 text-[#3a2a1a]">
+        <div class="flex items-baseline justify-between gap-6">
+            <h2 class="flex items-center gap-2 text-2xl md:text-3xl font-semibold text-royalDark tracking-wide">
+                <x-base.lucide icon="building" class="w-7 h-7" />
+                <span>Departments Management</span>
+            </h2>
+
+            <div class="flex flex-row items-end gap-8 md:gap-12 justify-end">
+                {{-- Inactive departments --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="pause-circle" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $departmentsInactive ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Inactive
+                    </div>
                 </div>
-                <div class="flex flex-wrap gap-2">
-                    <button type="button" class="btn-tonal btn-tonal--info group">
-                        <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
-                        زر 1
-                    </button>
-                    <button type="button" class="btn-tonal btn-tonal--success group">
-                        <x-base.lucide icon="save" class="w-5 h-5 icon-hover-rise" />
-                        زر 2
-                    </button>
-                    <button type="button" class="btn-tonal btn-tonal--warning">زر 3</button>
-                    <button type="button" class="btn-tonal btn-tonal--danger group">
-                        <x-base.lucide icon="trash-2" class="w-5 h-5 icon-hover-rise" />
-                        زر 4
-                    </button>
-                    <button type="button" class="btn-tonal btn-tonal--neutral group">
-                        <x-base.lucide icon="x-circle" class="w-5 h-5 icon-hover-rise" />
-                        زر 5
-                    </button>
+
+                {{-- Active departments --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="check-circle-2" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $departmentsActive ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Active
+                    </div>
                 </div>
-                <div class="mt-3 flex flex-wrap gap-2">
-                    <button type="button" class="btn-tonal btn-tonal--teal group">
-                        <x-base.lucide icon="check-circle" class="w-5 h-5 icon-hover-rise" />
-                        زر 6
-                    </button>
-                    <button type="button" class="btn-tonal btn-tonal--purple group">
-                        <x-base.lucide icon="printer" class="w-5 h-5 icon-hover-rise" />
-                        زر 7
-                    </button>
-                    <button type="button" class="btn-tonal btn-tonal--rose group">
-                        <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
-                        زر 8
-                    </button>
-                </div>
-                <div class="mt-3 flex flex-wrap gap-2">
-                    <button type="button" class="btn-tonal btn-tonal--sky group">
-                        <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
-                        زر 9
-                    </button>
-                    <button type="button" class="btn-tonal btn-tonal--amber group">
-                        <x-base.lucide icon="sun" class="w-5 h-5 icon-hover-rise" />
-                        زر 10
-                    </button>
-                    <button type="button" class="btn-tonal btn-tonal--lime group">
-                        <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
-                        زر 11
-                    </button>
+
+                {{-- Total departments --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="building" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $departmentsTotal ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Departments
+                    </div>
                 </div>
             </div>
         </div>
@@ -87,7 +74,7 @@
 
     <div class="mt-5 grid grid-cols-12 gap-6">
         <div class="intro-y col-span-12">
-            <x-base.preview-component class="intro-y box">
+            <x-base.preview-component class="intro-y box bg-white/80 border border-slate-200/70 shadow-[0_18px_45px_rgba(15,23,42,0.10)]">
                 <div class="p-5">
                     @if (session('success'))
                         <x-base.alert class="mb-4" variant="success">
@@ -149,30 +136,55 @@
                                 </x-base.form-select>
                             </div>
                             <div class="mt-4 flex flex-wrap gap-2 sm:items-center xl:mt-0">
-                                <button id="departments-filter-go" type="button" class="btn-tonal btn-tonal--info w-full sm:w-24 group">
-                                    <x-base.lucide icon="search" class="w-4 h-4 icon-hover-rise" />
-                                    Go
-                                </button>
-                                <button id="departments-filter-reset" type="button" class="btn-tonal btn-tonal--amber w-full sm:w-24 group">
-                                    <x-base.lucide icon="rotate-ccw" class="w-4 h-4 icon-hover-rise" />
-                                    Reset
-                                </button>
+                                <x-base.tippy content="Apply filters" placement="top">
+                                    <button id="departments-filter-go" type="button" class="btn-royal btn-royal--dark btn-royal--sm w-full sm:w-24 group">
+                                        <x-base.lucide icon="search" class="w-4 h-4 icon-hover-rise" />
+                                        Go
+                                    </button>
+                                </x-base.tippy>
+                                <x-base.tippy content="Reset filters" placement="top">
+                                    <button id="departments-filter-reset" type="button" class="btn-royal btn-royal--outline btn-royal--sm w-full sm:w-24 group">
+                                        <x-base.lucide icon="rotate-ccw" class="w-4 h-4 icon-hover-rise" />
+                                        Reset
+                                    </button>
+                                </x-base.tippy>
                             </div>
                         </form>
 
                         <div class="mt-5 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
-                            <button type="button" class="btn-tonal btn-tonal--purple btn-tonal--icon group" title="Print">
-                                <x-base.lucide icon="printer" class="w-5 h-5 icon-hover-rise" />
-                            </button>
-                            <button type="button" class="btn-tonal btn-tonal--rose btn-tonal--icon group" title="Export PDF">
-                                <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
-                            </button>
-                            <button id="departments-export" type="button" class="btn-tonal btn-tonal--lime btn-tonal--icon group" title="Export to Excel">
-                                <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
-                            </button>
-                            <button id="departments-refresh" type="button" class="btn-tonal btn-tonal--sky btn-tonal--icon group" title="Refresh">
-                                <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
-                            </button>
+                            <x-base.tippy content="Print" placement="bottom">
+                                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                    <x-base.lucide icon="printer" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+                            <x-base.tippy content="Export PDF" placement="bottom">
+                                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                    <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+                            <x-base.tippy content="Export to Excel" placement="bottom">
+                                <button id="departments-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                    <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+                            <x-base.tippy content="Refresh" placement="bottom">
+                                <button id="departments-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                    <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+
+                            {{-- Add Department button at the right end of the toolbar --}}
+                            <x-base.tippy content="Add new department" placement="bottom">
+                                <button
+                                    type="button"
+                                    class="btn-royal btn-royal--gold btn-royal--sm sm:btn-royal--lg group"
+                                    data-tw-toggle="modal"
+                                    data-tw-target="#create-department-modal"
+                                >
+                                    <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
+                                    <span class="hidden sm:inline">Add</span>
+                                </button>
+                            </x-base.tippy>
                         </div>
                     </div>
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\HR\Employee;
 use App\Models\HR\Department;
 use App\Models\Setting\Company;
+use App\Models\User;
 use App\Services\DocumentCodeGenerator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -19,6 +20,7 @@ use App\Exports\EmployeesExport;
 use Yajra\DataTables\Facades\DataTables;
 use App\Helpers\Reply;
 use App\Services\PdfExporter;
+use Illuminate\Validation\ValidationException;
 
 class EmployeeController extends Controller
 {
@@ -31,12 +33,26 @@ class EmployeeController extends Controller
     
     public function index()
     {
+        $this->ensureEmployeeRecordForUser(auth()->user());
+
         $companies = Company::where('is_active', true)->select('id', 'name')->get();
         $departments = Department::where('is_active', true)->select('id', 'name')->get();
         $generatedCode = $this->codeGenerator->preview('employees');
         $countriesJson = json_encode($this->getCountriesData(), JSON_UNESCAPED_UNICODE);
-        
-        return view('hr.employees.index', compact('companies', 'departments', 'generatedCode', 'countriesJson'));
+
+        $employeesTotal = Employee::count();
+        $employeesActive = Employee::where('is_active', true)->count();
+        $employeesInactive = Employee::where('is_active', false)->count();
+
+        return view('hr.employees.index', compact(
+            'companies',
+            'departments',
+            'generatedCode',
+            'countriesJson',
+            'employeesTotal',
+            'employeesActive',
+            'employeesInactive'
+        ));
     }
     
     public function previewCode()
@@ -215,7 +231,7 @@ class EmployeeController extends Controller
             'company_id' => 'required|exists:companies,id',
             'is_active' => 'nullable|boolean',
             'has_system_access' => 'nullable|boolean',
-            'system_password' => 'required_if:has_system_access,1|string|min:6|nullable',
+            'system_password' => 'nullable|string|min:6',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120', // 5MB max
         ]);
 
@@ -228,6 +244,8 @@ class EmployeeController extends Controller
             $validated['is_company_housing'] = $request->boolean('is_company_housing');
             $validated['has_system_access'] = $request->boolean('has_system_access');
 
+            $plainSystemPassword = $validated['system_password'] ?? null;
+
             if (!$validated['is_company_housing']) {
                 $validated['housing_room_number'] = null;
                 $validated['housing_unit_number'] = null;
@@ -235,8 +253,15 @@ class EmployeeController extends Controller
 
             if (!$validated['has_system_access']) {
                 $validated['system_password'] = null;
-            } elseif (!empty($validated['system_password'])) {
-                $validated['system_password'] = Hash::make($validated['system_password']);
+            }
+
+            if ($validated['has_system_access']) {
+                $user = $this->provisionUserAccount($validated, null, $plainSystemPassword);
+                $validated['user_id'] = $user->id;
+
+                $validated['system_password'] = $plainSystemPassword
+                    ? Hash::make($plainSystemPassword)
+                    : null;
             }
 
             // Handle profile picture upload
@@ -272,6 +297,8 @@ class EmployeeController extends Controller
 
     public function show(Employee $employee)
     {
+        $employee->loadMissing('user');
+
         return view('hr.employees.show', compact('employee'));
     }
 
@@ -324,6 +351,8 @@ class EmployeeController extends Controller
             $validated['is_company_housing'] = $request->boolean('is_company_housing');
             $validated['has_system_access'] = $request->boolean('has_system_access');
 
+            $plainSystemPassword = $validated['system_password'] ?? null;
+
             if (!$validated['is_company_housing']) {
                 $validated['housing_room_number'] = null;
                 $validated['housing_unit_number'] = null;
@@ -331,6 +360,19 @@ class EmployeeController extends Controller
 
             if (!$validated['has_system_access']) {
                 $validated['system_password'] = null;
+            }
+
+            if ($validated['has_system_access']) {
+                $user = $this->provisionUserAccount($validated, $employee, $plainSystemPassword);
+                $validated['user_id'] = $user->id;
+
+                if ($plainSystemPassword) {
+                    $validated['system_password'] = Hash::make($plainSystemPassword);
+                } else {
+                    unset($validated['system_password']);
+                }
+            } else {
+                unset($validated['system_password']);
             }
 
             // Map photo input to profile_picture column
@@ -581,5 +623,107 @@ class EmployeeController extends Controller
             ['name' => 'Bahrain', 'flag' => '🇧🇭'],
             ['name' => 'Kuwait', 'flag' => '🇰🇼'],
         ];
+    }
+
+    protected function ensureEmployeeRecordForUser(?User $user): void
+    {
+        if (!$user) {
+            return;
+        }
+
+        $alreadyLinked = Employee::where('user_id', $user->id)->exists();
+        if ($alreadyLinked) {
+            return;
+        }
+
+        $company = Company::where('is_active', true)->first() ?? Company::first();
+        if (!$company) {
+            return;
+        }
+
+        $nameParts = preg_split('/\s+/', trim($user->name));
+        $firstName = $nameParts[0] ?? $user->name;
+        $lastName = $nameParts[1] ?? $firstName;
+        $middleName = $nameParts[2] ?? null;
+
+        Employee::create([
+            'code' => $this->codeGenerator->generate('employees'),
+            'employee_id' => 'EMP' . strtoupper(Str::random(8)),
+            'first_name' => $firstName,
+            'middle_name' => $middleName,
+            'last_name' => $lastName,
+            'email' => $user->email,
+            'phone' => null,
+            'translated_name' => null,
+            'position' => 'System Administrator',
+            'iqama_position' => null,
+            'salary' => 0,
+            'hire_date' => now()->toDateString(),
+            'birth_date' => null,
+            'gender' => null,
+            'address' => null,
+            'is_company_housing' => false,
+            'housing_room_number' => null,
+            'housing_unit_number' => null,
+            'city' => null,
+            'country' => null,
+            'postal_code' => null,
+            'department_id' => null,
+            'company_id' => $company->id,
+            'user_id' => $user->id,
+            'has_system_access' => true,
+            'system_password' => null,
+            'is_active' => true,
+            'profile_picture' => null,
+        ]);
+    }
+
+    protected function provisionUserAccount(array $employeeData, ?Employee $employee, ?string $plainPassword = null): User
+    {
+        $this->ensureEmployeeRecordForUser(auth()->user());
+
+        $fullName = trim(implode(' ', array_filter([
+            $employeeData['first_name'] ?? null,
+            $employeeData['middle_name'] ?? null,
+            $employeeData['last_name'] ?? null,
+        ])));
+
+        $currentUser = $employee?->user;
+        $userByEmail = User::where('email', $employeeData['email'])->first();
+
+        if ($userByEmail && (!$currentUser || $userByEmail->id !== $currentUser->id)) {
+            $linkedToAnotherEmployee = Employee::where('user_id', $userByEmail->id)
+                ->when($employee, fn ($query) => $query->where('id', '!=', $employee->id))
+                ->exists();
+
+            if ($linkedToAnotherEmployee) {
+                throw ValidationException::withMessages([
+                    'email' => __('This email is already linked to another employee profile.'),
+                ]);
+            }
+
+            $currentUser = $userByEmail;
+        }
+
+        if (!$currentUser) {
+            if (!$plainPassword) {
+                throw ValidationException::withMessages([
+                    'system_password' => __('Please provide a password to create a system user for this employee.'),
+                ]);
+            }
+
+            $currentUser = new User();
+        }
+
+        $currentUser->email = $employeeData['email'];
+        $currentUser->name = $fullName ?: ($currentUser->name ?? $employeeData['email']);
+
+        if ($plainPassword) {
+            $currentUser->password = Hash::make($plainPassword);
+        }
+
+        $currentUser->save();
+
+        return $currentUser;
     }
 }

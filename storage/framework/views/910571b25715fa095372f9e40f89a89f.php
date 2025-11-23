@@ -32,7 +32,7 @@ unset($__defined_vars); ?>
 <div class="relative" id="notification-dropdown">
     
     <button
-        class="relative notification-bell text-slate-500 hover:text-slate-600 focus:outline-none"
+        class="relative notification-bell inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/60 bg-white text-slate-800 shadow-[0_14px_30px_rgba(15,15,20,0.12)] transition hover:-translate-y-0.5 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-200"
         data-tw-toggle="modal"
         data-tw-target="#notifications-slideover"
         :class="{ 'text-blue-600': unreadCount > 0 }"

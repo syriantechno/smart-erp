@@ -42,4 +42,17 @@ class Category extends Model
     {
         return $this->hasMany(Material::class);
     }
+
+    public function getLevel(): int
+    {
+        $level = 0;
+        $parent = $this->parent;
+
+        while ($parent) {
+            $level++;
+            $parent = $parent->parent;
+        }
+
+        return $level;
+    }
 }

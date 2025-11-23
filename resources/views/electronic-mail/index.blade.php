@@ -6,7 +6,78 @@
 
 @section('subcontent')
     @include('components.global-notifications')
-    <div class="mt-8 grid grid-cols-12 gap-6">
+
+    {{-- Heading + top stats strip on the same row (Departments template matches Positions) --}}
+    <div class="intro-y mt-6 mb-2 flex flex-col gap-1 text-[#3a2a1a]">
+        <div class="flex items-baseline justify-between gap-6">
+            <h2 class="flex items-center gap-2 text-2xl md:text-3xl font-semibold text-royalDark tracking-wide">
+                <x-base.lucide icon="mail" class="w-7 h-7" />
+                <span>Electronic Mail</span>
+            </h2>
+
+            <div class="flex flex-row items-end gap-8 md:gap-12 justify-end">
+                {{-- Important --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="star" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $starredEmails ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Starred
+                    </div>
+                </div>
+
+                {{-- Unread --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="mail-open" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $unreadEmails ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Unread
+                    </div>
+                </div>
+
+                {{-- Read --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="mail-check" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $readEmails ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Read
+                    </div>
+                </div>
+
+                {{-- Total --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="mail" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $totalEmails ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Total
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
         <div class="col-span-12 lg:col-span-3 2xl:col-span-2">
             <h2 class="intro-y mr-auto mt-2 text-lg font-medium">Electronic Mail</h2>
             <div class="intro-y mt-6">
@@ -161,12 +232,29 @@
                     </x-base.menu>
                 </div>
                 <div class="flex w-full sm:w-auto">
+                    <!-- Action Buttons -->
+                    <x-base.tippy content="Export PDF" placement="bottom">
+                        <button id="email-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark mr-2">
+                            <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
+                        </button>
+                    </x-base.tippy>
+                    <x-base.tippy content="Export" placement="bottom">
+                        <button id="email-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark mr-2">
+                            <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
+                        </button>
+                    </x-base.tippy>
+                    <x-base.tippy content="Refresh" placement="bottom">
+                        <button id="email-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark mr-2">
+                            <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
+                        </button>
+                    </x-base.tippy>
+
                     <button
                         type="button"
-                        class="btn-tonal btn-tonal--success mr-2 min-h-[40px] px-4 shadow-md group"
+                        class="btn-royal btn-royal--gold btn-royal--sm sm:btn-royal--lg group mr-2"
                         onclick="openComposeModal(); return false;"
                     >
-                        <x-base.lucide icon="Edit" class="w-4 h-4 mr-2 icon-hover-rise" />
+                        <x-base.lucide icon="edit" class="w-4 h-4 mr-2 icon-hover-rise" />
                         Compose
                     </button>
                     <x-base.menu>
@@ -1313,6 +1401,46 @@
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
+
+        // Add event listeners for new buttons
+        document.addEventListener('DOMContentLoaded', function () {
+            // PDF export
+            const pdfBtn = document.getElementById('email-pdf');
+            if (pdfBtn) {
+                pdfBtn.addEventListener('click', function () {
+                    showToast('PDF export functionality not implemented yet', 'info');
+                });
+            }
+
+            // Export functionality
+            const exportBtn = document.getElementById('email-export');
+            if (exportBtn) {
+                exportBtn.addEventListener('click', function () {
+                    // Simple export message for now
+                    if (typeof showToast === 'function') {
+                        showToast('Export functionality available in mail settings', 'info');
+                    }
+                });
+            }
+
+            // Refresh functionality
+            const refreshBtn = document.getElementById('email-refresh');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', function () {
+                    if (typeof syncInbox === 'function') {
+                        syncInbox();
+                        if (typeof showToast === 'function') {
+                            showToast('Inbox refreshed', 'success');
+                        }
+                    } else {
+                        window.location.reload();
+                        if (typeof showToast === 'function') {
+                            showToast('Page refreshed', 'success');
+                        }
+                    }
+                });
+            }
+        });
 
     </script>
 @endpush

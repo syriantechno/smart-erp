@@ -7,8 +7,76 @@
 @section('subcontent')
     @include('components.global-notifications')
 
-    <div class="intro-y mt-8 flex items-center">
-        <h2 class="mr-auto text-lg font-medium">Invoices</h2>
+    {{-- Heading + top stats strip on the same row (Departments template matches Positions) --}}
+    <div class="intro-y mt-6 mb-2 flex flex-col gap-1 text-[#3a2a1a]">
+        <div class="flex items-baseline justify-between gap-6">
+            <h2 class="flex items-center gap-2 text-2xl md:text-3xl font-semibold text-royalDark tracking-wide">
+                <x-base.lucide icon="receipt" class="w-7 h-7" />
+                <span>Invoices</span>
+            </h2>
+
+            <div class="flex flex-row items-end gap-8 md:gap-12 justify-end">
+                {{-- Overdue --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="alert-triangle" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $overdueInvoices ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Overdue
+                    </div>
+                </div>
+
+                {{-- Pending --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="clock" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $pendingInvoices ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Pending
+                    </div>
+                </div>
+
+                {{-- Paid --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="check-circle-2" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $paidInvoices ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Paid
+                    </div>
+                </div>
+
+                {{-- Total --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="receipt" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $totalInvoices ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Total
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="mt-5 grid grid-cols-12 gap-6">
@@ -123,36 +191,56 @@
 
         <!-- Invoices List -->
         <div class="intro-y col-span-12 lg:col-span-7">
-            <x-base.preview-component class="intro-y box">
+            <x-base.preview-component class="intro-y box bg-white/80 border border-slate-200/70 shadow-[0_18px_45px_rgba(15,23,42,0.10)]">
                 <div class="p-5">
-                    <h3 class="mb-4 text-base font-semibold">Recent Invoices</h3>
+                    <div class="flex flex-col sm:flex-row sm:items-end xl:items-start mb-4">
+                        <div class="flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
+                            <x-base.tippy content="Export PDF" placement="bottom">
+                                <button id="invoices-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                    <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+                            <x-base.tippy content="Export" placement="bottom">
+                                <button id="invoices-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                    <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+                            <x-base.tippy content="Refresh" placement="bottom">
+                                <button id="invoices-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                    <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+                        </div>
+                    </div>
 
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm">
-                            <thead>
-                                <tr class="border-b border-slate-200 text-xs font-semibold uppercase text-slate-500">
-                                    <th class="py-2 pr-4">Number</th>
-                                    <th class="py-2 pr-4">Company</th>
-                                    <th class="py-2 pr-4">Type</th>
-                                    <th class="py-2 pr-4">Date</th>
-                                    <th class="py-2 pr-4">Total</th>
-                                    <th class="py-2 pr-4">Status</th>
+                            <thead class="bg-gradient-to-r from-royalDark to-gray-800 text-white">
+                                <tr>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">#</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Number</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Company</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Type</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Date</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Total</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Status</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($invoices as $invoice)
-                                    <tr class="border-b border-slate-100 text-xs text-slate-700 dark:text-slate-300">
-                                        <td class="py-2 pr-4">
+                                    <tr class="border-b border-slate-100 text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-darkmode-600">
+                                        <td class="px-5 py-3">{{ $loop->iteration }}</td>
+                                        <td class="px-5 py-3">
                                             <div class="font-semibold">{{ $invoice->number }}</div>
                                             @if($invoice->reference)
                                                 <div class="text-[11px] text-slate-500">Ref: {{ $invoice->reference }}</div>
                                             @endif
                                         </td>
-                                        <td class="py-2 pr-4">{{ $invoice->company->name ?? '-' }}</td>
-                                        <td class="py-2 pr-4">{{ $invoice->type_label }}</td>
-                                        <td class="py-2 pr-4">{{ $invoice->invoice_date?->format('Y-m-d') }}</td>
-                                        <td class="py-2 pr-4">{{ number_format($invoice->total, 2) }}</td>
-                                        <td class="py-2 pr-4">
+                                        <td class="px-5 py-3">{{ $invoice->company->name ?? '-' }}</td>
+                                        <td class="px-5 py-3">{{ $invoice->type_label }}</td>
+                                        <td class="px-5 py-3">{{ $invoice->invoice_date?->format('Y-m-d') }}</td>
+                                        <td class="px-5 py-3">{{ number_format($invoice->total, 2) }}</td>
+                                        <td class="px-5 py-3 text-center">
                                             <span class="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-700 capitalize">
                                                 {{ $invoice->status }}
                                             </span>
@@ -160,7 +248,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="py-4 text-center text-xs text-slate-500">
+                                        <td colspan="7" class="px-5 py-8 text-center text-xs text-slate-500">
                                             No invoices found.
                                         </td>
                                     </tr>
@@ -173,3 +261,63 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // PDF export
+            const pdfBtn = document.getElementById('invoices-pdf');
+            if (pdfBtn) {
+                pdfBtn.addEventListener('click', function () {
+                    showToast('PDF export functionality not implemented yet', 'info');
+                });
+            }
+
+            // Export functionality
+            const exportBtn = document.getElementById('invoices-export');
+            if (exportBtn) {
+                exportBtn.addEventListener('click', function () {
+                    // Simple CSV export for now
+                    const rows = [];
+                    const headers = ['Number', 'Company', 'Type', 'Date', 'Total', 'Status'];
+                    rows.push(headers.join(','));
+
+                    @foreach($invoices as $invoice)
+                        const row = [
+                            '"{{ $invoice->number }}"',
+                            '"{{ $invoice->company->name ?? '-' }}"',
+                            '"{{ $invoice->type_label }}"',
+                            '"{{ $invoice->invoice_date?->format('Y-m-d') }}"',
+                            '{{ $invoice->total }}',
+                            '"{{ $invoice->status }}"'
+                        ];
+                        rows.push(row.join(','));
+                    @endforeach
+
+                    const csvContent = '\ufeff' + rows.join('\n');
+                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = 'invoices_' + new Date().toISOString().split('T')[0] + '.csv';
+                    link.click();
+                    URL.revokeObjectURL(link);
+
+                    if (typeof showToast === 'function') {
+                        showToast('Invoices exported successfully', 'success');
+                    }
+                });
+            }
+
+            // Refresh functionality
+            const refreshBtn = document.getElementById('invoices-refresh');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', function () {
+                    window.location.reload();
+                    if (typeof showToast === 'function') {
+                        showToast('Page refreshed', 'success');
+                    }
+                });
+            }
+        });
+    </script>
+@endpush

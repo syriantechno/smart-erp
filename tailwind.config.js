@@ -14,6 +14,9 @@ module.exports = {
     theme: {
         extend: {
             colors: {
+                // Global Royal brand colors
+                royalDark: "#303030",
+                royalYellow: "#d49a24",
                 theme: {
                     1: "rgb(var(--color-theme-1) / <alpha-value>)",
                     2: "rgb(var(--color-theme-2) / <alpha-value>)",

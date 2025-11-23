@@ -60,7 +60,7 @@
 @endphp
 
 <nav aria-label="breadcrumb" class="flex">
-    <ol class="flex items-center text-white">
+    <ol class="flex items-center text-slate-900">
         <li class="flex items-center">
             <a href="{{ url('/') }}" class="hover:text-primary">
                 {{ setting('app_name', config('app.name', 'Smart ERP')) }}
@@ -70,14 +70,14 @@
         @foreach($breadcrumbs as $index => $crumb)
             @if($index < count($breadcrumbs) - 1 && $crumb['url'])
                 <li class="relative ml-5 pl-0.5">
-                    <span class="before:content-[''] before:w-[14px] before:h-[14px] before:bg-chevron-white before:transform before:rotate-[-90deg] before:bg-[length:100%] before:-ml-[1.125rem] before:absolute before:my-auto before:inset-y-0"></span>
+                    <span class="before:content-[''] before:w-[14px] before:h-[14px] before:bg-chevron-black before:transform before:rotate-[-90deg] before:bg-[length:100%] before:-ml-[1.125rem] before:absolute before:my-auto before:inset-y-0"></span>
                     <a href="{{ $crumb['url'] }}" class="hover:text-primary">
                         {{ $crumb['label'] }}
                     </a>
                 </li>
             @else
-                <li class="relative ml-5 pl-0.5 text-white">
-                    <span class="before:content-[''] before:w-[14px] before:h-[14px] before:bg-chevron-white before:transform before:rotate-[-90deg] before:bg-[length:100%] before:-ml-[1.125rem] before:absolute before:my-auto before:inset-y-0"></span>
+                <li class="relative ml-5 pl-0.5 text-slate-900 font-medium">
+                    <span class="before:content-[''] before:w-[14px] before:h-[14px] before:bg-chevron-black before:transform before:rotate-[-90deg] before:bg-[length:100%] before:-ml-[1.125rem] before:absolute before:my-auto before:inset-y-0"></span>
                     {{ $crumb['label'] }}
                 </li>
             @endif

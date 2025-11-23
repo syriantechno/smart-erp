@@ -46,10 +46,7 @@ return new class extends Migration
             $table->json('approval_levels')->nullable(); // Define approval hierarchy
             $table->integer('current_level')->default(1);
             $table->text('rejection_reason')->nullable();
-
-            // Files/attachments
             $table->json('attachments')->nullable();
-
             $table->timestamps();
 
             // Foreign keys
@@ -71,10 +68,10 @@ return new class extends Migration
         Schema::create('approval_logs', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('approval_request_id');
-            $table->enum('action', ['submitted', 'approved', 'rejected', 'commented', 'forwarded']);
+            $table->string('action');
             $table->text('comments')->nullable();
             $table->unsignedBigInteger('user_id'); // Who performed the action
-            $table->integer('level')->nullable(); // Approval level
+            $table->unsignedInteger('level')->nullable(); // Approval level
             $table->timestamps();
 
             $table->foreign('approval_request_id')->references('id')->on('approval_requests')->onDelete('cascade');

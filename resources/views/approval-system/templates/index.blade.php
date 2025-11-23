@@ -55,21 +55,36 @@
 @section('subcontent')
     @include('components.global-notifications')
 
-    <div class="intro-y mt-8 flex items-center">
-        <h2 class="mr-auto text-lg font-medium">Approval Templates</h2>
-        <button
-            type="button"
-            class="btn-tonal btn-tonal--info w-40 sm:w-auto sm:ml-4 group"
-            onclick="openCreateModal()"
-        >
-            <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
-            Add Template
-        </button>
+    {{-- Heading + top stats strip on the same row (Departments template matches Positions) --}}
+    <div class="intro-y mt-6 mb-2 flex flex-col gap-1 text-[#3a2a1a]">
+        <div class="flex items-baseline justify-between gap-6">
+            <h2 class="flex items-center gap-2 text-2xl md:text-3xl font-semibold text-royalDark tracking-wide">
+                <x-base.lucide icon="file-text" class="w-7 h-7" />
+                <span>Approval Templates</span>
+            </h2>
+
+            <div class="flex flex-row items-end gap-8 md:gap-12 justify-end">
+                {{-- Templates count --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="file-text" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight" id="templates-count">
+                            0
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Templates
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="mt-5 grid grid-cols-12 gap-6">
         <div class="intro-y col-span-12">
-            <x-base.preview-component class="intro-y box">
+            <x-base.preview-component class="intro-y box bg-white/80 border border-slate-200/70 shadow-[0_18px_45px_rgba(15,23,42,0.10)]">
                 <div class="p-5">
                     <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
                         <form id="templates-filter-form" class="w-full sm:mr-auto xl:flex">
@@ -105,7 +120,7 @@
                             </div>
                             <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
                                 <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
-                                    Show
+                                    Display
                                 </label>
                                 <x-base.form-select id="template-filter-length" class="mt-2 w-full sm:mt-0 sm:w-auto">
                                     <option value="10">10</option>
@@ -115,11 +130,11 @@
                                 </x-base.form-select>
                             </div>
                             <div class="mt-4 flex flex-wrap gap-2 sm:items-center xl:mt-0">
-                                <button id="template-filter-go" type="button" class="btn-tonal btn-tonal--info w-full sm:w-24 group">
+                                <button id="template-filter-go" type="button" class="btn-royal btn-royal--dark btn-royal--sm w-full sm:w-24 group">
                                     <x-base.lucide icon="search" class="w-4 h-4 icon-hover-rise" />
                                     Go
                                 </button>
-                                <button id="template-filter-reset" type="button" class="btn-tonal btn-tonal--amber w-full sm:w-24 group">
+                                <button id="template-filter-reset" type="button" class="btn-royal btn-royal--outline btn-royal--sm w-full sm:w-24 group">
                                     <x-base.lucide icon="rotate-ccw" class="w-4 h-4 icon-hover-rise" />
                                     Reset
                                 </button>
@@ -127,12 +142,33 @@
                         </form>
 
                         <div class="mt-5 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
-                            <button type="button" class="btn-tonal btn-tonal--purple btn-tonal--icon group" id="template-export" title="Export">
-                                <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
-                            </button>
-                            <button type="button" class="btn-tonal btn-tonal--sky btn-tonal--icon group" id="template-refresh" title="Refresh">
-                                <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
-                            </button>
+                            <x-base.tippy content="Export PDF" placement="bottom">
+                                <button id="template-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                    <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+                            <x-base.tippy content="Export" placement="bottom">
+                                <button id="template-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                    <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+                            <x-base.tippy content="Refresh" placement="bottom">
+                                <button id="template-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                    <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+
+                            {{-- Add Template button at the right end of the toolbar --}}
+                            <x-base.tippy content="Add new template" placement="bottom">
+                                <button
+                                    type="button"
+                                    class="btn-royal btn-royal--gold btn-royal--sm sm:btn-royal--lg group"
+                                    onclick="openCreateModal()"
+                                >
+                                    <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
+                                    <span class="hidden sm:inline">Add</span>
+                                </button>
+                            </x-base.tippy>
                         </div>
                     </div>
 
@@ -143,14 +179,14 @@
                             data-erp-table
                             class="datatable-default w-full min-w-full table-auto text-left text-sm"
                         >
-                            <thead>
+                            <thead class="bg-gradient-to-r from-royalDark to-gray-800 text-white">
                                 <tr>
-                                    <th class="font-semibold px-5 py-2 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">#</th>
-                                    <th class="font-semibold px-5 py-2 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Name</th>
-                                    <th class="font-semibold px-5 py-2 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Type</th>
-                                    <th class="font-semibold px-5 py-2 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Levels</th>
-                                    <th class="font-semibold px-5 py-2 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Status</th>
-                                    <th class="font-semibold px-5 py-2 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Actions</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">#</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Name</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Type</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Levels</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Status</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -197,7 +233,7 @@
                             <p class="text-sm font-semibold text-slate-700">Approval Levels</p>
                             <p class="text-xs text-slate-500">Add approvers in the order they must approve.</p>
                         </div>
-                        <button type="button" class="btn-tonal btn-tonal--info group" onclick="addLevel()">
+                        <button type="button" class="btn-royal btn-royal--gold group" onclick="addLevel()">
                             <x-base.lucide icon="plus" class="w-4 h-4 icon-hover-rise" />
                             Add Level
                         </button>
@@ -221,7 +257,7 @@
                                     </x-base.form-select>
                                 </div>
                                 <div class="col-span-12 flex justify-end">
-                                    <button type="button" class="btn-tonal btn-tonal--danger group" data-remove-level>
+                                    <button type="button" class="btn-royal btn-royal--outline group" data-remove-level>
                                         <x-base.lucide icon="trash-2" class="w-4 h-4 icon-hover-rise" />
                                         Remove Level
                                     </button>
@@ -244,7 +280,7 @@
             <div class="flex w-full flex-wrap justify-end gap-2">
                 <button
                     type="button"
-                    class="btn-tonal btn-tonal--neutral group"
+                    class="btn-royal btn-royal--outline group"
                     data-tw-dismiss="modal"
                 >
                     <x-base.lucide icon="x-circle" class="w-5 h-5 icon-hover-rise" />
@@ -253,7 +289,7 @@
                 <button
                     type="submit"
                     form="template-form"
-                    class="btn-tonal btn-tonal--success group"
+                    class="btn-royal btn-royal--gold group"
                 >
                     <x-base.lucide icon="save" class="w-5 h-5 icon-hover-rise" />
                     Save
@@ -283,6 +319,7 @@
     const filterResetBtn = jq('#template-filter-reset');
     const exportBtn = jq('#template-export');
     const refreshBtn = jq('#template-refresh');
+    const pdfBtn = jq('#template-pdf');
 
     jq(function() {
         initializeTemplatesTable();
@@ -370,6 +407,10 @@
             if (window.erpCrud && typeof window.erpCrud.exportDataTable === 'function') {
                 window.erpCrud.exportDataTable(templatesTable, 'approval-templates');
             }
+        });
+
+        pdfBtn.on('click', function () {
+            jq('#template-pdf').showToast('PDF export functionality not implemented yet', 'info');
         });
 
         refreshBtn.on('click', function () {

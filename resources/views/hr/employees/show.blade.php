@@ -466,6 +466,97 @@
                 </div>
                 <!-- END: Contact Information -->
 
+                <!-- BEGIN: Approval Signature -->
+                <div class="intro-y box col-span-12 2xl:col-span-6" id="approval-signature">
+                    <div class="flex items-center border-b border-slate-200/60 px-5 py-5 dark:border-darkmode-400 sm:py-3">
+                        <h2 class="mr-auto text-base font-medium flex items-center gap-2">
+                            <x-base.lucide icon="PenSquare" class="h-4 w-4 text-primary" />
+                            Approval Signature
+                        </h2>
+                    </div>
+                    <div class="p-5">
+                        @php
+                            $linkedUser = $employee->user;
+                            $signatureUrl = $linkedUser?->signature_url;
+                            $canManageSignature = $linkedUser && $linkedUser->id === auth()->id();
+                        @endphp
+
+                        @if(!$linkedUser)
+                            <div class="rounded-md border border-slate-200/60 bg-slate-50 px-4 py-3 text-sm text-slate-600 dark:border-darkmode-400 dark:bg-darkmode-600 dark:text-slate-300">
+                                This employee is not linked to a system user, so no signature can be stored.
+                            </div>
+                        @else
+                            <div class="rounded-lg border-2 border-dashed border-slate-200/80 bg-white/60 p-5 text-center dark:border-darkmode-400 dark:bg-darkmode-700/40">
+                                @if ($signatureUrl)
+                                    <img
+                                        src="{{ $signatureUrl }}"
+                                        alt="{{ $employee->full_name }} signature"
+                                        class="mx-auto max-h-32"
+                                    />
+                                    <div class="mt-2 text-xs text-slate-500">Stored on {{ $linkedUser->updated_at?->format('Y-m-d') ?? '—' }}</div>
+                                @else
+                                    <div class="text-sm font-medium text-slate-500 dark:text-slate-300">
+                                        No signature on file yet
+                                    </div>
+                                @endif
+                            </div>
+
+                            @if ($canManageSignature)
+                                <form
+                                    class="mt-5 space-y-4"
+                                    action="{{ route('profile.signature.update') }}"
+                                    method="POST"
+                                    enctype="multipart/form-data"
+                                >
+                                    @csrf
+                                    <div class="text-left">
+                                        <x-base.form-label class="text-xs uppercase tracking-wide text-slate-500" for="signature">
+                                            Upload New Signature (PNG / JPG / WEBP up to 2MB)
+                                        </x-base.form-label>
+                                        <x-base.form-input
+                                            id="signature"
+                                            name="signature"
+                                            type="file"
+                                            accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                                        />
+                                        @error('signature', 'profileSignature')
+                                            <p class="mt-2 text-xs text-danger">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+
+                                    <div class="flex flex-wrap gap-2">
+                                        <x-base.button type="submit" variant="primary">
+                                            Save Signature
+                                        </x-base.button>
+
+                                        @if ($linkedUser->signature_path)
+                                            <button
+                                                type="submit"
+                                                name="remove_signature"
+                                                value="1"
+                                                class="btn btn-danger"
+                                            >
+                                                Remove Signature
+                                            </button>
+                                        @endif
+                                    </div>
+
+                                    @if (session('profile_signature_status'))
+                                        <div class="rounded border border-success/40 bg-success/10 px-3 py-2 text-xs text-success">
+                                            {{ session('profile_signature_status') }}
+                                        </div>
+                                    @endif
+                                </form>
+                            @else
+                                <div class="mt-4 rounded-md bg-slate-100/80 px-4 py-3 text-sm text-slate-600 dark:bg-darkmode-600 dark:text-slate-300">
+                                    Only the employee can update their stored signature. Ask {{ $employee->full_name }} to sign in and upload it here.
+                                </div>
+                            @endif
+                        @endif
+                    </div>
+                </div>
+                <!-- END: Approval Signature -->
+
                 <!-- BEGIN: Documents -->
                 <div class="intro-y box col-span-12 2xl:col-span-6" id="documents">
                     <div class="flex items-center border-b border-slate-200/60 px-5 py-5 dark:border-darkmode-400 sm:py-3">

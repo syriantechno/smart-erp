@@ -26,6 +26,12 @@ class DocumentController extends Controller
 
     public function index(Request $request)
     {
+        // Get statistics for the royal theme header
+        $totalDocuments = Document::count();
+        $activeDocuments = Document::where('status', 'active')->count();
+        $archivedDocuments = Document::where('status', 'archived')->count();
+        $recentDocuments = Document::where('created_at', '>=', now()->subDays(30))->count();
+
         $companies = Company::active()->select('id', 'name')->get();
         $departments = Department::active()->select('id', 'name')->get();
 
@@ -45,7 +51,11 @@ class DocumentController extends Controller
             'departments',
             'categories',
             'currentCategory',
-            'search'
+            'search',
+            'totalDocuments',
+            'activeDocuments',
+            'archivedDocuments',
+            'recentDocuments'
         ));
     }
 

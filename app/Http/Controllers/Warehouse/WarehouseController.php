@@ -20,7 +20,12 @@ class WarehouseController extends Controller
 
     public function index()
     {
-        return view('warehouse.index');
+        // Get statistics for the royal theme header
+        $totalWarehouses = Warehouse::count();
+        $activeWarehouses = Warehouse::where('is_active', true)->count();
+        $inactiveWarehouses = Warehouse::where('is_active', false)->count();
+
+        return view('warehouse.index', compact('totalWarehouses', 'activeWarehouses', 'inactiveWarehouses'));
     }
 
     public function previewCode()

@@ -14,90 +14,96 @@
 @section('subcontent')
     @include('components.global-notifications')
 
-    <div class="mt-8 grid grid-cols-12 gap-6">
-        @if(false)
-        <div class="col-span-12">
-            <div class="grid grid-cols-12 gap-6">
-                <!-- My Requests -->
-                <div class="col-span-12 sm:col-span-6 xl:col-span-3">
-                    <x-base.preview-component class="intro-y box">
-                        <div class="flex items-center p-5">
-                            <div class="image-fit h-12 w-12">
-                                <x-base.lucide icon="FileText" class="h-8 w-8 text-blue-500" />
-                            </div>
-                            <div class="ml-4 mr-auto">
-                                <div class="text-base font-medium text-slate-600 dark:text-slate-300">{{ $myRequestsCount }}</div>
-                                <div class="text-slate-500 text-xs">My Requests</div>
-                            </div>
+    {{-- Heading + top stats strip on the same row (Departments template matches Positions) --}}
+    <div class="intro-y mt-6 mb-2 flex flex-col gap-1 text-[#3a2a1a]">
+        <div class="flex items-baseline justify-between gap-6">
+            <h2 class="flex items-center gap-2 text-2xl md:text-3xl font-semibold text-royalDark tracking-wide">
+                <x-base.lucide icon="check-square" class="w-7 h-7" />
+                <span>Approval System</span>
+            </h2>
+
+            <div class="flex flex-row items-end gap-8 md:gap-12 justify-end">
+                {{-- Rejected --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="x-circle" class="w-4 h-4" />
                         </div>
-                    </x-base.preview-component>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $rejectedCount ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Rejected
+                    </div>
                 </div>
 
-                <!-- Pending Approval -->
-                <div class="col-span-12 sm:col-span-6 xl:col-span-3">
-                    <x-base.preview-component class="intro-y box">
-                        <div class="flex items-center p-5">
-                            <div class="image-fit h-12 w-12">
-                                <x-base.lucide icon="Clock" class="h-8 w-8 text-yellow-500" />
-                            </div>
-                            <div class="ml-4 mr-auto">
-                                <div class="text-base font-medium text-slate-600 dark:text-slate-300">{{ $pendingApprovalCount }}</div>
-                                <div class="text-slate-500 text-xs">Pending Approval</div>
-                            </div>
+                {{-- Approved --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="check-circle-2" class="w-4 h-4" />
                         </div>
-                    </x-base.preview-component>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $approvedCount ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Approved
+                    </div>
                 </div>
 
-                <!-- Approved -->
-                <div class="col-span-12 sm:col-span-6 xl:col-span-3">
-                    <x-base.preview-component class="intro-y box">
-                        <div class="flex items-center p-5">
-                            <div class="image-fit h-12 w-12">
-                                <x-base.lucide icon="CheckCircle" class="h-8 w-8 text-green-500" />
-                            </div>
-                            <div class="ml-4 mr-auto">
-                                <div class="text-base font-medium text-slate-600 dark:text-slate-300">{{ $approvedCount }}</div>
-                                <div class="text-slate-500 text-xs">Approved</div>
-                            </div>
+                {{-- Pending --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="clock" class="w-4 h-4" />
                         </div>
-                    </x-base.preview-component>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $pendingApprovalCount ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Pending
+                    </div>
                 </div>
 
-                <!-- Rejected -->
-                <div class="col-span-12 sm:col-span-6 xl:col-span-3">
-                    <x-base.preview-component class="intro-y box">
-                        <div class="flex items-center p-5">
-                            <div class="image-fit h-12 w-12">
-                                <x-base.lucide icon="XCircle" class="h-8 w-8 text-red-500" />
-                            </div>
-                            <div class="ml-4 mr-auto">
-                                <div class="text-base font-medium text-slate-600 dark:text-slate-300">{{ $rejectedCount }}</div>
-                                <div class="text-slate-500 text-xs">Rejected</div>
-                            </div>
+                {{-- My Requests --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="file-text" class="w-4 h-4" />
                         </div>
-                    </x-base.preview-component>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $myRequestsCount ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        My Requests
+                    </div>
                 </div>
             </div>
         </div>
-        @endif
+    </div>
 
-        <!-- Main Content -->
-        <div class="col-span-12">
-            <x-base.preview-component class="intro-y box">
+    <div class="mt-5 grid grid-cols-12 gap-6">
+        <div class="intro-y col-span-12">
+            <x-base.preview-component class="intro-y box bg-white/80 border border-slate-200/70 shadow-[0_18px_45px_rgba(15,23,42,0.10)]">
                 <!-- Tabs -->
                 <div class="p-5 border-b border-slate-200/60 dark:border-darkmode-400">
                     <div class="flex flex-col sm:flex-row items-center">
                         <h2 class="mr-5 text-lg font-medium">Approval Requests</h2>
                         <div class="flex items-center">
-                            <x-base.button
-                                id="new-request-btn"
-                                variant="primary"
-                                class="mr-2 shadow-md"
-                                type="button"
-                            >
-                                <x-base.lucide icon="Plus" class="w-4 h-4 mr-2" />
-                                New Request
-                            </x-base.button>
+                            <x-base.tippy content="Create new approval request" placement="bottom">
+                                <button
+                                    type="button"
+                                    id="new-request-btn"
+                                    class="btn-royal btn-royal--gold btn-royal--sm sm:btn-royal--lg group"
+                                >
+                                    <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
+                                    <span class="hidden sm:inline">New Request</span>
+                                </button>
+                            </x-base.tippy>
                         </div>
                     </div>
 
@@ -106,7 +112,7 @@
                         <div class="nav nav-tabs flex flex-row flex-wrap gap-2" role="tablist">
                             <a href="{{ route('approval-system.index', ['tab' => 'my-requests']) }}"
                                class="nav-link {{ $currentTab === 'my-requests' ? 'active' : '' }}">
-                                <x-base.lucide icon="FileText" class="w-4 h-4 mr-2" />
+                                <x-base.lucide icon="file-text" class="w-4 h-4 mr-2" />
                                 My Requests
                                 @if($myRequestsCount > 0)
                                     <span class="ml-2 bg-blue-500 text-white rounded-full px-2 py-1 text-xs">{{ $myRequestsCount }}</span>
@@ -114,7 +120,7 @@
                             </a>
                             <a href="{{ route('approval-system.index', ['tab' => 'pending-approval']) }}"
                                class="nav-link {{ $currentTab === 'pending-approval' ? 'active' : '' }}">
-                                <x-base.lucide icon="Clock" class="w-4 h-4 mr-2" />
+                                <x-base.lucide icon="clock" class="w-4 h-4 mr-2" />
                                 Pending Approval
                                 @if($pendingApprovalCount > 0)
                                     <span class="ml-2 bg-yellow-500 text-white rounded-full px-2 py-1 text-xs">{{ $pendingApprovalCount }}</span>
@@ -122,7 +128,7 @@
                             </a>
                             <a href="{{ route('approval-system.index', ['tab' => 'approved']) }}"
                                class="nav-link {{ $currentTab === 'approved' ? 'active' : '' }}">
-                                <x-base.lucide icon="CheckCircle" class="w-4 h-4 mr-2" />
+                                <x-base.lucide icon="check-circle" class="w-4 h-4 mr-2" />
                                 Approved
                                 @if($approvedCount > 0)
                                     <span class="ml-2 bg-green-500 text-white rounded-full px-2 py-1 text-xs">{{ $approvedCount }}</span>
@@ -130,7 +136,7 @@
                             </a>
                             <a href="{{ route('approval-system.index', ['tab' => 'rejected']) }}"
                                class="nav-link {{ $currentTab === 'rejected' ? 'active' : '' }}">
-                                <x-base.lucide icon="XCircle" class="w-4 h-4 mr-2" />
+                                <x-base.lucide icon="x-circle" class="w-4 h-4 mr-2" />
                                 Rejected
                                 @if($rejectedCount > 0)
                                     <span class="ml-2 bg-red-500 text-white rounded-full px-2 py-1 text-xs">{{ $rejectedCount }}</span>
@@ -138,56 +144,11 @@
                             </a>
                             <a href="{{ route('approval-system.index', ['tab' => 'all']) }}"
                                class="nav-link {{ $currentTab === 'all' ? 'active' : '' }}">
-                                <x-base.lucide icon="List" class="w-4 h-4 mr-2" />
+                                <x-base.lucide icon="list" class="w-4 h-4 mr-2" />
                                 All Requests
                             </a>
                         </div>
                     </div>
-
-                    @if(false)
-                    <!-- Filters -->
-                    <div class="mt-5 grid grid-cols-12 gap-4">
-                        <div class="col-span-12 md:col-span-3">
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Type</label>
-                            <select id="type-filter" class="w-full form-select">
-                                <option value="">All Types</option>
-                                <option value="leave_request">Leave Request</option>
-                                <option value="purchase_request">Purchase Request</option>
-                                <option value="expense_claim">Expense Claim</option>
-                                <option value="loan_request">Loan Request</option>
-                                <option value="overtime_request">Overtime Request</option>
-                                <option value="training_request">Training Request</option>
-                                <option value="equipment_request">Equipment Request</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                        <div class="col-span-12 md:col-span-3">
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Status</label>
-                            <select id="status-filter" class="w-full form-select">
-                                <option value="">All Status</option>
-                                <option value="pending">Pending</option>
-                                <option value="approved">Approved</option>
-                                <option value="rejected">Rejected</option>
-                                <option value="cancelled">Cancelled</option>
-                            </select>
-                        </div>
-                        <div class="col-span-12 md:col-span-3">
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Priority</label>
-                            <select id="priority-filter" class="w-full form-select">
-                                <option value="">All Priorities</option>
-                                <option value="low">Low</option>
-                                <option value="normal">Normal</option>
-                                <option value="high">High</option>
-                                <option value="urgent">Urgent</option>
-                            </select>
-                        </div>
-                        <div class="col-span-12 md:col-span-3 flex items-end">
-                            <button onclick="applyFilters()" class="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-                                Apply Filters
-                            </button>
-                        </div>
-                    </div>
-                    @endif
                 </div>
 
                 <!-- Data Table -->
@@ -199,7 +160,7 @@
                             data-erp-table
                             class="datatable-default w-full min-w-full table-auto text-left text-sm"
                         >
-                            <thead>
+                            <thead class="bg-gradient-to-r from-royalDark to-gray-800 text-white">
                                 <tr>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Code</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Title</th>

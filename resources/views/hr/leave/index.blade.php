@@ -37,133 +37,102 @@
     data-leave-preview-url="{{ route('hr.leave.preview-code') }}"
     data-leave-base-url="{{ route('hr.leave.index') }}"
 >
-<div class="grid grid-cols-12 gap-6">
+<div class="mt-8 flex items-center">
+    <h2 class="mr-auto text-lg font-medium">Leave Management</h2>
+    <div class="ml-auto flex flex-wrap gap-2">
+        <button type="button"
+            class="btn-royal btn-royal--gold group"
+            data-tw-toggle="modal"
+            data-tw-target="#create-leave-modal">
+            <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
+            Log Leave Request
+        </button>
+        <button type="button" class="btn-royal btn-royal--outline group" id="leave-export-summary">
+            <x-base.lucide icon="download" class="w-5 h-5 icon-hover-rise" />
+            Export Summary
+        </button>
+    </div>
+</div>
+<div class="mt-5 grid grid-cols-12 gap-6">
     <div class="col-span-12">
-        <div class="grid grid-cols-12 gap-6">
-            <!-- BEGIN: Leave Overview -->
-            <div class="col-span-12 mt-8">
-                <div class="intro-y flex items-center h-10">
-                    <div>
-                        <h2 class="text-lg font-medium leading-tight">
-                            Leave Management
-                        </h2>
-                        <p class="text-slate-500 text-sm">Track requests, decisions, and balances in one view.</p>
-                    </div>
-                    <div class="ml-auto flex flex-wrap gap-2">
-                        <button type="button"
-                            class="btn-tonal btn-tonal--success group"
-                            data-tw-toggle="modal"
-                            data-tw-target="#create-leave-modal">
-                            <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
-                            Log Leave Request
-                        </button>
-                        <button type="button" class="btn-tonal btn-tonal--info group" id="leave-export-summary">
-                            <x-base.lucide icon="download" class="w-5 h-5 icon-hover-rise" />
-                            Export Summary
-                        </button>
+        <div class="flex flex-col gap-6">
+            <!-- Statistics Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="bg-gradient-to-r from-royalDark to-gray-800 rounded-lg p-6 shadow-lg">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <x-base.lucide icon="calendar" class="w-8 h-8 text-royalYellow" />
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-white text-sm font-medium uppercase tracking-wider">Total Requests</p>
+                            <p class="text-royalYellow text-2xl font-bold" data-leave-total>0</p>
+                        </div>
                     </div>
                 </div>
-                <div class="grid grid-cols-12 gap-6 mt-5">
-                    <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
-                        <div class="report-box zoom-in">
-                            <div class="box p-5">
-                                <div class="flex">
-                                    <x-base.lucide icon="calendar" class="report-box__icon text-primary" />
-                                    <div class="ml-auto">
-                                        <div class="report-box__indicator bg-primary tooltip cursor-pointer"
-                                            title="Tracked requests this quarter">
-                                            +8%
-                                            <x-base.lucide icon="chevron-up" class="w-4 h-4 ml-0.5" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="text-3xl font-medium leading-8 mt-6" data-leave-total>0</div>
-                                <div class="text-base text-slate-500 mt-1">Total Leave Requests</div>
-                            </div>
+
+                <div class="bg-gradient-to-r from-green-600 to-green-700 rounded-lg p-6 shadow-lg">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <x-base.lucide icon="check-circle" class="w-8 h-8 text-white" />
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-white text-sm font-medium uppercase tracking-wider">Approved</p>
+                            <p class="text-white text-2xl font-bold" data-leave-approved>0</p>
                         </div>
                     </div>
-                    <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
-                        <div class="report-box zoom-in">
-                            <div class="box p-5">
-                                <div class="flex">
-                                    <x-base.lucide icon="check-circle" class="report-box__icon text-success" />
-                                    <div class="ml-auto">
-                                        <div class="report-box__indicator bg-success tooltip cursor-pointer"
-                                            title="Compared to last month">
-                                            +2%
-                                            <x-base.lucide icon="chevron-up" class="w-4 h-4 ml-0.5" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="text-3xl font-medium leading-8 mt-6" data-leave-approved>0</div>
-                                <div class="text-base text-slate-500 mt-1">Approved Leaves</div>
-                            </div>
+                </div>
+
+                <div class="bg-gradient-to-r from-yellow-600 to-yellow-700 rounded-lg p-6 shadow-lg">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <x-base.lucide icon="clock" class="w-8 h-8 text-white" />
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-white text-sm font-medium uppercase tracking-wider">Pending</p>
+                            <p class="text-white text-2xl font-bold" data-leave-pending>0</p>
                         </div>
                     </div>
-                    <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
-                        <div class="report-box zoom-in">
-                            <div class="box p-5">
-                                <div class="flex">
-                                    <x-base.lucide icon="clock" class="report-box__icon text-warning" />
-                                    <div class="ml-auto">
-                                        <div class="report-box__indicator bg-warning tooltip cursor-pointer"
-                                            title="In manager review">
-                                            3 cases
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="text-3xl font-medium leading-8 mt-6" data-leave-pending>0</div>
-                                <div class="text-base text-slate-500 mt-1">Pending Decisions</div>
-                            </div>
+                </div>
+
+                <div class="bg-gradient-to-r from-red-600 to-red-700 rounded-lg p-6 shadow-lg">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <x-base.lucide icon="x-circle" class="w-8 h-8 text-white" />
                         </div>
-                    </div>
-                    <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
-                        <div class="report-box zoom-in">
-                            <div class="box p-5">
-                                <div class="flex">
-                                    <x-base.lucide icon="x-circle" class="report-box__icon text-danger" />
-                                    <div class="ml-auto">
-                                        <div class="report-box__indicator bg-danger tooltip cursor-pointer"
-                                            title="Declined requests">
-                                            Stable
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="text-3xl font-medium leading-8 mt-6" data-leave-rejected>0</div>
-                                <div class="text-base text-slate-500 mt-1">Rejected Leaves</div>
-                            </div>
+                        <div class="ml-4">
+                            <p class="text-white text-sm font-medium uppercase tracking-wider">Rejected</p>
+                            <p class="text-white text-2xl font-bold" data-leave-rejected>0</p>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- END: Leave Overview -->
 
-            <div class="col-span-12">
-                <x-base.preview-component class="intro-y box">
-                    <div class="p-5">
-                        <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-                            <div>
-                                <h3 class="text-base font-semibold text-slate-800">Leave Ledger</h3>
-                                <p class="text-sm text-slate-500">Filter, edit, and export leave requests.</p>
-                            </div>
-                            <div class="flex flex-wrap gap-2">
-                                <button type="button" id="leave-refresh"
-                                    class="btn-tonal btn-tonal--sky btn-tonal--icon group"
-                                    title="Refresh data">
-                                    <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
-                                </button>
-                                <button type="button" id="leave-export"
-                                    class="btn-tonal btn-tonal--lime btn-tonal--icon group"
-                                    title="Export to Excel">
-                                    <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
-                                </button>
-                                <button type="button" id="leave-pdf"
-                                    class="btn-tonal btn-tonal--rose btn-tonal--icon group"
-                                    title="Export PDF">
-                                    <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
-                                </button>
-                            </div>
+            <!-- Main Content Card -->
+            <x-base.preview-component class="intro-y box">
+                <div class="p-5">
+                    <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+                        <div>
+                            <h3 class="text-base font-semibold text-slate-800">Leave Ledger</h3>
+                            <p class="text-sm text-slate-500">Filter, edit, and export leave requests.</p>
                         </div>
+                        <div class="flex flex-wrap gap-2">
+                            <button type="button" id="leave-refresh"
+                                class="btn-royal btn-royal--outline btn-royal--icon group"
+                                title="Refresh data">
+                                <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
+                            </button>
+                            <button type="button" id="leave-export"
+                                class="btn-royal btn-royal--outline btn-royal--icon group"
+                                title="Export to Excel">
+                                <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
+                            </button>
+                            <button type="button" id="leave-pdf"
+                                class="btn-royal btn-royal--outline btn-royal--icon group"
+                                title="Export PDF">
+                                <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
+                            </button>
+                        </div>
+                    </div>
 
                         <form id="leave-filter-form" class="mt-6 grid grid-cols-12 gap-4 rounded-xl border border-slate-200/70 p-4">
                             <div class="col-span-12 lg:col-span-4 flex flex-col gap-2">
@@ -217,11 +186,11 @@
                             <div class="col-span-12 lg:col-span-4 flex flex-col gap-2">
                                 <label class="text-sm font-semibold text-slate-600">Actions</label>
                                 <div class="flex flex-wrap gap-2">
-                                    <button type="button" id="leave-filter-apply" class="btn-tonal btn-tonal--info group w-full sm:w-auto">
+                                    <button type="button" id="leave-filter-apply" class="btn-royal btn-royal--gold group w-full sm:w-auto">
                                         <x-base.lucide icon="search" class="w-4 h-4" />
                                         Apply Filter
                                     </button>
-                                    <button type="button" id="leave-filter-reset" class="btn-tonal btn-tonal--amber group w-full sm:w-auto">
+                                    <button type="button" id="leave-filter-reset" class="btn-royal btn-royal--outline group w-full sm:w-auto">
                                         <x-base.lucide icon="rotate-ccw" class="w-4 h-4" />
                                         Reset
                                     </button>
@@ -232,14 +201,14 @@
 
                         <div class="mt-6 overflow-x-auto" data-erp-table-wrapper>
                             <table id="leave-table" class="datatable-default w-full table-auto text-left text-sm" data-erp-table>
-                                <thead>
+                                <thead class="bg-gradient-to-r from-royalDark to-gray-800 text-white">
                                     <tr>
-                                        <th class="px-5 py-2 border-b font-semibold whitespace-nowrap">Request</th>
-                                        <th class="px-5 py-2 border-b font-semibold whitespace-nowrap">Employee</th>
-                                        <th class="px-5 py-2 border-b font-semibold whitespace-nowrap">Period</th>
-                                        <th class="px-5 py-2 border-b font-semibold whitespace-nowrap">Reason</th>
-                                        <th class="px-5 py-2 border-b font-semibold whitespace-nowrap text-center">Status</th>
-                                        <th class="px-5 py-2 border-b font-semibold whitespace-nowrap text-center">Actions</th>
+                                        <th class="px-5 py-3 border-b-2 dark:border-darkmode-300 font-medium whitespace-nowrap">Request</th>
+                                        <th class="px-5 py-3 border-b-2 dark:border-darkmode-300 font-medium whitespace-nowrap">Employee</th>
+                                        <th class="px-5 py-3 border-b-2 dark:border-darkmode-300 font-medium whitespace-nowrap">Period</th>
+                                        <th class="px-5 py-3 border-b-2 dark:border-darkmode-300 font-medium whitespace-nowrap">Reason</th>
+                                        <th class="px-5 py-3 border-b-2 dark:border-darkmode-300 font-medium text-center whitespace-nowrap">Status</th>
+                                        <th class="px-5 py-3 border-b-2 dark:border-darkmode-300 font-medium text-center whitespace-nowrap">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
@@ -259,7 +228,6 @@
     @include('hr.leave.modals.create', compact('leaveTypes', 'leaveReasons', 'leaveStatuses', 'employees'))
     @include('hr.leave.modals.edit', compact('leaveTypes', 'leaveReasons', 'leaveStatuses', 'employees'))
     <button id="open-edit-leave-modal" data-tw-toggle="modal" data-tw-target="#edit-leave-modal" class="hidden"></button>
-</div>
 </div>
 @endsection
 

@@ -88,198 +88,170 @@
 @section('subcontent')
     @include('components.global-notifications')
 
-    <div class="intro-y mt-8 flex items-center">
-        <h2 class="mr-auto text-lg font-medium">Material Requests</h2>
-        <button
-            type="button"
-            id="create-material-request-button"
-            class="btn-tonal btn-tonal--success w-40 sm:w-auto sm:ml-4 group"
-            data-tw-toggle="modal"
-            data-tw-target="#material-request-modal"
-        >
-            <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
-            New Material Request
-        </button>
-    </div>
+@section('subcontent')
+    @include('components.global-notifications')
 
-    <!-- Compact filters bar -->
-    <div class="intro-y mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        @php
-            $stats = $statusStats ?? [
-                'total' => 0,
-                'pending' => 0,
-                'in_progress' => 0,
-                'approved' => 0,
-                'rejected' => 0,
-                'completed' => 0,
-            ];
-        @endphp
+    {{-- Heading + top stats strip on the same row (Departments template matches Positions) --}}
+    <div class="intro-y mt-6 mb-2 flex flex-col gap-1 text-[#3a2a1a]">
+        <div class="flex items-baseline justify-between gap-6">
+            <h2 class="flex items-center gap-2 text-2xl md:text-3xl font-semibold text-royalDark tracking-wide">
+                <x-base.lucide icon="clipboard-list" class="w-7 h-7" />
+                <span>Material Requests</span>
+            </h2>
 
-        <!-- Modern status cards with counts -->
-        <div class="flex w-full overflow-x-auto gap-2 text-xs sm:max-w-xl">
-            <button
-                type="button"
-                data-status=""
-                onclick="filterByStatus('')"
-                class="status-card flex min-w-[100px] flex-col rounded-xl border border-slate-200 bg-white/80 px-3 py-2 text-left shadow-sm hover:border-primary/40 hover:bg-primary/5 transition"
-            >
-                <span class="text-[0.7rem] font-medium text-slate-500">All</span>
-                <span class="mt-1 text-base font-semibold text-slate-800">{{ number_format($stats['total']) }}</span>
-            </button>
+            <div class="flex flex-row items-end gap-8 md:gap-12 justify-end">
+                {{-- Rejected --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="x-circle" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $statusStats['rejected'] ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Rejected
+                    </div>
+                </div>
 
-            <button
-                type="button"
-                data-status="pending"
-                onclick="filterByStatus('pending')"
-                class="status-card flex min-w-[110px] flex-col rounded-xl border border-amber-100 bg-amber-50/80 px-3 py-2 text-left shadow-sm hover:border-amber-300 hover:bg-amber-50 transition"
-            >
-                <span class="inline-flex items-center gap-1 text-[0.7rem] font-medium text-amber-700">
-                    <span class="inline-block h-1.5 w-1.5 rounded-full bg-amber-400"></span>
-                    Pending
-                </span>
-                <span class="mt-1 text-base font-semibold text-amber-800">{{ number_format($stats['pending']) }}</span>
-            </button>
+                {{-- Approved --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="check-circle-2" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $statusStats['approved'] ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Approved
+                    </div>
+                </div>
 
-            <button
-                type="button"
-                data-status="in_progress"
-                onclick="filterByStatus('in_progress')"
-                class="status-card flex min-w-[120px] flex-col rounded-xl border border-sky-100 bg-sky-50/80 px-3 py-2 text-left shadow-sm hover:border-sky-300 hover:bg-sky-50 transition"
-            >
-                <span class="inline-flex items-center gap-1 text-[0.7rem] font-medium text-sky-700">
-                    <span class="inline-block h-1.5 w-1.5 rounded-full bg-sky-400"></span>
-                    In progress
-                </span>
-                <span class="mt-1 text-base font-semibold text-sky-800">{{ number_format($stats['in_progress']) }}</span>
-            </button>
+                {{-- In Progress --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="clock" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $statusStats['in_progress'] ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        In Progress
+                    </div>
+                </div>
 
-            <button
-                type="button"
-                data-status="approved"
-                onclick="filterByStatus('approved')"
-                class="status-card flex min-w-[110px] flex-col rounded-xl border border-emerald-100 bg-emerald-50/80 px-3 py-2 text-left shadow-sm hover:border-emerald-300 hover:bg-emerald-50 transition"
-            >
-                <span class="inline-flex items-center gap-1 text-[0.7rem] font-medium text-emerald-700">
-                    <span class="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
-                    Approved
-                </span>
-                <span class="mt-1 text-base font-semibold text-emerald-800">{{ number_format($stats['approved']) }}</span>
-            </button>
+                {{-- Pending --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="pause-circle" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $statusStats['pending'] ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Pending
+                    </div>
+                </div>
 
-            <button
-                type="button"
-                data-status="rejected"
-                onclick="filterByStatus('rejected')"
-                class="status-card flex min-w-[110px] flex-col rounded-xl border border-rose-100 bg-rose-50/80 px-3 py-2 text-left shadow-sm hover:border-rose-300 hover:bg-rose-50 transition"
-            >
-                <span class="inline-flex items-center gap-1 text-[0.7rem] font-medium text-rose-700">
-                    <span class="inline-block h-1.5 w-1.5 rounded-full bg-rose-400"></span>
-                    Rejected
-                </span>
-                <span class="mt-1 text-base font-semibold text-rose-800">{{ number_format($stats['rejected']) }}</span>
-            </button>
-
-            <button
-                type="button"
-                data-status="completed"
-                onclick="filterByStatus('completed')"
-                class="status-card flex min-w-[120px] flex-col rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-2 text-left shadow-sm hover:border-slate-400 hover:bg-slate-50 transition"
-            >
-                <span class="inline-flex items-center gap-1 text-[0.7rem] font-medium text-slate-700">
-                    <span class="inline-block h-1.5 w-1.5 rounded-full bg-slate-500"></span>
-                    Completed
-                </span>
-                <span class="mt-1 text-base font-semibold text-slate-800">{{ number_format($stats['completed']) }}</span>
-            </button>
-        </div>
-
-        <!-- Quick search + advanced toggle -->
-        <div class="flex w-full items-center gap-2 sm:w-auto">
-            <div class="relative flex-1 sm:w-56">
-                <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-400">
-                    <x-base.lucide icon="search" class="w-3.5 h-3.5" />
-                </span>
-                <input
-                    id="quick-search"
-                    type="text"
-                    placeholder="Quick search..."
-                    class="w-full rounded-full border border-slate-200 bg-white py-1.5 pl-8 pr-3 text-xs text-slate-700 placeholder:text-slate-400 focus:border-primary focus:ring-0"
-                />
+                {{-- Total --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="clipboard-list" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $statusStats['total'] ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Total
+                    </div>
+                </div>
             </div>
-            <button
-                type="button"
-                onclick="toggleAdvancedFilters()"
-                class="hidden sm:inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[0.72rem] font-medium text-slate-700 hover:bg-slate-50"
-            >
-                <x-base.lucide icon="sliders" class="w-3.5 h-3.5 mr-1" />
-                Advanced
-            </button>
         </div>
     </div>
 
     <div class="mt-5 grid grid-cols-12 gap-6">
         <div class="intro-y col-span-12">
-            <!-- Advanced filters -->
-            <x-base.preview-component id="advanced-filters-panel" class="intro-y box mb-6 hidden">
+            <x-base.preview-component class="intro-y box bg-white/80 border border-slate-200/70 shadow-[0_18px_45px_rgba(15,23,42,0.10)]">
                 <div class="p-5">
-                    <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                        <x-base.lucide icon="filter" class="h-5 w-5" />
-                        Filters
-                        <span id="material-requests-active-filters" class="hidden ml-2 px-2 py-0.5 text-xs bg-emerald-500/15 text-emerald-700 rounded-full">Active</span>
-                    </h3>
+                    <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
+                        <form id="material-requests-filter-form" class="w-full sm:mr-auto xl:flex">
+                            <div class="items-center sm:mr-4 sm:flex">
+                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
+                                    Status
+                                </label>
+                                <x-base.form-select id="status-filter" class="mt-2 w-full sm:mt-0 sm:w-auto">
+                                    <option value="">All Status</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="in_progress">In progress</option>
+                                    <option value="approved">Approved</option>
+                                    <option value="rejected">Rejected</option>
+                                    <option value="completed">Completed</option>
+                                </x-base.form-select>
+                            </div>
+                            <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
+                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
+                                    Search
+                                </label>
+                                <x-base.form-input
+                                    id="search-filter"
+                                    type="text"
+                                    placeholder="Search..."
+                                    class="mt-2 w-full sm:mt-0 sm:w-48 2xl:w-full"
+                                />
+                            </div>
+                            <div class="mt-4 flex flex-wrap gap-2 sm:items-center xl:mt-0">
+                                <button id="material-requests-filter-go" type="button" class="btn-royal btn-royal--dark btn-royal--sm w-full sm:w-24 group">
+                                    <x-base.lucide icon="search" class="w-4 h-4 icon-hover-rise" />
+                                    Go
+                                </button>
+                                <button id="material-requests-filter-reset" type="button" class="btn-royal btn-royal--outline btn-royal--sm w-full sm:w-24 group">
+                                    <x-base.lucide icon="rotate-ccw" class="w-4 h-4 icon-hover-rise" />
+                                    Reset
+                                </button>
+                            </div>
+                        </form>
 
-                    <div class="grid grid-cols-12 gap-4">
-                        <div class="col-span-12 md:col-span-4">
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Status
-                            </label>
-                            <x-base.form-select id="status-filter" class="w-full">
-                                <option value="">All Status</option>
-                                <option value="pending">Pending</option>
-                                <option value="in_progress">In progress</option>
-                                <option value="approved">Approved</option>
-                                <option value="rejected">Rejected</option>
-                                <option value="completed">Completed</option>
-                            </x-base.form-select>
-                        </div>
+                        <div class="mt-5 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
+                            <x-base.tippy content="Export PDF" placement="bottom">
+                                <button id="material-requests-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                    <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+                            <x-base.tippy content="Export" placement="bottom">
+                                <button id="material-requests-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                    <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+                            <x-base.tippy content="Refresh" placement="bottom">
+                                <button id="material-requests-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                    <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
 
-                        <div class="col-span-12 md:col-span-4">
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Search
-                            </label>
-                            <x-base.form-input
-                                id="search-filter"
-                                type="text"
-                                placeholder="Search material requests..."
-                                class="w-full"
-                            />
-                        </div>
-
-                        <div class="col-span-12 md:col-span-4 flex items-end gap-2">
-                            <button
-                                type="button"
-                                class="btn-tonal btn-tonal--amber flex-1 group"
-                                onclick="clearFilters()"
-                            >
-                                <x-base.lucide icon="rotate-ccw" class="w-4 h-4 icon-hover-rise" />
-                                Clear
-                            </button>
-                            <button
-                                type="button"
-                                class="btn-tonal btn-tonal--info flex-1 group"
-                                onclick="applyFilters()"
-                            >
-                                <x-base.lucide icon="search" class="w-4 h-4 icon-hover-rise" />
-                                Apply
-                            </button>
+                            {{-- Add Material Request button at the right end of the toolbar --}}
+                            <x-base.tippy content="Create new material request" placement="bottom">
+                                <button
+                                    type="button"
+                                    id="create-material-request-button"
+                                    class="btn-royal btn-royal--gold btn-royal--sm sm:btn-royal--lg group"
+                                    data-tw-toggle="modal"
+                                    data-tw-target="#material-request-modal"
+                                >
+                                    <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
+                                    <span class="hidden sm:inline">New Request</span>
+                                </button>
+                            </x-base.tippy>
                         </div>
                     </div>
-                </div>
-            </x-base.preview-component>
-
-            <!-- Material Requests Table -->
-            <x-base.preview-component class="intro-y box">
-                <div class="p-5">
                     <div class="overflow-x-auto sm:overflow-visible" data-erp-table-wrapper>
                         <table
                             id="material-requests-table"
@@ -287,7 +259,7 @@
                             data-erp-table
                             class="datatable-default w-full min-w-full table-auto text-left text-sm"
                         >
-                            <thead>
+                            <thead class="bg-gradient-to-r from-royalDark to-gray-800 text-white">
                                 <tr>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Code</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Title</th>
@@ -295,8 +267,8 @@
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Company</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Request Date</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Total Amount</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Approvals</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Status</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Approvals</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Status</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Actions</th>
                                 </tr>
                             </thead>
@@ -407,6 +379,28 @@
 
             $('#status-filter').on('change', function() {
                 applyFilters();
+            });
+
+            // PDF export
+            $('#material-requests-pdf').on('click', function() {
+                showToast('PDF export functionality not implemented yet', 'info');
+            });
+
+            // Export functionality
+            $('#material-requests-export').on('click', function() {
+                if (window.erpCrud && typeof window.erpCrud.exportDataTable === 'function') {
+                    window.erpCrud.exportDataTable(materialRequestsTable, 'material-requests');
+                } else {
+                    showToast('Export functionality not available', 'error');
+                }
+            });
+
+            // Refresh functionality
+            $('#material-requests-refresh').on('click', function() {
+                if (materialRequestsTable) {
+                    materialRequestsTable.ajax.reload();
+                    showToast('Data refreshed', 'success');
+                }
             });
 
             // Quick search input in compact bar

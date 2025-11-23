@@ -25,6 +25,7 @@ class User extends Authenticatable
         'password',
         'status',
         'email_verified_at',
+        'signature_path',
     ];
 
     /**
@@ -41,6 +42,7 @@ class User extends Authenticatable
 
     protected $appends = [
         'profile_photo_url',
+        'signature_url',
     ];
 
     /**
@@ -153,5 +155,14 @@ class User extends Authenticatable
     public function getProfilePhotoUrlAttribute()
     {
         return 'https://ui-avatars.com/api/?name='.urlencode($this->name).'&color=7F9CF5&background=EBF4FF';
+    }
+
+    public function getSignatureUrlAttribute(): ?string
+    {
+        if (!$this->signature_path) {
+            return null;
+        }
+
+        return \Storage::disk('public')->url($this->signature_path);
     }
 }

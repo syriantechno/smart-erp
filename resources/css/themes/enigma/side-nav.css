@@ -3,6 +3,8 @@
 .enigma {
     .side-nav {
         /* Enhanced sidebar styling with smooth transitions */
+        /* Disable vertical scrolling on the sidebar itself so we have a single main scrollbar */
+        overflow-y: hidden;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
@@ -168,16 +170,28 @@
             display: flex;
             align-items: center;
             padding-left: theme("spacing.3");
-            color: theme("colors.slate.600");
-            margin-bottom: theme("spacing[2.5]");
+            color: #303030;
+            /* عناصر القائمة أقرب لبعض */
+            margin-bottom: theme("spacing.2");
             position: relative;
             border-radius: theme("borderRadius.xl");
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            
+            background: transparent;
+            box-shadow: none;
+            border: 0;
+
+            /* Soften default browser focus outline */
+            &:focus,
+            &:focus-visible {
+                outline: none;
+                box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.35);
+                border-radius: theme("borderRadius.xl");
+            }
+
             .side-menu__icon {
                 transition: all 0.2s ease;
                 flex-shrink: 0;
-                color: rgb(var(--primary-rgb, 37, 99, 235));
+                color: #303030;
             }
             
             .side-menu__title {
@@ -186,6 +200,9 @@
                 width: 100%;
                 margin-left: theme("spacing.3");
                 transition: all 0.2s ease;
+                /* تكبير خط نص القائمة قليلاً */
+                font-size: 0.95rem;
+                line-height: 1.4;
                 @media screen(xl) {
                     display: flex;
                 }
@@ -264,16 +281,12 @@
                 /* First level */
                 & > .side-menu {
                     &.side-menu--active {
-                        background: linear-gradient(135deg, 
-                            rgba(var(--primary-rgb, 37, 99, 235), 0.1) 0%,
-                            rgba(var(--primary-rgb, 37, 99, 235), 0.05) 100%
-                        );
-                        border: 1px solid rgba(var(--primary-rgb, 37, 99, 235), 0.2);
+                        /* Simple active state: transparent bg, golden left border */
+                        background: transparent;
+                        border: 0;
                         z-index: 10;
-                        transition: all 0.3s ease;
-                        box-shadow: 
-                            0 4px 12px rgba(var(--primary-rgb, 37, 99, 235), 0.15),
-                            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+                        transition: all 0.2s ease;
+                        box-shadow: none;
                         
                         &:before {
                             content: "";
@@ -284,95 +297,115 @@
                             bottom: 0;
                             border-radius: theme("borderRadius.xl");
                             position: absolute;
-                            border-left: 3px solid theme("colors.primary");
-                            background: linear-gradient(90deg, 
-                                rgba(var(--primary-rgb, 37, 99, 235), 0.1) 0%,
-                                transparent 100%
-                            );
+                            border-left: 3px solid #d49a24;
+                            background: transparent;
                         }
                         &:after {
                             display: none; /* Remove chevron completely */
                         }
                         .side-menu__icon {
-                            color: theme("colors.primary");
+                            color: #d49a24;
                             z-index: 10;
-                            transform: scale(1.1);
-                            filter: drop-shadow(0 2px 4px rgba(var(--primary-rgb, 37, 99, 235), 0.3));
+                            transform: none;
+                            filter: none;
                         }
                         .side-menu__title {
-                            color: theme("colors.primary");
+                            color: #d49a24; /* Royal yellow for active tab text */
                             font-weight: theme("fontWeight.semibold");
                             z-index: 10;
                         }
                     }
+                    /* Open state: only keep icon/text color, no card background */
+                    &.side-menu--open {
+                        background: transparent;
+                        transform: none;
+                        box-shadow: none;
+
+                        &:before {
+                            content: none;
+                        }
+                        .side-menu__icon {
+                            color: #d49a24;
+                        }
+                        .side-menu__title {
+                            color: #d49a24; /* same royal yellow when menu is open */
+                            font-weight: theme("fontWeight.medium");
+                        }
+                    }
                     &:hover {
                         &:not(.side-menu--active):not(.side-menu--open) {
-                            background: linear-gradient(135deg, 
-                                rgba(var(--primary-rgb, 37, 99, 235), 0.08) 0%,
-                                rgba(var(--primary-rgb, 37, 99, 235), 0.04) 100%
-                            );
-                            transform: translateX(4px);
-                            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
-                            
+                            /* Hover: affect only icon/text, no background or overlay */
+                            background: transparent;
+                            transform: none;
+                            box-shadow: none;
+
                             &:before {
-                                content: "";
-                                display: block;
-                                top: 0;
-                                left: 0;
-                                right: 0;
-                                bottom: 0;
-                                border-radius: theme("borderRadius.xl");
-                                position: absolute;
-                                z-index: -1;
-                                border-left: 3px solid
-                                    rgb(var(--primary-rgb, 37, 99, 235));
-                                background: linear-gradient(90deg, 
-                                    rgba(var(--primary-rgb, 37, 99, 235), 0.08) 0%,
-                                    transparent 100%
-                                );
+                                content: none;
                             }
                             .side-menu__icon {
-                                color: rgb(var(--primary-rgb, 37, 99, 235));
-                                transform: scale(1.1);
+                                color: #d49a24;
+                                transform: none;
                             }
                             .side-menu__title {
-                                color: rgb(var(--primary-rgb, 37, 99, 235));
+                                color: #303030;
                                 font-weight: theme("fontWeight.medium");
                             }
                         }
                     }
                 }
                 & > ul {
-                    background-color: theme("colors.white" / 4%);
-                    border-radius: theme("borderRadius.xl");
+                    /* No background block for sub-menu; keep structure only */
+                    background-color: transparent;
+                    border-radius: 0;
                     position: relative;
-                    border: 1px solid theme("colors.slate.200" / 70%);
+                    border: 0;
+                    box-shadow: none;
                     &:before {
-                        content: "";
-                        display: block;
-                        top: 0;
-                        left: 0;
-                        right: 0;
-                        bottom: 0;
-                        background-color: theme("colors.white" / 30%);
-                        border-radius: theme("borderRadius.xl");
-                        position: absolute;
-                        z-index: -1;
+                        content: none;
                     }
                     &:not(.side-menu__sub-open) {
                         display: none;
                     }
                     & > li {
                         /* Second level */
+                        position: relative;
+
+                        /* Single curved (L-shaped) hierarchy line per item */
+                        &:before {
+                            content: "";
+                            position: absolute;
+                            top: -1.5rem;
+                            left: 1.2rem;
+                            width: 1rem;
+                            height: 2.8rem;
+                            border-left: 1px solid rgba(48, 48, 48, 0.8);
+                            border-bottom: 1px solid rgba(48, 48, 48, 0.8);
+                            border-bottom-left-radius: 8px;
+                            opacity: 0.6;
+                            pointer-events: none;
+                        }
+
                         & > .side-menu {
-                            padding-left: theme("spacing.7");
+                            /* Move submenu label further to the right from the connector line */
+                            padding-left: theme("spacing.9");
+                            /* تقليل المسافة العمودية بين عناصر الـ sub-menu */
+                            height: 34px;
+                            margin-bottom: theme("spacing.1");
+
+                            /* Submenu: hide icon to reduce visual noise */
+                            .side-menu__icon {
+                                display: none;
+                            }
+
                             &.side-menu--active {
-                                .side-menu__icon {
-                                    color: theme("colors.slate.700");
-                                }
+                                /* Active sub-menu item: highlight text only */
+                                background-color: transparent;
+                                box-shadow: none;
+                                border-radius: 0;
+
                                 .side-menu__title {
-                                    color: theme("colors.slate.700");
-                                    font-weight: theme("fontWeight.medium");
+                                    color: #d49a24; /* royal yellow for current page */
+                                    font-weight: theme("fontWeight.semibold");
                                 }
                             }
                             &:not(.side-menu--active) {
@@ -380,9 +413,6 @@
                             }
                             &:hover {
                                 &:not(.side-menu--active) {
-                                    .side-menu__icon {
-                                        color: rgb(var(--primary-rgb, 37, 99, 235));
-                                    }
                                     .side-menu__title {
                                         color: rgb(var(--primary-rgb, 37, 99, 235));
                                         font-weight: theme("fontWeight.medium");

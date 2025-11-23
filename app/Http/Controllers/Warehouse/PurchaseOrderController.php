@@ -25,6 +25,12 @@ class PurchaseOrderController extends Controller
 
     public function index()
     {
+        // Get statistics for the royal theme header
+        $totalPurchaseOrders = PurchaseOrder::count();
+        $pendingPurchaseOrders = PurchaseOrder::where('status', 'pending')->count();
+        $approvedPurchaseOrders = PurchaseOrder::where('status', 'approved')->count();
+        $completedPurchaseOrders = PurchaseOrder::where('status', 'completed')->count();
+
         // Get suppliers and materials for the unified invoice form
         try {
             $suppliers = collect(); // Empty collection as fallback
@@ -41,7 +47,7 @@ class PurchaseOrderController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('warehouse.purchase-orders.index', compact('suppliers', 'materials', 'approvalTemplates'));
+        return view('warehouse.purchase-orders.index', compact('suppliers', 'materials', 'approvalTemplates', 'totalPurchaseOrders', 'pendingPurchaseOrders', 'approvedPurchaseOrders', 'completedPurchaseOrders'));
     }
 
     public function previewCode()

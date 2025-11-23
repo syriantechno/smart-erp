@@ -22,7 +22,15 @@ class PositionController extends Controller
 
     public function index()
     {
-        return view('hr.positions.index');
+        $positionsTotal = Position::count();
+        $positionsActive = Position::where('is_active', true)->count();
+        $positionsInactive = Position::where('is_active', false)->count();
+
+        return view('hr.positions.index', compact(
+            'positionsTotal',
+            'positionsActive',
+            'positionsInactive'
+        ));
     }
 
     public function store(Request $request)

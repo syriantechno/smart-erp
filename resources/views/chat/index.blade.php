@@ -78,7 +78,77 @@
 @section('subcontent')
     @include('components.global-notifications')
 
-    <div class="mt-8 grid grid-cols-12 gap-6">
+    {{-- Heading + top stats strip on the same row (Departments template matches Positions) --}}
+    <div class="intro-y mt-6 mb-2 flex flex-col gap-1 text-[#3a2a1a]">
+        <div class="flex items-baseline justify-between gap-6">
+            <h2 class="flex items-center gap-2 text-2xl md:text-3xl font-semibold text-royalDark tracking-wide">
+                <x-base.lucide icon="message-square" class="w-7 h-7" />
+                <span>Internal Chat</span>
+            </h2>
+
+            <div class="flex flex-row items-end gap-8 md:gap-12 justify-end">
+                {{-- Active --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="message-square" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            0
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Active Chats
+                    </div>
+                </div>
+
+                {{-- Messages --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="message-circle" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            0
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Messages
+                    </div>
+                </div>
+
+                {{-- Unread --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="mail-open" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            0
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Unread
+                    </div>
+                </div>
+
+                {{-- Total --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="users" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            0
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Conversations
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
         <div class="col-span-12 lg:col-span-3 2xl:col-span-2">
             
             <div class="intro-y">
@@ -160,6 +230,23 @@
                         </div>
                     </div>
                     <div class="flex items-center">
+                        <!-- Action Buttons -->
+                        <x-base.tippy content="Export PDF" placement="bottom">
+                            <button id="chat-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark mr-2">
+                                <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
+                            </button>
+                        </x-base.tippy>
+                        <x-base.tippy content="Export" placement="bottom">
+                            <button id="chat-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark mr-2">
+                                <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
+                            </button>
+                        </x-base.tippy>
+                        <x-base.tippy content="Refresh" placement="bottom">
+                            <button id="chat-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark mr-2">
+                                <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
+                            </button>
+                        </x-base.tippy>
+
                         <button
                             type="button"
                             class="btn-tonal btn-tonal--info min-h-[36px] px-3 text-sm font-semibold"
@@ -684,5 +771,39 @@
         window.clearFile = clearFile;
         window.startNewConversation = startNewConversation;
         window.refreshMessages = refreshMessages;
+        // Add event listeners for new buttons
+        document.addEventListener('DOMContentLoaded', function () {
+            // PDF export
+            const pdfBtn = document.getElementById('chat-pdf');
+            if (pdfBtn) {
+                pdfBtn.addEventListener('click', function () {
+                    showToast('PDF export functionality not implemented yet', 'info');
+                });
+            }
+
+            // Export functionality
+            const exportBtn = document.getElementById('chat-export');
+            if (exportBtn) {
+                exportBtn.addEventListener('click', function () {
+                    // Simple export message for now
+                    showToast('Export functionality available through chat settings', 'info');
+                });
+            }
+
+            // Refresh functionality
+            const refreshBtn = document.getElementById('chat-refresh');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', function () {
+                    if (currentConversationId) {
+                        loadMessages(currentConversationId);
+                        showToast('Messages refreshed', 'success');
+                    } else {
+                        loadConversations();
+                        showToast('Conversations refreshed', 'success');
+                    }
+                });
+            }
+        });
+
     </script>
 @endpush

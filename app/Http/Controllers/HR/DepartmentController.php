@@ -30,7 +30,17 @@ class DepartmentController extends Controller
     public function index()
     {
         $departments = Department::with(['manager', 'parent', 'employees'])->get();
-        return view('hr.departments.index', compact('departments'));
+
+        $departmentsTotal = $departments->count();
+        $departmentsActive = $departments->where('is_active', true)->count();
+        $departmentsInactive = $departments->where('is_active', false)->count();
+
+        return view('hr.departments.index', compact(
+            'departments',
+            'departmentsTotal',
+            'departmentsActive',
+            'departmentsInactive'
+        ));
     }
 
     public function create()

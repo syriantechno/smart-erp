@@ -36,6 +36,12 @@ class ElectronicMailController extends Controller
         $draftCount = ElectronicMail::draft()->where('sender_user_id', auth()->id())->count();
         $starredCount = ElectronicMail::starred()->where('recipient_user_id', auth()->id())->count();
 
+        // Additional statistics for royal theme header
+        $totalEmails = ElectronicMail::count();
+        $readEmails = ElectronicMail::where('is_read', true)->count();
+        $unreadEmails = ElectronicMail::where('is_read', false)->count();
+        $starredEmails = ElectronicMail::where('is_starred', true)->count();
+
         $currentFolder = $request->get('folder', 'inbox');
 
         $mailAccount = Auth::check() ? Auth::user()->defaultMailAccount : null;
@@ -48,6 +54,10 @@ class ElectronicMailController extends Controller
             'sentCount',
             'draftCount',
             'starredCount',
+            'totalEmails',
+            'readEmails',
+            'unreadEmails',
+            'starredEmails',
             'currentFolder',
             'mailAccount'
         ));

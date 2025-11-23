@@ -46,82 +46,135 @@
 
 @section('subcontent')
     @include('components.global-notifications')
-    <div class="intro-y mt-8 flex items-center">
-        <h2 class="mr-auto text-lg font-medium">Warehouses Management</h2>
-        <button
-            type="button"
-            class="btn-tonal btn-tonal--success w-40 sm:w-auto sm:ml-4 group"
-            data-tw-toggle="modal"
-            data-tw-target="#create-warehouse-modal"
-        >
-            <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
-            Add Warehouse
-        </button>
+
+    {{-- Heading + top stats strip on the same row (Departments template matches Positions) --}}
+    <div class="intro-y mt-6 mb-2 flex flex-col gap-1 text-[#3a2a1a]">
+        <div class="flex items-baseline justify-between gap-6">
+            <h2 class="flex items-center gap-2 text-2xl md:text-3xl font-semibold text-royalDark tracking-wide">
+                <x-base.lucide icon="warehouse" class="w-7 h-7" />
+                <span>Warehouses Management</span>
+            </h2>
+
+            <div class="flex flex-row items-end gap-8 md:gap-12 justify-end">
+                {{-- Inactive warehouses --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="pause-circle" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $inactiveWarehouses ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Inactive
+                    </div>
+                </div>
+
+                {{-- Active warehouses --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="check-circle-2" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $activeWarehouses ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Active
+                    </div>
+                </div>
+
+                {{-- Total warehouses --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="warehouse" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $totalWarehouses ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Warehouses
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="mt-5 grid grid-cols-12 gap-6">
         <div class="intro-y col-span-12">
-            <!-- Advanced Filters Section -->
-            <x-base.preview-component class="intro-y box mb-6">
+            <x-base.preview-component class="intro-y box bg-white/80 border border-slate-200/70 shadow-[0_18px_45px_rgba(15,23,42,0.10)]">
                 <div class="p-5">
-                    <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                        <x-base.lucide icon="filter" class="h-5 w-5"></x-base.lucide>
-                        Advanced Filters
-                        <span id="warehouses-active-filters-indicator" class="hidden ml-2 px-2 py-0.5 text-xs bg-emerald-500/15 text-emerald-700 rounded-full">Active</span>
-                    </h3>
+                    <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
+                        <form id="warehouses-filter-form" class="w-full sm:mr-auto xl:flex">
+                            <div class="items-center sm:mr-4 sm:flex">
+                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
+                                    Status
+                                </label>
+                                <x-base.form-select id="warehouses-status-filter" class="mt-2 w-full sm:mt-0 sm:w-auto">
+                                    <option value="">All Status</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </x-base.form-select>
+                            </div>
+                            <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
+                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
+                                    Search
+                                </label>
+                                <x-base.form-input
+                                    id="warehouses-search-filter"
+                                    type="text"
+                                    placeholder="Search..."
+                                    class="mt-2 w-full sm:mt-0 sm:w-48 2xl:w-full"
+                                />
+                            </div>
+                            <div class="mt-4 flex flex-wrap gap-2 sm:items-center xl:mt-0">
+                                <button id="warehouses-filter-go" type="button" class="btn-royal btn-royal--dark btn-royal--sm w-full sm:w-24 group">
+                                    <x-base.lucide icon="search" class="w-4 h-4 icon-hover-rise" />
+                                    Go
+                                </button>
+                                <button id="warehouses-filter-reset" type="button" class="btn-royal btn-royal--outline btn-royal--sm w-full sm:w-24 group">
+                                    <x-base.lucide icon="rotate-ccw" class="w-4 h-4 icon-hover-rise" />
+                                    Reset
+                                </button>
+                            </div>
+                        </form>
 
-                    <div class="grid grid-cols-12 gap-4">
-                        <!-- Status Filter -->
-                        <div class="col-span-12 md:col-span-3">
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Status
-                            </label>
-                            <x-base.form-select id="warehouses-status-filter" class="w-full">
-                                <option value="">All Status</option>
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                            </x-base.form-select>
-                        </div>
+                        <div class="mt-5 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
+                            <x-base.tippy content="Export PDF" placement="bottom">
+                                <button id="warehouses-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                    <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+                            <x-base.tippy content="Export" placement="bottom">
+                                <button id="warehouses-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                    <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+                            <x-base.tippy content="Refresh" placement="bottom">
+                                <button id="warehouses-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                    <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
 
-                        <!-- Search Filter -->
-                        <div class="col-span-12 md:col-span-6">
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Search
-                            </label>
-                            <x-base.form-input
-                                id="warehouses-search-filter"
-                                type="text"
-                                placeholder="Search by code, name or location..."
-                                class="w-full"
-                            />
-                        </div>
-
-                        <!-- Filter Actions -->
-                        <div class="col-span-12 md:col-span-3 flex items-end gap-2">
-                            <button
-                                type="button"
-                                class="btn-tonal btn-tonal--amber flex-1 group"
-                                onclick="clearWarehousesFilters()"
-                            >
-                                <x-base.lucide icon="rotate-ccw" class="w-4 h-4 icon-hover-rise" />
-                                Clear
-                            </button>
-                            <button
-                                type="button"
-                                class="btn-tonal btn-tonal--info flex-1 group"
-                                onclick="applyWarehousesFilters()"
-                            >
-                                <x-base.lucide icon="search" class="w-4 h-4 icon-hover-rise" />
-                                Apply
-                            </button>
+                            {{-- Add Warehouse button at the right end of the toolbar --}}
+                            <x-base.tippy content="Add new warehouse" placement="bottom">
+                                <button
+                                    type="button"
+                                    class="btn-royal btn-royal--gold btn-royal--sm sm:btn-royal--lg group"
+                                    data-tw-toggle="modal"
+                                    data-tw-target="#create-warehouse-modal"
+                                >
+                                    <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
+                                    <span class="hidden sm:inline">Add</span>
+                                </button>
+                            </x-base.tippy>
                         </div>
                     </div>
-                </div>
-            </x-base.preview-component>
 
-            <!-- Warehouses Table -->
-            <x-base.preview-component class="intro-y box">
-                <div class="p-5">
                     <div class="overflow-x-auto sm:overflow-visible" data-erp-table-wrapper>
                         <table
                             id="warehouses-table"
@@ -129,38 +182,13 @@
                             data-erp-table
                             class="datatable-default w-full min-w-full table-auto text-left text-sm"
                         >
-                            <thead>
+                            <thead class="bg-gradient-to-r from-royalDark to-gray-800 text-white">
                                 <tr>
-                                    <th
-                                        data-tw-merge
-                                        class="font-semibold px-5 py-2 border-b-2 dark:border-darkmode-300 whitespace-nowrap"
-                                    >
-                                        Code
-                                    </th>
-                                    <th
-                                        data-tw-merge
-                                        class="font-semibold px-5 py-2 border-b-2 dark:border-darkmode-300 whitespace-nowrap"
-                                    >
-                                        Name
-                                    </th>
-                                    <th
-                                        data-tw-merge
-                                        class="font-semibold px-5 py-2 border-b-2 dark:border-darkmode-300 whitespace-nowrap"
-                                    >
-                                        Location
-                                    </th>
-                                    <th
-                                        data-tw-merge
-                                        class="font-semibold px-5 py-2 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center"
-                                    >
-                                        Status
-                                    </th>
-                                    <th
-                                        data-tw-merge
-                                        class="font-semibold px-5 py-2 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center"
-                                    >
-                                        Actions
-                                    </th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Code</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Name</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Location</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Status</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -197,19 +225,17 @@
         });
 
         function initializeWarehousesDataTable() {
-            warehousesTable = window.initDataTable('#warehouses-table', {
-                ajax: {
-                    url: @json(route('warehouse.warehouses.datatable')),
-                    type: 'GET',
-                    data: function (d) {
-                        const statusEl = document.getElementById('warehouses-status-filter');
-                        const searchEl = document.getElementById('warehouses-search-filter');
+            warehousesTable = window.erpCrud.initDataTable({
+                tableSelector: '#warehouses-table',
+                ajaxUrl: '{{ route("warehouse.warehouses.datatable") }}',
+                ajaxData: function (d) {
+                    const statusEl = document.getElementById('warehouses-status-filter');
+                    const searchEl = document.getElementById('warehouses-search-filter');
 
-                        d.status = statusEl ? statusEl.value : '';
-                        d.filter_value = searchEl ? searchEl.value : '';
-                        d.filter_field = 'all';
-                        d.filter_type = 'contains';
-                    }
+                    d.status = statusEl ? statusEl.value : '';
+                    d.filter_value = searchEl ? searchEl.value : '';
+                    d.filter_field = 'all';
+                    d.filter_type = 'contains';
                 },
                 columns: [
                     { data: 'code', name: 'code' },
@@ -218,11 +244,7 @@
                     { data: 'status_badge', name: 'status_badge', orderable: false, searchable: false },
                     { data: 'actions', name: 'actions', orderable: false, searchable: false }
                 ],
-                pageLength: 25,
-                lengthChange: false,
-                searching: false,
-                dom:
-                    "t<'datatable-footer flex flex-col md:flex-row md:items-center md:justify-between mt-5 gap-4'<'datatable-info text-slate-500'i><'datatable-pagination'p>>",
+                pageLength: 25
             });
 
             window.warehousesTable = warehousesTable;
@@ -244,6 +266,10 @@
                 return;
             }
 
+            const pdfBtn = jq('#warehouses-pdf');
+            const exportBtn = jq('#warehouses-export');
+            const refreshBtn = jq('#warehouses-refresh');
+
             jq('#warehouses-search-filter').on('keypress', function (e) {
                 if (e.which === 13) {
                     applyWarehousesFilters();
@@ -253,6 +279,31 @@
             jq('#warehouses-status-filter').on('change', function () {
                 applyWarehousesFilters();
             });
+
+            if (pdfBtn.length) {
+                pdfBtn.on('click', function () {
+                    showToast('PDF export functionality not implemented yet', 'info');
+                });
+            }
+
+            if (exportBtn.length) {
+                exportBtn.on('click', function () {
+                    if (window.erpCrud && typeof window.erpCrud.exportDataTable === 'function') {
+                        window.erpCrud.exportDataTable(warehousesTable, 'warehouses');
+                    } else {
+                        showToast('Export functionality not available', 'error');
+                    }
+                });
+            }
+
+            if (refreshBtn.length) {
+                refreshBtn.on('click', function () {
+                    if (warehousesTable) {
+                        warehousesTable.ajax.reload();
+                        showToast('Data refreshed', 'success');
+                    }
+                });
+            }
         }
 
         function applyWarehousesFilters() {
@@ -274,6 +325,7 @@
                 warehousesTable.ajax.reload();
             }
             updateWarehousesActiveFiltersIndicator();
+            showToast('Filters reset', 'success');
         }
 
         function updateWarehousesActiveFiltersIndicator() {

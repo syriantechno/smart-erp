@@ -14,6 +14,7 @@ use App\Http\Controllers\CRM\LeadController;
 use App\Http\Controllers\CRM\OpportunityController;
 use App\Http\Controllers\CRM\ActivityController;
 use App\Http\Controllers\CRM\FileController;
+use App\Http\Controllers\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -62,6 +63,9 @@ Route::middleware('auth')->group(function () {
 
     // Calendar
     Route::get('calendar', [CalendarController::class, 'index'])->name('calendar');
+
+    // Profile
+    Route::post('profile/signature', [ProfileController::class, 'updateSignature'])->name('profile.signature.update');
 
     // HR Routes
     Route::prefix('hr')->name('hr.')->group(function () {

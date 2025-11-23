@@ -21,8 +21,14 @@ class DeliveryOrderController extends Controller
 
     public function index()
     {
+        // Get statistics for the royal theme header
+        $totalDeliveryOrders = DeliveryOrder::count();
+        $pendingDeliveryOrders = DeliveryOrder::where('status', 'pending')->count();
+        $shippedDeliveryOrders = DeliveryOrder::where('status', 'shipped')->count();
+        $deliveredDeliveryOrders = DeliveryOrder::where('status', 'delivered')->count();
+
         $warehouses = Warehouse::active()->select('id', 'name')->get();
-        return view('warehouse.delivery-orders.index', compact('warehouses'));
+        return view('warehouse.delivery-orders.index-unified', compact('warehouses', 'totalDeliveryOrders', 'pendingDeliveryOrders', 'shippedDeliveryOrders', 'deliveredDeliveryOrders'));
     }
 
     public function previewCode()

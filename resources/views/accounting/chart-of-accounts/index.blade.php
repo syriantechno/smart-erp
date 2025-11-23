@@ -14,27 +14,76 @@
 
 @section('subcontent')
     @include('components.global-notifications')
-    <div class="intro-y mt-8 flex items-center">
-        <h2 class="mr-auto text-lg font-medium">Chart of Accounts</h2>
-        <div class="flex items-center gap-2">
-            <button
-                type="button"
-                class="btn-tonal btn-tonal--info min-h-[44px] px-4 group"
-                data-tw-toggle="modal"
-                data-tw-target="#journal-entries-modal"
-            >
-                <x-base.lucide icon="BookOpen" class="w-4 h-4 icon-hover-rise" />
-                Journal Entries
-            </button>
-            <button
-                type="button"
-                class="btn-tonal btn-tonal--success min-h-[44px] px-4 group"
-                data-tw-toggle="modal"
-                data-tw-target="#add-account-modal"
-            >
-                <x-base.lucide icon="SquarePlus" class="w-4 h-4 icon-hover-rise" />
-                Add Account
-            </button>
+
+    {{-- Heading + top stats strip on the same row (Departments template matches Positions) --}}
+    <div class="intro-y mt-6 mb-2 flex flex-col gap-1 text-[#3a2a1a]">
+        <div class="flex items-baseline justify-between gap-6">
+            <h2 class="flex items-center gap-2 text-2xl md:text-3xl font-semibold text-royalDark tracking-wide">
+                <x-base.lucide icon="book-open" class="w-7 h-7" />
+                <span>Chart of Accounts</span>
+            </h2>
+
+            <div class="flex flex-row items-end gap-8 md:gap-12 justify-end">
+                {{-- Total accounts --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="book-open" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight" id="total-accounts">
+                            0
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Total
+                    </div>
+                </div>
+
+                {{-- Asset accounts --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="trending-up" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight" id="asset-accounts">
+                            0
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Assets
+                    </div>
+                </div>
+
+                {{-- Liability accounts --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="trending-down" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight" id="liability-accounts">
+                            0
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Liabilities
+                    </div>
+                </div>
+
+                {{-- Income accounts --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="dollar-sign" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight" id="income-accounts">
+                            0
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Income
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -275,23 +324,45 @@
                             </div>
                         </form>
 
-                        <div class="mt-5 flex sm:mt-0">
-                            <button
-                                id="account-export"
-                                type="button"
-                                class="btn-tonal btn-tonal--neutral mr-2 w-1/2 sm:w-auto group"
-                            >
-                                <x-base.lucide icon="Download" class="h-4 w-4 icon-hover-rise" />
-                                Export
-                            </button>
-                            <button
-                                id="account-refresh"
-                                type="button"
-                                class="btn-tonal btn-tonal--info w-1/2 sm:w-auto group"
-                            >
-                                <x-base.lucide icon="RefreshCcw" class="h-4 w-4 icon-hover-rise" />
-                                Refresh
-                            </button>
+                        <div class="mt-5 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
+                            <x-base.tippy content="Journal Entries" placement="bottom">
+                                <button
+                                    type="button"
+                                    class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark"
+                                    data-tw-toggle="modal"
+                                    data-tw-target="#journal-entries-modal"
+                                >
+                                    <x-base.lucide icon="book-open" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+                            <x-base.tippy content="Export PDF" placement="bottom">
+                                <button id="account-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                    <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+                            <x-base.tippy content="Export" placement="bottom">
+                                <button id="account-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                    <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+                            <x-base.tippy content="Refresh" placement="bottom">
+                                <button id="account-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                    <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+
+                            {{-- Add Account button at the right end of the toolbar --}}
+                            <x-base.tippy content="Add new account" placement="bottom">
+                                <button
+                                    type="button"
+                                    class="btn-royal btn-royal--gold btn-royal--sm sm:btn-royal--lg group"
+                                    data-tw-toggle="modal"
+                                    data-tw-target="#add-account-modal"
+                                >
+                                    <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
+                                    <span class="hidden sm:inline">Add</span>
+                                </button>
+                            </x-base.tippy>
                         </div>
                     </div>
 
@@ -558,6 +629,23 @@
                         console.error('Export error:', error);
                         showToast('Failed to export chart of accounts', 'error');
                     }
+                });
+            }
+
+            // PDF export
+            const pdfBtn = document.getElementById('account-pdf');
+            if (pdfBtn) {
+                pdfBtn.addEventListener('click', function () {
+                    showToast('PDF export functionality not implemented yet', 'info');
+                });
+            }
+
+            // Refresh functionality
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', function () {
+                    table.ajax.reload(null, false);
+                    updateAccountStatistics();
+                    showToast('Data refreshed', 'success');
                 });
             }
 

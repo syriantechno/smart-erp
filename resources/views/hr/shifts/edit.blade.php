@@ -10,7 +10,7 @@
 @section('subcontent')
     <div class="intro-y mt-8 flex items-center">
         <h2 class="mr-auto text-lg font-medium">تعديل الشيفتة: {{ $shift->name }}</h2>
-        <a href="{{ route('hr.shifts.index') }}" class="btn btn-secondary ml-2">
+        <a href="{{ route('hr.shifts.index') }}" class="btn-royal btn-royal--outline ml-2">
             <x-base.lucide icon="ArrowLeft" class="w-4 h-4 mr-2" />
             العودة للقائمة
         </a>
@@ -225,11 +225,11 @@
 
                         <!-- Action Buttons -->
                         <div class="flex justify-end gap-2 pt-4 border-t">
-                            <a href="{{ route('hr.shifts.index') }}" class="btn btn-outline-secondary">
+                            <a href="{{ route('hr.shifts.index') }}" class="btn-royal btn-royal--outline">
                                 <x-base.lucide icon="X" class="w-4 h-4 mr-2" />
                                 إلغاء
                             </a>
-                            <button type="submit" class="btn btn-primary">
+                            <button type="submit" class="btn-royal btn-royal--gold">
                                 <x-base.lucide icon="Save" class="w-4 h-4 mr-2" />
                                 حفظ التغييرات
                             </button>

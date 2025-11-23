@@ -292,40 +292,75 @@
                                 Save
                             </x-base.button>
                         </div>
-                        <div class="mx-auto w-52 xl:ml-6 xl:mr-0">
-                            <div
-                                class="rounded-md border-2 border-dashed border-slate-200/60 p-5 shadow-sm dark:border-darkmode-400">
-                                <div class="image-fit zoom-in relative mx-auto h-40 cursor-pointer">
-                                    <img
-                                        class="rounded-md"
-                                        src="{{ Vite::asset($fakers[0]['photos'][0]) }}"
-                                        alt="Midone - Tailwind Admin Dashboard Template"
-                                    />
-                                    <x-base.tippy
-                                        class="absolute right-0 top-0 -mr-2 -mt-2 flex h-5 w-5 items-center justify-center rounded-full bg-danger text-white"
-                                        as="div"
-                                        content="Remove this profile photo?"
-                                    >
-                                        <x-base.lucide
-                                            class="h-4 w-4"
-                                            icon="X"
+                        <div class="mx-auto w-full max-w-xs xl:ml-6 xl:mr-0">
+                            <form
+                                class="rounded-md border-2 border-dashed border-slate-200/60 p-5 shadow-sm dark:border-darkmode-400"
+                                method="POST"
+                                action="{{ route('profile.signature.update') }}"
+                                enctype="multipart/form-data"
+                            >
+                                @csrf
+                                <div class="text-center">
+                                    <p class="text-sm font-medium text-slate-600">
+                                        توقيع الموافقة
+                                    </p>
+                                    <p class="mt-1 text-xs text-slate-500">
+                                        يدعم PNG / JPG / WEBP لغاية 2MB
+                                    </p>
+                                </div>
+
+                                <div class="mt-4">
+                                    @if (auth()->user()->signature_url)
+                                        <img
+                                            src="{{ auth()->user()->signature_url }}"
+                                            alt="Signature preview"
+                                            class="mx-auto max-h-28"
                                         />
-                                    </x-base.tippy>
+                                    @else
+                                        <div class="text-center text-xs text-slate-500">
+                                            لا يوجد توقيع محفوظ بعد
+                                        </div>
+                                    @endif
                                 </div>
-                                <div class="relative mx-auto mt-5 cursor-pointer">
-                                    <x-base.button
-                                        class="w-full"
-                                        type="button"
-                                        variant="primary"
-                                    >
-                                        Change Photo
-                                    </x-base.button>
+
+                                <div class="mt-4">
+                                    <x-base.form-label class="text-xs font-medium" for="signature">
+                                        تحميل توقيع جديد
+                                    </x-base.form-label>
                                     <x-base.form-input
-                                        class="absolute left-0 top-0 h-full w-full opacity-0"
+                                        id="signature"
+                                        name="signature"
                                         type="file"
+                                        accept="image/png,image/jpeg,image/webp,image/svg+xml"
                                     />
+                                    @error('signature', 'profileSignature')
+                                        <p class="mt-2 text-xs text-danger">{{ $message }}</p>
+                                    @enderror
                                 </div>
-                            </div>
+
+                                <div class="mt-5 flex flex-col gap-2">
+                                    <x-base.button type="submit" variant="primary">
+                                        حفظ التوقيع
+                                    </x-base.button>
+
+                                    @if (auth()->user()->signature_path)
+                                        <button
+                                            type="submit"
+                                            name="remove_signature"
+                                            value="1"
+                                            class="btn btn-danger"
+                                        >
+                                            حذف التوقيع
+                                        </button>
+                                    @endif
+                                </div>
+
+                                @if (session('profile_signature_status'))
+                                    <div class="mt-4 rounded border border-success/50 bg-success/10 px-3 py-2 text-xs text-success">
+                                        {{ session('profile_signature_status') }}
+                                    </div>
+                                @endif
+                            </form>
                         </div>
                     </div>
                 </div>

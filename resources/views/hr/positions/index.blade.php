@@ -76,17 +76,62 @@
 
 @section('subcontent')
     @include('components.global-notifications')
-    <div class="intro-y mt-8 flex items-center">
-        <h2 class="mr-auto text-lg font-medium">Positions Management</h2>
-        <button
-            type="button"
-            class="btn-tonal btn-tonal--info w-40 sm:w-auto sm:ml-4 group"
-            data-tw-toggle="modal"
-            data-tw-target="#create-position-modal"
-        >
-            <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
-            Add Position
-        </button>
+
+    {{-- Heading + top stats strip on the same row --}}
+    <div class="intro-y mt-6 mb-2 flex flex-col gap-1 text-[#3a2a1a]">
+        <div class="flex items-baseline justify-between gap-6">
+            <h2 class="flex items-center gap-2 text-2xl md:text-3xl font-semibold text-royalDark tracking-wide">
+                <x-base.lucide icon="briefcase" class="w-7 h-7" />
+                <span>Positions Management</span>
+            </h2>
+
+            <div class="flex flex-row items-end gap-8 md:gap-12 justify-end">
+                {{-- Inactive positions --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="pause-circle" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $positionsInactive ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Inactive
+                    </div>
+                </div>
+
+                {{-- Active positions --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="check-circle-2" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $positionsActive ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Active
+                    </div>
+                </div>
+
+                {{-- Total positions --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="briefcase" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $positionsTotal ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Positions
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Hidden button to trigger edit modal -->
@@ -94,7 +139,7 @@
 
     <div class="mt-5 grid grid-cols-12 gap-6">
         <div class="intro-y col-span-12">
-            <x-base.preview-component class="intro-y box">
+            <x-base.preview-component class="intro-y box bg-white/80 border border-slate-200/70 shadow-[0_18px_45px_rgba(15,23,42,0.10)]">
                 <div class="p-5">
                     <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
                         <form id="positions-filter-form" class="w-full sm:mr-auto xl:flex">
@@ -136,30 +181,55 @@
                                 </x-base.form-select>
                             </div>
                             <div class="mt-4 flex flex-wrap gap-2 sm:items-center xl:mt-0">
-                                <button id="positions-filter-go" type="button" class="btn-tonal btn-tonal--info w-full sm:w-24 group">
-                                    <x-base.lucide icon="search" class="w-4 h-4 icon-hover-rise" />
-                                    Go
-                                </button>
-                                <button id="positions-filter-reset" type="button" class="btn-tonal btn-tonal--amber w-full sm:w-24 group">
-                                    <x-base.lucide icon="rotate-ccw" class="w-4 h-4 icon-hover-rise" />
-                                    Reset
-                                </button>
+                                <x-base.tippy content="Apply filters" placement="top">
+                                    <button id="positions-filter-go" type="button" class="btn-royal btn-royal--dark btn-royal--sm w-full sm:w-24 group">
+                                        <x-base.lucide icon="search" class="w-4 h-4 icon-hover-rise" />
+                                        Go
+                                    </button>
+                                </x-base.tippy>
+                                <x-base.tippy content="Reset filters" placement="top">
+                                    <button id="positions-filter-reset" type="button" class="btn-royal btn-royal--outline btn-royal--sm w-full sm:w-24 group">
+                                        <x-base.lucide icon="rotate-ccw" class="w-4 h-4 icon-hover-rise" />
+                                        Reset
+                                    </button>
+                                </x-base.tippy>
                             </div>
                         </form>
 
                         <div class="mt-5 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
-                            <button type="button" class="btn-tonal btn-tonal--purple btn-tonal--icon group" title="Print">
-                                <x-base.lucide icon="printer" class="w-5 h-5 icon-hover-rise" />
-                            </button>
-                            <button type="button" class="btn-tonal btn-tonal--rose btn-tonal--icon group" title="Export PDF">
-                                <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
-                            </button>
-                            <button id="positions-export" type="button" class="btn-tonal btn-tonal--lime btn-tonal--icon group" title="Export to Excel">
-                                <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
-                            </button>
-                            <button id="positions-refresh" type="button" class="btn-tonal btn-tonal--sky btn-tonal--icon group" title="Refresh">
-                                <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
-                            </button>
+                            <x-base.tippy content="Print" placement="bottom">
+                                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                    <x-base.lucide icon="printer" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+                            <x-base.tippy content="Export PDF" placement="bottom">
+                                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                    <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+                            <x-base.tippy content="Export to Excel" placement="bottom">
+                                <button id="positions-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                    <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+                            <x-base.tippy content="Refresh" placement="bottom">
+                                <button id="positions-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                    <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+
+                            {{-- Add button at the right end of the toolbar --}}
+                            <x-base.tippy content="Add new position" placement="bottom">
+                                <button
+                                    type="button"
+                                    class="btn-royal btn-royal--gold btn-royal--sm sm:btn-royal--lg group"
+                                    data-tw-toggle="modal"
+                                    data-tw-target="#create-position-modal"
+                                >
+                                    <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
+                                    <span class="hidden sm:inline">Add</span>
+                                </button>
+                            </x-base.tippy>
                         </div>
                     </div>
 
@@ -269,10 +339,10 @@
         </form>
 
         @slot('footer')
-            <div class="flex w-full flex-wrap justify-end gap-2">
+            <div class="custom-modal-footer">
                 <button
                     type="button"
-                    class="btn-tonal btn-tonal--neutral group"
+                    class="btn-royal btn-royal--outline group"
                     data-tw-dismiss="modal"
                 >
                     <x-base.lucide icon="x-circle" class="w-5 h-5 icon-hover-rise" />
@@ -281,7 +351,7 @@
                 <button
                     type="submit"
                     form="edit-position-form"
-                    class="btn-tonal btn-tonal--success group"
+                    class="btn-royal btn-royal--dark group"
                 >
                     <x-base.lucide icon="save" class="w-5 h-5 icon-hover-rise" />
                     Update

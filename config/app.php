@@ -137,6 +137,7 @@ return [
     'aliases' => [
         'DataTables' => Yajra\DataTables\Facades\DataTables::class,
         'Vite' => Illuminate\Support\Facades\Vite::class,
+        'Storage' => Illuminate\Support\Facades\Storage::class,
     ],
 
 ];

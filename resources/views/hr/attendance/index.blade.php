@@ -19,139 +19,125 @@
         data-attendance-index-url="{{ route('hr.attendance.index') }}"
         data-attendance-store-url="{{ route('hr.attendance.store') }}"
     >
-    <div class="intro-y mt-8 flex items-center">
+    <div class="mt-8 flex items-center">
         <h2 class="mr-auto text-lg font-medium">📊 Attendance</h2>
     </div>
 
     <div class="mt-5 grid grid-cols-12 gap-6">
-        <!-- Statistics Cards -->
-        <div class="intro-y col-span-12">
-            <div class="grid grid-cols-12 gap-6">
-                <div class="col-span-12 sm:col-span-6 xl:col-span-3">
-                    <x-base.preview-component class="intro-y box">
-                        <div class="p-5">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 mr-3">
-                                    <x-base.lucide icon="Calendar" class="h-8 w-8 text-success" />
-                                </div>
-                                <div class="flex-grow">
-                                    <h6 class="mb-1">Total Days</h6>
-                                    <h4 class="mb-0 font-bold" id="total-days">0</h4>
-                                </div>
+        <div class="col-span-12">
+            <div class="flex flex-col gap-6">
+                <!-- Statistics Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="bg-gradient-to-r from-royalDark to-gray-800 rounded-lg p-6 shadow-lg">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <x-base.lucide icon="Calendar" class="w-8 h-8 text-royalYellow" />
                             </div>
-                        </div>
-                    </x-base.preview-component>
-                </div>
-                <div class="col-span-12 sm:col-span-6 xl:col-span-3">
-                    <x-base.preview-component class="intro-y box">
-                        <div class="p-5">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 mr-3">
-                                    <x-base.lucide icon="UserCheck" class="h-8 w-8 text-primary" />
-                                </div>
-                                <div class="flex-grow">
-                                    <h6 class="mb-1">Present</h6>
-                                    <h4 class="mb-0 font-bold text-success" id="total-present">0</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </x-base.preview-component>
-                </div>
-                <div class="col-span-12 sm:col-span-6 xl:col-span-3">
-                    <x-base.preview-component class="intro-y box">
-                        <div class="p-5">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 mr-3">
-                                    <x-base.lucide icon="UserX" class="h-8 w-8 text-danger" />
-                                </div>
-                                <div class="flex-grow">
-                                    <h6 class="mb-1">Absent</h6>
-                                    <h4 class="mb-0 font-bold text-danger" id="total-absent">0</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </x-base.preview-component>
-                </div>
-                <div class="col-span-12 sm:col-span-6 xl:col-span-3">
-                    <x-base.preview-component class="intro-y box">
-                        <div class="p-5">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 mr-3">
-                                    <x-base.lucide icon="Sun" class="h-8 w-8 text-info" />
-                                </div>
-                                <div class="flex-grow">
-                                    <h6 class="mb-1">Vacation</h6>
-                                    <h4 class="mb-0 font-bold text-info" id="total-vacation">0</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </x-base.preview-component>
-                </div>
-            </div>
-        </div>
-
-        <!-- Attendance Table -->
-        <div class="intro-y col-span-12">
-            <x-base.preview-component class="intro-y box">
-                <div class="p-5">
-                    <div class="flex flex-col sm:flex-row sm:items-end xl:items-start justify-between mb-4">
-                        <div class="flex items-center gap-2 mb-4 sm:mb-0">
-                            <h5 class="font-semibold">Attendance Table - {{ \Carbon\Carbon::create($year, $month)->locale('ar')->monthName }} {{ $year }}</h5>
-                        </div>
-                        <div class="flex gap-2 flex-wrap justify-end">
-                            <!-- Month/Year Selector -->
-                            <div class="flex gap-2">
-                                <select
-                                    id="year-select"
-                                    class="disabled:bg-slate-100 disabled:cursor-not-allowed disabled:dark:bg-darkmode-800/50 [&[readonly]]:bg-slate-100 [&[readonly]]:cursor-not-allowed [&[readonly]]:dark:bg-darkmode-800/50 transition duration-200 ease-in-out text-sm border-slate-200 shadow-sm rounded-md py-2 px-3 pr-8 focus:ring-4 focus:ring-primary focus:ring-opacity-20 focus:border-primary focus:border-opacity-40 dark:bg-darkmode-800 dark:border-transparent dark:focus:ring-slate-700 dark:focus:ring-opacity-50 group-[.form-inline]:flex-1 mt-2 w-full sm:mt-0 sm:w-auto 2xl:w-full"
-                                >
-                                    @for($y = 2024; $y <= 2026; $y++)
-                                        <option value="{{ $y }}" {{ $y == $year ? 'selected' : '' }}>{{ $y }}</option>
-                                    @endfor
-                                </select>
-
-                                <select
-                                    id="month-select"
-                                    class="disabled:bg-slate-100 disabled:cursor-not-allowed disabled:dark:bg-darkmode-800/50 [&[readonly]]:bg-slate-100 [&[readonly]]:cursor-not-allowed [&[readonly]]:dark:bg-darkmode-800/50 transition duration-200 ease-in-out text-sm border-slate-200 shadow-sm rounded-md py-2 px-3 pr-8 focus:ring-4 focus:ring-primary focus:ring-opacity-20 focus:border-primary focus:border-opacity-40 dark:bg-darkmode-800 dark:border-transparent dark:focus:ring-slate-700 dark:focus:ring-opacity-50 group-[.form-inline]:flex-1 mt-2 w-full sm:mt-0 sm:w-auto 2xl:w-full"
-                                >
-                                    @for($m = 1; $m <= 12; $m++)
-                                        <option value="{{ $m }}" {{ $m == $month ? 'selected' : '' }}>
-                                            {{ \Carbon\Carbon::create()->month($m)->locale('ar')->monthName }}
-                                        </option>
-                                    @endfor
-                                </select>
-                            </div>
-
-                            <div class="flex flex-wrap gap-2">
-                                <button
-                                    id="export-btn"
-                                    type="button"
-                                    class="btn-tonal btn-tonal--lime btn-tonal--icon group"
-                                    title="Export attendance"
-                                >
-                                    <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
-                                </button>
-
-                                <button
-                                    id="load-month-btn"
-                                    type="button"
-                                    class="btn-tonal btn-tonal--sky btn-tonal--icon group"
-                                    title="Refresh month"
-                                >
-                                    <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
-                                </button>
-
-                                <button
-                                    id="add-attendance-btn"
-                                    type="button"
-                                    class="btn-tonal btn-tonal--success group"
-                                >
-                                    <x-base.lucide icon="plus" class="w-5 h-5 icon-hover-rise" />
-                                    Add Attendance
-                                </button>
+                            <div class="ml-4">
+                                <p class="text-white text-sm font-medium uppercase tracking-wider">Total Days</p>
+                                <p class="text-royalYellow text-2xl font-bold" id="total-days">0</p>
                             </div>
                         </div>
                     </div>
+
+                    <div class="bg-gradient-to-r from-green-600 to-green-700 rounded-lg p-6 shadow-lg">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <x-base.lucide icon="UserCheck" class="w-8 h-8 text-white" />
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-white text-sm font-medium uppercase tracking-wider">Present</p>
+                                <p class="text-white text-2xl font-bold" id="total-present">0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-r from-red-600 to-red-700 rounded-lg p-6 shadow-lg">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <x-base.lucide icon="UserX" class="w-8 h-8 text-white" />
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-white text-sm font-medium uppercase tracking-wider">Absent</p>
+                                <p class="text-white text-2xl font-bold" id="total-absent">0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg p-6 shadow-lg">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <x-base.lucide icon="Sun" class="w-8 h-8 text-white" />
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-white text-sm font-medium uppercase tracking-wider">Vacation</p>
+                                <p class="text-white text-2xl font-bold" id="total-vacation">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Content Card -->
+                <x-base.preview-component class="intro-y box">
+                    <div class="p-5">
+                        <div class="flex flex-col sm:flex-row sm:items-end xl:items-start justify-between mb-4">
+                            <div class="flex items-center gap-2 mb-4 sm:mb-0">
+                                <h5 class="font-semibold">Attendance Table - {{ \Carbon\Carbon::create($year, $month)->locale('ar')->monthName }} {{ $year }}</h5>
+                            </div>
+                            <div class="flex gap-2 flex-wrap justify-end">
+                                <!-- Month/Year Selector -->
+                                <div class="flex gap-2">
+                                    <select
+                                        id="year-select"
+                                        class="disabled:bg-slate-100 disabled:cursor-not-allowed disabled:dark:bg-darkmode-800/50 [&[readonly]]:bg-slate-100 [&[readonly]]:cursor-not-allowed [&[readonly]]:dark:bg-darkmode-800/50 transition duration-200 ease-in-out text-sm border-slate-200 shadow-sm rounded-md py-2 px-3 pr-8 focus:ring-4 focus:ring-primary focus:ring-opacity-20 focus:border-primary focus:border-opacity-40 dark:bg-darkmode-800 dark:border-transparent dark:focus:ring-slate-700 dark:focus:ring-opacity-50 group-[.form-inline]:flex-1 mt-2 w-full sm:mt-0 sm:w-auto 2xl:w-full"
+                                    >
+                                        @for($y = 2024; $y <= 2026; $y++)
+                                            <option value="{{ $y }}" {{ $y == $year ? 'selected' : '' }}>{{ $y }}</option>
+                                        @endfor
+                                    </select>
+
+                                    <select
+                                        id="month-select"
+                                        class="disabled:bg-slate-100 disabled:cursor-not-allowed disabled:dark:bg-darkmode-800/50 [&[readonly]]:bg-slate-100 [&[readonly]]:cursor-not-allowed [&[readonly]]:dark:bg-darkmode-800/50 transition duration-200 ease-in-out text-sm border-slate-200 shadow-sm rounded-md py-2 px-3 pr-8 focus:ring-4 focus:ring-primary focus:ring-opacity-20 focus:border-primary focus:border-opacity-40 dark:bg-darkmode-800 dark:border-transparent dark:focus:ring-slate-700 dark:focus:ring-opacity-50 group-[.form-inline]:flex-1 mt-2 w-full sm:mt-0 sm:w-auto 2xl:w-full"
+                                    >
+                                        @for($m = 1; $m <= 12; $m++)
+                                            <option value="{{ $m }}" {{ $m == $month ? 'selected' : '' }}>
+                                                {{ \Carbon\Carbon::create()->month($m)->locale('ar')->monthName }}
+                                            </option>
+                                        @endfor
+                                    </select>
+                                </div>
+
+                                <div class="flex flex-wrap gap-2">
+                                    <button
+                                        id="export-btn"
+                                        type="button"
+                                        class="btn-royal btn-royal--outline btn-royal--icon group"
+                                        title="Export attendance"
+                                    >
+                                        <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
+                                    </button>
+
+                                    <button
+                                        id="load-month-btn"
+                                        type="button"
+                                        class="btn-royal btn-royal--outline btn-royal--icon group"
+                                        title="Refresh month"
+                                    >
+                                        <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
+                                    </button>
+
+                                    <button
+                                        id="add-attendance-btn"
+                                        type="button"
+                                        class="btn-royal btn-royal--gold group"
+                                    >
+                                        <x-base.lucide icon="plus" class="w-5 h-5 icon-hover-rise" />
+                                        Add Attendance
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
 
                     <div class="legend-banner mt-4 flex flex-wrap items-center gap-4 text-xs">
                         <div class="flex items-center gap-2">
@@ -417,24 +403,22 @@
 
         @slot('footer')
             <div class="flex justify-end gap-2 w-full">
-                <x-base.button
-                    class="w-24"
+                <button
+                    class="btn-royal btn-royal--outline"
                     data-tw-dismiss="modal"
                     type="button"
-                    variant="outline-secondary"
                 >
                     Cancel
-                </x-base.button>
-                <x-base.button
-                    class="w-32"
+                </button>
+                <button
+                    class="btn-royal btn-royal--gold"
                     type="submit"
                     form="attendance-form"
-                    variant="primary"
                     id="save-attendance-btn"
                 >
                     <x-base.lucide icon="Save" class="w-4 h-4 mr-2" />
                     Save
-                </x-base.button>
+                </button>
             </div>
         @endslot
     </x-modal.form>
@@ -473,13 +457,12 @@
 
         @slot('footer')
             <div class="flex justify-end w-full">
-                <x-base.button
-                    variant="secondary"
-                    size="sm"
+                <button
+                    class="btn-royal btn-royal--outline"
                     data-tw-dismiss="modal"
                 >
                     Close
-                </x-base.button>
+                </button>
             </div>
         @endslot
     </x-modal.form>

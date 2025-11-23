@@ -44,46 +44,50 @@
 /* .side-nav__item:hover { background-color: var(--secondary-color) !important; } */
 /* .side-nav__item--active { background-color: var(--accent-color) !important; } */
 
-/* Top navigation overrides - HR pulse gradient */
+html,
+body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+body {
+    background: linear-gradient(135deg, #dfe3eb 0%, #f7ebd0 45%, #f5d97f 100%) fixed;
+    min-height: 100vh;
+}
+
+.smart-erp {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* Top navigation overrides */
 .top-nav {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 45%, var(--accent-color) 100%) !important;
-    color: #f8fafc !important;
-    box-shadow: 0 10px 30px rgba(var(--primary-rgb), 0.25);
+    background: transparent !important;
+    color: #0f172a !important;
+    box-shadow: none;
 }
 
 .top-nav__item {
-    color: #e2e8f0 !important;
+    color: #374151 !important;
 }
 
 .top-nav__item:hover,
 .top-nav__item--active {
-    background-color: rgba(255, 255, 255, 0.12) !important;
-    color: #ffffff !important;
+    background-color: rgba(15, 23, 42, 0.08) !important;
+    color: #111827 !important;
 }
 
 /* Top bar background */
 .top-bar-pattern {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 45%, var(--accent-color) 100%) !important;
+    background: transparent !important;
     position: relative;
-    overflow: hidden;
-    box-shadow: 0 35px 80px rgba(var(--primary-rgb), 0.35);
+    box-shadow: none;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
 }
 
-.top-bar-pattern::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: radial-gradient(circle at 12% 120%, rgba(255, 255, 255, 0.18), transparent 55%),
-        radial-gradient(circle at 70% 130%, rgba(255, 255, 255, 0.1), transparent 50%);
-    opacity: 0.6;
-}
-
+.top-bar-pattern::before,
 .top-bar-pattern::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: radial-gradient(circle at 65% 35%, rgba(255, 255, 255, 0.12), transparent 50%);
-    mix-blend-mode: screen;
+    content: none !important;
 }

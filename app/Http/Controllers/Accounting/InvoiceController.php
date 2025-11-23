@@ -16,6 +16,12 @@ class InvoiceController extends Controller
 {
     public function index(): View
     {
+        // Get statistics for the royal theme header
+        $totalInvoices = Invoice::count();
+        $paidInvoices = Invoice::where('status', 'paid')->count();
+        $pendingInvoices = Invoice::where('status', 'pending')->count();
+        $overdueInvoices = Invoice::where('status', 'overdue')->count();
+
         $companies = Company::orderBy('name')->get();
         $taxes = Tax::where('is_active', true)->orderBy('name')->get();
         $accounts = Accounting::orderBy('code')->get();
@@ -25,7 +31,7 @@ class InvoiceController extends Controller
             ->limit(50)
             ->get();
 
-        return view('accounting.invoices.index', compact('companies', 'taxes', 'accounts', 'invoices'));
+        return view('accounting.invoices.index', compact('companies', 'taxes', 'accounts', 'invoices', 'totalInvoices', 'paidInvoices', 'pendingInvoices', 'overdueInvoices'));
     }
 
     protected function generateInvoiceNumber(): string

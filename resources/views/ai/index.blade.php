@@ -47,7 +47,77 @@
 @section('subcontent')
     @include('components.global-notifications')
 
-    <!-- AI Status Check -->
+    {{-- Heading + top stats strip on the same row (Departments template matches Positions) --}}
+    <div class="intro-y mt-6 mb-2 flex flex-col gap-1 text-[#3a2a1a]">
+        <div class="flex items-baseline justify-between gap-6">
+            <h2 class="flex items-center gap-2 text-2xl md:text-3xl font-semibold text-royalDark tracking-wide">
+                <x-base.lucide icon="bot" class="w-7 h-7" />
+                <span>AI Assistant</span>
+            </h2>
+
+            <div class="flex flex-row items-end gap-8 md:gap-12 justify-end">
+                {{-- Automations --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="settings" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $stats['active_automations'] ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Automations
+                    </div>
+                </div>
+
+                {{-- Generated Content --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="file-text" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $stats['generated_content'] ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Content
+                    </div>
+                </div>
+
+                {{-- Completed --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="check-circle-2" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $stats['completed_interactions'] ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Completed
+                    </div>
+                </div>
+
+                {{-- Total --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="message-square" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $stats['total_interactions'] ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Interactions
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div id="ai-status-alert" class="alert alert-warning mb-6" style="display: none;">
         <div class="flex items-center">
             <x-base.lucide icon="AlertTriangle" class="w-5 h-5 mr-2" />
@@ -133,8 +203,28 @@
         <!-- Quick Actions -->
         <div class="col-span-12">
             <div class="bg-white rounded-lg p-6 shadow-sm border">
+                <div class="flex flex-col sm:flex-row sm:items-end xl:items-start mb-4">
+                    <div class="flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
+                        <x-base.tippy content="Export PDF" placement="bottom">
+                            <button id="ai-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
+                            </button>
+                        </x-base.tippy>
+                        <x-base.tippy content="Export" placement="bottom">
+                            <button id="ai-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
+                            </button>
+                        </x-base.tippy>
+                        <x-base.tippy content="Refresh" placement="bottom">
+                            <button id="ai-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
+                            </button>
+                        </x-base.tippy>
+                    </div>
+                </div>
+
                 <h2 class="text-xl font-semibold mb-6 flex items-center">
-                    <x-base.lucide icon="Zap" class="w-6 h-6 mr-2 text-blue-600" />
+                    <x-base.lucide icon="zap" class="w-6 h-6 mr-2 text-blue-600" />
                     Quick Actions
                 </h2>
 
@@ -777,5 +867,36 @@
         window.testAIConnection = testAIConnection;
         window.handleChatKeyPress = handleChatKeyPress;
         window.sendMessage = sendMessage;
+        // Add event listeners for new buttons
+        document.addEventListener('DOMContentLoaded', function () {
+            // PDF export
+            const pdfBtn = document.getElementById('ai-pdf');
+            if (pdfBtn) {
+                pdfBtn.addEventListener('click', function () {
+                    showToast('PDF export functionality not implemented yet', 'info');
+                });
+            }
+
+            // Export functionality
+            const exportBtn = document.getElementById('ai-export');
+            if (exportBtn) {
+                exportBtn.addEventListener('click', function () {
+                    // Simple export message for now
+                    showToast('Export functionality available through AI settings', 'info');
+                });
+            }
+
+            // Refresh functionality
+            const refreshBtn = document.getElementById('ai-refresh');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', function () {
+                    loadRecentActivity();
+                    if (typeof showToast === 'function') {
+                        showToast('Data refreshed', 'success');
+                    }
+                });
+            }
+        });
+
     </script>
 @endpush

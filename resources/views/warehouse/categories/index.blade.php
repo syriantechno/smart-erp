@@ -13,25 +13,148 @@
 
 @section('subcontent')
     @include('components.global-notifications')
-    <div class="intro-y mt-8 flex items-center">
-        <h2 class="mr-auto text-lg font-medium">Categories Management</h2>
-        <button
-            type="button"
-            id="open-create-category-modal"
-            class="btn-tonal btn-tonal--info w-40 sm:w-auto sm:ml-4 group"
-            data-tw-toggle="modal"
-            data-tw-target="#create-category-modal"
-        >
-            <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
-            Add Category
-        </button>
+
+    {{-- Heading + top stats strip on the same row (Departments template matches Positions) --}}
+    <div class="intro-y mt-6 mb-2 flex flex-col gap-1 text-[#3a2a1a]">
+        <div class="flex items-baseline justify-between gap-6">
+            <h2 class="flex items-center gap-2 text-2xl md:text-3xl font-semibold text-royalDark tracking-wide">
+                <x-base.lucide icon="tag" class="w-7 h-7" />
+                <span>Categories Management</span>
+            </h2>
+
+            <div class="flex flex-row items-end gap-8 md:gap-12 justify-end">
+                {{-- Inactive categories --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="pause-circle" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $inactiveCategories ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Inactive
+                    </div>
+                </div>
+
+                {{-- Active categories --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="check-circle-2" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $activeCategories ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Active
+                    </div>
+                </div>
+
+                {{-- Total categories --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="tag" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $totalCategories ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Categories
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    @php
+        function renderCategoryOptions($categories, $level = 0) {
+            foreach ($categories as $category) {
+                $indent = str_repeat('&nbsp;', $level * 4);
+                echo '<option value="' . $category->id . '">' . $indent . $category->name . '</option>';
+                if ($category->children && $category->children->count() > 0) {
+                    renderCategoryOptions($category->children, $level + 1);
+                }
+            }
+        }
+    @endphp
 
     <div class="mt-5 grid grid-cols-12 gap-6">
         <div class="intro-y col-span-12">
-            <!-- Categories Table -->
-            <x-base.preview-component class="intro-y box">
+            <x-base.preview-component class="intro-y box bg-white/80 border border-slate-200/70 shadow-[0_18px_45px_rgba(15,23,42,0.10)]">
                 <div class="p-5">
+                    <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
+                        <form id="categories-filter-form" class="w-full sm:mr-auto xl:flex">
+                            <div class="items-center sm:mr-4 sm:flex">
+                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
+                                    Status
+                                </label>
+                                <x-base.form-select id="categories-status-filter" class="mt-2 w-full sm:mt-0 sm:w-auto">
+                                    <option value="">All Status</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </x-base.form-select>
+                            </div>
+                            <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
+                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
+                                    Search
+                                </label>
+                                <x-base.form-input
+                                    id="categories-search-filter"
+                                    type="text"
+                                    placeholder="Search..."
+                                    class="mt-2 w-full sm:mt-0 sm:w-48 2xl:w-full"
+                                />
+                            </div>
+                            <div class="mt-4 flex flex-wrap gap-2 sm:items-center xl:mt-0">
+                                <button id="categories-filter-go" type="button" class="btn-royal btn-royal--dark btn-royal--sm w-full sm:w-24 group">
+                                    <x-base.lucide icon="search" class="w-4 h-4 icon-hover-rise" />
+                                    Go
+                                </button>
+                                <button id="categories-filter-reset" type="button" class="btn-royal btn-royal--outline btn-royal--sm w-full sm:w-24 group">
+                                    <x-base.lucide icon="rotate-ccw" class="w-4 h-4 icon-hover-rise" />
+                                    Reset
+                                </button>
+                            </div>
+                        </form>
+
+                        <div class="mt-5 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
+                            <x-base.tippy content="Export PDF" placement="bottom">
+                                <button id="categories-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                    <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+                            <x-base.tippy content="Export" placement="bottom">
+                                <button id="categories-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                    <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+                            <x-base.tippy content="Refresh" placement="bottom">
+                                <button id="categories-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                    <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+
+                            {{-- Add Category button at the right end of the toolbar --}}
+                            <x-base.tippy content="Add new category" placement="bottom">
+                                <button
+                                    type="button"
+                                    id="open-create-category-modal"
+                                    class="btn-royal btn-royal--gold btn-royal--sm sm:btn-royal--lg group"
+                                    data-tw-toggle="modal"
+                                    data-tw-target="#create-category-modal"
+                                >
+                                    <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
+                                    <span class="hidden sm:inline">Add</span>
+                                </button>
+                            </x-base.tippy>
+                        </div>
+                    </div>
+
                     <div class="overflow-x-auto sm:overflow-visible" data-erp-table-wrapper>
                         <table
                             id="categories-table"
@@ -39,14 +162,14 @@
                             data-erp-table
                             class="datatable-default w-full min-w-full table-auto text-left text-sm"
                         >
-                            <thead>
+                            <thead class="bg-gradient-to-r from-royalDark to-gray-800 text-white">
                                 <tr>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Code</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Name</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Parent</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Description</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Status</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Actions</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Status</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -97,9 +220,10 @@
                         <x-base.form-label for="create-category-parent">Parent Category</x-base.form-label>
                         <x-base.form-select id="create-category-parent" name="parent_id" class="w-full">
                             <option value="">Root Category</option>
-                            @foreach(\App\Models\Warehouse\Category::orderBy('name')->get() as $parentCategory)
-                                <option value="{{ $parentCategory->id }}">{{ $parentCategory->name }}</option>
-                            @endforeach
+                            @php
+                                $rootCategories = \App\Models\Warehouse\Category::whereNull('parent_id')->with('children')->orderBy('name')->get();
+                                renderCategoryOptions($rootCategories);
+                            @endphp
                         </x-base.form-select>
                     </div>
 
@@ -129,7 +253,7 @@
             <div class="flex w-full flex-wrap justify-end gap-2">
                 <button
                     type="button"
-                    class="btn-tonal btn-tonal--neutral group"
+                    class="btn-royal btn-royal--outline group"
                     data-tw-dismiss="modal"
                 >
                     <x-base.lucide icon="x-circle" class="w-5 h-5 icon-hover-rise" />
@@ -139,7 +263,7 @@
                     type="submit"
                     form="create-category-form"
                     id="create-category-btn"
-                    class="btn-tonal btn-tonal--success group"
+                    class="btn-royal btn-royal--gold group"
                 >
                     <x-base.lucide icon="save" class="w-5 h-5 icon-hover-rise" />
                     Save Category
@@ -264,9 +388,10 @@
                         <x-base.form-label for="edit-category-parent">Parent Category</x-base.form-label>
                         <x-base.form-select id="edit-category-parent" name="parent_id" class="w-full">
                             <option value="">Root Category</option>
-                            @foreach(\App\Models\Warehouse\Category::orderBy('name')->get() as $parentCategory)
-                                <option value="{{ $parentCategory->id }}">{{ $parentCategory->name }}</option>
-                            @endforeach
+                            @php
+                                $rootCategories = \App\Models\Warehouse\Category::whereNull('parent_id')->with('children')->orderBy('name')->get();
+                                renderCategoryOptions($rootCategories);
+                            @endphp
                         </x-base.form-select>
                     </div>
 
@@ -296,7 +421,7 @@
             <div class="flex w-full flex-wrap justify-end gap-2">
                 <button
                     type="button"
-                    class="btn-tonal btn-tonal--neutral group"
+                    class="btn-royal btn-royal--outline group"
                     data-tw-dismiss="modal"
                 >
                     <x-base.lucide icon="x-circle" class="w-5 h-5 icon-hover-rise" />
@@ -306,7 +431,7 @@
                     type="submit"
                     form="edit-category-form"
                     id="edit-category-btn"
-                    class="btn-tonal btn-tonal--success group"
+                    class="btn-royal btn-royal--gold group"
                 >
                     <x-base.lucide icon="save" class="w-5 h-5 icon-hover-rise" />
                     Update Category
@@ -333,6 +458,7 @@
             }
 
             initializeCategoriesDataTable();
+            setupCategoriesEventListeners();
 
             // Auto-generate code when opening create category modal
             const openBtn = document.getElementById('open-create-category-modal');
@@ -358,9 +484,18 @@
             categoriesTable = window.erpCrud.initDataTable({
                 tableSelector: '#categories-table',
                 ajaxUrl: @json(route('warehouse.categories.datatable')),
+                ajaxData: function (d) {
+                    const statusEl = document.getElementById('categories-status-filter');
+                    const searchEl = document.getElementById('categories-search-filter');
+
+                    d.status = statusEl ? statusEl.value : '';
+                    d.filter_value = searchEl ? searchEl.value : '';
+                    d.filter_field = 'all';
+                    d.filter_type = 'contains';
+                },
                 columns: [
                     { data: 'code', name: 'code' },
-                    { data: 'name', name: 'name' },
+                    { data: 'indented_name', name: 'indented_name', orderable: false },
                     {
                         data: 'parent_name',
                         name: 'parent_name',
@@ -387,6 +522,68 @@
             });
 
             window.categoriesTable = categoriesTable;
+
+            if (!categoriesTable) {
+                return;
+            }
+
+            categoriesTable.on('draw', function () {
+                if (typeof window.lucide !== 'undefined' && window.lucide.createIcons) {
+                    window.lucide.createIcons();
+                }
+            });
+        }
+
+        function setupCategoriesEventListeners() {
+            const jq = window.jQuery || window.$;
+            if (!jq) {
+                return;
+            }
+
+            const pdfBtn = jq('#categories-pdf');
+            const exportBtn = jq('#categories-export');
+            const refreshBtn = jq('#categories-refresh');
+
+            jq('#categories-search-filter').on('keypress', function (e) {
+                if (e.which === 13) {
+                    applyCategoriesFilters();
+                }
+            });
+
+            jq('#categories-status-filter').on('change', function () {
+                applyCategoriesFilters();
+            });
+
+            if (pdfBtn.length) {
+                pdfBtn.on('click', function () {
+                    showToast('PDF export functionality not implemented yet', 'info');
+                });
+            }
+
+            if (exportBtn.length) {
+                exportBtn.on('click', function () {
+                    if (window.erpCrud && typeof window.erpCrud.exportDataTable === 'function') {
+                        window.erpCrud.exportDataTable(categoriesTable, 'categories');
+                    } else {
+                        showToast('Export functionality not available', 'error');
+                    }
+                });
+            }
+
+            if (refreshBtn.length) {
+                refreshBtn.on('click', function () {
+                    if (categoriesTable) {
+                        categoriesTable.ajax.reload();
+                        showToast('Data refreshed', 'success');
+                    }
+                });
+            }
+        }
+
+        function applyCategoriesFilters() {
+            if (categoriesTable) {
+                categoriesTable.ajax.reload();
+            }
         }
 
         window.editCategory = function(id) {

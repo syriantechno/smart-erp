@@ -20,7 +20,12 @@ class CategoryController extends Controller
 
     public function index()
     {
-        return view('warehouse.categories.index');
+        // Get statistics for the royal theme header
+        $totalCategories = Category::count();
+        $activeCategories = Category::where('is_active', true)->count();
+        $inactiveCategories = Category::where('is_active', false)->count();
+
+        return view('warehouse.categories.index', compact('totalCategories', 'activeCategories', 'inactiveCategories'));
     }
 
     public function previewCode()
@@ -37,6 +42,11 @@ class CategoryController extends Controller
         return DataTables::of($baseQuery)
             ->addColumn('parent_name', function ($category) {
                 return $category->parent ? $category->parent->name : 'Root';
+            })
+            ->addColumn('indented_name', function ($category) {
+                $level = $category->getLevel();
+                $indent = str_repeat('— ', $level);
+                return $indent . $category->name;
             })
             ->addColumn('status_badge', function ($category) {
                 $badgeClass = $category->is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';

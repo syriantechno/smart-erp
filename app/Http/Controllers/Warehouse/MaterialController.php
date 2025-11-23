@@ -26,10 +26,21 @@ class MaterialController extends Controller
         $categories = Category::active()->select('id', 'name', 'parent_id')->get();
         $units = MeasurementUnit::active()->select('id', 'name', 'symbol')->get();
         $parentCategories = $categories->whereNull('parent_id');
+
+        // Get statistics for the royal theme header
+        $totalMaterials = Material::count();
+        $activeMaterials = Material::where('is_active', true)->count();
+        $inactiveMaterials = Material::where('is_active', false)->count();
+        $lowStockMaterials = 0; // TODO: Implement proper low stock calculation when inventory system is complete
+
         return view('warehouse.materials.index', [
             'categories' => $categories,
-            'parentCategories' => $parentCategories,
             'units' => $units,
+            'parentCategories' => $parentCategories,
+            'totalMaterials' => $totalMaterials,
+            'activeMaterials' => $activeMaterials,
+            'inactiveMaterials' => $inactiveMaterials,
+            'lowStockMaterials' => $lowStockMaterials
         ]);
     }
 

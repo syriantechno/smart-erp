@@ -21,8 +21,14 @@ class SaleOrderController extends Controller
 
     public function index()
     {
+        // Get statistics for the royal theme header
+        $totalSaleOrders = SaleOrder::count();
+        $pendingSaleOrders = SaleOrder::where('status', 'pending')->count();
+        $confirmedSaleOrders = SaleOrder::where('status', 'confirmed')->count();
+        $completedSaleOrders = SaleOrder::where('status', 'completed')->count();
+
         $warehouses = Warehouse::active()->select('id', 'name')->get();
-        return view('warehouse.sale-orders.index', compact('warehouses'));
+        return view('warehouse.sale-orders.index', compact('warehouses', 'totalSaleOrders', 'pendingSaleOrders', 'confirmedSaleOrders', 'completedSaleOrders'));
     }
 
     public function previewCode()

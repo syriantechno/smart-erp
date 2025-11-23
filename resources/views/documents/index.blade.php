@@ -58,7 +58,77 @@
 @section('subcontent')
     @include('components.global-notifications')
 
-    <div class="mt-8 grid grid-cols-12 gap-6">
+    {{-- Heading + top stats strip on the same row (Departments template matches Positions) --}}
+    <div class="intro-y mt-6 mb-2 flex flex-col gap-1 text-[#3a2a1a]">
+        <div class="flex items-baseline justify-between gap-6">
+            <h2 class="flex items-center gap-2 text-2xl md:text-3xl font-semibold text-royalDark tracking-wide">
+                <x-base.lucide icon="folder-open" class="w-7 h-7" />
+                <span>Document Manager</span>
+            </h2>
+
+            <div class="flex flex-row items-end gap-8 md:gap-12 justify-end">
+                {{-- Archived --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="archive" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $archivedDocuments ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Archived
+                    </div>
+                </div>
+
+                {{-- Recent --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="clock" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $recentDocuments ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Recent
+                    </div>
+                </div>
+
+                {{-- Active --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="check-circle-2" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $activeDocuments ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Active
+                    </div>
+                </div>
+
+                {{-- Total --}}
+                <div class="flex flex-col items-center gap-1">
+                    <div class="flex items-baseline gap-2">
+                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
+                            <x-base.lucide icon="folder-open" class="w-4 h-4" />
+                        </div>
+                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                            {{ $totalDocuments ?? '—' }}
+                        </div>
+                    </div>
+                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
+                        Documents
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
         <!-- Sidebar with Categories (styled like file manager menu) -->
         <div class="col-span-12 lg:col-span-3 2xl:col-span-2">
             <h2 class="intro-y mr-auto mt-2 text-lg font-medium">
@@ -180,16 +250,36 @@
                                     class="pl-10 w-full"
                                 />
                             </div>
+
+                            <!-- Action Buttons -->
+                            <x-base.tippy content="Export PDF" placement="bottom">
+                                <button id="documents-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                    <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+                            <x-base.tippy content="Export" placement="bottom">
+                                <button id="documents-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                    <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+                            <x-base.tippy content="Refresh" placement="bottom">
+                                <button id="documents-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                    <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
+                                </button>
+                            </x-base.tippy>
+
                             <!-- Upload Button -->
-                            <button
-                                type="button"
-                                class="btn-tonal btn-tonal--success flex items-center min-h-[40px] px-4 font-semibold"
-                                data-tw-toggle="modal"
-                                data-tw-target="#upload-modal"
-                            >
-                                <x-base.lucide icon="Upload" class="w-4 h-4 mr-2 icon-hover-rise" />
-                                Upload
-                            </button>
+                            <x-base.tippy content="Upload new document" placement="bottom">
+                                <button
+                                    type="button"
+                                    class="btn-royal btn-royal--gold btn-royal--sm sm:btn-royal--lg group"
+                                    data-tw-toggle="modal"
+                                    data-tw-target="#upload-modal"
+                                >
+                                    <x-base.lucide icon="upload" class="w-5 h-5 icon-hover-rise" />
+                                    <span class="hidden sm:inline">Upload</span>
+                                </button>
+                            </x-base.tippy>
                         </div>
                     </div>
 
@@ -309,7 +399,40 @@
 @include('components.datatable.scripts')
 
 @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // PDF export
+            const pdfBtn = document.getElementById('documents-pdf');
+            if (pdfBtn) {
+                pdfBtn.addEventListener('click', function () {
+                    showToast('PDF export functionality not implemented yet', 'info');
+                });
+            }
+
+            // Export functionality
+            const exportBtn = document.getElementById('documents-export');
+            if (exportBtn) {
+                exportBtn.addEventListener('click', function () {
+                    if (typeof showToast === 'function') {
+                        showToast('Export functionality available through existing export button', 'info');
+                    }
+                });
+            }
+
+            // Refresh functionality
+            const refreshBtn = document.getElementById('documents-refresh');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', function () {
+                    if (documentsTable) {
+                        documentsTable.ajax.reload();
+                        if (typeof showToast === 'function') {
+                            showToast('Data refreshed', 'success');
+                        }
+                    }
+                });
+            }
+        });
+    </script>
 @endpush
 
 @push('scripts')

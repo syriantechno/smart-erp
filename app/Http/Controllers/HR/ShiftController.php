@@ -29,7 +29,13 @@ class ShiftController extends Controller
     public function index(): View
     {
         $companies = Company::active()->get();
-        return view('hr.shifts.index', compact('companies'));
+
+        // Get statistics for the royal theme header
+        $totalShifts = Shift::count();
+        $activeShifts = Shift::where('is_active', true)->count();
+        $inactiveShifts = Shift::where('is_active', false)->count();
+
+        return view('hr.shifts.index', compact('companies', 'totalShifts', 'activeShifts', 'inactiveShifts'));
     }
 
     /**

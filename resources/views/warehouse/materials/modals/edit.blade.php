@@ -12,7 +12,8 @@
                 Material Information
             </h4>
             <div class="grid grid-cols-12 gap-4 gap-y-4">
-                <div class="col-span-12 md:col-span-6">
+                <!-- First Row: Code, Name, Category, Unit, Status -->
+                <div class="col-span-12 md:col-span-2 xl:col-span-15/100">
                     <x-base.form-label for="edit-code">Code</x-base.form-label>
                     <x-base.form-input
                         id="edit-code"
@@ -24,7 +25,7 @@
                     />
                 </div>
 
-                <div class="col-span-12 md:col-span-6">
+                <div class="col-span-12 md:col-span-3 xl:col-span-25/100">
                     <x-base.form-label for="edit-name">Name</x-base.form-label>
                     <x-base.form-input
                         id="edit-name"
@@ -36,26 +37,20 @@
                     />
                 </div>
 
-                <div class="col-span-12 md:col-span-6">
+                <div class="col-span-12 md:col-span-2 xl:col-span-15/100">
                     <x-base.form-label for="edit-category">Category</x-base.form-label>
                     <x-base.form-select id="edit-category" name="category_id" class="w-full" required>
                         <option value="">Select Category</option>
-                        @foreach($categories ?? [] as $category)
-                            <option value="{{ $category->id }}">{{ $category->name }}</option>
-                        @endforeach
+                        <!-- Categories will be populated by JavaScript -->
                     </x-base.form-select>
                 </div>
 
-                <div class="col-span-12 md:col-span-6">
+                <div class="col-span-12 md:col-span-2 xl:col-span-20/100">
                     <x-base.form-label for="edit-unit">Unit</x-base.form-label>
                     <div class="flex gap-2">
                         <x-base.form-select id="edit-unit" name="unit_id" class="w-full" required>
                             <option value="">Select Unit</option>
-                            @foreach(($units ?? []) as $unit)
-                                <option value="{{ $unit->id }}">
-                                    {{ $unit->name }}{{ $unit->symbol ? ' (' . $unit->symbol . ')' : '' }}
-                                </option>
-                            @endforeach
+                            <!-- Units will be populated by JavaScript -->
                         </x-base.form-select>
                         <button
                             type="button"
@@ -78,7 +73,7 @@
                                             type="text"
                                             class="w-full"
                                             placeholder="Code (e.g. PCS)"
-                        data-unit-field="code"
+                                            data-unit-field="code"
                                             autocomplete="off"
                                         />
                                     </div>
@@ -125,7 +120,16 @@
                     </div>
                 </div>
 
-                <div class="col-span-12 md:col-span-6">
+                <div class="col-span-12 md:col-span-2 xl:col-span-10/100">
+                    <x-base.form-label for="edit-status">Status</x-base.form-label>
+                    <x-base.form-select id="edit-status" name="is_active" class="w-full" required>
+                        <option value="1">Active</option>
+                        <option value="0">Inactive</option>
+                    </x-base.form-select>
+                </div>
+
+                <!-- Second Row: SKU, Barcode, Price, Opening Balance -->
+                <div class="col-span-12 md:col-span-3 xl:col-span-25/100">
                     <x-base.form-label for="edit-sku" class="flex items-center gap-2">
                         SKU
                         <span class="text-xs font-normal text-slate-400">(Optional)</span>
@@ -139,7 +143,7 @@
                     />
                 </div>
 
-                <div class="col-span-12 md:col-span-6">
+                <div class="col-span-12 md:col-span-3 xl:col-span-25/100">
                     <x-base.form-label for="edit-barcode" class="flex items-center gap-2">
                         Barcode
                         <span class="text-xs font-normal text-slate-400">(Optional)</span>
@@ -153,7 +157,7 @@
                     />
                 </div>
 
-                <div class="col-span-12 md:col-span-6">
+                <div class="col-span-12 md:col-span-2 xl:col-span-15/100">
                     <x-base.form-label for="edit-price">Price</x-base.form-label>
                     <x-base.form-input
                         id="edit-price"
@@ -167,7 +171,7 @@
                     />
                 </div>
 
-                <div class="col-span-12 md:col-span-6">
+                <div class="col-span-12 md:col-span-3 xl:col-span-20/100">
                     <x-base.form-label for="edit-opening-quantity">Opening Balance</x-base.form-label>
                     <x-base.form-input
                         id="edit-opening-quantity"
@@ -178,14 +182,6 @@
                         class="w-full"
                         placeholder="0.0000"
                     />
-                </div>
-
-                <div class="col-span-12 md:col-span-6">
-                    <x-base.form-label for="edit-status">Status</x-base.form-label>
-                    <x-base.form-select id="edit-status" name="is_active" class="w-full" required>
-                        <option value="1">Active</option>
-                        <option value="0">Inactive</option>
-                    </x-base.form-select>
                 </div>
 
                 <div class="col-span-12">
@@ -239,7 +235,7 @@
         <div class="flex w-full flex-wrap justify-end gap-2">
             <button
                 type="button"
-                class="btn-tonal btn-tonal--neutral group"
+                class="btn-royal btn-royal--outline group"
                 data-tw-dismiss="modal"
             >
                 <x-base.lucide icon="x-circle" class="w-5 h-5 icon-hover-rise" />
@@ -249,10 +245,10 @@
                 type="submit"
                 form="edit-material-form"
                 id="edit-material-btn"
-                class="btn-tonal btn-tonal--success group"
+                class="btn-royal btn-royal--gold group"
             >
                 <x-base.lucide icon="save" class="w-5 h-5 icon-hover-rise" />
-                Save
+                Update
             </button>
         </div>
     @endslot
@@ -316,6 +312,10 @@
             const $ = jq;
             const form = document.getElementById('edit-material-form');
             const submitBtn = $('#edit-material-btn');
+            
+            // Populate categories and units dropdowns
+            populateDropdowns();
+
             const imageInput = document.getElementById('edit-material-image');
             const previewImage = document.getElementById('edit-material-image-preview');
             const placeholder = document.getElementById('edit-material-image-placeholder');
@@ -324,6 +324,25 @@
 
             if (!form) {
                 return;
+            }
+
+            function populateDropdowns() {
+                // Populate categories
+                const categorySelect = $('#edit-category');
+                if (window.materialsCategories && window.materialsCategories.length > 0) {
+                    window.materialsCategories.forEach(function(category) {
+                        categorySelect.append('<option value="' + category.id + '">' + category.name + '</option>');
+                    });
+                }
+
+                // Populate units
+                const unitSelect = $('#edit-unit');
+                if (window.materialsUnits && window.materialsUnits.length > 0) {
+                    window.materialsUnits.forEach(function(unit) {
+                        const label = unit.symbol ? unit.name + ' (' + unit.symbol + ')' : unit.name;
+                        unitSelect.append('<option value="' + unit.id + '">' + label + '</option>');
+                    });
+                }
             }
 
             const resetImagePreview = () => {

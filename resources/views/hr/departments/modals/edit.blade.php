@@ -89,7 +89,7 @@
             <div class="flex w-full flex-wrap justify-end gap-2">
                 <button
                     type="button"
-                    class="btn-tonal btn-tonal--neutral group"
+                    class="btn-royal btn-royal--outline group"
                     data-tw-dismiss="modal"
                 >
                     <x-base.lucide icon="x-circle" class="w-5 h-5 icon-hover-rise" />
@@ -99,7 +99,7 @@
                     type="submit"
                     id="update-department-btn"
                     form="edit-department-form"
-                    class="btn-tonal btn-tonal--success group"
+                    class="btn-royal btn-royal--gold group"
                 >
                     <x-base.lucide icon="save" class="w-5 h-5 icon-hover-rise" />
                     Update Department

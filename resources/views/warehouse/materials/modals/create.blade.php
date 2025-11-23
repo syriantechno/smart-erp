@@ -9,7 +9,8 @@
                 Material Information
             </h4>
             <div class="grid grid-cols-12 gap-4 gap-y-4">
-                <div class="col-span-12 md:col-span-6">
+                <!-- First Row: Code, Name, Category, Unit, Status -->
+                <div class="col-span-12 md:col-span-2 xl:col-span-15/100">
                     <x-base.form-label for="create-code">Code</x-base.form-label>
                     <x-base.form-input
                         id="create-code"
@@ -22,7 +23,7 @@
                     />
                 </div>
 
-                <div class="col-span-12 md:col-span-6">
+                <div class="col-span-12 md:col-span-3 xl:col-span-25/100">
                     <x-base.form-label for="create-name">Name</x-base.form-label>
                     <x-base.form-input
                         id="create-name"
@@ -34,26 +35,20 @@
                     />
                 </div>
 
-                <div class="col-span-12 md:col-span-6">
+                <div class="col-span-12 md:col-span-2 xl:col-span-15/100">
                     <x-base.form-label for="create-category">Category</x-base.form-label>
                     <x-base.form-select id="create-category" name="category_id" class="w-full" required>
                         <option value="">Select Category</option>
-                        @foreach($categories ?? [] as $category)
-                            <option value="{{ $category->id }}">{{ $category->name }}</option>
-                        @endforeach
+                        <!-- Categories will be populated by JavaScript -->
                     </x-base.form-select>
                 </div>
 
-                <div class="col-span-12 md:col-span-6">
+                <div class="col-span-12 md:col-span-2 xl:col-span-20/100">
                     <x-base.form-label for="create-unit">Unit</x-base.form-label>
                     <div class="flex gap-2">
                         <x-base.form-select id="create-unit" name="unit_id" class="w-full" required>
                             <option value="">Select Unit</option>
-                            @foreach(($units ?? []) as $unit)
-                                <option value="{{ $unit->id }}">
-                                    {{ $unit->name }}{{ $unit->symbol ? ' (' . $unit->symbol . ')' : '' }}
-                                </option>
-                            @endforeach
+                            <!-- Units will be populated by JavaScript -->
                         </x-base.form-select>
                         <button
                             type="button"
@@ -123,7 +118,16 @@
                     </div>
                 </div>
 
-                <div class="col-span-12 md:col-span-6">
+                <div class="col-span-12 md:col-span-2 xl:col-span-10/100">
+                    <x-base.form-label for="create-status">Status</x-base.form-label>
+                    <x-base.form-select id="create-status" name="is_active" class="w-full" required>
+                        <option value="1">Active</option>
+                        <option value="0">Inactive</option>
+                    </x-base.form-select>
+                </div>
+
+                <!-- Second Row: SKU, Barcode, Price, Opening Balance -->
+                <div class="col-span-12 md:col-span-3 xl:col-span-25/100">
                     <x-base.form-label for="create-sku" class="flex items-center gap-2">
                         SKU
                         <span class="text-xs font-normal text-slate-400">(Optional)</span>
@@ -137,7 +141,7 @@
                     />
                 </div>
 
-                <div class="col-span-12 md:col-span-6">
+                <div class="col-span-12 md:col-span-3 xl:col-span-25/100">
                     <x-base.form-label for="create-barcode" class="flex items-center gap-2">
                         Barcode
                         <span class="text-xs font-normal text-slate-400">(Optional)</span>
@@ -151,7 +155,7 @@
                     />
                 </div>
 
-                <div class="col-span-12 md:col-span-6">
+                <div class="col-span-12 md:col-span-2 xl:col-span-15/100">
                     <x-base.form-label for="create-price">Price</x-base.form-label>
                     <x-base.form-input
                         id="create-price"
@@ -165,7 +169,7 @@
                     />
                 </div>
 
-                <div class="col-span-12 md:col-span-6">
+                <div class="col-span-12 md:col-span-3 xl:col-span-20/100">
                     <x-base.form-label for="create-opening-quantity">Opening Balance</x-base.form-label>
                     <x-base.form-input
                         id="create-opening-quantity"
@@ -177,14 +181,6 @@
                         value="0"
                         placeholder="0.0000"
                     />
-                </div>
-
-                <div class="col-span-12 md:col-span-6">
-                    <x-base.form-label for="create-status">Status</x-base.form-label>
-                    <x-base.form-select id="create-status" name="is_active" class="w-full" required>
-                        <option value="1">Active</option>
-                        <option value="0">Inactive</option>
-                    </x-base.form-select>
                 </div>
 
                 <div class="col-span-12">
@@ -238,7 +234,7 @@
         <div class="flex w-full flex-wrap justify-end gap-2">
             <button
                 type="button"
-                class="btn-tonal btn-tonal--neutral group"
+                class="btn-royal btn-royal--outline group"
                 data-tw-dismiss="modal"
             >
                 <x-base.lucide icon="x-circle" class="w-5 h-5 icon-hover-rise" />
@@ -248,7 +244,7 @@
                 type="submit"
                 form="create-material-form"
                 id="create-material-btn"
-                class="btn-tonal btn-tonal--success group"
+                class="btn-royal btn-royal--success group"
             >
                 <x-base.lucide icon="save" class="w-5 h-5 icon-hover-rise" />
                 Save
@@ -267,6 +263,10 @@
             const $ = jq;
             const form = document.getElementById('create-material-form');
             const submitBtn = $('#create-material-btn');
+            
+            // Populate categories and units dropdowns
+            populateDropdowns();
+
             const imageInput = document.getElementById('create-material-image');
             const previewImage = document.getElementById('create-material-image-preview');
             const placeholder = document.getElementById('create-material-image-placeholder');
@@ -274,6 +274,25 @@
 
             if (!form) {
                 return;
+            }
+
+            function populateDropdowns() {
+                // Populate categories
+                const categorySelect = $('#create-category');
+                if (window.materialsCategories && window.materialsCategories.length > 0) {
+                    window.materialsCategories.forEach(function(category) {
+                        categorySelect.append('<option value="' + category.id + '">' + category.name + '</option>');
+                    });
+                }
+
+                // Populate units
+                const unitSelect = $('#create-unit');
+                if (window.materialsUnits && window.materialsUnits.length > 0) {
+                    window.materialsUnits.forEach(function(unit) {
+                        const label = unit.symbol ? unit.name + ' (' + unit.symbol + ')' : unit.name;
+                        unitSelect.append('<option value="' + unit.id + '">' + label + '</option>');
+                    });
+                }
             }
 
             const resetImagePreview = () => {
