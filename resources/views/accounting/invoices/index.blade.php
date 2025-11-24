@@ -90,12 +90,12 @@
                         @csrf
 
                         <div>
-                            <x-base.form-label for="company_id">Company <span class="text-danger">*</span></x-base.form-label>
-                            <x-base.form-select id="company_id" name="company_id" required>
-                                <option value="">Select company</option>
-                                @foreach($companies as $company)
-                                    <option value="{{ $company->id }}" @selected(old('company_id') == $company->id)>
-                                        {{ $company->name }}
+                            <x-base.form-label for="customer_id">Customer <span class="text-danger">*</span></x-base.form-label>
+                            <x-base.form-select id="customer_id" name="customer_id" required>
+                                <option value="">Select customer</option>
+                                @foreach($customers as $customer)
+                                    <option value="{{ $customer->id }}" @selected(old('customer_id') == $customer->id)>
+                                        {{ $customer->code }} - {{ $customer->name }}
                                     </option>
                                 @endforeach
                             </x-base.form-select>
@@ -219,7 +219,7 @@
                                 <tr>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">#</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Number</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Company</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Customer</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Type</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Date</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Total</th>
@@ -236,7 +236,7 @@
                                                 <div class="text-[11px] text-slate-500">Ref: {{ $invoice->reference }}</div>
                                             @endif
                                         </td>
-                                        <td class="px-5 py-3">{{ $invoice->company->name ?? '-' }}</td>
+                                        <td class="px-5 py-3">{{ $invoice->customer->name ?? '-' }}</td>
                                         <td class="px-5 py-3">{{ $invoice->type_label }}</td>
                                         <td class="px-5 py-3">{{ $invoice->invoice_date?->format('Y-m-d') }}</td>
                                         <td class="px-5 py-3">{{ number_format($invoice->total, 2) }}</td>
@@ -279,13 +279,13 @@
                 exportBtn.addEventListener('click', function () {
                     // Simple CSV export for now
                     const rows = [];
-                    const headers = ['Number', 'Company', 'Type', 'Date', 'Total', 'Status'];
+                    const headers = ['Number', 'Customer', 'Type', 'Date', 'Total', 'Status'];
                     rows.push(headers.join(','));
 
                     @foreach($invoices as $invoice)
                         const row = [
                             '"{{ $invoice->number }}"',
-                            '"{{ $invoice->company->name ?? '-' }}"',
+                            '"{{ $invoice->customer->name ?? '-' }}"',
                             '"{{ $invoice->type_label }}"',
                             '"{{ $invoice->invoice_date?->format('Y-m-d') }}"',
                             '{{ $invoice->total }}',

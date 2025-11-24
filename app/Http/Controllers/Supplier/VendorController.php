@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Supplier;
 
 use App\Http\Controllers\Controller;
 use App\Models\Supplier\Vendor;
+use App\Services\Accounting\LinkedAccountManager;
 use App\Services\DocumentCodeGenerator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -14,31 +15,41 @@ use Yajra\DataTables\Facades\DataTables;
 class VendorController extends Controller
 {
     protected $codeGenerator;
+    protected $linkedAccountManager;
 
-    public function __construct(DocumentCodeGenerator $codeGenerator)
+    public function __construct(DocumentCodeGenerator $codeGenerator, LinkedAccountManager $linkedAccountManager)
     {
         $this->codeGenerator = $codeGenerator;
+        $this->linkedAccountManager = $linkedAccountManager;
     }
 
     public function index(): \Illuminate\View\View
     {
-        return view('supplier.vendors.index');
+        $totalVendors = Vendor::count();
+        $activeVendors = Vendor::where('is_active', true)->count();
+        $inactiveVendors = $totalVendors - $activeVendors;
+
+        return view('supplier.vendors.index', [
+            'totalVendors' => $totalVendors,
+            'activeVendors' => $activeVendors,
+            'inactiveVendors' => $inactiveVendors,
+        ]);
     }
 
     public function datatable(): JsonResponse
     {
-        $vendors = Vendor::query();
+        $vendors = Vendor::query()->with('account');
 
-        // Apply search filter
-        if (request()->has('search') && !empty(request('search'))) {
-            $search = request('search');
-            $vendors->where(function ($query) use ($search) {
-                $query->where('code', 'like', "%{$search}%")
-                    ->orWhere('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('phone', 'like', "%{$search}%")
-                    ->orWhere('contact_person', 'like', "%{$search}%");
-            });
+        // Apply advanced search filter
+        $field = request('field', 'all');
+        $type = request('type', 'contains');
+        $value = request('value');
+
+        if ($field !== 'all' && !empty($value)) {
+            $operator = $type === 'equals' ? '=' : 'like';
+            $searchValue = $type === 'equals' ? $value : "%{$value}%";
+
+            $vendors->where($field, $operator, $searchValue);
         }
 
         // Apply status filter - only if status is explicitly set to 0 or 1
@@ -49,10 +60,17 @@ class VendorController extends Controller
         }
 
         return DataTables::of($vendors)
+            ->addColumn('linked_account', function ($vendor) {
+                if ($vendor->account) {
+                    return '<a href="' . route('accounting.chart-of-accounts.index') . '" class="text-primary hover:underline" title="View in Chart of Accounts">' . $vendor->account->code . ' - ' . $vendor->account->name . '</a>';
+                }
+                return '<span class="text-gray-400">No account linked</span>';
+            })
             ->addColumn('action', function ($vendor) {
                 return view('supplier.vendors.partials.actions', compact('vendor'))->render();
             })
             ->addIndexColumn()
+            ->rawColumns(['linked_account', 'action'])
             ->make(true);
     }
 
@@ -76,6 +94,7 @@ class VendorController extends Controller
             'website' => 'nullable|url|max:255',
             'tax_id' => 'nullable|string|max:50',
             'payment_terms' => 'nullable|string|max:255',
+            'account_id' => 'nullable|exists:accountings,id',
             'notes' => 'nullable|string',
             'is_active' => 'boolean'
         ]);
@@ -84,7 +103,14 @@ class VendorController extends Controller
             return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
         }
 
-        $vendor = Vendor::create($request->all());
+        $validatedData = $validator->validated();
+
+        // Ensure linked account exists
+        if (empty($validatedData['account_id'])) {
+            $validatedData['account_id'] = $this->linkedAccountManager->ensureVendorAccount(null, $validatedData['name']);
+        }
+
+        $vendor = Vendor::create($validatedData);
         return response()->json(['success' => true, 'message' => 'Vendor created successfully', 'vendor' => $vendor]);
     }
 
@@ -107,6 +133,7 @@ class VendorController extends Controller
             'website' => 'nullable|url|max:255',
             'tax_id' => 'nullable|string|max:50',
             'payment_terms' => 'nullable|string|max:255',
+            'account_id' => 'nullable|exists:accountings,id',
             'notes' => 'nullable|string',
             'is_active' => 'boolean'
         ]);
@@ -115,7 +142,14 @@ class VendorController extends Controller
             return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
         }
 
-        $vendor->update($request->all());
+        $validatedData = $validator->validated();
+
+        // Ensure linked account exists
+        if (empty($validatedData['account_id'])) {
+            $validatedData['account_id'] = $this->linkedAccountManager->ensureVendorAccount(null, $validatedData['name']);
+        }
+
+        $vendor->update($validatedData);
         return response()->json(['success' => true, 'message' => 'Vendor updated successfully', 'vendor' => $vendor]);
     }
 

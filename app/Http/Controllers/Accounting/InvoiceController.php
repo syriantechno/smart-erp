@@ -8,6 +8,7 @@ use App\Models\Accounting\Invoice;
 use App\Models\Accounting\InvoiceLine;
 use App\Models\Accounting\Tax;
 use App\Models\Company;
+use App\Models\Customer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -23,15 +24,16 @@ class InvoiceController extends Controller
         $overdueInvoices = Invoice::where('status', 'overdue')->count();
 
         $companies = Company::orderBy('name')->get();
+        $customers = Customer::orderBy('name')->get();
         $taxes = Tax::where('is_active', true)->orderBy('name')->get();
         $accounts = Accounting::orderBy('code')->get();
-        $invoices = Invoice::with(['company', 'tax'])
+        $invoices = Invoice::with(['customer', 'tax'])
             ->orderByDesc('invoice_date')
             ->orderByDesc('id')
             ->limit(50)
             ->get();
 
-        return view('accounting.invoices.index', compact('companies', 'taxes', 'accounts', 'invoices', 'totalInvoices', 'paidInvoices', 'pendingInvoices', 'overdueInvoices'));
+        return view('accounting.invoices.index', compact('companies', 'customers', 'taxes', 'accounts', 'invoices', 'totalInvoices', 'paidInvoices', 'pendingInvoices', 'overdueInvoices'));
     }
 
     protected function generateInvoiceNumber(): string
@@ -54,7 +56,7 @@ class InvoiceController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'company_id' => ['required', 'exists:companies,id'],
+            'customer_id' => ['required', 'exists:customers,id'],
             'type' => ['required', 'in:sales,purchase'],
             'tax_id' => ['nullable', 'exists:taxes,id'],
             'invoice_date' => ['required', 'date'],
@@ -104,8 +106,54 @@ class InvoiceController extends Controller
             $line->save();
         }
 
+        // Post to customer account
+        $this->postInvoiceToCustomerAccount($invoice);
+
         return redirect()
             ->route('accounting.invoices.index')
             ->with('success', 'Invoice created successfully.');
+    }
+
+    protected function postInvoiceToCustomerAccount(Invoice $invoice): void
+    {
+        if (!$invoice->customer || !$invoice->customer->account) {
+            return; // Skip if no customer account linked
+        }
+
+        $journalEntry = new \App\Models\Accounting\JournalEntry();
+        $journalEntry->reference_number = $invoice->number;
+        $journalEntry->entry_date = $invoice->invoice_date;
+        $journalEntry->description = "Invoice: {$invoice->number} - {$invoice->customer->name}";
+        $journalEntry->total_debit = $invoice->total;
+        $journalEntry->total_credit = $invoice->total;
+        $journalEntry->status = 'posted';
+        $journalEntry->save();
+
+        // Debit customer account (increase receivable)
+        $debitLine = new \App\Models\Accounting\JournalEntryLine();
+        $debitLine->journal_entry_id = $journalEntry->id;
+        $debitLine->account_id = $invoice->customer->account->id;
+        $debitLine->debit = $invoice->total;
+        $debitLine->credit = 0;
+        $debitLine->description = "Invoice receivable";
+        $debitLine->save();
+
+        // Credit sales revenue account (you may want to make this configurable)
+        $salesAccount = Accounting::where('code', '4000')->first(); // Sales Revenue
+        if (!$salesAccount) {
+            $salesAccount = Accounting::first(); // Fallback to first account
+        }
+
+        $creditLine = new \App\Models\Accounting\JournalEntryLine();
+        $creditLine->journal_entry_id = $journalEntry->id;
+        $creditLine->account_id = $salesAccount->id;
+        $creditLine->debit = 0;
+        $creditLine->credit = $invoice->total;
+        $creditLine->description = "Sales revenue";
+        $creditLine->save();
+
+        // Update invoice status to posted
+        $invoice->status = 'posted';
+        $invoice->save();
     }
 }

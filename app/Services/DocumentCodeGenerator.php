@@ -113,6 +113,7 @@ class DocumentCodeGenerator
             'warehouses' => 'warehouses',
             'categories' => 'categories',
             'purchase_requests' => 'purchase_requests',
+            'customers' => 'customers',
             // Add more mappings as needed
         ];
 

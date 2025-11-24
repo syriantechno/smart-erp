@@ -206,6 +206,28 @@ class SideMenu
                     ]
                 ]
             ],
+            'supplier' => [
+                'icon' => 'truck',
+                'title' => 'Supplier',
+                'sub_menu' => [
+                    'supplier-vendors' => [
+                        'icon' => 'building-2',
+                        'route_name' => 'supplier.vendors.index',
+                        'title' => 'Vendors',
+                    ],
+                ],
+            ],
+            'customers' => [
+                'icon' => 'users',
+                'title' => 'Customers',
+                'sub_menu' => [
+                    'customers-index' => [
+                        'icon' => 'user-plus',
+                        'route_name' => 'customers.index',
+                        'title' => 'All Customers',
+                    ],
+                ],
+            ],
             'accounting' => [
                 'icon' => 'file-text',
                 'title' => 'Accounting',

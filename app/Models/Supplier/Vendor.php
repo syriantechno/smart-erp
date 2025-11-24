@@ -4,6 +4,7 @@ namespace App\Models\Supplier;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Vendor extends Model
@@ -22,6 +23,7 @@ class Vendor extends Model
         'website',
         'tax_id',
         'payment_terms',
+        'account_id',
         'notes',
         'is_active',
     ];
@@ -34,6 +36,11 @@ class Vendor extends Model
     public function purchaseOrders(): HasMany
     {
         return $this->hasMany(\App\Models\Warehouse\PurchaseOrder::class);
+    }
+
+    public function account(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Accounting\Accounting::class, 'account_id');
     }
 
     // Scopes

@@ -59,12 +59,12 @@
 <?php endif; ?>
                         </div>
                         <div class="text-6xl md:text-7xl font-semibold tracking-tight">
-                            <?php echo e($importantEmails ?? '—'); ?>
+                            <?php echo e($starredEmails ?? '—'); ?>
 
                         </div>
                     </div>
                     <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
-                        Important
+                        Starred
                     </div>
                 </div>
 

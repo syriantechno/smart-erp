@@ -502,6 +502,17 @@ Route::middleware('auth')->group(function () {
         });
     });
 
+    // Customers Routes
+    Route::prefix('customers')->name('customers.')->group(function () {
+        Route::get('/', [App\Http\Controllers\CustomerController::class, 'index'])->name('index');
+        Route::get('/datatable', [App\Http\Controllers\CustomerController::class, 'datatable'])->name('datatable');
+        Route::get('/preview-code', [App\Http\Controllers\CustomerController::class, 'previewCode'])->name('preview-code');
+        Route::post('/', [App\Http\Controllers\CustomerController::class, 'store'])->name('store');
+        Route::get('/{customer}', [App\Http\Controllers\CustomerController::class, 'show'])->name('show');
+        Route::put('/{customer}', [App\Http\Controllers\CustomerController::class, 'update'])->name('update');
+        Route::delete('/{customer}', [App\Http\Controllers\CustomerController::class, 'destroy'])->name('destroy');
+    });
+
     // Manufacturing Routes
     Route::prefix('manufacturing')->name('manufacturing.')->group(function () {
         // Main dashboard
