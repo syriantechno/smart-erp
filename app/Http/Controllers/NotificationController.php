@@ -311,7 +311,17 @@ class NotificationController extends Controller
 
         $actionUrl = route('hr.employees.documents.index', $employeeDocument->employee_id);
 
-        self::sendToAllUsers($title, $message, 'warning', $actionUrl, 'AlertTriangle');
+        NotificationDispatcher::toAllUsers(
+            'employee_document.expiring',
+            $title,
+            $message,
+            $actionUrl,
+            'AlertTriangle',
+            [
+                'employee_document_id' => $employeeDocument->id,
+                'employee_id' => $employeeDocument->employee_id,
+            ]
+        );
     }
 
     /**
@@ -377,12 +387,12 @@ class NotificationController extends Controller
         $actionUrl = route('hr.positions.index');
 
         NotificationDispatcher::toAllUsers(
-            'department.deleted',
+            'position.deleted',
             $title,
             $message,
             $actionUrl,
             'Trash2',
-            ['department_id' => $department->id]
+            ['position_id' => $position->id]
         );
     }
 
@@ -434,7 +444,14 @@ class NotificationController extends Controller
         $message = "User {$actor} deleted department '{$department->name}'.";
         $actionUrl = route('hr.departments.index');
 
-        self::sendToAllUsers($title, $message, 'error', $actionUrl, 'Trash2');
+        NotificationDispatcher::toAllUsers(
+            'department.deleted',
+            $title,
+            $message,
+            $actionUrl,
+            'Trash2',
+            ['department_id' => $department->id]
+        );
     }
 
     /**

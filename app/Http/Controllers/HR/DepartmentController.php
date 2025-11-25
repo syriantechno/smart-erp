@@ -17,6 +17,7 @@ use Illuminate\Validation\Rule;
 use Yajra\DataTables\Facades\DataTables;
 use App\Helpers\NotificationHelper;
 use App\Helpers\Reply;
+use App\Services\Notifications\NotificationDispatcher;
 
 class DepartmentController extends Controller
 {
@@ -117,12 +118,14 @@ class DepartmentController extends Controller
                 ]);
 
                 if ($firstApproverId) {
-                    \App\Http\Controllers\NotificationController::sendToUser(
+                    NotificationDispatcher::toUser(
                         $firstApproverId,
+                        'approval.pending',
                         'Approval Request Pending',
                         'You have a new approval request pending your action.',
-                        'info',
-                        route('approval-system.index', ['tab' => 'pending-approval'])
+                        route('approval-system.index', ['tab' => 'pending-approval']),
+                        'Bell',
+                        ['type' => 'info', 'actor_id' => auth()->id()]
                     );
                 }
             } else {
