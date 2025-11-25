@@ -415,6 +415,41 @@
                                     @endif
                                 </div>
                             </div>
+
+                            <!-- Task Likes card -->
+                            <div class="col-span-12">
+                                <div class="rounded-lg border border-slate-200/60 p-4 dark:border-darkmode-400 bg-gradient-to-br from-pink-50/80 to-white dark:from-darkmode-600 dark:to-darkmode-700">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div class="text-sm font-medium text-slate-700 dark:text-slate-100 flex items-center">
+                                            <x-base.lucide icon="heart" class="w-4 h-4 mr-2 text-pink-500" />
+                                            Task Likes
+                                        </div>
+                                    </div>
+                                    @php
+                                        $taskLikesCount = $employee->task_likes_count ?? 0;
+                                        $taskLikesPoints = $employee->task_likes_points ?? 0;
+                                        $totalPointsWithLikes = $employee->total_points_with_likes ?? $totalPoints;
+                                    @endphp
+                                    <div class="grid grid-cols-3 gap-3 mb-3">
+                                        <div class="text-center p-3 rounded-lg bg-white/60 dark:bg-darkmode-600/80">
+                                            <div class="text-2xl font-bold text-pink-500">{{ $taskLikesCount }}</div>
+                                            <div class="text-[11px] text-slate-500">Total Likes</div>
+                                        </div>
+                                        <div class="text-center p-3 rounded-lg bg-white/60 dark:bg-darkmode-600/80">
+                                            <div class="text-2xl font-bold text-emerald-500">+{{ $taskLikesPoints }}</div>
+                                            <div class="text-[11px] text-slate-500">Points from Likes</div>
+                                        </div>
+                                        <div class="text-center p-3 rounded-lg bg-white/60 dark:bg-darkmode-600/80">
+                                            <div class="text-2xl font-bold text-amber-500">{{ $totalPointsWithLikes }}</div>
+                                            <div class="text-[11px] text-slate-500">Total Points</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-xs text-slate-500 dark:text-slate-400 text-center">
+                                        <x-base.lucide icon="info" class="w-3 h-3 inline mr-1" />
+                                        Each like on completed tasks adds 1 point to the employee's score
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
