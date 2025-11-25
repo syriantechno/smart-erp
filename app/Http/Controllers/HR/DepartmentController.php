@@ -129,8 +129,18 @@ class DepartmentController extends Controller
                     );
                 }
             } else {
-                // No template configured: behave as before and create department directly
-                \App\Http\Controllers\NotificationController::departmentCreated($department);
+                $actor = auth()->user()?->name ?? 'System';
+                $title = 'New Department Added';
+                $message = "User {$actor} created department '{$department->name}'.";
+
+                NotificationDispatcher::toAllUsers(
+                    'department.created',
+                    $title,
+                    $message,
+                    route('hr.departments.index'),
+                    'Building',
+                    ['department_id' => $department->id, 'actor_id' => auth()->id()]
+                );
             }
 
             DB::commit();
@@ -357,7 +367,18 @@ class DepartmentController extends Controller
 
         $department->update($validated);
 
-        \App\Http\Controllers\NotificationController::departmentUpdated($department);
+        $actor = auth()->user()?->name ?? 'System';
+        $title = 'Department Updated';
+        $message = "User {$actor} updated department '{$department->name}'.";
+
+        NotificationDispatcher::toAllUsers(
+            'department.updated',
+            $title,
+            $message,
+            route('hr.departments.index'),
+            'Pencil',
+            ['department_id' => $department->id, 'actor_id' => auth()->id()]
+        );
 
         if ($request->ajax()) {
             return response()->json([
@@ -395,23 +416,6 @@ class DepartmentController extends Controller
                 return back();
             }
 
-            $departmentName = $department->name;
-            $department->delete();
-
-            DB::commit();
-
-            if (request()->ajax()) {
-                \App\Http\Controllers\NotificationController::departmentDeleted($department);
-                return Reply::success('Department deleted successfully');
-            }
-
-            \App\Http\Controllers\NotificationController::departmentDeleted($department);
-            return redirect()->route('hr.departments.index')
-                ->with('success', 'Department deleted successfully');
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            
             if (request()->ajax()) {
                 notify_error_code(1004, 'Failed to delete department');
                 return Reply::error('Error deleting department: ' . $e->getMessage(), [], 500);
