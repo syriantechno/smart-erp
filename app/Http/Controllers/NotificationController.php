@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Notification;
 use App\Models\Document;
 use App\Models\HR\Employee as HREmployee;
+use App\Services\Notifications\NotificationDispatcher;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -211,29 +212,14 @@ class NotificationController extends Controller
      */
     public static function sendToAllUsers(string $title, string $message, string $type = 'info', string $actionUrl = null, string $icon = null): void
     {
-        // Set default icon based on type if not provided
-        if (!$icon) {
-            $icon = match ($type) {
-                'success' => 'CheckCircle',
-                'error' => 'ExclamationCircle',
-                'warning' => 'ExclamationTriangle',
-                default => 'InformationCircle',
-            };
-        }
-
-        $users = \App\Models\User::all();
-
-        foreach ($users as $user) {
-            Notification::create([
-                'type' => $type,
-                'title' => $title,
-                'message' => $message,
-                'user_id' => $user->id,
-                'created_by' => auth()->id(),
-                'action_url' => $actionUrl,
-                'icon' => $icon,
-            ]);
-        }
+        NotificationDispatcher::toAllUsers(
+            'custom.notification',
+            $title,
+            $message,
+            $actionUrl,
+            $icon,
+            ['type' => $type]
+        );
     }
 
     /**
@@ -280,7 +266,14 @@ class NotificationController extends Controller
         $message = "User {$actor} added or updated document '{$docTitle}' which will expire on {$expiryDate}.";
         $actionUrl = route('documents.index');
 
-        self::sendToAllUsers($title, $message, 'warning', $actionUrl, 'AlertTriangle');
+        NotificationDispatcher::toAllUsers(
+            'document.expiring',
+            $title,
+            $message,
+            $actionUrl,
+            'AlertTriangle',
+            ['document_id' => $document->id]
+        );
     }
 
     /**
@@ -335,7 +328,14 @@ class NotificationController extends Controller
         $message = "User {$actor} added position '{$position->title}' to department '{$position->department->name}'.";
         $actionUrl = route('hr.positions.index');
 
-        self::sendToAllUsers($title, $message, 'success', $actionUrl, 'Plus');
+        NotificationDispatcher::toAllUsers(
+            'department.created',
+            $title,
+            $message,
+            $actionUrl,
+            'Building',
+            ['department_id' => $department->id]
+        );
     }
 
     /**
@@ -352,7 +352,14 @@ class NotificationController extends Controller
         $message = "User {$actor} updated position '{$position->title}'.";
         $actionUrl = route('hr.positions.index');
 
-        self::sendToAllUsers($title, $message, 'info', $actionUrl, 'Pencil');
+        NotificationDispatcher::toAllUsers(
+            'department.updated',
+            $title,
+            $message,
+            $actionUrl,
+            'Pencil',
+            ['department_id' => $department->id]
+        );
     }
 
     /**
@@ -369,7 +376,14 @@ class NotificationController extends Controller
         $message = "User {$actor} deleted position '{$position->title}'.";
         $actionUrl = route('hr.positions.index');
 
-        self::sendToAllUsers($title, $message, 'error', $actionUrl, 'Trash2');
+        NotificationDispatcher::toAllUsers(
+            'department.deleted',
+            $title,
+            $message,
+            $actionUrl,
+            'Trash2',
+            ['department_id' => $department->id]
+        );
     }
 
     /**
@@ -437,7 +451,14 @@ class NotificationController extends Controller
         $message = "User {$actor} created employee '{$employee->first_name} {$employee->last_name}'.";
         $actionUrl = route('hr.employees.index');
 
-        self::sendToAllUsers($title, $message, 'success', $actionUrl, 'UserPlus');
+        NotificationDispatcher::toAllUsers(
+            'employee.created',
+            $title,
+            $message,
+            $actionUrl,
+            'UserPlus',
+            ['employee_id' => $employee->id]
+        );
     }
 
     /**
@@ -454,6 +475,13 @@ class NotificationController extends Controller
         $message = "User {$actor} deleted employee '{$employee->first_name} {$employee->last_name}'.";
         $actionUrl = route('hr.employees.index');
 
-        self::sendToAllUsers($title, $message, 'error', $actionUrl, 'UserMinus');
+        NotificationDispatcher::toAllUsers(
+            'employee.deleted',
+            $title,
+            $message,
+            $actionUrl,
+            'UserMinus',
+            ['employee_id' => $employee->id]
+        );
     }
 }

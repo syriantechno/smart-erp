@@ -2,7 +2,8 @@
 
 namespace App\Jobs;
 
-use App\Http\Controllers\NotificationController;
+use App\Models\Notification;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -66,22 +67,27 @@ class SendNotificationToChannel implements ShouldQueue
 
     protected function sendInApp(): void
     {
+        $type = $this->data['type'] ?? 'info';
+        $createdBy = $this->data['actor_id'] ?? null;
+
         foreach ($this->recipientIds as $userId) {
-            NotificationController::sendToUser(
-                $userId,
-                $this->title,
-                $this->message,
-                'info',
-                $this->actionUrl,
-                $this->icon
-            );
+            Notification::create([
+                'type' => $type,
+                'title' => $this->title,
+                'message' => $this->message,
+                'user_id' => $userId,
+                'created_by' => $createdBy,
+                'action_url' => $this->actionUrl,
+                'icon' => $this->icon,
+                'data' => $this->data,
+            ]);
         }
     }
 
     protected function sendMail(): void
     {
         foreach ($this->recipientIds as $userId) {
-            $user = \App\Models\User::find($userId);
+            $user = User::find($userId);
             if (!$user || !$user->email) {
                 continue;
             }
