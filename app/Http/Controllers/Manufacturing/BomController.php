@@ -82,10 +82,28 @@ class BomController extends Controller
             }
 
             DB::commit();
+            
+            // Return JSON for AJAX requests
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'id' => $template->id,
+                    'message' => 'BOM Template created successfully'
+                ]);
+            }
+            
             return redirect()->route('manufacturing.bom.show', $template)
                 ->with('success', 'BOM Template created successfully');
         } catch (\Exception $e) {
             DB::rollBack();
+            
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error creating BOM: ' . $e->getMessage()
+                ], 422);
+            }
+            
             return back()->with('error', 'Error creating BOM: ' . $e->getMessage())->withInput();
         }
     }
@@ -249,10 +267,28 @@ class BomController extends Controller
             }
 
             DB::commit();
+            
+            // Return JSON for AJAX requests
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'id' => $order->id,
+                    'message' => 'Manufacturing Order created successfully'
+                ]);
+            }
+            
             return redirect()->route('manufacturing.mo.show', $order)
                 ->with('success', 'Manufacturing Order created successfully');
         } catch (\Exception $e) {
             DB::rollBack();
+            
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error creating order: ' . $e->getMessage()
+                ], 422);
+            }
+            
             return back()->with('error', 'Error creating order: ' . $e->getMessage())->withInput();
         }
     }
