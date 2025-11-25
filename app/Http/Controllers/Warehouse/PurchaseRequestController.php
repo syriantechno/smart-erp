@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Warehouse;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\NotificationController;
+use App\Services\Notifications\NotificationDispatcher;
 use App\Models\Approval\ApprovalRequest;
 use App\Models\Approval\ApprovalTemplate;
 use App\Models\Setting\Company;
@@ -674,12 +674,14 @@ class PurchaseRequestController extends Controller
         ]);
 
         if ($currentApproverId) {
-            NotificationController::sendToUser(
+            NotificationDispatcher::toUser(
                 $currentApproverId,
+                'approval.pending',
                 'Material Request Approval Needed',
                 'Material request ' . $purchaseRequest->code . ' is pending your approval.',
-                'info',
-                route('warehouse.material-requests.show', $purchaseRequest)
+                route('warehouse.material-requests.show', $purchaseRequest),
+                'ClipboardCheck',
+                ['type' => 'info', 'material_request_id' => $purchaseRequest->id]
             );
         }
 

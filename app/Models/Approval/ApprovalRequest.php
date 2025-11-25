@@ -3,6 +3,7 @@
 namespace App\Models\Approval;
 
 use App\Http\Controllers\NotificationController;
+use App\Services\Notifications\NotificationDispatcher;
 use App\Models\HR\Department;
 use App\Models\Setting\Company;
 use App\Models\User;
@@ -225,12 +226,14 @@ class ApprovalRequest extends Model
 
         // Notify next approver or finalize entity
         if ($nextApproverId) {
-            NotificationController::sendToUser(
+            NotificationDispatcher::toUser(
                 $nextApproverId,
+                'approval.pending',
                 'Approval Request Pending',
                 'You have a new approval request pending your action.',
-                'info',
-                route('approval-system.index', ['tab' => 'pending-approval'])
+                route('approval-system.index', ['tab' => 'pending-approval']),
+                'Bell',
+                ['type' => 'info', 'approval_request_id' => $this->id]
             );
         } elseif ($wasFinalApproval) {
             $this->onFullyApproved();
@@ -279,7 +282,14 @@ class ApprovalRequest extends Model
             $department->is_active = true;
             $department->save();
 
-            NotificationController::departmentCreated($department);
+            NotificationDispatcher::toAllUsers(
+                'department.created',
+                'New Department Added',
+                "Department '{$department->name}' has been approved and activated.",
+                route('hr.departments.index'),
+                'Building',
+                ['department_id' => $department->id]
+            );
         }
 
         // Notify requester and all approvers that the request is approved
@@ -299,12 +309,14 @@ class ApprovalRequest extends Model
         $userIds = array_unique(array_filter($userIds));
 
         foreach ($userIds as $id) {
-            NotificationController::sendToUser(
+            NotificationDispatcher::toUser(
                 $id,
+                'approval.approved',
                 'Approval Request Approved',
                 'An approval request you are involved in has been fully approved.',
-                'success',
-                route('approval-system.index')
+                route('approval-system.index'),
+                'CheckCircle',
+                ['approval_request_id' => $this->id]
             );
         }
     }
@@ -328,12 +340,14 @@ class ApprovalRequest extends Model
         $userIds = array_unique(array_filter($userIds));
 
         foreach ($userIds as $id) {
-            NotificationController::sendToUser(
+            NotificationDispatcher::toUser(
                 $id,
+                'approval.rejected',
                 'Approval Request Rejected',
                 'An approval request you are involved in has been rejected.',
-                'error',
-                route('approval-system.index')
+                route('approval-system.index'),
+                'XCircle',
+                ['approval_request_id' => $this->id]
             );
         }
     }

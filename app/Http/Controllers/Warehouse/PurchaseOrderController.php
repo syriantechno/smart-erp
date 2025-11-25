@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Warehouse;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\NotificationController;
+use App\Services\Notifications\NotificationDispatcher;
 use App\Models\Approval\ApprovalRequest;
 use App\Models\Approval\ApprovalTemplate;
 use App\Models\User;
@@ -369,12 +369,14 @@ class PurchaseOrderController extends Controller
         ]);
 
         if ($currentApproverId) {
-            NotificationController::sendToUser(
+            NotificationDispatcher::toUser(
                 $currentApproverId,
+                'approval.pending',
                 'Purchase Order Approval Needed',
                 'Purchase order ' . $purchaseOrder->code . ' is pending your approval.',
-                'info',
-                route('warehouse.purchase-orders.show', $purchaseOrder)
+                route('warehouse.purchase-orders.show', $purchaseOrder),
+                'ClipboardCheck',
+                ['type' => 'info', 'purchase_order_id' => $purchaseOrder->id]
             );
         }
 

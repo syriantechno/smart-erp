@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 use App\Helpers\Reply;
+use App\Services\Notifications\NotificationDispatcher;
 
 class AttendanceController extends Controller
 {
@@ -75,6 +76,8 @@ class AttendanceController extends Controller
                     ->toArray();
             }
 
+            $employees = Employee::whereIn('id', $employeeIds)->get(['id', 'user_id', 'first_name', 'last_name']);
+
             $savedRecords = 0;
             $requiredHours = (float) setting('attendance.working_hours_per_day', 8.0); // يمكن ضبطها من إعدادات الحضور
 
@@ -115,6 +118,17 @@ class AttendanceController extends Controller
                 $savedRecords++;
             }
 
+            $this->notifyEmployees(
+                $employees,
+                'attendance.recorded',
+                'Attendance Recorded',
+                'Attendance has been recorded/updated.',
+                [
+                    'attendance_date' => $request->attendance_date,
+                    'actor_id' => auth()->id(),
+                ]
+            );
+
             return Reply::success("تم حفظ الحضور لـ {$savedRecords} موظف بنجاح", [
                 'data' => $savedRecords,
             ]);
@@ -154,6 +168,18 @@ class AttendanceController extends Controller
                 'working_hours' => $workingHours,
                 'overtime_hours' => max(0, $workingHours - $requiredHours),
             ]);
+
+            $attendance->loadMissing('employee');
+            $this->notifyEmployees(
+                collect([$attendance->employee]),
+                'attendance.updated',
+                'Attendance Updated',
+                'Your attendance record has been updated.',
+                [
+                    'attendance_date' => $attendance->attendance_date?->format('Y-m-d'),
+                    'actor_id' => auth()->id(),
+                ]
+            );
 
             return Reply::success('Attendance record updated successfully', [
                 'data' => $attendance,
@@ -198,6 +224,17 @@ class AttendanceController extends Controller
 
             DB::commit();
 
+            $employees = Employee::whereIn('id', collect($request->attendances)->pluck('employee_id'))
+                ->get(['id', 'user_id', 'first_name', 'last_name']);
+
+            $this->notifyEmployees(
+                $employees,
+                'attendance.bulk_updated',
+                'Attendance Updated',
+                'Your attendance records have been updated in bulk.',
+                ['actor_id' => auth()->id()]
+            );
+
             return Reply::success('Attendance records updated successfully');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -237,6 +274,18 @@ class AttendanceController extends Controller
         try {
             $attendance = Attendance::findOrFail($id);
             $attendance->delete();
+
+            $attendance->loadMissing('employee');
+            $this->notifyEmployees(
+                collect([$attendance->employee]),
+                'attendance.deleted',
+                'Attendance Deleted',
+                'An attendance record was deleted.',
+                [
+                    'attendance_date' => $attendance->attendance_date?->format('Y-m-d'),
+                    'actor_id' => auth()->id(),
+                ]
+            );
 
             return Reply::success('Attendance record deleted successfully');
         } catch (\Exception $e) {
@@ -301,5 +350,28 @@ class AttendanceController extends Controller
         ];
 
         return $days[$dayOfWeek] ?? 'monday';
+    }
+
+    private function notifyEmployees($employees, string $eventKey, string $title, string $message, array $data = []): void
+    {
+        $recipientIds = collect($employees)
+            ->filter(fn ($employee) => $employee && $employee->user_id)
+            ->pluck('user_id')
+            ->unique()
+            ->all();
+
+        if (empty($recipientIds)) {
+            return;
+        }
+
+        NotificationDispatcher::toUsers(
+            $recipientIds,
+            $eventKey,
+            $title,
+            $message,
+            route('hr.attendance.index'),
+            'CalendarCheck',
+            $data
+        );
     }
 }
