@@ -165,6 +165,45 @@
             </div>
         </div>
 
+        <!-- BOM & Manufacturing Orders -->
+        <div class="col-span-12">
+            <div class="intro-y box">
+                <div class="p-5">
+                    <h3 class="text-base font-medium text-slate-800 dark:text-slate-200 mb-4">
+                        <x-base.lucide icon="layers" class="w-5 h-5 inline mr-2" />
+                        Bill of Materials (BOM) System
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <a href="{{ route('manufacturing.bom.index') }}" class="flex items-center p-5 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-xl hover:from-indigo-600 hover:to-indigo-700 transition-all shadow-lg group">
+                            <div class="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center mr-4">
+                                <x-base.lucide icon="layers" class="w-7 h-7 text-white" />
+                            </div>
+                            <div class="flex-1">
+                                <div class="font-semibold text-white text-lg">BOM Templates</div>
+                                <div class="text-sm text-indigo-100">Define product recipes & material requirements</div>
+                            </div>
+                            <x-base.lucide icon="chevron-right" class="w-6 h-6 text-white/60 group-hover:text-white transition-colors" />
+                        </a>
+
+                        <a href="{{ route('manufacturing.mo.index') }}" class="flex items-center p-5 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all shadow-lg group">
+                            <div class="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center mr-4">
+                                <x-base.lucide icon="factory" class="w-7 h-7 text-white" />
+                            </div>
+                            <div class="flex-1">
+                                <div class="font-semibold text-white text-lg">Manufacturing Orders</div>
+                                <div class="text-sm text-emerald-100">Create orders & auto-consume materials</div>
+                            </div>
+                            <x-base.lucide icon="chevron-right" class="w-6 h-6 text-white/60 group-hover:text-white transition-colors" />
+                        </a>
+                    </div>
+                    <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">
+                        <x-base.lucide icon="info" class="w-4 h-4 inline mr-1" />
+                        Create BOM templates to define product recipes, then create manufacturing orders to automatically calculate and consume raw materials.
+                    </p>
+                </div>
+            </div>
+        </div>
+
         <!-- Recent Production Orders -->
         <div class="col-span-12">
             <div class="intro-y box">

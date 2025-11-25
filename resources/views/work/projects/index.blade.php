@@ -203,43 +203,104 @@
     </div>
 @endsection
 
+@include('components.datatable.scripts')
+
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Initialize DataTable using erpCrud
+            const tableEl = document.getElementById('projects-table');
+            const datatableUrl = tableEl.dataset.projectsDatatableUrl;
+            const deleteUrlBase = tableEl.dataset.projectsDeleteUrlBase;
+
+            window.projectsTable = window.erpCrud.initDataTable({
+                tableSelector: '#projects-table',
+                ajaxUrl: datatableUrl,
+                ajaxData: function(d) {
+                    d.company_id = document.getElementById('company-filter')?.value || '';
+                    d.department_id = document.getElementById('department-filter')?.value || '';
+                    d.status = document.getElementById('status-filter')?.value || '';
+                },
+                columns: [
+                    { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false, className: 'text-center' },
+                    { data: 'code', name: 'code' },
+                    { data: 'name', name: 'name' },
+                    { data: 'company_department', name: 'company_department', orderable: false },
+                    { data: 'manager', name: 'manager', orderable: false },
+                    { data: 'status', name: 'status', className: 'text-center' },
+                    { data: 'priority', name: 'priority', className: 'text-center' },
+                    { data: 'progress_percentage', name: 'progress_percentage', className: 'text-center' },
+                    { data: 'actions', name: 'actions', orderable: false, searchable: false, className: 'text-center' }
+                ],
+                pageLength: 25
+            });
+
+            // Filter Go button
+            document.getElementById('projects-filter-go')?.addEventListener('click', function() {
+                window.projectsTable.ajax.reload();
+            });
+
+            // Filter Reset button
+            document.getElementById('projects-filter-reset')?.addEventListener('click', function() {
+                document.getElementById('company-filter').value = '';
+                document.getElementById('department-filter').value = '';
+                document.getElementById('status-filter').value = '';
+                window.projectsTable.ajax.reload();
+            });
+
             // PDF export
-            const pdfBtn = document.getElementById('projects-pdf');
-            if (pdfBtn) {
-                pdfBtn.addEventListener('click', function () {
-                    showToast('PDF export functionality not implemented yet', 'info');
-                });
-            }
+            document.getElementById('projects-pdf')?.addEventListener('click', function () {
+                showInfo('PDF export functionality coming soon');
+            });
 
             // Export functionality
-            const exportBtn = document.getElementById('projects-export');
-            if (exportBtn) {
-                exportBtn.addEventListener('click', function () {
-                    if (window.erpCrud && typeof window.erpCrud.exportDataTable === 'function') {
-                        window.erpCrud.exportDataTable(window.projectsTable, 'projects');
-                    } else {
-                        showToast('Export functionality not available', 'error');
-                    }
-                });
-            }
+            document.getElementById('projects-export')?.addEventListener('click', function () {
+                showInfo('Export functionality coming soon');
+            });
 
             // Refresh functionality
-            const refreshBtn = document.getElementById('projects-refresh');
-            if (refreshBtn) {
-                refreshBtn.addEventListener('click', function () {
-                    if (window.projectsTable) {
-                        window.projectsTable.ajax.reload();
-                        if (typeof showToast === 'function') {
-                            showToast('Data refreshed', 'success');
-                        }
-                    }
-                });
-            }
+            document.getElementById('projects-refresh')?.addEventListener('click', function () {
+                if (window.projectsTable) {
+                    window.projectsTable.ajax.reload();
+                    showSuccess('Data refreshed');
+                }
+            });
         });
+
+        // Delete Project Function
+        function deleteProject(id, name) {
+            confirmDelete(name, function() {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                
+                fetch(`/project-management/projects/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showSuccess('Project deleted successfully');
+                        window.projectsTable.ajax.reload();
+                    } else {
+                        showError(data.message || 'Failed to delete project');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showError('Failed to delete project');
+                });
+            });
+        }
+
+        // Open Create Modal Function
+        function openCreateModal() {
+            window.location.href = '{{ route("project-management.projects.create") }}';
+        }
     </script>
 @endpush

@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Manufacturing;
 use App\Http\Controllers\Controller;
 use App\Models\Manufacturing\ProductionOrder;
 use App\Models\Manufacturing\ProductionMachine;
+use App\Models\Manufacturing\ProductionStage;
+use App\Models\Manufacturing\QualityCheck;
+use App\Models\Manufacturing\ProductionReport;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -24,7 +27,7 @@ class ManufacturingController extends Controller
         ];
 
         // Get recent production orders
-        $recentOrders = ProductionOrder::latest()->take(5)->get();
+        $recentOrders = ProductionOrder::with('createdBy')->latest()->take(5)->get();
 
         return view('manufacturing.index', compact('stats', 'recentOrders'));
     }
@@ -104,7 +107,7 @@ class ManufacturingController extends Controller
     // Production Stages Management
     public function stagesIndex()
     {
-        $stages = \App\Models\ProductionStage::orderBy('sequence')->get();
+        $stages = ProductionStage::orderBy('sequence')->get();
         return view('manufacturing.stages.index', compact('stages'));
     }
 
@@ -117,17 +120,17 @@ class ManufacturingController extends Controller
             'stage_cost' => 'required|numeric|min:0',
         ]);
 
-        $maxSequence = \App\Models\ProductionStage::max('sequence') ?? 0;
+        $maxSequence = ProductionStage::max('sequence') ?? 0;
         $validated['sequence'] = $maxSequence + 1;
 
-        \App\Models\ProductionStage::create($validated);
+        ProductionStage::create($validated);
 
         return redirect()->route('manufacturing.stages.index')->with('success', 'Production stage created successfully');
     }
 
     public function updateStage(Request $request, $stageId)
     {
-        $stage = \App\Models\ProductionStage::findOrFail($stageId);
+        $stage = ProductionStage::findOrFail($stageId);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -145,7 +148,7 @@ class ManufacturingController extends Controller
 
     public function destroyStage($stageId)
     {
-        $stage = \App\Models\ProductionStage::findOrFail($stageId);
+        $stage = ProductionStage::findOrFail($stageId);
         $stage->delete();
 
         return redirect()->route('manufacturing.stages.index')->with('success', 'Production stage deleted successfully');
@@ -208,7 +211,7 @@ class ManufacturingController extends Controller
     // Quality Control
     public function qualityIndex()
     {
-        $checks = \App\Models\QualityCheck::with('productionOrder', 'checkedBy')->paginate(15);
+        $checks = QualityCheck::with('productionOrder', 'checkedBy')->paginate(15);
         return view('manufacturing.quality.index', compact('checks'));
     }
 
@@ -230,14 +233,14 @@ class ManufacturingController extends Controller
         $validated['checked_by'] = auth()->id();
         $validated['checked_at'] = now();
 
-        \App\Models\QualityCheck::create($validated);
+        QualityCheck::create($validated);
 
         return redirect()->route('manufacturing.quality.index')->with('success', 'Quality check recorded successfully');
     }
 
     public function updateQualityCheck(Request $request, $checkId)
     {
-        $check = \App\Models\QualityCheck::findOrFail($checkId);
+        $check = QualityCheck::findOrFail($checkId);
 
         $validated = $request->validate([
             'check_name' => 'required|string|max:255',
@@ -259,7 +262,7 @@ class ManufacturingController extends Controller
     // Reports
     public function reportsIndex()
     {
-        $reports = \App\Models\ProductionReport::paginate(15);
+        $reports = ProductionReport::with('generatedBy')->paginate(15);
         return view('manufacturing.reports.index', compact('reports'));
     }
 
@@ -283,7 +286,7 @@ class ManufacturingController extends Controller
             'generated_by' => auth()->id(),
         ];
 
-        \App\Models\ProductionReport::create($reportData);
+        ProductionReport::create($reportData);
 
         return redirect()->route('manufacturing.reports.index')->with('success', 'Report generated successfully');
     }
@@ -317,7 +320,7 @@ class ManufacturingController extends Controller
 
     public function getActiveStages()
     {
-        return response()->json(\App\Models\ProductionStage::where('is_active', true)->orderBy('sequence')->get());
+        return response()->json(ProductionStage::where('is_active', true)->orderBy('sequence')->get());
     }
 
     public function getAvailableMachines()

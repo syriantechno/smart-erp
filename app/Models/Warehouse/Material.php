@@ -60,6 +60,12 @@ class Material extends Model
         return $this->image_path ? asset('storage/' . $this->image_path) : null;
     }
 
+    // Get total quantity from all inventories
+    public function getQuantityAttribute(): float
+    {
+        return $this->inventories()->sum('quantity') ?? 0;
+    }
+
     public function purchaseRequestItems(): HasMany
     {
         return $this->hasMany(PurchaseRequestItem::class);

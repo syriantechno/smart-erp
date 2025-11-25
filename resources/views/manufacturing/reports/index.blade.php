@@ -1,0 +1,191 @@
+@extends('../themes/' . $activeTheme . '/' . $activeLayout)
+
+@section('subhead')
+    <title>Production Reports - Manufacturing</title>
+@endsection
+
+@section('subcontent')
+<div class="space-y-6">
+    {{-- Header --}}
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-semibold text-slate-800">Production Reports</h1>
+            <p class="text-sm text-slate-500 mt-1">Generate and view manufacturing reports</p>
+        </div>
+        <div class="flex items-center gap-2">
+            <a href="{{ route('manufacturing.index') }}" class="h-10 rounded-full px-5 flex items-center justify-center text-xs font-semibold text-slate-600 border border-slate-300 hover:bg-white/80 transition-all">
+                <x-base.lucide icon="arrow-left" class="w-4 h-4 mr-2" /> Back
+            </a>
+            <button onclick="document.getElementById('generate-report-modal').classList.remove('hidden')" class="h-10 rounded-full px-5 flex items-center justify-center text-xs font-semibold text-white bg-[#303030] hover:bg-[#404040] transition-all">
+                <x-base.lucide icon="file-plus" class="w-4 h-4 mr-2" /> Generate Report
+            </button>
+        </div>
+    </div>
+
+    {{-- Quick Stats --}}
+    <div class="grid grid-cols-4 gap-4">
+        <div class="rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 p-5 shadow-lg">
+            <div class="flex items-center gap-4">
+                <div class="h-12 w-12 rounded-xl bg-white/20 flex items-center justify-center">
+                    <x-base.lucide icon="file-text" class="w-6 h-6 text-white" />
+                </div>
+                <div>
+                    <div class="text-3xl font-bold text-white">{{ $reports->total() }}</div>
+                    <div class="text-xs text-slate-300 mt-1">Total Reports</div>
+                </div>
+            </div>
+        </div>
+        <div class="rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 p-5 shadow-lg">
+            <div class="flex items-center gap-4">
+                <div class="h-12 w-12 rounded-xl bg-white/20 flex items-center justify-center">
+                    <x-base.lucide icon="calendar" class="w-6 h-6 text-white" />
+                </div>
+                <div>
+                    <div class="text-3xl font-bold text-white">{{ $reports->where('report_type', 'daily')->count() }}</div>
+                    <div class="text-xs text-blue-100 mt-1">Daily</div>
+                </div>
+            </div>
+        </div>
+        <div class="rounded-2xl bg-gradient-to-br from-green-500 to-green-600 p-5 shadow-lg">
+            <div class="flex items-center gap-4">
+                <div class="h-12 w-12 rounded-xl bg-white/20 flex items-center justify-center">
+                    <x-base.lucide icon="calendar-days" class="w-6 h-6 text-white" />
+                </div>
+                <div>
+                    <div class="text-3xl font-bold text-white">{{ $reports->where('report_type', 'weekly')->count() }}</div>
+                    <div class="text-xs text-green-100 mt-1">Weekly</div>
+                </div>
+            </div>
+        </div>
+        <div class="rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 p-5 shadow-lg">
+            <div class="flex items-center gap-4">
+                <div class="h-12 w-12 rounded-xl bg-white/20 flex items-center justify-center">
+                    <x-base.lucide icon="calendar-range" class="w-6 h-6 text-white" />
+                </div>
+                <div>
+                    <div class="text-3xl font-bold text-white">{{ $reports->where('report_type', 'monthly')->count() }}</div>
+                    <div class="text-xs text-purple-100 mt-1">Monthly</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Reports Table --}}
+    <div class="rounded-2xl bg-white shadow-lg overflow-hidden border border-slate-200/60">
+        <table class="w-full">
+            <thead class="bg-slate-50 border-b border-slate-200">
+                <tr>
+                    <th class="text-left px-6 py-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Report #</th>
+                    <th class="text-center px-6 py-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Type</th>
+                    <th class="text-left px-6 py-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Period</th>
+                    <th class="text-center px-6 py-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Orders</th>
+                    <th class="text-center px-6 py-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Completed</th>
+                    <th class="text-center px-6 py-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Efficiency</th>
+                    <th class="text-left px-6 py-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Generated By</th>
+                    <th class="px-6 py-4"></th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                @forelse($reports as $report)
+                <tr class="hover:bg-slate-50/50 transition-colors">
+                    <td class="px-6 py-4">
+                        <span class="font-mono font-semibold text-[#303030]">{{ $report->report_number }}</span>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="inline-flex px-3 py-1 rounded-full text-xs font-semibold capitalize
+                            @if($report->report_type === 'daily') bg-blue-100 text-blue-700
+                            @elseif($report->report_type === 'weekly') bg-green-100 text-green-700
+                            @elseif($report->report_type === 'monthly') bg-purple-100 text-purple-700
+                            @else bg-slate-100 text-slate-600 @endif">
+                            {{ $report->report_type }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-slate-600">
+                        {{ $report->start_date->format('M d') }} - {{ $report->end_date->format('M d, Y') }}
+                    </td>
+                    <td class="px-6 py-4 text-center font-medium text-slate-700">{{ $report->total_orders }}</td>
+                    <td class="px-6 py-4 text-center font-medium text-green-600">{{ $report->completed_orders }}</td>
+                    <td class="px-6 py-4 text-center">
+                        <div class="flex items-center justify-center gap-2">
+                            <div class="w-16 h-2 bg-slate-200 rounded-full overflow-hidden">
+                                <div class="h-full bg-gradient-to-r from-green-400 to-green-600 rounded-full" style="width: {{ $report->efficiency_percentage }}%"></div>
+                            </div>
+                            <span class="text-xs font-medium text-slate-600">{{ $report->efficiency_percentage }}%</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-sm text-slate-700">{{ $report->generatedBy?->name ?? 'System' }}</div>
+                        <div class="text-xs text-slate-500">{{ $report->created_at->format('M d, Y') }}</div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center justify-end gap-1">
+                            <button class="h-8 w-8 rounded-full flex items-center justify-center hover:bg-slate-100 text-slate-400 hover:text-blue-600 transition-all" title="View">
+                                <x-base.lucide icon="eye" class="w-4 h-4" />
+                            </button>
+                            <button class="h-8 w-8 rounded-full flex items-center justify-center hover:bg-slate-100 text-slate-400 hover:text-green-600 transition-all" title="Download">
+                                <x-base.lucide icon="download" class="w-4 h-4" />
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="8" class="px-6 py-16 text-center">
+                        <div class="inline-flex items-center justify-center h-16 w-16 rounded-full bg-slate-100 mb-4">
+                            <x-base.lucide icon="file-text" class="w-8 h-8 text-slate-400" />
+                        </div>
+                        <p class="text-slate-600 font-medium">No reports generated yet</p>
+                        <p class="text-sm text-slate-400 mt-1">Generate your first production report</p>
+                        <button onclick="document.getElementById('generate-report-modal').classList.remove('hidden')" class="inline-flex items-center mt-4 px-5 py-2.5 rounded-full bg-[#303030] text-white text-sm font-semibold hover:bg-[#404040] transition-all">
+                            <x-base.lucide icon="file-plus" class="w-4 h-4 mr-2" /> Generate Report
+                        </button>
+                    </td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+        
+        @if($reports->hasPages())
+        <div class="px-6 py-4 border-t border-slate-200">
+            {{ $reports->links() }}
+        </div>
+        @endif
+    </div>
+</div>
+
+{{-- Generate Report Modal --}}
+<div id="generate-report-modal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="fixed inset-0 bg-black/50" onclick="document.getElementById('generate-report-modal').classList.add('hidden')"></div>
+        <div class="relative bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+            <h3 class="text-lg font-semibold text-[#303030] mb-4">Generate Report</h3>
+            <form action="{{ route('manufacturing.reports.generate') }}" method="POST" class="space-y-4">
+                @csrf
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Report Type *</label>
+                    <select name="report_type" required class="w-full h-10 px-3 rounded-lg border border-slate-200 focus:border-slate-400 focus:ring-2 focus:ring-slate-200">
+                        <option value="daily">Daily Report</option>
+                        <option value="weekly">Weekly Report</option>
+                        <option value="monthly">Monthly Report</option>
+                        <option value="custom">Custom Period</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Start Date *</label>
+                        <input type="date" name="start_date" required value="{{ now()->subDays(7)->format('Y-m-d') }}" class="w-full h-10 px-3 rounded-lg border border-slate-200 focus:border-slate-400 focus:ring-2 focus:ring-slate-200">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">End Date *</label>
+                        <input type="date" name="end_date" required value="{{ now()->format('Y-m-d') }}" class="w-full h-10 px-3 rounded-lg border border-slate-200 focus:border-slate-400 focus:ring-2 focus:ring-slate-200">
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3 pt-4">
+                    <button type="button" onclick="document.getElementById('generate-report-modal').classList.add('hidden')" class="h-10 px-5 rounded-full text-sm font-semibold text-slate-600 border border-slate-300 hover:bg-slate-50">Cancel</button>
+                    <button type="submit" class="h-10 px-5 rounded-full text-sm font-semibold text-white bg-[#303030] hover:bg-[#404040]">Generate</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endsection

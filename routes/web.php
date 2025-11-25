@@ -625,6 +625,26 @@ Route::middleware('auth')->group(function () {
         Route::get('/orders/datatable', [App\Http\Controllers\Manufacturing\ManufacturingController::class, 'ordersDatatable'])->name('orders.datatable');
         Route::get('/stages/active', [App\Http\Controllers\Manufacturing\ManufacturingController::class, 'getActiveStages'])->name('stages.active');
         Route::get('/machines/available', [App\Http\Controllers\Manufacturing\ManufacturingController::class, 'getAvailableMachines'])->name('machines.available');
+
+        // BOM (Bill of Materials) Templates
+        Route::get('/bom', [App\Http\Controllers\Manufacturing\BomController::class, 'index'])->name('bom.index');
+        Route::get('/bom/create', [App\Http\Controllers\Manufacturing\BomController::class, 'create'])->name('bom.create');
+        Route::post('/bom', [App\Http\Controllers\Manufacturing\BomController::class, 'store'])->name('bom.store');
+        Route::get('/bom/{bom}', [App\Http\Controllers\Manufacturing\BomController::class, 'show'])->name('bom.show');
+        Route::get('/bom/{bom}/edit', [App\Http\Controllers\Manufacturing\BomController::class, 'edit'])->name('bom.edit');
+        Route::put('/bom/{bom}', [App\Http\Controllers\Manufacturing\BomController::class, 'update'])->name('bom.update');
+        Route::delete('/bom/{bom}', [App\Http\Controllers\Manufacturing\BomController::class, 'destroy'])->name('bom.destroy');
+        Route::get('/bom/{bom}/details', [App\Http\Controllers\Manufacturing\BomController::class, 'getBomDetails'])->name('bom.details');
+
+        // Manufacturing Orders (New BOM-based)
+        Route::get('/mo', [App\Http\Controllers\Manufacturing\BomController::class, 'ordersIndex'])->name('mo.index');
+        Route::get('/mo/create', [App\Http\Controllers\Manufacturing\BomController::class, 'createOrder'])->name('mo.create');
+        Route::post('/mo', [App\Http\Controllers\Manufacturing\BomController::class, 'storeOrder'])->name('mo.store');
+        Route::get('/mo/{order}', [App\Http\Controllers\Manufacturing\BomController::class, 'showOrder'])->name('mo.show');
+        Route::post('/mo/{order}/confirm', [App\Http\Controllers\Manufacturing\BomController::class, 'confirmOrder'])->name('mo.confirm');
+        Route::post('/mo/{order}/start', [App\Http\Controllers\Manufacturing\BomController::class, 'startOrder'])->name('mo.start');
+        Route::post('/mo/{order}/complete', [App\Http\Controllers\Manufacturing\BomController::class, 'completeOrder'])->name('mo.complete');
+        Route::post('/mo/calculate-materials', [App\Http\Controllers\Manufacturing\BomController::class, 'calculateMaterials'])->name('mo.calculate');
     });
 
     // Project Management Routes

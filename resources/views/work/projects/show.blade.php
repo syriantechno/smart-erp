@@ -1,583 +1,241 @@
 @extends('../themes/' . $activeTheme . '/' . $activeLayout)
 
 @section('subhead')
-    <title>{{ $project->name }} - {{ config('app.name') }}</title>
+    <title>{{ $project->name }} - Project Dashboard</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 @endsection
 
-@push('styles')
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.min.css">
-@endpush
+@php
+    $totalTasks = $project->tasks->count();
+    $completedTasks = $project->tasks->where('status', 'completed')->count();
+    $inProgressTasks = $project->tasks->where('status', 'in_progress')->count();
+    $pendingTasks = $project->tasks->where('status', 'pending')->count();
+    $overdueTasks = $project->tasks->filter(fn($t) => $t->due_date && $t->due_date->isPast() && !in_array($t->status, ['completed', 'cancelled']))->count();
+    $daysRemaining = $project->end_date ? max(0, now()->diffInDays($project->end_date, false)) : null;
+    $daysPassed = $project->start_date ? now()->diffInDays($project->start_date) : 0;
+    $totalDays = $project->start_date && $project->end_date ? $project->start_date->diffInDays($project->end_date) : 0;
+    $timeProgress = $totalDays > 0 ? min(100, round(($daysPassed / $totalDays) * 100)) : 0;
+    $budgetUsed = $project->budget > 0 ? round(($project->actual_cost / $project->budget) * 100) : 0;
+    $taskProgress = $totalTasks > 0 ? round(($completedTasks / $totalTasks) * 100) : 0;
+    $teamMembers = $project->tasks->pluck('employee')->filter()->unique('id');
+@endphp
 
 @section('subcontent')
-    @include('components.global-notifications')
-
-    <div class="mt-8 grid grid-cols-12 gap-6">
-        <!-- Project Header -->
-        <div class="col-span-12">
-            <x-base.preview-component class="intro-y box">
-                <div class="p-5">
-                    <div class="flex items-center justify-between mb-6">
-                        <div class="flex items-center gap-4">
-                            <h2 class="text-2xl font-medium">{{ $project->name }}</h2>
-                            <span class="inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold
-                                @if($project->status === 'active') stats-card-warning
-                                @elseif($project->status === 'planning') stats-card-info
-                                @elseif($project->status === 'on_hold') stats-card-neutral
-                                @elseif($project->status === 'completed') stats-card-success
-                                @else stats-card-danger
-                                @endif">
-                                {{ ucfirst(str_replace('_', ' ', $project->status)) }}
-                            </span>
-                        </div>
-                        <div class="flex gap-2">
-                            <button
-                                class="btn-royal btn-royal--outline btn-royal--sm"
-                                onclick="window.location.href='{{ route('work.projects.edit', $project) }}'"
-                            >
-                                <x-base.lucide icon="edit" class="w-4 h-4 mr-2" />
-                                Edit
-                            </button>
-                            <button
-                                class="btn-royal btn-royal--dark btn-royal--sm"
-                                onclick="window.location.href='{{ route('work.projects.index') }}'"
-                            >
-                                <x-base.lucide icon="arrow-left" class="w-4 h-4 mr-2" />
-                                Back
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Progress Bar -->
-                    <div class="mb-6 p-4 rounded-lg" style="background-color: color-mix(in oklch, #2563eb 5%, #ffffff); border: 1px solid color-mix(in oklch, #2563eb, transparent 90%);">
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-sm font-medium" style="color: color-mix(in oklch, #2563eb, black 22%);">Project Progress</span>
-                            <span class="text-sm font-semibold px-2 py-1 rounded-full" style="background-color: color-mix(in oklch, #2563eb 15%, #ffffff); color: color-mix(in oklch, #2563eb, black 30%);">{{ $project->progress_percentage }}%</span>
-                        </div>
-                        <div class="w-full rounded-full h-3" style="background-color: color-mix(in oklch, #2563eb, transparent 85%);">
-                            <div class="h-3 rounded-full transition-all duration-500 ease-out" 
-                                 style="width: {{ $project->progress_percentage }}%; 
-                                        background: linear-gradient(90deg, 
-                                            @if($project->progress_percentage >= 75) color-mix(in oklch, #1b7a4a 70%, #ffffff), color-mix(in oklch, #1b7a4a 90%, #ffffff)
-                                            @elseif($project->progress_percentage >= 50) color-mix(in oklch, #c98028 70%, #ffffff), color-mix(in oklch, #c98028 90%, #ffffff)
-                                            @else color-mix(in oklch, #b21a50 70%, #ffffff), color-mix(in oklch, #b21a50 90%, #ffffff)
-                                            @endif);"></div>
-                        </div>
-                        <div class="flex items-center justify-between mt-2 text-xs">
-                            <span style="color: color-mix(in oklch, #2563eb, black 35%);">
-                                @if($project->progress_percentage >= 75) Excellent Progress
-                                @elseif($project->progress_percentage >= 50) Good Progress
-                                @elseif($project->progress_percentage > 0) Getting Started
-                                @else Not Started
-                                @endif
-                            </span>
-                            <span class="px-2 py-1 rounded-full text-xs" style="
-                                @if($project->progress_percentage >= 75) background-color: color-mix(in oklch, #1b7a4a 15%, #ffffff); color: color-mix(in oklch, #1b7a4a, black 30%);
-                                @elseif($project->progress_percentage >= 50) background-color: color-mix(in oklch, #c98028 15%, #ffffff); color: color-mix(in oklch, #c98028, black 30%);
-                                @else background-color: color-mix(in oklch, #b21a50 15%, #ffffff); color: color-mix(in oklch, #b21a50, black 30%);
-                                @endif">
-                                @if($project->progress_percentage >= 75) On Track
-                                @elseif($project->progress_percentage >= 50) In Progress
-                                @else Needs Attention
-                                @endif
-                            </span>
-                        </div>
-                    </div>
+    <div class="mt-6 ml-1 sm:ml-2 md:ml-3 lg:ml-4">
+        {{-- Header --}}
+        <div class="flex items-start justify-between">
+            <div>
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="text-xs font-mono tracking-wider text-slate-500 bg-white/60 px-3 py-1 rounded-full">{{ $project->code }}</span>
+                    <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold
+                        @if($project->status === 'active') bg-[#f7e08a] text-[#3a2a1a]
+                        @elseif($project->status === 'completed') bg-green-100 text-green-700
+                        @elseif($project->status === 'planning') bg-blue-100 text-blue-700
+                        @else bg-slate-200 text-slate-700 @endif">
+                        {{ ucfirst(str_replace('_', ' ', $project->status)) }}
+                    </span>
+                    <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold
+                        @if($project->priority === 'critical') bg-red-100 text-red-700
+                        @elseif($project->priority === 'high') bg-orange-100 text-orange-700
+                        @else bg-slate-100 text-slate-600 @endif">
+                        {{ ucfirst($project->priority) }}
+                    </span>
                 </div>
-            </x-base.preview-component>
-        </div>
-
-        <!-- Project Details -->
-        <div class="col-span-12 lg:col-span-8">
-            <x-base.preview-component class="intro-y box">
-                <div class="p-5">
-                    <h3 class="text-lg font-medium mb-6">Project Details</h3>
-
-                    <div class="grid grid-cols-12 gap-6">
-                        <!-- Basic Info -->
-                        <div class="col-span-12 md:col-span-6">
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Project Code</label>
-                                    <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $project->code }}</p>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Project Name</label>
-                                    <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $project->name }}</p>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Company</label>
-                                    <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $project->company?->name ?? 'N/A' }}</p>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Department</label>
-                                    <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $project->department?->name ?? 'N/A' }}</p>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Project Manager</label>
-                                    <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $project->manager?->name ?? 'N/A' }}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Timeline & Budget -->
-                        <div class="col-span-12 md:col-span-6">
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Start Date</label>
-                                    <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $project->start_date?->format('M d, Y') }}</p>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">End Date</label>
-                                    <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $project->end_date?->format('M d, Y') ?? 'Not set' }}</p>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Priority</label>
-                                    <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold
-                                        @if($project->priority === 'critical') bg-red-100 text-red-700
-                                        @elseif($project->priority === 'high') bg-orange-100 text-orange-700
-                                        @elseif($project->priority === 'medium') bg-blue-100 text-blue-700
-                                        @else bg-gray-100 text-gray-700
-                                        @endif">
-                                        {{ ucfirst($project->priority) }}
-                                    </span>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Budget</label>
-                                    <p class="mt-1 text-sm text-gray-900 dark:text-white">${{ number_format($project->budget ?? 0, 2) }}</p>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Actual Cost</label>
-                                    <p class="mt-1 text-sm text-gray-900 dark:text-white">${{ number_format($project->actual_cost ?? 0, 2) }}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Description -->
-                        @if($project->description)
-                        <div class="col-span-12">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
-                                <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $project->description }}</p>
-                            </div>
-                        </div>
-                        @endif
-
-                        <!-- Objectives -->
-                        @if($project->objectives)
-                        <div class="col-span-12 md:col-span-6">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Objectives</label>
-                                <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $project->objectives }}</p>
-                            </div>
-                        </div>
-                        @endif
-
-                        <!-- Deliverables -->
-                        @if($project->deliverables)
-                        <div class="col-span-12 md:col-span-6">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Deliverables</label>
-                                <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $project->deliverables }}</p>
-                            </div>
-                        </div>
-                        @endif
-
-                        <!-- Risks -->
-                        @if($project->risks)
-                        <div class="col-span-12">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Risks</label>
-                                <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $project->risks }}</p>
-                            </div>
-                        </div>
-                        @endif
-
-                        <!-- Notes -->
-                        @if($project->notes)
-                        <div class="col-span-12">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Notes</label>
-                                <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $project->notes }}</p>
-                            </div>
-                        </div>
-                        @endif
-                    </div>
-                </div>
-            </x-base.preview-component>
-        </div>
-
-        <!-- Sidebar -->
-        <div class="col-span-12 lg:col-span-4">
-            <!-- Quick Actions -->
-            <x-base.preview-component class="intro-y box mb-6">
-                <div class="p-5">
-                    <h3 class="text-lg font-medium mb-4">Quick Actions</h3>
-                    <div class="space-y-3">
-                        <button
-                            class="btn-royal btn-royal--outline btn-royal--sm w-full justify-start"
-                            onclick="editProject({{ $project->id }})"
-                        >
-                            <x-base.lucide icon="edit" class="w-4 h-4 mr-2" />
-                            Edit Project
-                        </button>
-
-                        <button
-                            class="btn-royal btn-royal--action btn-royal--danger w-full justify-start"
-                            onclick="deleteProject({{ $project->id }}, '{{ addslashes($project->name) }}')"
-                        >
-                            <x-base.lucide icon="trash-2" class="w-4 h-4 mr-2" />
-                            Delete Project
-                        </button>
-                    </div>
-                </div>
-            </x-base.preview-component>
-
-            <!-- Project Stats -->
-            <x-base.preview-component class="intro-y box">
-                <div class="p-5">
-                    <h3 class="text-lg font-medium mb-4">Project Stats</h3>
-                    <div class="space-y-4">
-                        <div class="stats-card-info p-3 rounded-lg">
-                            <div class="flex justify-between items-center">
-                                <span class="text-sm opacity-80">Total Tasks</span>
-                                <span class="text-lg font-bold">{{ $project->tasks->count() }}</span>
-                            </div>
-                        </div>
-
-                        <div class="stats-card-success p-3 rounded-lg">
-                            <div class="flex justify-between items-center">
-                                <span class="text-sm opacity-80">Completed Tasks</span>
-                                <span class="text-lg font-bold">{{ $project->tasks->where('status', 'completed')->count() }}</span>
-                            </div>
-                        </div>
-
-                        <div class="stats-card-warning p-3 rounded-lg">
-                            <div class="flex justify-between items-center">
-                                <span class="text-sm opacity-80">Days Remaining</span>
-                                <span class="text-lg font-bold">
-                                    @if($project->end_date)
-                                        {{ max(0, now()->diffInDays($project->end_date, false)) }}
-                                    @else
-                                        N/A
-                                    @endif
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="stats-card-neutral p-3 rounded-lg">
-                            <div class="flex justify-between items-center">
-                                <span class="text-sm opacity-80">Days Passed</span>
-                                <span class="text-lg font-bold">{{ $project->start_date ? now()->diffInDays($project->start_date) : 0 }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </x-base.preview-component>
-
-            <!-- Project Tasks Chart -->
-            @php
-                $totalTasks = $project->tasks->count();
-                $completedTasks = $project->tasks->where('status', 'completed')->count();
-                $inProgressTasks = $project->tasks->where('status', 'in_progress')->count();
-                $pendingTasks = $project->tasks->where('status', 'pending')->count();
-                $overdueTasks = $project->tasks->filter(fn($t) => $t->due_date && $t->due_date->isPast() && !in_array($t->status, ['completed', 'cancelled']))->count();
-            @endphp
-            @if($totalTasks > 0)
-                <x-base.preview-component class="intro-y box mt-6">
-                    <div class="p-5">
-                        <h3 class="text-lg font-medium mb-4">Tasks Overview</h3>
-                        <div class="chart-container p-4">
-                            <canvas id="project-tasks-chart" width="300" height="300"></canvas>
-                        </div>
-                        
-                        <!-- Task Stats -->
-                        <div class="mt-4 space-y-2">
-                            <div class="flex items-center justify-between text-sm">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-3 h-3 rounded-full" style="background-color: color-mix(in oklch, #1b7a4a 70%, #ffffff);"></div>
-                                    <span>Completed</span>
-                                </div>
-                                <span class="font-medium">{{ $completedTasks }}</span>
-                            </div>
-                            <div class="flex items-center justify-between text-sm">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-3 h-3 rounded-full" style="background-color: color-mix(in oklch, #2563eb 70%, #ffffff);"></div>
-                                    <span>In Progress</span>
-                                </div>
-                                <span class="font-medium">{{ $inProgressTasks }}</span>
-                            </div>
-                            <div class="flex items-center justify-between text-sm">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-3 h-3 rounded-full" style="background-color: color-mix(in oklch, #c98028 70%, #ffffff);"></div>
-                                    <span>Pending</span>
-                                </div>
-                                <span class="font-medium">{{ $pendingTasks }}</span>
-                            </div>
-                            @if($overdueTasks > 0)
-                            <div class="flex items-center justify-between text-sm">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-3 h-3 rounded-full" style="background-color: color-mix(in oklch, #b21a50 70%, #ffffff);"></div>
-                                    <span>Overdue</span>
-                                </div>
-                                <span class="font-medium text-red-600">{{ $overdueTasks }}</span>
-                            </div>
-                            @endif
-                        </div>
-                    </div>
-                </x-base.preview-component>
-            @endif
-        </div>
-
-        <!-- Project Tasks List - Full Width -->
-        <div class="col-span-12">
-            <x-base.preview-component class="intro-y box">
-                <div class="flex items-center justify-between border-b border-slate-200/60 px-5 py-4 dark:border-darkmode-400">
-                    <h3 class="text-lg font-medium flex items-center gap-2">
-                        <x-base.lucide icon="check-square" class="w-5 h-5" />
-                        Project Tasks
-                        <span class="text-sm font-normal text-slate-500">({{ $totalTasks }} total)</span>
-                    </h3>
-                    <div class="flex items-center gap-2">
-                        <a href="{{ route('tasks.index', ['project_id' => $project->id]) }}" class="btn-royal btn-royal--outline btn-royal--sm">
-                            <x-base.lucide icon="external-link" class="w-4 h-4 mr-1" />
-                            View All
-                        </a>
-                        <button type="button" class="btn-royal btn-royal--gold btn-royal--sm" data-tw-toggle="modal" data-tw-target="#create-task-modal">
-                            <x-base.lucide icon="plus" class="w-4 h-4 mr-1" />
-                            Add Task
-                        </button>
-                    </div>
-                </div>
-                <div class="p-5">
-                    @if($project->tasks->count() > 0)
-                        <div class="space-y-3">
-                            @foreach($project->tasks->sortByDesc('created_at')->take(10) as $task)
-                                <a href="{{ route('tasks.show', $task) }}" class="flex items-center justify-between p-4 border border-slate-200/60 rounded-lg dark:border-darkmode-400 hover:bg-slate-50 dark:hover:bg-darkmode-600 transition-colors cursor-pointer hover:border-primary/30 group">
-                                    <div class="flex items-center flex-1">
-                                        @if($task->color)
-                                            <div class="w-3 h-3 rounded-full mr-3 border border-white shadow-sm" style="background-color: {{ $task->color }}"></div>
-                                        @else
-                                            <x-base.lucide class="h-4 w-4 text-slate-400 mr-3 {{ $task->type_color }}" icon="{{ $task->type_icon }}" />
-                                        @endif
-                                        <div class="flex-1">
-                                            <div class="font-medium text-sm group-hover:text-primary transition-colors flex items-center gap-2">
-                                                {{ $task->title }}
-                                                @if($task->hasSubtasks())
-                                                    <span class="text-xs text-slate-400">({{ $task->subtasks->where('status', 'completed')->count() }}/{{ $task->subtasks->count() }})</span>
-                                                @endif
-                                            </div>
-                                            <div class="text-xs text-slate-500 mt-1 flex items-center gap-3">
-                                                <span class="font-mono">{{ $task->code }}</span>
-                                                @if($task->employee)
-                                                    <span class="flex items-center gap-1">
-                                                        <x-base.lucide icon="user" class="w-3 h-3" />
-                                                        {{ $task->employee->full_name }}
-                                                    </span>
-                                                @endif
-                                                @if($task->due_date)
-                                                    <span class="flex items-center gap-1 {{ $task->isOverdue() ? 'text-red-500' : '' }}">
-                                                        <x-base.lucide icon="calendar" class="w-3 h-3" />
-                                                        {{ $task->due_date->format('M d') }}
-                                                        @if($task->isOverdue())
-                                                            <span class="text-red-500 font-medium">(Overdue)</span>
-                                                        @endif
-                                                    </span>
-                                                @endif
-                                                @if($task->estimated_hours)
-                                                    <span class="flex items-center gap-1">
-                                                        <x-base.lucide icon="clock" class="w-3 h-3" />
-                                                        {{ $task->actual_hours ?? 0 }}/{{ $task->estimated_hours }}h
-                                                    </span>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center space-x-2">
-                                        <!-- Progress -->
-                                        @if($task->progress_percentage > 0)
-                                            <div class="w-16 h-2 bg-slate-200 rounded-full overflow-hidden">
-                                                <div class="h-full bg-primary rounded-full" style="width: {{ $task->progress_percentage }}%"></div>
-                                            </div>
-                                            <span class="text-xs text-slate-500 w-8">{{ $task->progress_percentage }}%</span>
-                                        @endif
-                                        
-                                        <!-- Priority Badge -->
-                                        @php
-                                            $priorityClass = match($task->priority) {
-                                                'high' => 'bg-red-100 text-red-700',
-                                                'medium' => 'bg-yellow-100 text-yellow-700',
-                                                'low' => 'bg-green-100 text-green-700',
-                                                default => 'bg-gray-100 text-gray-700'
-                                            };
-                                        @endphp
-                                        <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold {{ $priorityClass }}">
-                                            {{ ucfirst($task->priority) }}
-                                        </span>
-                                        
-                                        <!-- Status Badge -->
-                                        @php
-                                            $statusClass = match($task->status) {
-                                                'completed' => 'bg-green-100 text-green-700',
-                                                'in_progress' => 'bg-blue-100 text-blue-700',
-                                                'pending' => 'bg-yellow-100 text-yellow-700',
-                                                'cancelled' => 'bg-red-100 text-red-700',
-                                                default => 'bg-gray-100 text-gray-700'
-                                            };
-                                        @endphp
-                                        <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold {{ $statusClass }}">
-                                            {{ ucfirst(str_replace('_', ' ', $task->status)) }}
-                                        </span>
-                                        
-                                        <x-base.lucide class="h-4 w-4 text-slate-400 group-hover:text-primary transition-colors" icon="chevron-right" />
-                                    </div>
-                                </a>
-                            @endforeach
-                        </div>
-                        
-                        @if($project->tasks->count() > 10)
-                            <div class="mt-4 text-center">
-                                <a href="{{ route('tasks.index', ['project_id' => $project->id]) }}" class="text-primary hover:text-primary/80 text-sm">
-                                    View all {{ $project->tasks->count() }} tasks →
-                                </a>
-                            </div>
-                        @endif
-                    @else
-                        <div class="flex flex-col items-center justify-center py-10">
-                            <x-base.lucide class="h-12 w-12 text-slate-400 mb-4" icon="check-square" />
-                            <div class="text-slate-500 text-center mb-2">No tasks yet</div>
-                            <button type="button" class="btn-royal btn-royal--gold btn-royal--sm" data-tw-toggle="modal" data-tw-target="#create-task-modal">
-                                <x-base.lucide icon="plus" class="w-4 h-4 mr-1" />
-                                Create First Task
-                            </button>
-                        </div>
+                <h1 class="text-3xl sm:text-4xl font-semibold tracking-tight text-slate-900">{{ $project->name }}</h1>
+                <div class="mt-3 flex items-center gap-3 text-sm text-slate-700">
+                    @if($project->company)<span>{{ $project->company->name }}</span>@endif
+                    @if($project->department)<span class="text-slate-400">•</span><span>{{ $project->department->name }}</span>@endif
+                    @if($project->start_date)
+                        <span class="text-slate-400">•</span>
+                        <span class="flex items-center gap-1"><x-base.lucide icon="calendar" class="w-4 h-4" /> {{ $project->start_date->format('M d') }} - {{ $project->end_date?->format('M d, Y') ?? 'Ongoing' }}</span>
                     @endif
                 </div>
-            </x-base.preview-component>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="{{ route('project-management.projects.edit', $project) }}" class="h-10 rounded-full px-5 flex items-center justify-center text-xs font-semibold text-[#3a2a1a] border border-slate-300 hover:bg-white/80 transition-all">
+                    <x-base.lucide icon="edit" class="w-4 h-4 mr-2" /> Edit
+                </a>
+                <a href="{{ route('project-management.projects.index') }}" class="h-10 rounded-full px-5 flex items-center justify-center text-xs font-semibold text-white bg-[#303030] hover:bg-[#404040] transition-all">
+                    <x-base.lucide icon="arrow-left" class="w-4 h-4 mr-2" /> Back
+                </a>
+            </div>
+        </div>
+
+        {{-- Stats Row --}}
+        <div class="mt-8 flex gap-10 text-right justify-end">
+            <div>
+                <div class="flex items-baseline justify-end gap-2 text-[#3a2a1a]">
+                    <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1"><x-base.lucide icon="trending-up" class="w-4 h-4" /></div>
+                    <div class="text-6xl font-semibold tracking-tight">{{ $project->progress_percentage }}%</div>
+                </div>
+                <div class="mt-1 text-xs uppercase tracking-[0.25em] text-slate-600">Progress</div>
+            </div>
+            <div>
+                <div class="flex items-baseline justify-end gap-2 text-[#3a2a1a]">
+                    <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1"><x-base.lucide icon="check-square" class="w-4 h-4" /></div>
+                    <div class="text-6xl font-semibold tracking-tight">{{ $completedTasks }}/{{ $totalTasks }}</div>
+                </div>
+                <div class="mt-1 text-xs uppercase tracking-[0.25em] text-slate-600">Tasks</div>
+            </div>
+            <div>
+                <div class="flex items-baseline justify-end gap-2 text-[#3a2a1a]">
+                    <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1"><x-base.lucide icon="calendar" class="w-4 h-4" /></div>
+                    <div class="text-6xl font-semibold tracking-tight">{{ $daysRemaining ?? '∞' }}</div>
+                </div>
+                <div class="mt-1 text-xs uppercase tracking-[0.25em] text-slate-600">Days Left</div>
+            </div>
+            <div>
+                <div class="flex items-baseline justify-end gap-2 text-[#3a2a1a]">
+                    <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1"><x-base.lucide icon="users" class="w-4 h-4" /></div>
+                    <div class="text-6xl font-semibold tracking-tight">{{ $teamMembers->count() }}</div>
+                </div>
+                <div class="mt-1 text-xs uppercase tracking-[0.25em] text-slate-600">Team</div>
+            </div>
+            <div>
+                <div class="flex items-baseline justify-end gap-2 text-[#3a2a1a]">
+                    <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1"><x-base.lucide icon="wallet" class="w-4 h-4" /></div>
+                    <div class="text-6xl font-semibold tracking-tight">${{ number_format(($project->budget ?? 0)/1000) }}K</div>
+                </div>
+                <div class="mt-1 text-xs uppercase tracking-[0.25em] text-slate-600">Budget</div>
+            </div>
+        </div>
+
+        {{-- Tabs Navigation --}}
+        <div class="mt-10 flex items-center gap-1 border-b border-slate-200/60 overflow-x-auto pb-px">
+            <button class="project-tab active px-4 py-3 text-sm font-semibold text-[#303030] border-b-2 border-[#303030] -mb-px whitespace-nowrap" data-tab="overview">
+                <x-base.lucide icon="layout-dashboard" class="w-4 h-4 inline mr-1" />Overview
+            </button>
+            <button class="project-tab px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-700 border-b-2 border-transparent -mb-px whitespace-nowrap" data-tab="tasks">
+                <x-base.lucide icon="check-square" class="w-4 h-4 inline mr-1" />Tasks
+                <span class="ml-1 px-1.5 py-0.5 rounded-full bg-slate-200 text-xs">{{ $totalTasks }}</span>
+            </button>
+            <button class="project-tab px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-700 border-b-2 border-transparent -mb-px whitespace-nowrap" data-tab="milestones">
+                <x-base.lucide icon="flag" class="w-4 h-4 inline mr-1" />Milestones
+            </button>
+            <button class="project-tab px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-700 border-b-2 border-transparent -mb-px whitespace-nowrap" data-tab="team">
+                <x-base.lucide icon="users" class="w-4 h-4 inline mr-1" />Team
+                <span class="ml-1 px-1.5 py-0.5 rounded-full bg-slate-200 text-xs">{{ $teamMembers->count() }}</span>
+            </button>
+            <button class="project-tab px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-700 border-b-2 border-transparent -mb-px whitespace-nowrap" data-tab="materials">
+                <x-base.lucide icon="package" class="w-4 h-4 inline mr-1" />Materials
+            </button>
+            <button class="project-tab px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-700 border-b-2 border-transparent -mb-px whitespace-nowrap" data-tab="requests">
+                <x-base.lucide icon="clipboard-list" class="w-4 h-4 inline mr-1" />Requests
+            </button>
+            <button class="project-tab px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-700 border-b-2 border-transparent -mb-px whitespace-nowrap" data-tab="delivery">
+                <x-base.lucide icon="truck" class="w-4 h-4 inline mr-1" />Delivery
+            </button>
+            <button class="project-tab px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-700 border-b-2 border-transparent -mb-px whitespace-nowrap" data-tab="invoices">
+                <x-base.lucide icon="receipt" class="w-4 h-4 inline mr-1" />Invoices
+            </button>
+            <button class="project-tab px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-700 border-b-2 border-transparent -mb-px whitespace-nowrap" data-tab="documents">
+                <x-base.lucide icon="folder" class="w-4 h-4 inline mr-1" />Documents
+            </button>
+            <button class="project-tab px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-700 border-b-2 border-transparent -mb-px whitespace-nowrap" data-tab="costs">
+                <x-base.lucide icon="calculator" class="w-4 h-4 inline mr-1" />Costs
+            </button>
+            <button class="project-tab px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-700 border-b-2 border-transparent -mb-px whitespace-nowrap" data-tab="risks">
+                <x-base.lucide icon="alert-triangle" class="w-4 h-4 inline mr-1" />Risks
+            </button>
+            <button class="project-tab px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-700 border-b-2 border-transparent -mb-px whitespace-nowrap" data-tab="activity">
+                <x-base.lucide icon="activity" class="w-4 h-4 inline mr-1" />Activity
+            </button>
+            <button class="project-tab px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-700 border-b-2 border-transparent -mb-px whitespace-nowrap" data-tab="details">
+                <x-base.lucide icon="info" class="w-4 h-4 inline mr-1" />Details
+            </button>
+        </div>
+
+        {{-- Tab Contents --}}
+        <div class="mt-6">
+            {{-- Overview Tab --}}
+            <div id="tab-overview" class="tab-content">
+                @include('work.projects.partials.show.tab-overview')
+            </div>
+
+            {{-- Tasks Tab --}}
+            <div id="tab-tasks" class="tab-content hidden">
+                @include('work.projects.partials.show.tab-tasks')
+            </div>
+
+            {{-- Milestones Tab --}}
+            <div id="tab-milestones" class="tab-content hidden">
+                @include('work.projects.partials.show.tab-milestones')
+            </div>
+
+            {{-- Team Tab --}}
+            <div id="tab-team" class="tab-content hidden">
+                @include('work.projects.partials.show.tab-team')
+            </div>
+
+            {{-- Materials Tab --}}
+            <div id="tab-materials" class="tab-content hidden">
+                @include('work.projects.partials.show.tab-materials')
+            </div>
+
+            {{-- Material Requests Tab --}}
+            <div id="tab-requests" class="tab-content hidden">
+                @include('work.projects.partials.show.tab-requests')
+            </div>
+
+            {{-- Delivery Notes Tab --}}
+            <div id="tab-delivery" class="tab-content hidden">
+                @include('work.projects.partials.show.tab-delivery')
+            </div>
+
+            {{-- Invoices Tab --}}
+            <div id="tab-invoices" class="tab-content hidden">
+                @include('work.projects.partials.show.tab-invoices')
+            </div>
+
+            {{-- Documents Tab --}}
+            <div id="tab-documents" class="tab-content hidden">
+                @include('work.projects.partials.show.tab-documents')
+            </div>
+
+            {{-- Costs Tab --}}
+            <div id="tab-costs" class="tab-content hidden">
+                @include('work.projects.partials.show.tab-costs')
+            </div>
+
+            {{-- Risks Tab --}}
+            <div id="tab-risks" class="tab-content hidden">
+                @include('work.projects.partials.show.tab-risks')
+            </div>
+
+            {{-- Activity Tab --}}
+            <div id="tab-activity" class="tab-content hidden">
+                @include('work.projects.partials.show.tab-activity')
+            </div>
+
+            {{-- Details Tab --}}
+            <div id="tab-details" class="tab-content hidden">
+                @include('work.projects.partials.show.tab-details')
+            </div>
         </div>
     </div>
 @endsection
 
 @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize Project Tasks Chart
-            const tasksChart = document.getElementById('project-tasks-chart');
-            if (tasksChart) {
-                initProjectTasksChart();
-            }
-        });
-
-        function initProjectTasksChart() {
-            const ctx = document.getElementById('project-tasks-chart').getContext('2d');
-            
-            const completedTasks = {{ $completedTasks ?? 0 }};
-            const inProgressTasks = {{ $inProgressTasks ?? 0 }};
-            const pendingTasks = {{ $pendingTasks ?? 0 }};
-            
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Completed', 'In Progress', 'Pending'],
-                    datasets: [{
-                        data: [completedTasks, inProgressTasks, pendingTasks],
-                        backgroundColor: [
-                            'color-mix(in oklch, #1b7a4a 18%, #ffffff)', // success
-                            'color-mix(in oklch, #2563eb 18%, #ffffff)',  // info
-                            'color-mix(in oklch, #c98028 18%, #ffffff)'   // warning
-                        ],
-                        borderColor: [
-                            'color-mix(in oklch, #1b7a4a, transparent 78%)',
-                            'color-mix(in oklch, #2563eb, transparent 78%)',
-                            'color-mix(in oklch, #c98028, transparent 78%)'
-                        ],
-                        borderWidth: 2,
-                        hoverBackgroundColor: [
-                            'color-mix(in oklch, #1b7a4a 25%, #ffffff)',
-                            'color-mix(in oklch, #2563eb 25%, #ffffff)',
-                            'color-mix(in oklch, #c98028 25%, #ffffff)'
-                        ],
-                        hoverBorderWidth: 3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                padding: 20,
-                                usePointStyle: true,
-                                font: {
-                                    size: 12
-                                }
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const label = context.label || '';
-                                    const value = context.parsed;
-                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const percentage = Math.round((value / total) * 100);
-                                    return `${label}: ${value} (${percentage}%)`;
-                                }
-                            }
-                        }
-                    },
-                    cutout: '60%',
-                    animation: {
-                        animateRotate: true,
-                        duration: 1000
-                    }
-                }
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.project-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            // Remove active from all tabs
+            document.querySelectorAll('.project-tab').forEach(t => {
+                t.classList.remove('active', 'text-[#303030]', 'border-[#303030]');
+                t.classList.add('text-slate-500', 'border-transparent');
             });
-        }
-        function editProject(id) {
-            window.location.href = `{{ url('work/projects') }}/${id}/edit`;
-        }
-
-        function deleteProject(id, name) {
-            if (typeof window.confirmDelete === 'function') {
-                window.confirmDelete(name, function() {
-                    $.ajax({
-                        url: `{{ url('work/projects') }}/${id}`,
-                        type: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        success: function(response) {
-                            if (response.success) {
-                                if (typeof window.showSuccess === 'function') {
-                                    window.showSuccess(response.message || 'Project deleted successfully');
-                                }
-                                setTimeout(() => {
-                                    window.location.href = '{{ route("work.projects.index") }}';
-                                }, 1500);
-                            } else if (typeof window.showError === 'function') {
-                                window.showError(response.message || 'Failed to delete project');
-                            }
-                        },
-                        error: function(xhr) {
-                            const msg = xhr.responseJSON?.message || 'Failed to delete project';
-                            if (typeof window.showError === 'function') {
-                                window.showError(msg);
-                            }
-                        }
-                    });
-                });
-            }
-        }
-    </script>
+            // Hide all content
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+            
+            // Activate clicked tab
+            this.classList.add('active', 'text-[#303030]', 'border-[#303030]');
+            this.classList.remove('text-slate-500', 'border-transparent');
+            
+            // Show content
+            document.getElementById('tab-' + this.dataset.tab).classList.remove('hidden');
+        });
+    });
+});
+</script>
 @endpush
