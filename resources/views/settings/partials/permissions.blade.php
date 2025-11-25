@@ -35,9 +35,9 @@
                                     @endforeach
                                 </div>
                                 <div class="flex justify-end">
-                                    <x-base.button type="submit" variant="primary" size="sm">
+                                    <button type="submit" class="btn-royal btn-royal--gold btn-royal--sm">
                                         Save Permissions
-                                    </x-base.button>
+                                    </button>
                                 </div>
                             </form>
                         </div>

@@ -180,7 +180,7 @@
                 <div class="mt-4 pt-3 border-t border-dashed border-slate-200 dark:border-darkmode-400">
                     <button
                         type="button"
-                        class="btn-tonal btn-tonal--info w-full min-h-[38px] px-4 text-sm font-semibold"
+                        class="btn-royal btn-royal--dark btn-royal--sm w-full min-h-[38px] px-4 text-sm font-semibold"
                         data-tw-toggle="modal"
                         data-tw-target="#category-modal"
                     >
@@ -330,7 +330,7 @@
                         <div class="col-span-12 flex justify-end mt-2">
                             <button
                                 type="button"
-                                class="btn-tonal btn-tonal--info min-h-[38px] px-4 text-sm font-semibold"
+                                class="btn-royal btn-royal--dark btn-royal--sm min-h-[38px] px-4 text-sm font-semibold"
                                 onclick="applyFilters()"
                             >
                                 <x-base.lucide icon="Search" class="w-4 h-4 mr-2 icon-hover-rise" />

@@ -559,8 +559,8 @@
                 customClass: {
                     popup: 'swal-modern-popup',
                     actions: 'swal-modern-actions',
-                    confirmButton: 'swal-modern-btn btn-tonal btn-tonal--danger',
-                    cancelButton: 'swal-modern-btn btn-tonal btn-tonal--neutral',
+                    confirmButton: 'swal-modern-btn btn-royal btn-royal--action btn-royal--danger',
+                    cancelButton: 'swal-modern-btn btn-royal btn-royal--outline btn-royal--sm',
                 },
                 backdrop: 'rgba(15,23,42,0.55)',
             }).then((result) => {

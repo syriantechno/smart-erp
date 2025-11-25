@@ -41,11 +41,11 @@
                 <p class="text-slate-500">Centralize people, link them to companies, and keep the relationship history.</p>
             </div>
             <div class="flex flex-wrap gap-2">
-                <button type="button" class="btn-tonal btn-tonal--info" data-tw-toggle="modal" data-tw-target="#crm-contact-filters">
-                    <x-base.lucide icon="Filter" class="w-4 h-4 mr-2" /> Filters
+                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm" data-tw-toggle="modal" data-tw-target="#crm-contact-filters">
+                    <x-base.lucide icon="filter" class="w-4 h-4" /> Filters
                 </button>
-                <button type="button" class="btn-tonal btn-tonal--success" data-tw-toggle="modal" data-tw-target="#crm-contact-create">
-                    <x-base.lucide icon="UserPlus" class="w-4 h-4 mr-2" /> New Contact
+                <button type="button" class="btn-royal btn-royal--gold btn-royal--sm" data-tw-toggle="modal" data-tw-target="#crm-contact-create">
+                    <x-base.lucide icon="user-plus" class="w-4 h-4" /> New Contact
                 </button>
             </div>
         </div>
@@ -110,11 +110,11 @@
                     </x-base.form-select>
                 </div>
                 <div class="flex gap-3">
-                    <button type="button" id="crm-contact-apply" class="btn-tonal btn-tonal--info">
-                        <x-base.lucide icon="Search" class="w-4 h-4 mr-2" /> Apply
+                    <button type="button" id="crm-contact-apply" class="btn-royal btn-royal--dark btn-royal--sm">
+                        <x-base.lucide icon="search" class="w-4 h-4" /> Apply
                     </button>
-                    <button type="button" id="crm-contact-reset" class="btn-tonal btn-tonal--warning">
-                        <x-base.lucide icon="RotateCcw" class="w-4 h-4 mr-2" /> Reset
+                    <button type="button" id="crm-contact-reset" class="btn-royal btn-royal--outline btn-royal--sm">
+                        <x-base.lucide icon="rotate-ccw" class="w-4 h-4" /> Reset
                     </button>
                 </div>
             </div>
@@ -141,51 +141,126 @@
     @include('crm.contacts.partials.create-modal')
 @endsection
 
+@include('components.datatable.scripts')
+
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const table = $('#crm-contacts-table').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url: '{{ route('crm.contacts.datatable') }}',
-                    data: function (params) {
-                        params.company_id = document.getElementById('crm-contact-company').value;
-                        params.status = document.getElementById('crm-contact-status').value;
-                    }
+        document.addEventListener('DOMContentLoaded', function () {
+            const companyFilter = document.getElementById('crm-contact-company');
+            const statusFilter = document.getElementById('crm-contact-status');
+            const applyBtn = document.getElementById('crm-contact-apply');
+            const resetBtn = document.getElementById('crm-contact-reset');
+
+            const table = window.erpCrud.initDataTable({
+                tableSelector: '#crm-contacts-table',
+                ajaxUrl: '{{ route("crm.contacts.datatable") }}',
+                ajaxData: function (d) {
+                    d.company_id = companyFilter ? companyFilter.value : 'all';
+                    d.status = statusFilter ? statusFilter.value : 'all';
                 },
+                pageLength: 25,
                 columns: [
-                    { data: 'name', name: 'name' },
-                    { data: 'company', name: 'company.name' },
-                    { data: 'email', name: 'email' },
-                    { data: 'phone', name: 'phone' },
-                    { data: 'position', name: 'position' },
-                    { data: 'status', name: 'status' },
+                    { data: 'name', name: 'name', className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700' },
+                    { data: 'company', name: 'company.name', className: 'px-5 py-3 border-b dark:border-darkmode-300' },
+                    { data: 'email', name: 'email', className: 'px-5 py-3 border-b dark:border-darkmode-300' },
+                    { data: 'phone', name: 'phone', className: 'px-5 py-3 border-b dark:border-darkmode-300' },
+                    { data: 'position', name: 'position', className: 'px-5 py-3 border-b dark:border-darkmode-300' },
+                    { data: 'status', name: 'status', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center' },
                     {
                         data: 'id',
+                        name: 'actions',
                         orderable: false,
                         searchable: false,
-                        className: 'text-center',
-                        render: (id) => `
-                            <div class="flex items-center justify-center gap-2">
-                                <button class="text-primary" data-action="edit" data-id="${id}">
-                                    <x-base.lucide icon="Edit" class="w-4 h-4" />
-                                </button>
-                                <button class="text-danger" data-action="delete" data-id="${id}">
-                                    <x-base.lucide icon="Trash" class="w-4 h-4" />
-                                </button>
-                            </div>
-                        `
+                        className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center',
+                        render: function (data, type, row) {
+                            return `
+                                <div class="flex items-center justify-center gap-2">
+                                    <button class="btn-royal btn-royal--action btn-royal--primary" data-action="edit" data-id="${data}" title="Edit">
+                                        <i data-lucide="edit" class="w-4 h-4"></i>
+                                    </button>
+                                    <button class="btn-royal btn-royal--action btn-royal--danger" data-action="delete" data-id="${data}" data-name="${row.name || ''}" title="Delete">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            `;
+                        }
                     }
-                ]
+                ],
+                drawCallback: function () {
+                    if (typeof window.lucide !== 'undefined') {
+                        window.lucide.createIcons();
+                    }
+                }
             });
 
-            document.getElementById('crm-contact-apply').addEventListener('click', () => table.ajax.reload());
-            document.getElementById('crm-contact-reset').addEventListener('click', () => {
-                document.getElementById('crm-contact-company').value = 'all';
-                document.getElementById('crm-contact-status').value = 'all';
-                table.ajax.reload();
+            if (!table) {
+                console.error('Failed to initialize DataTable');
+                return;
+            }
+
+            // Apply filters
+            if (applyBtn) {
+                applyBtn.addEventListener('click', function () {
+                    table.ajax.reload();
+                });
+            }
+
+            // Reset filters
+            if (resetBtn) {
+                resetBtn.addEventListener('click', function () {
+                    if (companyFilter) companyFilter.value = 'all';
+                    if (statusFilter) statusFilter.value = 'all';
+                    table.ajax.reload();
+                });
+            }
+
+            // Handle actions
+            document.querySelector('#crm-contacts-table').addEventListener('click', function (e) {
+                const editBtn = e.target.closest('[data-action="edit"]');
+                const deleteBtn = e.target.closest('[data-action="delete"]');
+
+                if (editBtn) {
+                    const id = editBtn.dataset.id;
+                    window.location.href = '{{ url("crm/contacts") }}/' + id + '/edit';
+                }
+
+                if (deleteBtn) {
+                    const id = deleteBtn.dataset.id;
+                    const name = deleteBtn.dataset.name || 'this contact';
+
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: `You are about to delete "${name}". This action cannot be undone.`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#dc2626',
+                        cancelButtonColor: '#6b7280',
+                        confirmButtonText: 'Yes, delete it!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetch('{{ url("crm/contacts") }}/' + id, {
+                                method: 'DELETE',
+                                headers: {
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                    'Accept': 'application/json'
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire('Deleted!', data.message || 'Contact deleted successfully.', 'success');
+                                    table.ajax.reload();
+                                } else {
+                                    Swal.fire('Error!', data.message || 'Failed to delete contact.', 'error');
+                                }
+                            })
+                            .catch(() => {
+                                Swal.fire('Error!', 'An error occurred while deleting.', 'error');
+                            });
+                        }
+                    });
+                }
             });
         });
     </script>

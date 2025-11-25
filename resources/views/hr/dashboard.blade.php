@@ -18,34 +18,34 @@
         $getExpiryTone = function (?int $daysLeft) {
             if (is_null($daysLeft)) {
                 return [
-                    'class' => 'btn-tonal btn-tonal--neutral !px-3 !py-1 text-[0.7rem] font-semibold',
+                    'class' => 'btn-royal btn-royal--outline btn-royal--sm !px-3 !py-1 text-[0.7rem] font-semibold',
                     'label' => __('No date'),
                 ];
             }
 
             if ($daysLeft <= 0) {
                 return [
-                    'class' => 'btn-tonal btn-tonal--rose !px-3 !py-1 text-[0.7rem] font-semibold',
+                    'class' => 'btn-royal btn-royal--action btn-royal--danger !px-3 !py-1 text-[0.7rem] font-semibold',
                     'label' => __('Expired'),
                 ];
             }
 
             if ($daysLeft <= 10) {
                 return [
-                    'class' => 'btn-tonal btn-tonal--danger !px-3 !py-1 text-[0.7rem] font-semibold',
+                    'class' => 'btn-royal btn-royal--action btn-royal--danger !px-3 !py-1 text-[0.7rem] font-semibold',
                     'label' => __('Urgent'),
                 ];
             }
 
             if ($daysLeft <= 20) {
                 return [
-                    'class' => 'btn-tonal btn-tonal--amber !px-3 !py-1 text-[0.7rem] font-semibold',
+                    'class' => 'btn-royal btn-royal--outline btn-royal--sm !px-3 !py-1 text-[0.7rem] font-semibold',
                     'label' => __('Soon'),
                 ];
             }
 
             return [
-                'class' => 'btn-tonal btn-tonal--sky !px-3 !py-1 text-[0.7rem] font-semibold',
+                'class' => 'btn-royal btn-royal--action btn-royal--info !px-3 !py-1 text-[0.7rem] font-semibold',
                 'label' => __('Upcoming'),
             ];
         };
@@ -517,7 +517,7 @@
                                     </div>
                                 </div>
                                 @if($employee)
-                                    <a href="{{ route('hr.employees.documents.index', $employee->id) }}" class="btn-tonal  btn-tonal--info" title="View documents">
+                                    <a href="{{ route('hr.employees.documents.index', $employee->id) }}" class="btn-royal btn-royal--action btn-royal--primary" title="View documents">
                                         <x-base.lucide icon="ExternalLink" class="h-4 w-4" />
                                     </a>
                                 @endif

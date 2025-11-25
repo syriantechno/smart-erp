@@ -283,11 +283,11 @@
 
             <!-- Modal Footer -->
             <div class="custom-modal-footer">
-                <button type="button" class="btn-tonal btn-tonal--warning" onclick="closeCreateModal()">
+                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm" onclick="closeCreateModal()">
                     <x-base.lucide icon="X" class="w-4 h-4 mr-2" />
                     Cancel
                 </button>
-                <button type="submit" class="btn-tonal btn-tonal--success" id="create-project-btn">
+                <button type="submit" class="btn-royal btn-royal--gold btn-royal--sm" id="create-project-btn">
                     <x-base.lucide icon="save" class="w-4 h-4 mr-2" />
                     Create Project
                 </button>

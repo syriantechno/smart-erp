@@ -277,10 +277,10 @@
                                 as="button"
                                 type="button"
                                 content="Close advanced filters"
-                                class="btn-tonal btn-tonal--warning w-28"
+                                class="btn-royal btn-royal--outline btn-royal--sm w-28"
                                 data-tw-dismiss="modal"
                             >
-                                <x-base.lucide icon="X" class="mr-2 h-4 w-4 animate-pulse" />
+                                <x-base.lucide icon="x" class="mr-2 h-4 w-4" />
                                 Close
                             </x-base.tippy>
                             <x-base.tippy
@@ -288,9 +288,9 @@
                                 id="advanced-filter-apply"
                                 type="button"
                                 content="Apply filters"
-                                class="btn-tonal btn-tonal--info w-28"
+                                class="btn-royal btn-royal--dark btn-royal--sm w-28"
                             >
-                                <x-base.lucide icon="Search" class="mr-2 h-4 w-4 animate-pulse" />
+                                <x-base.lucide icon="search" class="mr-2 h-4 w-4" />
                                 Apply
                             </x-base.tippy>
                         </div>

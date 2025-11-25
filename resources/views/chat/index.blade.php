@@ -249,7 +249,7 @@
 
                         <button
                             type="button"
-                            class="btn-tonal btn-tonal--info min-h-[36px] px-3 text-sm font-semibold"
+                            class="btn-royal btn-royal--dark btn-royal--sm min-h-[36px] px-3 text-sm font-semibold"
                             onclick="refreshMessages()"
                         >
                             <x-base.lucide icon="RefreshCw" class="w-4 h-4 mr-1 icon-hover-rise" />
@@ -284,7 +284,7 @@
                         <button
                             id="send-button"
                             type="button"
-                            class="btn-tonal btn-tonal--success min-h-[42px] px-4 text-sm font-semibold group disabled:opacity-60"
+                            class="btn-royal btn-royal--gold btn-royal--sm min-h-[42px] px-4 text-sm font-semibold group disabled:opacity-60"
                             onclick="sendMessage()"
                             disabled
                         >
@@ -311,7 +311,7 @@
                 <p class="text-slate-500 mb-4">Choose a conversation from the sidebar to start chatting</p>
                 <button
                     type="button"
-                    class="btn-tonal btn-tonal--success min-h-[42px] px-4 text-sm font-semibold"
+                    class="btn-royal btn-royal--gold btn-royal--sm min-h-[42px] px-4 text-sm font-semibold"
                     onclick="showNewChatModal()"
                 >
                     <x-base.lucide icon="Plus" class="w-4 h-4 mr-2 icon-hover-rise" />
@@ -361,7 +361,7 @@
             <div class="flex justify-end w-full gap-2">
                 <button
                     type="button"
-                    class="btn-tonal btn-tonal--neutral min-h-[40px] px-4"
+                    class="btn-royal btn-royal--outline btn-royal--sm min-h-[40px] px-4"
                     data-tw-dismiss="modal"
                 >
                     <x-base.lucide icon="X" class="w-4 h-4 mr-2 icon-hover-rise" />
@@ -369,7 +369,7 @@
                 </button>
                 <button
                     type="button"
-                    class="btn-tonal btn-tonal--success min-h-[40px] px-4"
+                    class="btn-royal btn-royal--gold btn-royal--sm min-h-[40px] px-4"
                     onclick="startNewConversation()"
                 >
                     <x-base.lucide icon="MessageCircle" class="w-4 h-4 mr-2 icon-hover-rise" />

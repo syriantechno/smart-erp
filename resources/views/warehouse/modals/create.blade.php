@@ -71,7 +71,7 @@
             <div class="flex w-full flex-wrap justify-end gap-2">
                 <button
                     type="button"
-                    class="btn-tonal btn-tonal--neutral group"
+                    class="btn-royal btn-royal--outline btn-royal--sm group"
                     data-tw-dismiss="modal"
                 >
                     <x-base.lucide icon="x-circle" class="w-5 h-5 icon-hover-rise" />
@@ -81,7 +81,7 @@
                     type="submit"
                     form="create-warehouse-form"
                     id="create-warehouse-btn"
-                    class="btn-tonal btn-tonal--success group"
+                    class="btn-royal btn-royal--gold btn-royal--sm group"
                 >
                     <x-base.lucide icon="save" class="w-5 h-5 icon-hover-rise" />
                     Save

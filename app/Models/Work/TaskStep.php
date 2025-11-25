@@ -4,6 +4,7 @@ namespace App\Models\Work;
 
 use App\Models\BaseModel;
 use App\Models\User;
+use App\Models\HR\Employee;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TaskStep extends BaseModel
@@ -16,6 +17,8 @@ class TaskStep extends BaseModel
         'is_completed',
         'completed_at',
         'completed_by',
+        'delegated_task_id',
+        'assigned_to',
     ];
 
     protected $casts = [
@@ -38,6 +41,38 @@ class TaskStep extends BaseModel
     public function completedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'completed_by');
+    }
+
+    /**
+     * Get the delegated subtask (when step is assigned to another employee).
+     */
+    public function delegatedTask(): BelongsTo
+    {
+        return $this->belongsTo(Task::class, 'delegated_task_id');
+    }
+
+    /**
+     * Get the employee assigned to this step.
+     */
+    public function assignee(): BelongsTo
+    {
+        return $this->belongsTo(Employee::class, 'assigned_to');
+    }
+
+    /**
+     * Check if this step is delegated to another employee.
+     */
+    public function isDelegated(): bool
+    {
+        return !is_null($this->delegated_task_id);
+    }
+
+    /**
+     * Check if this step has an assignee.
+     */
+    public function hasAssignee(): bool
+    {
+        return !is_null($this->assigned_to);
     }
 
     /**

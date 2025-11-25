@@ -24,7 +24,7 @@
                         <div class="flex space-x-2">
                             <button
                                 type="button"
-                                class="btn-tonal btn-tonal--success min-h-[44px] px-4 group"
+                                class="btn-royal btn-royal--gold btn-royal--sm min-h-[44px] px-4 group"
                                 onclick="window.location.href='{{ route('manufacturing.orders.create') }}'"
                             >
                                 <x-base.lucide icon="SquarePlus" class="w-4 h-4 mr-2 icon-hover-rise" />
@@ -173,7 +173,7 @@
                         <h3 class="text-base font-medium text-slate-800 dark:text-slate-200">Recent Production Orders</h3>
                         <button
                             type="button"
-                            class="btn-tonal btn-tonal--info min-h-[38px] px-4 text-sm group"
+                            class="btn-royal btn-royal--dark btn-royal--sm min-h-[38px] px-4 text-sm group"
                             onclick="window.location.href='{{ route('manufacturing.orders.index') }}'"
                         >
                             <x-base.lucide icon="Eye" class="w-4 h-4 mr-2 icon-hover-rise" />

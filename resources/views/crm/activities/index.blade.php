@@ -41,11 +41,11 @@
                 <p class="text-slate-500">Track every call, email, meeting, and task across leads and opportunities.</p>
             </div>
             <div class="flex flex-wrap gap-2">
-                <button type="button" class="btn-tonal btn-tonal--info" data-tw-toggle="modal" data-tw-target="#crm-activity-filters">
-                    <x-base.lucide icon="Filter" class="w-4 h-4 mr-2" /> Filters
+                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm" data-tw-toggle="modal" data-tw-target="#crm-activity-filters">
+                    <x-base.lucide icon="filter" class="w-4 h-4" /> Filters
                 </button>
-                <button type="button" class="btn-tonal btn-tonal--success" data-tw-toggle="modal" data-tw-target="#crm-activity-create">
-                    <x-base.lucide icon="CalendarPlus" class="w-4 h-4 mr-2" /> Log Activity
+                <button type="button" class="btn-royal btn-royal--gold btn-royal--sm" data-tw-toggle="modal" data-tw-target="#crm-activity-create">
+                    <x-base.lucide icon="calendar-plus" class="w-4 h-4" /> Log Activity
                 </button>
             </div>
         </div>
@@ -128,11 +128,11 @@
                     </x-base.form-select>
                 </div>
                 <div class="col-span-12 flex gap-3">
-                    <button type="button" id="crm-activity-apply" class="btn-tonal btn-tonal--info">
-                        <x-base.lucide icon="Search" class="w-4 h-4 mr-2" /> Apply
+                    <button type="button" id="crm-activity-apply" class="btn-royal btn-royal--dark btn-royal--sm">
+                        <x-base.lucide icon="search" class="w-4 h-4" /> Apply
                     </button>
-                    <button type="button" id="crm-activity-reset" class="btn-tonal btn-tonal--warning">
-                        <x-base.lucide icon="RotateCcw" class="w-4 h-4 mr-2" /> Reset
+                    <button type="button" id="crm-activity-reset" class="btn-royal btn-royal--outline btn-royal--sm">
+                        <x-base.lucide icon="rotate-ccw" class="w-4 h-4" /> Reset
                     </button>
                 </div>
             </div>
@@ -161,57 +161,134 @@
     @include('crm.activities.partials.create-modal')
 @endsection
 
+@include('components.datatable.scripts')
+
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const table = $('#crm-activities-table').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url: '{{ route('crm.activities.datatable') }}',
-                    data: function (params) {
-                        params.activity_type = document.getElementById('crm-activity-type').value;
-                        params.status = document.getElementById('crm-activity-status').value;
-                        params.company_id = document.getElementById('crm-activity-company').value;
-                        params.lead_id = document.getElementById('crm-activity-lead').value;
-                    }
+        document.addEventListener('DOMContentLoaded', function () {
+            const typeFilter = document.getElementById('crm-activity-type');
+            const statusFilter = document.getElementById('crm-activity-status');
+            const companyFilter = document.getElementById('crm-activity-company');
+            const leadFilter = document.getElementById('crm-activity-lead');
+            const applyBtn = document.getElementById('crm-activity-apply');
+            const resetBtn = document.getElementById('crm-activity-reset');
+
+            const table = window.erpCrud.initDataTable({
+                tableSelector: '#crm-activities-table',
+                ajaxUrl: '{{ route("crm.activities.datatable") }}',
+                ajaxData: function (d) {
+                    d.activity_type = typeFilter ? typeFilter.value : 'all';
+                    d.status = statusFilter ? statusFilter.value : 'all';
+                    d.company_id = companyFilter ? companyFilter.value : 'all';
+                    d.lead_id = leadFilter ? leadFilter.value : 'all';
                 },
+                pageLength: 25,
                 columns: [
-                    { data: 'subject', name: 'subject' },
-                    { data: 'activity_type', name: 'activity_type' },
-                    { data: 'company', name: 'company.name' },
-                    { data: 'lead', name: 'lead.code' },
-                    { data: 'opportunity', name: 'opportunity.code' },
-                    { data: 'status', name: 'status' },
-                    { data: 'scheduled_at', name: 'scheduled_at' },
-                    { data: 'completed_at', name: 'completed_at' },
+                    { data: 'subject', name: 'subject', className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700' },
+                    { data: 'activity_type', name: 'activity_type', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center' },
+                    { data: 'company', name: 'company.name', className: 'px-5 py-3 border-b dark:border-darkmode-300' },
+                    { data: 'lead', name: 'lead.code', className: 'px-5 py-3 border-b dark:border-darkmode-300' },
+                    { data: 'opportunity', name: 'opportunity.code', className: 'px-5 py-3 border-b dark:border-darkmode-300' },
+                    { data: 'status', name: 'status', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center' },
+                    { data: 'scheduled_at', name: 'scheduled_at', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center' },
+                    { data: 'completed_at', name: 'completed_at', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center' },
                     {
                         data: 'id',
+                        name: 'actions',
                         orderable: false,
                         searchable: false,
-                        className: 'text-center',
-                        render: (id) => `
-                            <div class="flex items-center justify-center gap-2">
-                                <button class="text-primary" data-action="edit" data-id="${id}">
-                                    <x-base.lucide icon="Edit" class="w-4 h-4" />
-                                </button>
-                                <button class="text-danger" data-action="delete" data-id="${id}">
-                                    <x-base.lucide icon="Trash" class="w-4 h-4" />
-                                </button>
-                            </div>
-                        `
+                        className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center',
+                        render: function (data, type, row) {
+                            return `
+                                <div class="flex items-center justify-center gap-2">
+                                    <button class="btn-royal btn-royal--action btn-royal--primary" data-action="edit" data-id="${data}" title="Edit">
+                                        <i data-lucide="edit" class="w-4 h-4"></i>
+                                    </button>
+                                    <button class="btn-royal btn-royal--action btn-royal--danger" data-action="delete" data-id="${data}" data-name="${row.subject || ''}" title="Delete">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            `;
+                        }
                     }
-                ]
+                ],
+                drawCallback: function () {
+                    if (typeof window.lucide !== 'undefined') {
+                        window.lucide.createIcons();
+                    }
+                }
             });
 
-            document.getElementById('crm-activity-apply').addEventListener('click', () => table.ajax.reload());
-            document.getElementById('crm-activity-reset').addEventListener('click', () => {
-                document.getElementById('crm-activity-type').value = 'all';
-                document.getElementById('crm-activity-status').value = 'all';
-                document.getElementById('crm-activity-company').value = 'all';
-                document.getElementById('crm-activity-lead').value = 'all';
-                table.ajax.reload();
+            if (!table) {
+                console.error('Failed to initialize DataTable');
+                return;
+            }
+
+            // Apply filters
+            if (applyBtn) {
+                applyBtn.addEventListener('click', function () {
+                    table.ajax.reload();
+                });
+            }
+
+            // Reset filters
+            if (resetBtn) {
+                resetBtn.addEventListener('click', function () {
+                    if (typeFilter) typeFilter.value = 'all';
+                    if (statusFilter) statusFilter.value = 'all';
+                    if (companyFilter) companyFilter.value = 'all';
+                    if (leadFilter) leadFilter.value = 'all';
+                    table.ajax.reload();
+                });
+            }
+
+            // Handle actions
+            document.querySelector('#crm-activities-table').addEventListener('click', function (e) {
+                const editBtn = e.target.closest('[data-action="edit"]');
+                const deleteBtn = e.target.closest('[data-action="delete"]');
+
+                if (editBtn) {
+                    const id = editBtn.dataset.id;
+                    window.location.href = '{{ url("crm/activities") }}/' + id + '/edit';
+                }
+
+                if (deleteBtn) {
+                    const id = deleteBtn.dataset.id;
+                    const name = deleteBtn.dataset.name || 'this activity';
+
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: `You are about to delete "${name}". This action cannot be undone.`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#dc2626',
+                        cancelButtonColor: '#6b7280',
+                        confirmButtonText: 'Yes, delete it!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetch('{{ url("crm/activities") }}/' + id, {
+                                method: 'DELETE',
+                                headers: {
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                    'Accept': 'application/json'
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire('Deleted!', data.message || 'Activity deleted successfully.', 'success');
+                                    table.ajax.reload();
+                                } else {
+                                    Swal.fire('Error!', data.message || 'Failed to delete activity.', 'error');
+                                }
+                            })
+                            .catch(() => {
+                                Swal.fire('Error!', 'An error occurred while deleting.', 'error');
+                            });
+                        }
+                    });
+                }
             });
         });
     </script>

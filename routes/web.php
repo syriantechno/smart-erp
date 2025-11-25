@@ -228,6 +228,42 @@ Route::middleware('auth')->group(function () {
         
         // Task Comments Routes
         Route::post('/{task}/comments', [App\Http\Controllers\Work\TaskController::class, 'addComment'])->name('comments.store');
+
+        // Enhanced Task Routes
+        Route::get('/statistics', [App\Http\Controllers\Work\TaskController::class, 'statistics'])->name('statistics');
+        Route::get('/labels', [App\Http\Controllers\Work\TaskController::class, 'labels'])->name('labels');
+        
+        // Subtasks
+        Route::get('/{task}/subtasks', [App\Http\Controllers\Work\TaskController::class, 'subtasks'])->name('subtasks');
+        Route::post('/{task}/subtasks', [App\Http\Controllers\Work\TaskController::class, 'createSubtask'])->name('subtasks.store');
+        
+        // Attachments
+        Route::post('/{task}/attachments', [App\Http\Controllers\Work\TaskController::class, 'uploadAttachment'])->name('attachments.store');
+        Route::delete('/{task}/attachments/{attachment}', [App\Http\Controllers\Work\TaskController::class, 'deleteAttachment'])->name('attachments.destroy');
+        
+        // Time Tracking
+        Route::get('/{task}/time-logs', [App\Http\Controllers\Work\TaskController::class, 'timeLogs'])->name('time-logs');
+        Route::post('/{task}/timer/start', [App\Http\Controllers\Work\TaskController::class, 'startTimer'])->name('timer.start');
+        Route::post('/{task}/timer/{timeLog}/stop', [App\Http\Controllers\Work\TaskController::class, 'stopTimer'])->name('timer.stop');
+        
+        // Checklists
+        Route::post('/{task}/checklists', [App\Http\Controllers\Work\TaskController::class, 'addChecklist'])->name('checklists.store');
+        Route::post('/{task}/checklists/items/{itemId}/toggle', [App\Http\Controllers\Work\TaskController::class, 'toggleChecklistItem'])->name('checklists.items.toggle');
+        
+        // Activity Log
+        Route::get('/{task}/activities', [App\Http\Controllers\Work\TaskController::class, 'activities'])->name('activities');
+        
+        // Watchers
+        Route::post('/{task}/watchers/toggle', [App\Http\Controllers\Work\TaskController::class, 'toggleWatcher'])->name('watchers.toggle');
+        
+        // Labels
+        Route::post('/{task}/labels', [App\Http\Controllers\Work\TaskController::class, 'addLabel'])->name('labels.add');
+        Route::delete('/{task}/labels/{label}', [App\Http\Controllers\Work\TaskController::class, 'removeLabel'])->name('labels.remove');
+        
+        // Step Delegation
+        Route::get('/employees-for-delegation', [App\Http\Controllers\Work\TaskController::class, 'getEmployeesForDelegation'])->name('employees-for-delegation');
+        Route::get('/{task}/steps/{step}', [App\Http\Controllers\Work\TaskController::class, 'getStep'])->name('steps.show');
+        Route::post('/{task}/steps/{step}/delegate', [App\Http\Controllers\Work\TaskController::class, 'delegateStep'])->name('steps.delegate');
     });
 
     // Warehouse Routes

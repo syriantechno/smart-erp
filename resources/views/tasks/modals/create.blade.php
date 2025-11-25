@@ -192,7 +192,7 @@
             <button
                 type="button"
                 data-tw-dismiss="modal"
-                class="btn-tonal btn-tonal--neutral w-28 group"
+                class="btn-royal btn-royal--outline btn-royal--sm w-28 group"
             >
                 <x-base.lucide icon="X" class="w-4 h-4 mr-2 icon-hover-rise" />
                 Cancel
@@ -200,7 +200,7 @@
             <button
                 type="submit"
                 form="create-task-form"
-                class="btn-tonal btn-tonal--success w-36 group"
+                class="btn-royal btn-royal--gold btn-royal--sm w-36 group"
             >
                 <x-base.lucide icon="Save" class="w-4 h-4 mr-2 icon-hover-rise" />
                 Create Task
@@ -390,26 +390,7 @@
                 return stepDiv;
             }
 
-            if (addStepBtn) {
-                console.log('✅ Add Step button found and event listener attached');
-                addStepBtn.addEventListener('click', function() {
-                    console.log('🔥 Add Step button clicked!');
-                    const stepItem = createStepItem();
-                    stepsContainer.appendChild(stepItem);
-                    updateStepNumbers();
-                    toggleNoStepsMessage();
-                    
-                    // Focus on the title input
-                    const titleInput = stepItem.querySelector('input[name*="[title]"]');
-                    if (titleInput) titleInput.focus();
-                    
-                    console.log('✅ Step added successfully');
-                });
-            } else {
-                console.error('❌ Add Step button not found!');
-            }
-
-            // Event delegation for step actions
+            // Event delegation for step actions (move up, move down, remove)
             if (stepsContainer) {
                 stepsContainer.addEventListener('click', function(e) {
                     const stepItem = e.target.closest('.step-item');
@@ -438,27 +419,28 @@
             // Initialize
             toggleNoStepsMessage();
 
-            // Alternative event listener using document delegation
-            document.addEventListener('click', function(e) {
-                if (e.target && e.target.id === 'add-step-btn') {
-                    console.log('🔥 Add Step button clicked via delegation!');
+            // Single event listener for Add Step button
+            if (addStepBtn) {
+                console.log('✅ Add Step button found');
+                addStepBtn.addEventListener('click', function(e) {
                     e.preventDefault();
+                    e.stopPropagation();
+                    console.log('🔥 Add Step button clicked!');
                     
                     const stepItem = createStepItem();
-                    const container = document.getElementById('task-steps-container');
-                    if (container) {
-                        container.appendChild(stepItem);
-                        updateStepNumbers();
-                        toggleNoStepsMessage();
-                        
-                        // Focus on the title input
-                        const titleInput = stepItem.querySelector('input[name*="[title]"]');
-                        if (titleInput) titleInput.focus();
-                        
-                        console.log('✅ Step added via delegation');
-                    }
-                }
-            });
+                    stepsContainer.appendChild(stepItem);
+                    updateStepNumbers();
+                    toggleNoStepsMessage();
+                    
+                    // Focus on the title input
+                    const titleInput = stepItem.querySelector('input[name*="[title]"]');
+                    if (titleInput) titleInput.focus();
+                    
+                    console.log('✅ Step added successfully');
+                });
+            } else {
+                console.error('❌ Add Step button not found!');
+            }
 
             // Company change handler
             const companySelect = document.getElementById('company_id');

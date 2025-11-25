@@ -95,14 +95,7 @@
         </div>
 
         <div class="mt-5 flex justify-end">
-            <x-base.button
-                type="submit"
-                variant="primary"
-                class="w-32"
-            >
-                <x-base.lucide icon="Save" class="w-4 h-4 mr-2 animate-pulse" />
-                Save
-            </x-base.button>
+            <button type="submit" class="btn-royal btn-royal--gold btn-royal--sm w-32"><x-base.lucide icon="save" class="w-4 h-4 mr-2" />Save</button>
         </div>
     </form>
 </div>

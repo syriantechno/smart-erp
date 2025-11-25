@@ -1,4 +1,4 @@
-<?php if (! $__env->hasRenderedOnce('717d2d28-51e5-499d-9efb-4f79c9a10fb8')): $__env->markAsRenderedOnce('717d2d28-51e5-499d-9efb-4f79c9a10fb8');
+<?php if (! $__env->hasRenderedOnce('9e67eb64-f4d2-42a5-9b3b-fc121a5ba2bd')): $__env->markAsRenderedOnce('9e67eb64-f4d2-42a5-9b3b-fc121a5ba2bd');
 $__env->startPush('styles'); ?>
     <style>
         /* Global Notification Styles */
@@ -540,7 +540,7 @@ $__env->startPush('styles'); ?>
     </div>
 </div>
 
-<?php if (! $__env->hasRenderedOnce('78abbe6f-d2b6-4d18-b669-b0b602f1bd07')): $__env->markAsRenderedOnce('78abbe6f-d2b6-4d18-b669-b0b602f1bd07');
+<?php if (! $__env->hasRenderedOnce('0b189f57-5424-4dd7-b8a2-f7305f1bd6df')): $__env->markAsRenderedOnce('0b189f57-5424-4dd7-b8a2-f7305f1bd6df');
 $__env->startPush('scripts'); ?>
 <script>
     // Global Notification System
@@ -719,8 +719,8 @@ $__env->startPush('scripts'); ?>
                 customClass: {
                     popup: 'swal-modern-popup',
                     actions: 'swal-modern-actions',
-                    confirmButton: 'swal-modern-btn btn-tonal btn-tonal--danger',
-                    cancelButton: 'swal-modern-btn btn-tonal btn-tonal--neutral',
+                    confirmButton: 'swal-modern-btn btn-royal btn-royal--action btn-royal--danger',
+                    cancelButton: 'swal-modern-btn btn-royal btn-royal--outline btn-royal--sm',
                 },
                 backdrop: 'rgba(15,23,42,0.55)',
             }).then((result) => {

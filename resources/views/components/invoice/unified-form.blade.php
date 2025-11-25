@@ -35,7 +35,7 @@
                         />
                         <button
                             type="button"
-                            class="btn-tonal btn-tonal--info "
+                            class="btn-royal btn-royal--dark btn-royal--sm "
                             onclick="refreshInvoiceCode('{{ $type }}')"
                             title="Refresh Code"
                         >
@@ -137,7 +137,7 @@
                 </h4>
                 <button
                     type="button"
-                    class="btn-tonal btn-tonal--success"
+                    class="btn-royal btn-royal--gold btn-royal--sm"
                     onclick="addMaterialRow('{{ $id }}')"
                 >
                     <x-base.lucide icon="plus" class="w-4 h-4 mr-2" />
@@ -197,14 +197,14 @@
     <x-slot name="footer">
         <div class="flex justify-end gap-2 w-full">
             <button
-                class="btn-tonal btn-tonal--warning"
+                class="btn-royal btn-royal--outline btn-royal--sm"
                 data-tw-dismiss="modal"
                 type="button"
             >
                 Cancel
             </button>
             <button
-                class="btn-tonal btn-tonal--success"
+                class="btn-royal btn-royal--gold btn-royal--sm"
                 type="submit"
                 form="{{ $id }}-form"
             >
@@ -244,7 +244,7 @@
             <input type="text" class="form-input total-display w-full" readonly placeholder="0.00">
         </td>
         <td class="text-center">
-            <button type="button" class="btn-tonal btn-tonal--danger  remove-row" title="Remove">
+            <button type="button" class="btn-royal btn-royal--action btn-royal--danger  remove-row" title="Remove">
                 <x-base.lucide icon="trash-2" class="w-4 h-4" />
             </button>
         </td>

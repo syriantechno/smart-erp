@@ -130,19 +130,14 @@
         </div>
 
         <div class="mt-5 flex items-center justify-between">
-            <x-base.button type="submit" variant="primary" class="w-40">
-                <x-base.lucide icon="Save" class="w-4 h-4 mr-2 animate-pulse" />
+            <button type="submit" class="btn-royal btn-royal--gold btn-royal--sm w-40">
+                <x-base.lucide icon="save" class="w-4 h-4 mr-2" />
                 Save Appearance
-            </x-base.button>
+            </button>
 
-            <x-base.button
-                type="button"
-                variant="secondary"
-                class="text-xs"
-                onclick="event.preventDefault(); if (confirm('Reset theme colors to default values?')) window.resetThemeSettings && window.resetThemeSettings();"
-            >
+            <button type="button" class="btn-royal btn-royal--outline btn-royal--sm" onclick="event.preventDefault(); if (confirm('Reset theme colors to default values?')) window.resetThemeSettings && window.resetThemeSettings();">
                 Reset Theme
-            </x-base.button>
+            </button>
         </div>
     </form>
 </div>

@@ -5,10 +5,10 @@
             AI Settings
         </h2>
         <div class="flex items-center gap-2">
-            <x-base.button type="button" id="ai-test-connection-btn" variant="outline-secondary">
-                <x-base.lucide icon="Activity" class="w-4 h-4 mr-2" />
+            <button type="button" id="ai-test-connection-btn" class="btn-royal btn-royal--outline btn-royal--sm">
+                <x-base.lucide icon="activity" class="w-4 h-4 mr-2" />
                 Test AI Connection
-            </x-base.button>
+            </button>
         </div>
     </div>
 
@@ -127,15 +127,10 @@
         </div>
 
         <div class="mt-5 flex justify-end">
-            <x-base.button
-                type="submit"
-                form="ai-settings-form"
-                variant="primary"
-                class="w-48"
-            >
-                <x-base.lucide icon="Save" class="w-4 h-4 mr-2 animate-pulse" />
+            <button type="submit" form="ai-settings-form" class="btn-royal btn-royal--gold btn-royal--sm w-48">
+                <x-base.lucide icon="save" class="w-4 h-4 mr-2" />
                 Save
-            </x-base.button>
+            </button>
         </div>
     </form>
 </div>

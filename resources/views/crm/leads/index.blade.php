@@ -41,11 +41,11 @@
                 <p class="text-slate-500">Track prospects, convert them to opportunities, and stay focused on the best deals.</p>
             </div>
             <div class="flex flex-wrap gap-2">
-                <button type="button" class="btn-tonal btn-tonal--info" data-tw-toggle="modal" data-tw-target="#crm-lead-filters">
-                    <x-base.lucide icon="Filter" class="w-4 h-4 mr-2" /> Filters
+                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm" data-tw-toggle="modal" data-tw-target="#crm-lead-filters">
+                    <x-base.lucide icon="filter" class="w-4 h-4" /> Filters
                 </button>
-                <button type="button" class="btn-tonal btn-tonal--success" data-tw-toggle="modal" data-tw-target="#crm-lead-create">
-                    <x-base.lucide icon="Sparkles" class="w-4 h-4 mr-2" /> New Lead
+                <button type="button" class="btn-royal btn-royal--gold btn-royal--sm" data-tw-toggle="modal" data-tw-target="#crm-lead-create">
+                    <x-base.lucide icon="sparkles" class="w-4 h-4" /> New Lead
                 </button>
             </div>
         </div>
@@ -119,11 +119,11 @@
                     </x-base.form-select>
                 </div>
                 <div class="flex gap-3">
-                    <button type="button" id="crm-lead-apply" class="btn-tonal btn-tonal--info">
-                        <x-base.lucide icon="Search" class="w-4 h-4 mr-2" /> Apply
+                    <button type="button" id="crm-lead-apply" class="btn-royal btn-royal--dark btn-royal--sm">
+                        <x-base.lucide icon="search" class="w-4 h-4" /> Apply
                     </button>
-                    <button type="button" id="crm-lead-reset" class="btn-tonal btn-tonal--warning">
-                        <x-base.lucide icon="RotateCcw" class="w-4 h-4 mr-2" /> Reset
+                    <button type="button" id="crm-lead-reset" class="btn-royal btn-royal--outline btn-royal--sm">
+                        <x-base.lucide icon="rotate-ccw" class="w-4 h-4" /> Reset
                     </button>
                 </div>
             </div>
@@ -152,55 +152,131 @@
     @include('crm.leads.partials.create-modal')
 @endsection
 
+@include('components.datatable.scripts')
+
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const table = $('#crm-leads-table').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url: '{{ route('crm.leads.datatable') }}',
-                    data: function (params) {
-                        params.company_id = document.getElementById('crm-lead-company').value;
-                        params.contact_id = document.getElementById('crm-lead-contact').value;
-                        params.status = document.getElementById('crm-lead-status').value;
-                    }
+        document.addEventListener('DOMContentLoaded', function () {
+            const companyFilter = document.getElementById('crm-lead-company');
+            const contactFilter = document.getElementById('crm-lead-contact');
+            const statusFilter = document.getElementById('crm-lead-status');
+            const applyBtn = document.getElementById('crm-lead-apply');
+            const resetBtn = document.getElementById('crm-lead-reset');
+
+            const table = window.erpCrud.initDataTable({
+                tableSelector: '#crm-leads-table',
+                ajaxUrl: '{{ route("crm.leads.datatable") }}',
+                ajaxData: function (d) {
+                    d.company_id = companyFilter ? companyFilter.value : 'all';
+                    d.contact_id = contactFilter ? contactFilter.value : 'all';
+                    d.status = statusFilter ? statusFilter.value : 'all';
                 },
+                pageLength: 25,
                 columns: [
-                    { data: 'code', name: 'code' },
-                    { data: 'title', name: 'title' },
-                    { data: 'company', name: 'company.name' },
-                    { data: 'contact', name: 'contact.first_name' },
-                    { data: 'status', name: 'status' },
-                    { data: 'priority', name: 'priority' },
-                    { data: 'estimated_value', name: 'estimated_value' },
-                    { data: 'expected_close_date', name: 'expected_close_date' },
+                    { data: 'code', name: 'code', className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700 whitespace-nowrap' },
+                    { data: 'title', name: 'title', className: 'px-5 py-3 border-b dark:border-darkmode-300' },
+                    { data: 'company', name: 'company.name', className: 'px-5 py-3 border-b dark:border-darkmode-300' },
+                    { data: 'contact', name: 'contact.first_name', className: 'px-5 py-3 border-b dark:border-darkmode-300' },
+                    { data: 'status', name: 'status', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center' },
+                    { data: 'priority', name: 'priority', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center' },
+                    { data: 'estimated_value', name: 'estimated_value', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-right' },
+                    { data: 'expected_close_date', name: 'expected_close_date', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center' },
                     {
                         data: 'id',
+                        name: 'actions',
                         orderable: false,
                         searchable: false,
-                        className: 'text-center',
-                        render: (id) => `
-                            <div class="flex items-center justify-center gap-2">
-                                <button class="text-primary" data-action="edit" data-id="${id}">
-                                    <x-base.lucide icon="Edit" class="w-4 h-4" />
-                                </button>
-                                <button class="text-danger" data-action="delete" data-id="${id}">
-                                    <x-base.lucide icon="Trash" class="w-4 h-4" />
-                                </button>
-                            </div>
-                        `
+                        className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center',
+                        render: function (data, type, row) {
+                            return `
+                                <div class="flex items-center justify-center gap-2">
+                                    <button class="btn-royal btn-royal--action btn-royal--primary" data-action="edit" data-id="${data}" title="Edit">
+                                        <i data-lucide="edit" class="w-4 h-4"></i>
+                                    </button>
+                                    <button class="btn-royal btn-royal--action btn-royal--danger" data-action="delete" data-id="${data}" data-name="${row.title || ''}" title="Delete">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            `;
+                        }
                     }
-                ]
+                ],
+                drawCallback: function () {
+                    if (typeof window.lucide !== 'undefined') {
+                        window.lucide.createIcons();
+                    }
+                }
             });
 
-            document.getElementById('crm-lead-apply').addEventListener('click', () => table.ajax.reload());
-            document.getElementById('crm-lead-reset').addEventListener('click', () => {
-                document.getElementById('crm-lead-company').value = 'all';
-                document.getElementById('crm-lead-contact').value = 'all';
-                document.getElementById('crm-lead-status').value = 'all';
-                table.ajax.reload();
+            if (!table) {
+                console.error('Failed to initialize DataTable');
+                return;
+            }
+
+            // Apply filters
+            if (applyBtn) {
+                applyBtn.addEventListener('click', function () {
+                    table.ajax.reload();
+                });
+            }
+
+            // Reset filters
+            if (resetBtn) {
+                resetBtn.addEventListener('click', function () {
+                    if (companyFilter) companyFilter.value = 'all';
+                    if (contactFilter) contactFilter.value = 'all';
+                    if (statusFilter) statusFilter.value = 'all';
+                    table.ajax.reload();
+                });
+            }
+
+            // Handle edit action
+            document.querySelector('#crm-leads-table').addEventListener('click', function (e) {
+                const editBtn = e.target.closest('[data-action="edit"]');
+                const deleteBtn = e.target.closest('[data-action="delete"]');
+
+                if (editBtn) {
+                    const id = editBtn.dataset.id;
+                    window.location.href = '{{ url("crm/leads") }}/' + id + '/edit';
+                }
+
+                if (deleteBtn) {
+                    const id = deleteBtn.dataset.id;
+                    const name = deleteBtn.dataset.name || 'this lead';
+
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: `You are about to delete "${name}". This action cannot be undone.`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#dc2626',
+                        cancelButtonColor: '#6b7280',
+                        confirmButtonText: 'Yes, delete it!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetch('{{ url("crm/leads") }}/' + id, {
+                                method: 'DELETE',
+                                headers: {
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                    'Accept': 'application/json'
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire('Deleted!', data.message || 'Lead deleted successfully.', 'success');
+                                    table.ajax.reload();
+                                } else {
+                                    Swal.fire('Error!', data.message || 'Failed to delete lead.', 'error');
+                                }
+                            })
+                            .catch(() => {
+                                Swal.fire('Error!', 'An error occurred while deleting.', 'error');
+                            });
+                        }
+                    });
+                }
             });
         });
     </script>

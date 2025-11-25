@@ -101,19 +101,11 @@ document.addEventListener('DOMContentLoaded', function() {
             window.journalEntriesTable.destroy();
         }
 
-        window.journalEntriesTable = window.initDataTable('#journal-entries-table', {
-            ajax: {
-                url: '{{ route("accounting.journal-entries.datatable") }}',
-                type: 'GET',
-                error: function (xhr, textStatus, error) {
-                    console.error('Journal Entries AJAX error:', textStatus, error, xhr.responseText);
-                }
-            },
+        window.journalEntriesTable = window.erpCrud.initDataTable({
+            tableSelector: '#journal-entries-table',
+            ajaxUrl: '{{ route("accounting.journal-entries.datatable") }}',
             pageLength: 10,
-            lengthChange: false,
-            searching: false,
             order: [[2, 'desc']],
-            dom: "t<'datatable-footer flex flex-col md:flex-row md:items-center md:justify-between mt-5 gap-4'<'datatable-info text-slate-500'i><'datatable-pagination'p>>",
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center font-medium', orderable: false },
                 { data: 'reference_number', name: 'reference_number', className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700 whitespace-nowrap' },
@@ -136,8 +128,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     searchable: false
                 }
             ],
-            rawColumns: ['status_badge', 'actions'],
             drawCallback: function () {
+                if (typeof window.lucide !== 'undefined') {
+                    window.lucide.createIcons();
+                }
                 if (typeof window.Lucide !== 'undefined') {
                     window.Lucide.createIcons();
                 }

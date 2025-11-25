@@ -31,14 +31,14 @@
                         </div>
                         <div class="flex gap-2">
                             <button
-                                class="btn-tonal btn-tonal--warning"
+                                class="btn-royal btn-royal--outline btn-royal--sm"
                                 onclick="window.location.href='{{ route('work.projects.edit', $project) }}'"
                             >
                                 <x-base.lucide icon="edit" class="w-4 h-4 mr-2" />
                                 Edit
                             </button>
                             <button
-                                class="btn-tonal btn-tonal--info"
+                                class="btn-royal btn-royal--dark btn-royal--sm"
                                 onclick="window.location.href='{{ route('work.projects.index') }}'"
                             >
                                 <x-base.lucide icon="arrow-left" class="w-4 h-4 mr-2" />
@@ -222,7 +222,7 @@
                     <h3 class="text-lg font-medium mb-4">Quick Actions</h3>
                     <div class="space-y-3">
                         <button
-                            class="btn-tonal btn-tonal--warning w-full justify-start"
+                            class="btn-royal btn-royal--outline btn-royal--sm w-full justify-start"
                             onclick="editProject({{ $project->id }})"
                         >
                             <x-base.lucide icon="edit" class="w-4 h-4 mr-2" />
@@ -230,7 +230,7 @@
                         </button>
 
                         <button
-                            class="btn-tonal btn-tonal--danger w-full justify-start"
+                            class="btn-royal btn-royal--action btn-royal--danger w-full justify-start"
                             onclick="deleteProject({{ $project->id }}, '{{ addslashes($project->name) }}')"
                         >
                             <x-base.lucide icon="trash-2" class="w-4 h-4 mr-2" />
@@ -283,13 +283,14 @@
             </x-base.preview-component>
 
             <!-- Project Tasks Chart -->
-            @if($project->tasks->count() > 0)
-                @php
-                    $totalTasks = $project->tasks->count();
-                    $completedTasks = $project->tasks->where('status', 'completed')->count();
-                    $inProgressTasks = $project->tasks->where('status', 'in_progress')->count();
-                    $pendingTasks = $project->tasks->where('status', 'pending')->count();
-                @endphp
+            @php
+                $totalTasks = $project->tasks->count();
+                $completedTasks = $project->tasks->where('status', 'completed')->count();
+                $inProgressTasks = $project->tasks->where('status', 'in_progress')->count();
+                $pendingTasks = $project->tasks->where('status', 'pending')->count();
+                $overdueTasks = $project->tasks->filter(fn($t) => $t->due_date && $t->due_date->isPast() && !in_array($t->status, ['completed', 'cancelled']))->count();
+            @endphp
+            @if($totalTasks > 0)
                 <x-base.preview-component class="intro-y box mt-6">
                     <div class="p-5">
                         <h3 class="text-lg font-medium mb-4">Tasks Overview</h3>
@@ -320,10 +321,146 @@
                                 </div>
                                 <span class="font-medium">{{ $pendingTasks }}</span>
                             </div>
+                            @if($overdueTasks > 0)
+                            <div class="flex items-center justify-between text-sm">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-3 h-3 rounded-full" style="background-color: color-mix(in oklch, #b21a50 70%, #ffffff);"></div>
+                                    <span>Overdue</span>
+                                </div>
+                                <span class="font-medium text-red-600">{{ $overdueTasks }}</span>
+                            </div>
+                            @endif
                         </div>
                     </div>
                 </x-base.preview-component>
             @endif
+        </div>
+
+        <!-- Project Tasks List - Full Width -->
+        <div class="col-span-12">
+            <x-base.preview-component class="intro-y box">
+                <div class="flex items-center justify-between border-b border-slate-200/60 px-5 py-4 dark:border-darkmode-400">
+                    <h3 class="text-lg font-medium flex items-center gap-2">
+                        <x-base.lucide icon="check-square" class="w-5 h-5" />
+                        Project Tasks
+                        <span class="text-sm font-normal text-slate-500">({{ $totalTasks }} total)</span>
+                    </h3>
+                    <div class="flex items-center gap-2">
+                        <a href="{{ route('tasks.index', ['project_id' => $project->id]) }}" class="btn-royal btn-royal--outline btn-royal--sm">
+                            <x-base.lucide icon="external-link" class="w-4 h-4 mr-1" />
+                            View All
+                        </a>
+                        <button type="button" class="btn-royal btn-royal--gold btn-royal--sm" data-tw-toggle="modal" data-tw-target="#create-task-modal">
+                            <x-base.lucide icon="plus" class="w-4 h-4 mr-1" />
+                            Add Task
+                        </button>
+                    </div>
+                </div>
+                <div class="p-5">
+                    @if($project->tasks->count() > 0)
+                        <div class="space-y-3">
+                            @foreach($project->tasks->sortByDesc('created_at')->take(10) as $task)
+                                <a href="{{ route('tasks.show', $task) }}" class="flex items-center justify-between p-4 border border-slate-200/60 rounded-lg dark:border-darkmode-400 hover:bg-slate-50 dark:hover:bg-darkmode-600 transition-colors cursor-pointer hover:border-primary/30 group">
+                                    <div class="flex items-center flex-1">
+                                        @if($task->color)
+                                            <div class="w-3 h-3 rounded-full mr-3 border border-white shadow-sm" style="background-color: {{ $task->color }}"></div>
+                                        @else
+                                            <x-base.lucide class="h-4 w-4 text-slate-400 mr-3 {{ $task->type_color }}" icon="{{ $task->type_icon }}" />
+                                        @endif
+                                        <div class="flex-1">
+                                            <div class="font-medium text-sm group-hover:text-primary transition-colors flex items-center gap-2">
+                                                {{ $task->title }}
+                                                @if($task->hasSubtasks())
+                                                    <span class="text-xs text-slate-400">({{ $task->subtasks->where('status', 'completed')->count() }}/{{ $task->subtasks->count() }})</span>
+                                                @endif
+                                            </div>
+                                            <div class="text-xs text-slate-500 mt-1 flex items-center gap-3">
+                                                <span class="font-mono">{{ $task->code }}</span>
+                                                @if($task->employee)
+                                                    <span class="flex items-center gap-1">
+                                                        <x-base.lucide icon="user" class="w-3 h-3" />
+                                                        {{ $task->employee->full_name }}
+                                                    </span>
+                                                @endif
+                                                @if($task->due_date)
+                                                    <span class="flex items-center gap-1 {{ $task->isOverdue() ? 'text-red-500' : '' }}">
+                                                        <x-base.lucide icon="calendar" class="w-3 h-3" />
+                                                        {{ $task->due_date->format('M d') }}
+                                                        @if($task->isOverdue())
+                                                            <span class="text-red-500 font-medium">(Overdue)</span>
+                                                        @endif
+                                                    </span>
+                                                @endif
+                                                @if($task->estimated_hours)
+                                                    <span class="flex items-center gap-1">
+                                                        <x-base.lucide icon="clock" class="w-3 h-3" />
+                                                        {{ $task->actual_hours ?? 0 }}/{{ $task->estimated_hours }}h
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <!-- Progress -->
+                                        @if($task->progress_percentage > 0)
+                                            <div class="w-16 h-2 bg-slate-200 rounded-full overflow-hidden">
+                                                <div class="h-full bg-primary rounded-full" style="width: {{ $task->progress_percentage }}%"></div>
+                                            </div>
+                                            <span class="text-xs text-slate-500 w-8">{{ $task->progress_percentage }}%</span>
+                                        @endif
+                                        
+                                        <!-- Priority Badge -->
+                                        @php
+                                            $priorityClass = match($task->priority) {
+                                                'high' => 'bg-red-100 text-red-700',
+                                                'medium' => 'bg-yellow-100 text-yellow-700',
+                                                'low' => 'bg-green-100 text-green-700',
+                                                default => 'bg-gray-100 text-gray-700'
+                                            };
+                                        @endphp
+                                        <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold {{ $priorityClass }}">
+                                            {{ ucfirst($task->priority) }}
+                                        </span>
+                                        
+                                        <!-- Status Badge -->
+                                        @php
+                                            $statusClass = match($task->status) {
+                                                'completed' => 'bg-green-100 text-green-700',
+                                                'in_progress' => 'bg-blue-100 text-blue-700',
+                                                'pending' => 'bg-yellow-100 text-yellow-700',
+                                                'cancelled' => 'bg-red-100 text-red-700',
+                                                default => 'bg-gray-100 text-gray-700'
+                                            };
+                                        @endphp
+                                        <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold {{ $statusClass }}">
+                                            {{ ucfirst(str_replace('_', ' ', $task->status)) }}
+                                        </span>
+                                        
+                                        <x-base.lucide class="h-4 w-4 text-slate-400 group-hover:text-primary transition-colors" icon="chevron-right" />
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                        
+                        @if($project->tasks->count() > 10)
+                            <div class="mt-4 text-center">
+                                <a href="{{ route('tasks.index', ['project_id' => $project->id]) }}" class="text-primary hover:text-primary/80 text-sm">
+                                    View all {{ $project->tasks->count() }} tasks →
+                                </a>
+                            </div>
+                        @endif
+                    @else
+                        <div class="flex flex-col items-center justify-center py-10">
+                            <x-base.lucide class="h-12 w-12 text-slate-400 mb-4" icon="check-square" />
+                            <div class="text-slate-500 text-center mb-2">No tasks yet</div>
+                            <button type="button" class="btn-royal btn-royal--gold btn-royal--sm" data-tw-toggle="modal" data-tw-target="#create-task-modal">
+                                <x-base.lucide icon="plus" class="w-4 h-4 mr-1" />
+                                Create First Task
+                            </button>
+                        </div>
+                    @endif
+                </div>
+            </x-base.preview-component>
         </div>
     </div>
 @endsection

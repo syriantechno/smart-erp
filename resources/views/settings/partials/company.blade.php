@@ -229,14 +229,10 @@
         </div>
 
             <div class="mt-5 flex justify-end">
-                <x-base.button
-                    type="submit"
-                    variant="primary"
-                    class="w-32"
-                >
-                    <x-base.lucide icon="Save" class="w-4 h-4 mr-2 animate-pulse" />
+                <button type="submit" class="btn-royal btn-royal--gold btn-royal--sm w-32">
+                    <x-base.lucide icon="save" class="w-4 h-4 mr-2" />
                     Save
-                </x-base.button>
+                </button>
             </div>
         </form>
     </div>
@@ -252,24 +248,14 @@
                 <p class="text-sm text-slate-500">Overview of all configured companies with quick actions.</p>
             </div>
             <div class="flex flex-wrap gap-2">
-                <x-base.button
-                    type="button"
-                    variant="outline-secondary"
-                    class="w-full sm:w-auto"
-                    id="company-table-export"
-                >
-                    <x-base.lucide icon="Download" class="w-4 h-4 mr-2" />
+                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm w-full sm:w-auto" id="company-table-export">
+                    <x-base.lucide icon="download" class="w-4 h-4 mr-2" />
                     Export
-                </x-base.button>
-                <x-base.button
-                    type="button"
-                    variant="outline-secondary"
-                    class="w-full sm:w-auto"
-                    id="company-table-refresh"
-                >
-                    <x-base.lucide icon="RefreshCcw" class="w-4 h-4 mr-2" />
+                </button>
+                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm w-full sm:w-auto" id="company-table-refresh">
+                    <x-base.lucide icon="refresh-ccw" class="w-4 h-4 mr-2" />
                     Refresh
-                </x-base.button>
+                </button>
             </div>
         </div>
 
@@ -330,14 +316,9 @@
                                 </td>
                                 <td class="px-4 py-3">
                                     <div class="flex flex-wrap items-center justify-center gap-2">
-                                        <x-base.button
-                                            type="button"
-                                            variant="outline-secondary"
-                                            class="company-load-btn px-3 py-1.5 text-xs"
-                                            data-company='@json($payload)'
-                                        >
-                                            <x-base.lucide icon="Edit3" class="w-3.5 h-3.5 mr-1" /> Load in form
-                                        </x-base.button>
+                                        <button type="button" class="btn-royal btn-royal--action btn-royal--primary company-load-btn" data-company='@json($payload)'>
+                                            <x-base.lucide icon="edit-3" class="w-3.5 h-3.5 mr-1" /> Load
+                                        </button>
                                         @if($companyRow->website)
                                             <a
                                                 href="{{ $companyRow->website }}"

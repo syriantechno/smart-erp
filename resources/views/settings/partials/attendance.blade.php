@@ -347,14 +347,7 @@
         </div>
 
         <div class="mt-5 flex justify-end">
-            <x-base.button
-                type="submit"
-                variant="primary"
-                class="w-32"
-            >
-                <x-base.lucide icon="Save" class="w-4 h-4 mr-2 animate-pulse" />
-                Save
-            </x-base.button>
+            <button type="submit" class="btn-royal btn-royal--gold btn-royal--sm w-32"><x-base.lucide icon="save" class="w-4 h-4 mr-2" />Save</button>
         </div>
     </form>
 
@@ -365,10 +358,10 @@
         <p class="text-slate-600 dark:text-slate-400 mb-4">
             If the settings don't appear, please reload the page or contact technical support.
         </p>
-        <x-base.button onclick="window.location.reload()" variant="primary">
-            <x-base.lucide icon="RefreshCw" class="w-4 h-4 mr-2" />
+        <button type="button" onclick="window.location.reload()" class="btn-royal btn-royal--dark btn-royal--sm">
+            <x-base.lucide icon="refresh-cw" class="w-4 h-4 mr-2" />
             Reload Page
-        </x-base.button>
+        </button>
     </div>
 </div>
 

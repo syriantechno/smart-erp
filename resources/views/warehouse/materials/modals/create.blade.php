@@ -52,7 +52,7 @@
                         </x-base.form-select>
                         <button
                             type="button"
-                            class="btn-tonal btn-tonal--primary  h-10 w-10 mt-auto"
+                            class="btn-royal btn-royal--action btn-royal--primary  h-10 w-10 mt-auto"
                             data-unit-quick-add-toggle
                             data-target="#create-unit-quick-add"
                             title="Add Unit"
@@ -103,11 +103,11 @@
                                     <input type="hidden" data-unit-field="is_active" value="1" />
 
                                     <div class="flex justify-end gap-2 pt-1">
-                                        <button type="button" class="btn-tonal btn-tonal--neutral" data-unit-quick-add-cancel>
+                                        <button type="button" class="btn-royal btn-royal--outline btn-royal--sm" data-unit-quick-add-cancel>
                                             <x-base.lucide icon="X" class="h-4 w-4" />
                                             Cancel
                                         </button>
-                                        <button type="button" class="btn-tonal btn-tonal--success" data-unit-quick-add-submit>
+                                        <button type="button" class="btn-royal btn-royal--gold btn-royal--sm" data-unit-quick-add-submit>
                                             <x-base.lucide icon="Save" class="h-4 w-4" />
                                             Save Unit
                                         </button>
@@ -202,11 +202,11 @@
                                 <p class="text-xs text-slate-500 dark:text-slate-400">Optional — recommended size 800x600px</p>
                             </div>
                             <div class="flex items-center gap-2">
-                                <label for="create-material-image" class="btn-tonal btn-tonal--primary cursor-pointer flex items-center gap-2">
+                                <label for="create-material-image" class="btn-royal btn-royal--action btn-royal--primary cursor-pointer flex items-center gap-2">
                                     <x-base.lucide icon="Upload" class="h-4 w-4" />
                                     Upload
                                 </label>
-                                <button type="button" id="create-material-image-remove" class="btn-tonal btn-tonal--danger hidden">
+                                <button type="button" id="create-material-image-remove" class="btn-royal btn-royal--action btn-royal--danger hidden">
                                     <x-base.lucide icon="Trash2" class="h-4 w-4" />
                                     Remove
                                 </button>

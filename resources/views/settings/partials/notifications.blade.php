@@ -203,14 +203,10 @@
             </div>
         </div>
         <div class="mt-5 flex justify-end">
-            <x-base.button
-                type="submit"
-                variant="primary"
-                class="w-48"
-            >
-                <x-base.lucide icon="Save" class="w-4 h-4 mr-2 animate-pulse" />
+            <button type="submit" class="btn-royal btn-royal--gold btn-royal--sm w-48">
+                <x-base.lucide icon="save" class="w-4 h-4 mr-2" />
                 Save Notifications
-            </x-base.button>
+            </button>
         </div>
     </form>
 </div>

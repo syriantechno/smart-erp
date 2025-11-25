@@ -110,7 +110,7 @@
             <x-base.dialog.footer>
                 <button
                     type="button"
-                    class="btn-tonal btn-tonal--neutral min-h-[42px] px-4 group"
+                    class="btn-royal btn-royal--outline btn-royal--sm min-h-[42px] px-4 group"
                     x-on:click="$dispatch('close')"
                 >
                     <x-base.lucide icon="X" class="w-4 h-4 mr-2 icon-hover-rise" />
@@ -120,7 +120,7 @@
                 <button
                     type="submit"
                     id="submit-account-btn"
-                    class="btn-tonal btn-tonal--success min-h-[42px] px-5 group"
+                    class="btn-royal btn-royal--gold btn-royal--sm min-h-[42px] px-5 group"
                 >
                     <x-base.lucide icon="Save" class="w-4 h-4 mr-2 icon-hover-rise" />
                     Create Account

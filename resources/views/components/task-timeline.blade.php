@@ -83,7 +83,7 @@
                                         @endif
                                         
                                         <!-- Step Status Info -->
-                                        <div class="flex items-center gap-4 mt-3 text-xs">
+                                        <div class="flex items-center flex-wrap gap-2 mt-3 text-xs">
                                             <span class="status-badge-info">Step {{ $step->step_order }}</span>
                                             @if($step->is_completed)
                                                 <span class="status-badge-success flex items-center gap-1">
@@ -92,14 +92,31 @@
                                                 @if($step->completedBy)
                                                     <span class="text-slate-500">by {{ $step->completedBy->name }}</span>
                                                 @endif
+                                            @elseif($step->isDelegated())
+                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">
+                                                    <x-base.lucide icon="send" class="w-3 h-3" />
+                                                    Delegated to {{ $step->assignee?->full_name ?? 'Employee' }}
+                                                </span>
+                                                @if($step->delegatedTask)
+                                                    <a href="{{ route('tasks.show', $step->delegatedTask) }}" 
+                                                       class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors">
+                                                        <x-base.lucide icon="external-link" class="w-3 h-3" />
+                                                        View Subtask ({{ ucfirst($step->delegatedTask->status) }})
+                                                    </a>
+                                                @endif
+                                            @elseif($step->hasAssignee())
+                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">
+                                                    <x-base.lucide icon="user" class="w-3 h-3" />
+                                                    Assigned to {{ $step->assignee?->full_name }}
+                                                </span>
                                             @else
                                                 <span class="status-badge-warning">Pending</span>
                                             @endif
                                         </div>
                                     </div>
                                     
-                                    <!-- Action Button -->
-                                    <div class="flex-shrink-0 ml-4">
+                                    <!-- Action Buttons -->
+                                    <div class="flex-shrink-0 ml-4 flex flex-col gap-2">
                                         @if(!$step->is_completed)
                                             <button 
                                                 type="button" 
@@ -107,9 +124,23 @@
                                                 data-step-id="{{ $step->id }}"
                                                 title="Mark as Complete"
                                             >
-                                                <x-base.lucide icon="Check" class="w-4 h-4" />
+                                                <x-base.lucide icon="check" class="w-4 h-4" />
                                                 Complete
                                             </button>
+                                            
+                                            @if(!$step->isDelegated())
+                                                <button 
+                                                    type="button" 
+                                                    class="delegate-step-btn inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md border border-purple-300 bg-purple-50 text-purple-700 hover:bg-purple-100 transition-colors dark:bg-purple-900/20 dark:border-purple-700 dark:text-purple-400"
+                                                    data-step-id="{{ $step->id }}"
+                                                    data-step-title="{{ $step->title }}"
+                                                    data-task-id="{{ $task->id }}"
+                                                    title="Delegate to Employee"
+                                                >
+                                                    <x-base.lucide icon="send" class="w-4 h-4" />
+                                                    Delegate
+                                                </button>
+                                            @endif
                                         @else
                                             <button 
                                                 type="button" 
@@ -117,7 +148,7 @@
                                                 data-step-id="{{ $step->id }}"
                                                 title="Mark as Pending"
                                             >
-                                                <x-base.lucide icon="RotateCcw" class="w-4 h-4" />
+                                                <x-base.lucide icon="rotate-ccw" class="w-4 h-4" />
                                                 Undo
                                             </button>
                                         @endif
@@ -139,9 +170,85 @@
     @endif
 </div>
 
+<!-- Delegation Modal -->
+<div id="delegate-step-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+        <div class="fixed inset-0 transition-opacity bg-slate-900/50" onclick="closeDelegateModal()"></div>
+        
+        <div class="relative z-10 w-full max-w-md p-6 mx-auto bg-white rounded-xl shadow-2xl dark:bg-darkmode-600">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-slate-800 dark:text-white flex items-center gap-2">
+                    <x-base.lucide icon="send" class="w-5 h-5 text-purple-500" />
+                    Delegate Step
+                </h3>
+                <button type="button" onclick="closeDelegateModal()" class="text-slate-400 hover:text-slate-600">
+                    <x-base.lucide icon="x" class="w-5 h-5" />
+                </button>
+            </div>
+            
+            <form id="delegate-step-form">
+                <input type="hidden" id="delegate-task-id" name="task_id">
+                <input type="hidden" id="delegate-step-id" name="step_id">
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Step</label>
+                    <div id="delegate-step-title" class="p-3 bg-slate-50 dark:bg-darkmode-700 rounded-lg text-sm font-medium"></div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                        Assign to Employee <span class="text-red-500">*</span>
+                    </label>
+                    <select id="delegate-employee-id" name="employee_id" required
+                            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-darkmode-400 dark:bg-darkmode-700">
+                        <option value="">Select Employee...</option>
+                    </select>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Due Date</label>
+                    <input type="date" id="delegate-due-date" name="due_date"
+                           class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-darkmode-400 dark:bg-darkmode-700">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Priority</label>
+                    <select id="delegate-priority" name="priority"
+                            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-darkmode-400 dark:bg-darkmode-700">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Additional Notes</label>
+                    <textarea id="delegate-description" name="description" rows="2"
+                              placeholder="Add any additional instructions..."
+                              class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-darkmode-400 dark:bg-darkmode-700 resize-none"></textarea>
+                </div>
+                
+                <div class="flex justify-end gap-2">
+                    <button type="button" onclick="closeDelegateModal()" 
+                            class="btn-royal btn-royal--outline btn-royal--sm">
+                        Cancel
+                    </button>
+                    <button type="submit" 
+                            class="btn-royal btn-royal--gold btn-royal--sm flex items-center gap-2">
+                        <x-base.lucide icon="send" class="w-4 h-4" />
+                        Delegate
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @if($totalSteps > 0)
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            let employeesLoaded = false;
+            
             // Handle step completion
             document.addEventListener('click', function(e) {
                 if (e.target.closest('.complete-step-btn')) {
@@ -152,6 +259,9 @@
                     const btn = e.target.closest('.uncomplete-step-btn');
                     const stepId = btn.getAttribute('data-step-id');
                     toggleStepCompletion(stepId, false);
+                } else if (e.target.closest('.delegate-step-btn')) {
+                    const btn = e.target.closest('.delegate-step-btn');
+                    openDelegateModal(btn);
                 }
             });
 
@@ -168,10 +278,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Reload the page to update the timeline
                         window.location.reload();
-                        
-                        // Show success message
                         if (typeof showToast === 'function') {
                             showToast(data.message || `Step ${action}d successfully`, 'success');
                         }
@@ -188,6 +295,97 @@
                     }
                 });
             }
+
+            // Delegation functions
+            window.openDelegateModal = function(btn) {
+                const stepId = btn.getAttribute('data-step-id');
+                const stepTitle = btn.getAttribute('data-step-title');
+                const taskId = btn.getAttribute('data-task-id');
+                
+                document.getElementById('delegate-step-id').value = stepId;
+                document.getElementById('delegate-task-id').value = taskId;
+                document.getElementById('delegate-step-title').textContent = stepTitle;
+                
+                // Load employees if not loaded
+                if (!employeesLoaded) {
+                    loadEmployees();
+                }
+                
+                document.getElementById('delegate-step-modal').classList.remove('hidden');
+            };
+
+            window.closeDelegateModal = function() {
+                document.getElementById('delegate-step-modal').classList.add('hidden');
+                document.getElementById('delegate-step-form').reset();
+            };
+
+            function loadEmployees() {
+                fetch('/tasks/employees-for-delegation', {
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.data.employees) {
+                        const select = document.getElementById('delegate-employee-id');
+                        select.innerHTML = '<option value="">Select Employee...</option>';
+                        
+                        data.data.employees.forEach(emp => {
+                            const option = document.createElement('option');
+                            option.value = emp.id;
+                            option.textContent = `${emp.name} - ${emp.position || 'Employee'} (${emp.department || 'No Dept'})`;
+                            select.appendChild(option);
+                        });
+                        
+                        employeesLoaded = true;
+                    }
+                })
+                .catch(error => console.error('Error loading employees:', error));
+            }
+
+            // Handle delegation form submit
+            document.getElementById('delegate-step-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const taskId = document.getElementById('delegate-task-id').value;
+                const stepId = document.getElementById('delegate-step-id').value;
+                const formData = new FormData(this);
+                
+                fetch(`/tasks/${taskId}/steps/${stepId}/delegate`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        employee_id: formData.get('employee_id'),
+                        due_date: formData.get('due_date'),
+                        priority: formData.get('priority'),
+                        description: formData.get('description'),
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        closeDelegateModal();
+                        window.location.reload();
+                        if (typeof showToast === 'function') {
+                            showToast('Step delegated successfully!', 'success');
+                        }
+                    } else {
+                        if (typeof showToast === 'function') {
+                            showToast(data.message || 'Failed to delegate step', 'error');
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    if (typeof showToast === 'function') {
+                        showToast('An error occurred while delegating the step', 'error');
+                    }
+                });
+            });
         });
     </script>
 @endif

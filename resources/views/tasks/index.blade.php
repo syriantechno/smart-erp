@@ -20,11 +20,11 @@
         <div class="flex items-center gap-2">
             <button
                 type="button"
-                class="btn-tonal btn-tonal--info hidden sm:inline-flex min-h-[44px] items-center gap-2 px-4 group"
+                class="btn-royal btn-royal--outline btn-royal--sm hidden sm:inline-flex min-h-[44px] items-center gap-2 px-4 group"
                 data-tw-toggle="modal"
                 data-tw-target="#tasks-filters-slideover"
             >
-                <x-base.lucide icon="Filter" class="w-4 h-4 icon-hover-rise" />
+                <x-base.lucide icon="filter" class="w-4 h-4 icon-hover-rise" />
                 Filters
                 <span
                     id="active-filters-indicator"
@@ -38,12 +38,12 @@
             <!-- Mobile filters icon -->
             <button
                 type="button"
-                class="btn-tonal btn-tonal--info inline-flex min-h-[44px] items-center justify-center gap-2 px-3 sm:hidden"
+                class="btn-royal btn-royal--outline btn-royal--sm inline-flex min-h-[44px] items-center justify-center gap-2 px-3 sm:hidden"
                 data-tw-toggle="modal"
                 data-tw-target="#tasks-filters-slideover"
                 title="Filters"
             >
-                <x-base.lucide icon="Filter" class="w-4 h-4 icon-hover-rise" />
+                <x-base.lucide icon="filter" class="w-4 h-4 icon-hover-rise" />
             </button>
 
             <div class="hidden sm:flex items-center rounded-full bg-slate-100 dark:bg-darkmode-700 px-1 py-1 ml-2">
@@ -69,11 +69,11 @@
 
             <button
                 type="button"
-                class="btn-tonal btn-tonal--success w-36 sm:w-auto sm:ml-2 group"
+                class="btn-royal btn-royal--gold btn-royal--sm w-36 sm:w-auto sm:ml-2 group"
                 data-tw-toggle="modal"
                 data-tw-target="#create-task-modal"
             >
-                <x-base.lucide icon="SquarePlus" class="w-4 h-4 icon-hover-rise" />
+                <x-base.lucide icon="square-plus" class="w-4 h-4 icon-hover-rise" />
                 Add Task
             </button>
         </div>
@@ -128,17 +128,17 @@
                                 <button
                                     id="tasks-filter-go"
                                     type="button"
-                                    class="btn-tonal btn-tonal--info w-full sm:w-24 group"
+                                    class="btn-royal btn-royal--dark btn-royal--sm w-full sm:w-24 group"
                                 >
-                                    <x-base.lucide icon="Search" class="w-4 h-4 icon-hover-rise" />
+                                    <x-base.lucide icon="search" class="w-4 h-4 icon-hover-rise" />
                                     Go
                                 </button>
                                 <button
                                     id="tasks-filter-reset"
                                     type="button"
-                                    class="btn-tonal btn-tonal--amber w-full sm:w-24 group"
+                                    class="btn-royal btn-royal--outline btn-royal--sm w-full sm:w-24 group"
                                 >
-                                    <x-base.lucide icon="RotateCcw" class="w-4 h-4 icon-hover-rise" />
+                                    <x-base.lucide icon="rotate-ccw" class="w-4 h-4 icon-hover-rise" />
                                     Reset
                                 </button>
                             </div>
@@ -148,17 +148,17 @@
                             <button
                                 id="tasks-export"
                                 type="button"
-                                class="btn-tonal btn-tonal--neutral mr-2 w-1/2 sm:w-auto group"
+                                class="btn-royal btn-royal--outline btn-royal--sm mr-2 w-1/2 sm:w-auto group"
                             >
-                                <x-base.lucide icon="Download" class="h-4 w-4 icon-hover-rise" />
+                                <x-base.lucide icon="download" class="h-4 w-4 icon-hover-rise" />
                                 Export
                             </button>
                             <button
                                 id="tasks-refresh"
                                 type="button"
-                                class="btn-tonal btn-tonal--info w-1/2 sm:w-auto group"
+                                class="btn-royal btn-royal--outline btn-royal--sm w-1/2 sm:w-auto group"
                             >
-                                <x-base.lucide icon="RefreshCcw" class="h-4 w-4 icon-hover-rise" />
+                                <x-base.lucide icon="refresh-ccw" class="h-4 w-4 icon-hover-rise" />
                                 Refresh
                             </button>
                         </div>
@@ -334,18 +334,18 @@
                         <div class="mt-2 flex justify-end gap-2">
                             <button
                                 type="button"
-                                class="btn-tonal btn-tonal--neutral w-28 group"
+                                class="btn-royal btn-royal--outline btn-royal--sm w-28 group"
                                 data-tw-dismiss="modal"
                             >
-                                <x-base.lucide icon="X" class="mr-2 h-4 w-4 icon-hover-rise" />
+                                <x-base.lucide icon="x" class="mr-2 h-4 w-4 icon-hover-rise" />
                                 Close
                             </button>
                             <button
                                 id="advanced-filter-apply"
                                 type="button"
-                                class="btn-tonal btn-tonal--info w-32 group"
+                                class="btn-royal btn-royal--dark btn-royal--sm w-32 group"
                             >
-                                <x-base.lucide icon="Search" class="mr-2 h-4 w-4 icon-hover-rise" />
+                                <x-base.lucide icon="search" class="mr-2 h-4 w-4 icon-hover-rise" />
                                 Apply Filters
                             </button>
                         </div>

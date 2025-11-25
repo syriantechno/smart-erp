@@ -323,6 +323,75 @@
     font-size: 0.85rem;
 }
 
+/* Royal Action Buttons - for table actions */
+.btn-royal--action {
+    padding: 0.4rem;
+    border-radius: 0.4rem;
+    font-size: 0.75rem;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.btn-royal--primary {
+    background-color: rgba(37, 99, 235, 0.1);
+    border-color: rgba(37, 99, 235, 0.2);
+    color: #2563eb;
+}
+
+.btn-royal--primary:hover {
+    background-color: rgba(37, 99, 235, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+.btn-royal--success {
+    background-color: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+}
+
+.btn-royal--success:hover {
+    background-color: rgba(16, 185, 129, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+}
+
+.btn-royal--warning {
+    background-color: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+}
+
+.btn-royal--warning:hover {
+    background-color: rgba(245, 158, 11, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+}
+
+.btn-royal--danger {
+    background-color: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.btn-royal--danger:hover {
+    background-color: rgba(239, 68, 68, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+}
+
+.btn-royal--info {
+    background-color: rgba(6, 182, 212, 0.1);
+    border-color: rgba(6, 182, 212, 0.2);
+    color: #06b6d4;
+}
+
+.btn-royal--info:hover {
+    background-color: rgba(6, 182, 212, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(6, 182, 212, 0.25);
+}
+
 .custom-modal-footer {
     padding: 1rem 1.75rem;
     border-top: 1px solid rgba(226, 232, 240, 0.9);

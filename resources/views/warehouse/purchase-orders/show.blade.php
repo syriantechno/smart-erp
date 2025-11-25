@@ -10,11 +10,11 @@
     <div class="intro-y mt-8 flex items-center">
         <h2 class="mr-auto text-lg font-medium">Purchase Order Details</h2>
         <div class="flex gap-2">
-            <a href="{{ route('warehouse.purchase-orders.edit', $purchaseOrder->id) }}" class="btn-tonal btn-tonal--warning">
+            <a href="{{ route('warehouse.purchase-orders.edit', $purchaseOrder->id) }}" class="btn-royal btn-royal--outline btn-royal--sm">
                 <x-base.lucide icon="edit" class="w-4 h-4 mr-2" />
                 Edit
             </a>
-            <a href="{{ route('warehouse.purchase-orders.index') }}" class="btn-tonal btn-tonal--secondary">
+            <a href="{{ route('warehouse.purchase-orders.index') }}" class="btn-royal btn-royal--outline btn-royal--sm">
                 <x-base.lucide icon="arrow-left" class="w-4 h-4 mr-2" />
                 Back to List
             </a>

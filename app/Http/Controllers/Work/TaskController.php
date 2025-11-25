@@ -6,15 +6,22 @@ use App\Http\Controllers\Controller;
 use App\Models\Work\Task;
 use App\Models\Work\TaskStep;
 use App\Models\Work\TaskComment;
+use App\Models\Work\TaskAttachment;
+use App\Models\Work\TaskTimeLog;
+use App\Models\Work\TaskChecklist;
+use App\Models\Work\TaskLabel;
+use App\Models\Work\Project;
 use App\Models\HR\Employee;
 use App\Models\HR\Department;
 use App\Models\Setting\Company;
 use App\Services\DocumentCodeGenerator;
+use App\Services\TaskService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use App\Exports\TasksExport;
 use Yajra\DataTables\Facades\DataTables;
@@ -23,8 +30,13 @@ use Carbon\Carbon;
 
 class TaskController extends Controller
 {
-    public function __construct(private DocumentCodeGenerator $codeGenerator)
-    {
+    protected TaskService $taskService;
+
+    public function __construct(
+        private DocumentCodeGenerator $codeGenerator,
+        TaskService $taskService
+    ) {
+        $this->taskService = $taskService;
     }
 
     public function index()
@@ -517,5 +529,419 @@ class TaskController extends Controller
 
             return Reply::error('Error updating task status: ' . $e->getMessage(), [], 500);
         }
+    }
+
+    // ============================================
+    // NEW ENHANCED TASK METHODS
+    // ============================================
+
+    /**
+     * Get task statistics for dashboard.
+     */
+    public function statistics(Request $request): JsonResponse
+    {
+        $employeeId = $request->employee_id;
+        $projectId = $request->project_id;
+
+        if ($employeeId) {
+            $stats = $this->taskService->getEmployeeTaskStats($employeeId);
+        } elseif ($projectId) {
+            $stats = $this->taskService->getProjectTaskStats($projectId);
+        } else {
+            // Global stats
+            $tasks = Task::query();
+            $stats = [
+                'total' => $tasks->count(),
+                'completed' => (clone $tasks)->where('status', 'completed')->count(),
+                'in_progress' => (clone $tasks)->where('status', 'in_progress')->count(),
+                'pending' => (clone $tasks)->where('status', 'pending')->count(),
+                'overdue' => (clone $tasks)->overdue()->count(),
+                'due_today' => (clone $tasks)->dueToday()->count(),
+            ];
+        }
+
+        return Reply::success('', ['stats' => $stats]);
+    }
+
+    /**
+     * Create a subtask.
+     */
+    public function createSubtask(Request $request, Task $task): JsonResponse
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'priority' => 'required|in:low,medium,high',
+            'due_date' => 'nullable|date',
+            'employee_id' => 'nullable|exists:employees,id',
+        ]);
+
+        try {
+            $validated['code'] = $this->codeGenerator->generate('tasks');
+            $validated['assigned_by'] = auth()->id();
+            $validated['status'] = 'pending';
+
+            $subtask = $this->taskService->createSubtask($task, $validated);
+
+            return Reply::success('Subtask created successfully', ['subtask' => $subtask]);
+        } catch (\Exception $e) {
+            return Reply::error('Error creating subtask: ' . $e->getMessage(), [], 500);
+        }
+    }
+
+    /**
+     * Get subtasks for a task.
+     */
+    public function subtasks(Task $task): JsonResponse
+    {
+        $subtasks = $task->subtasks()
+            ->with(['employee:id,first_name,last_name'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return Reply::success('', ['subtasks' => $subtasks]);
+    }
+
+    /**
+     * Upload attachment to task.
+     */
+    public function uploadAttachment(Request $request, Task $task): JsonResponse
+    {
+        $request->validate([
+            'file' => 'required|file|max:10240', // 10MB max
+            'description' => 'nullable|string|max:500',
+        ]);
+
+        try {
+            $file = $request->file('file');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $path = $file->storeAs('task-attachments/' . $task->id, $filename, 'public');
+
+            $attachment = $task->attachments()->create([
+                'uploaded_by' => auth()->id(),
+                'filename' => $filename,
+                'original_filename' => $file->getClientOriginalName(),
+                'file_path' => $path,
+                'file_type' => $file->getMimeType(),
+                'file_size' => $file->getSize(),
+                'description' => $request->description,
+            ]);
+
+            $task->logActivity('attachment_added', null, null, $file->getClientOriginalName());
+
+            return Reply::success('Attachment uploaded successfully', ['attachment' => $attachment]);
+        } catch (\Exception $e) {
+            return Reply::error('Error uploading attachment: ' . $e->getMessage(), [], 500);
+        }
+    }
+
+    /**
+     * Delete attachment.
+     */
+    public function deleteAttachment(Task $task, TaskAttachment $attachment): JsonResponse
+    {
+        try {
+            Storage::disk('public')->delete($attachment->file_path);
+            $filename = $attachment->original_filename;
+            $attachment->delete();
+
+            $task->logActivity('attachment_removed', null, $filename, null);
+
+            return Reply::success('Attachment deleted successfully');
+        } catch (\Exception $e) {
+            return Reply::error('Error deleting attachment: ' . $e->getMessage(), [], 500);
+        }
+    }
+
+    /**
+     * Start time tracking.
+     */
+    public function startTimer(Request $request, Task $task): JsonResponse
+    {
+        try {
+            $timeLog = $this->taskService->startTimer($task, $request->description);
+
+            return Reply::success('Timer started', ['time_log' => $timeLog]);
+        } catch (\Exception $e) {
+            return Reply::error('Error starting timer: ' . $e->getMessage(), [], 500);
+        }
+    }
+
+    /**
+     * Stop time tracking.
+     */
+    public function stopTimer(Task $task, TaskTimeLog $timeLog): JsonResponse
+    {
+        try {
+            $timeLog = $this->taskService->stopTimer($timeLog);
+
+            return Reply::success('Timer stopped', [
+                'time_log' => $timeLog,
+                'total_hours' => $task->fresh()->actual_hours,
+            ]);
+        } catch (\Exception $e) {
+            return Reply::error('Error stopping timer: ' . $e->getMessage(), [], 500);
+        }
+    }
+
+    /**
+     * Get time logs for a task.
+     */
+    public function timeLogs(Task $task): JsonResponse
+    {
+        $timeLogs = $task->timeLogs()
+            ->with('user:id,name')
+            ->orderBy('started_at', 'desc')
+            ->get();
+
+        return Reply::success('', [
+            'time_logs' => $timeLogs,
+            'total_hours' => $task->actual_hours,
+            'estimated_hours' => $task->estimated_hours,
+        ]);
+    }
+
+    /**
+     * Add checklist to task.
+     */
+    public function addChecklist(Request $request, Task $task): JsonResponse
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'items' => 'nullable|array',
+            'items.*.title' => 'required|string|max:255',
+        ]);
+
+        try {
+            $checklist = $task->checklists()->create([
+                'title' => $validated['title'],
+                'sort_order' => $task->checklists()->count(),
+            ]);
+
+            if (!empty($validated['items'])) {
+                foreach ($validated['items'] as $index => $item) {
+                    $checklist->items()->create([
+                        'title' => $item['title'],
+                        'sort_order' => $index,
+                    ]);
+                }
+            }
+
+            $task->logActivity('checklist_added', null, null, $validated['title']);
+
+            return Reply::success('Checklist added', ['checklist' => $checklist->load('items')]);
+        } catch (\Exception $e) {
+            return Reply::error('Error adding checklist: ' . $e->getMessage(), [], 500);
+        }
+    }
+
+    /**
+     * Toggle checklist item.
+     */
+    public function toggleChecklistItem(Request $request, Task $task, $itemId): JsonResponse
+    {
+        try {
+            $item = \App\Models\Work\TaskChecklistItem::findOrFail($itemId);
+            $item->toggle();
+
+            $task->updateProgress();
+
+            return Reply::success('Item updated', [
+                'item' => $item->fresh(),
+                'progress' => $task->fresh()->progress_percentage,
+            ]);
+        } catch (\Exception $e) {
+            return Reply::error('Error updating item: ' . $e->getMessage(), [], 500);
+        }
+    }
+
+    /**
+     * Get task activity log.
+     */
+    public function activities(Task $task): JsonResponse
+    {
+        $activities = $task->activities()
+            ->with('user:id,name')
+            ->limit(50)
+            ->get();
+
+        return Reply::success('', ['activities' => $activities]);
+    }
+
+    /**
+     * Add/remove watcher.
+     */
+    public function toggleWatcher(Request $request, Task $task): JsonResponse
+    {
+        $userId = $request->user_id ?? auth()->id();
+        $watchers = $task->watchers ?? [];
+
+        if (in_array($userId, $watchers)) {
+            $watchers = array_values(array_diff($watchers, [$userId]));
+            $message = 'Removed from watchers';
+        } else {
+            $watchers[] = $userId;
+            $message = 'Added to watchers';
+        }
+
+        $task->update(['watchers' => $watchers]);
+
+        return Reply::success($message, ['watchers' => $watchers]);
+    }
+
+    /**
+     * Get available labels.
+     */
+    public function labels(Request $request): JsonResponse
+    {
+        $labels = TaskLabel::forCompany($request->company_id)->get();
+
+        return Reply::success('', ['labels' => $labels]);
+    }
+
+    /**
+     * Add label to task.
+     */
+    public function addLabel(Request $request, Task $task): JsonResponse
+    {
+        $labelId = $request->validate(['label_id' => 'required|exists:task_labels,id'])['label_id'];
+
+        $task->labels()->syncWithoutDetaching([$labelId]);
+        $label = TaskLabel::find($labelId);
+
+        $task->logActivity('label_added', null, null, $label->name);
+
+        return Reply::success('Label added', ['labels' => $task->labels]);
+    }
+
+    /**
+     * Remove label from task.
+     */
+    public function removeLabel(Task $task, TaskLabel $label): JsonResponse
+    {
+        $task->labels()->detach($label->id);
+
+        $task->logActivity('label_removed', null, $label->name, null);
+
+        return Reply::success('Label removed', ['labels' => $task->labels]);
+    }
+
+    // ============================================
+    // STEP DELEGATION METHODS
+    // ============================================
+
+    /**
+     * Delegate a step to another employee by creating a subtask.
+     */
+    public function delegateStep(Request $request, Task $task, TaskStep $step): JsonResponse
+    {
+        $validated = $request->validate([
+            'employee_id' => 'required|exists:employees,id',
+            'due_date' => 'nullable|date',
+            'priority' => 'nullable|in:low,medium,high',
+            'description' => 'nullable|string',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $employee = Employee::findOrFail($validated['employee_id']);
+
+            // Create a subtask from the step
+            $subtaskData = [
+                'code' => $this->codeGenerator->generate('tasks'),
+                'title' => $step->title,
+                'description' => $validated['description'] ?? $step->description ?? "Delegated from: {$task->title}",
+                'priority' => $validated['priority'] ?? $task->priority,
+                'status' => 'pending',
+                'due_date' => $validated['due_date'] ?? $task->due_date,
+                'employee_id' => $employee->id,
+                'department_id' => $employee->department_id,
+                'company_id' => $employee->company_id,
+                'project_id' => $task->project_id,
+                'parent_id' => $task->id,
+                'assigned_by' => auth()->id(),
+            ];
+
+            $subtask = Task::create($subtaskData);
+
+            // Link the step to the subtask
+            $step->update([
+                'delegated_task_id' => $subtask->id,
+                'assigned_to' => $employee->id,
+            ]);
+
+            // Log activity
+            $task->logActivity(
+                'step_delegated',
+                'step',
+                null,
+                "{$step->title} → {$employee->full_name}",
+                "Step delegated to {$employee->full_name}"
+            );
+
+            DB::commit();
+
+            // Notify the employee
+            $this->taskService->notifyAssignee($subtask);
+
+            return Reply::success('Step delegated successfully', [
+                'step' => $step->fresh()->load('delegatedTask', 'assignee'),
+                'subtask' => $subtask,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error delegating step', ['error' => $e->getMessage()]);
+            return Reply::error('Error delegating step: ' . $e->getMessage(), [], 500);
+        }
+    }
+
+    /**
+     * Get step details with delegation info.
+     */
+    public function getStep(Task $task, TaskStep $step): JsonResponse
+    {
+        $step->load(['delegatedTask.employee', 'assignee', 'completedBy']);
+
+        return Reply::success('', ['step' => $step]);
+    }
+
+    /**
+     * Sync step completion with delegated task.
+     * This is called when a delegated subtask is completed.
+     */
+    public function syncStepFromSubtask(Task $subtask): void
+    {
+        // Find the step that has this subtask as delegated
+        $step = TaskStep::where('delegated_task_id', $subtask->id)->first();
+
+        if ($step && $subtask->status === 'completed') {
+            $step->markAsCompleted($subtask->employee?->user_id);
+            
+            // Update parent task progress
+            $step->task->updateProgress();
+        }
+    }
+
+    /**
+     * Get employees for delegation dropdown.
+     */
+    public function getEmployeesForDelegation(Request $request): JsonResponse
+    {
+        $employees = Employee::where('is_active', true)
+            ->with(['department:id,name', 'company:id,name'])
+            ->select('id', 'first_name', 'last_name', 'department_id', 'company_id', 'position')
+            ->get()
+            ->map(function ($employee) {
+                return [
+                    'id' => $employee->id,
+                    'name' => $employee->full_name,
+                    'position' => $employee->position,
+                    'department' => $employee->department?->name,
+                    'company' => $employee->company?->name,
+                ];
+            });
+
+        return Reply::success('', ['employees' => $employees]);
     }
 }

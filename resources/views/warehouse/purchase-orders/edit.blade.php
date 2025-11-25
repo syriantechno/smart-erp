@@ -9,7 +9,7 @@
 
     <div class="intro-y mt-8 flex items-center">
         <h2 class="mr-auto text-lg font-medium">Edit Purchase Order</h2>
-        <a href="{{ route('warehouse.purchase-orders.show', $purchaseOrder->id) }}" class="btn-tonal btn-tonal--secondary">
+        <a href="{{ route('warehouse.purchase-orders.show', $purchaseOrder->id) }}" class="btn-royal btn-royal--outline btn-royal--sm">
             <x-base.lucide icon="arrow-left" class="w-4 h-4 mr-2" />
             Back to Details
         </a>
@@ -142,10 +142,10 @@
 
                         <!-- Submit Buttons -->
                         <div class="flex justify-end gap-2">
-                            <a href="{{ route('warehouse.purchase-orders.show', $purchaseOrder->id) }}" class="btn-tonal btn-tonal--warning">
+                            <a href="{{ route('warehouse.purchase-orders.show', $purchaseOrder->id) }}" class="btn-royal btn-royal--outline btn-royal--sm">
                                 Cancel
                             </a>
-                            <button type="submit" class="btn-tonal btn-tonal--success">
+                            <button type="submit" class="btn-royal btn-royal--gold btn-royal--sm">
                                 <x-base.lucide icon="save" class="w-4 h-4 mr-2" />
                                 Update Purchase Order
                             </button>

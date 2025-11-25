@@ -188,7 +188,7 @@
                                         {{ old('debug_mode', $settings['app.debug'] ?? config('app.debug', false)) ? 'checked' : '' }}
                                         class="sr-only peer"
                                     />
-                                    <div class="relative h-6 w-11 rounded-full bg-slate-200 transition-colors duration-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/25 dark:bg-darkmode-600 peer-checked:bg-primary after:absolute after:top-0.5 after:start-[2px] after:h-5 بعد:w-5 بعد:rounded-full بعد:bg-white بعد:shadow بعد:transition-all بعد:duration-200 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"></div>
+                                    <div class="relative h-6 w-11 rounded-full bg-slate-200 transition-colors duration-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/25 dark:bg-darkmode-600 peer-checked:bg-primary after:absolute after:top-0.5 after:start-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition-all after:duration-200 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"></div>
                                 </label>
                             </div>
                         </div>
@@ -251,14 +251,10 @@
         </div>
 
         <div class="mt-5 flex justify-end">
-            <x-base.button
-                type="submit"
-                variant="primary"
-                class="w-32"
-            >
-                <x-base.lucide icon="Save" class="w-4 h-4 mr-2 animate-pulse" />
+            <button type="submit" class="btn-royal btn-royal--gold btn-royal--sm w-32">
+                <x-base.lucide icon="save" class="w-4 h-4 mr-2" />
                 Save
-            </x-base.button>
+            </button>
         </div>
     </form>
 </div>

@@ -353,11 +353,11 @@
                         Mail Details
                     </h2>
                     <div class="flex items-center gap-2 mr-4">
-                        <button type="button" class="btn-tonal btn-tonal--info min-h-[34px] px-3 text-sm group" onclick="replyToCurrentMail()">
+                        <button type="button" class="btn-royal btn-royal--dark btn-royal--sm min-h-[34px] px-3 text-sm group" onclick="replyToCurrentMail()">
                             <x-base.lucide icon="Reply" class="w-4 h-4 mr-1 icon-hover-rise" />
                             Reply
                         </button>
-                        <button type="button" class="btn-tonal btn-tonal--info min-h-[34px] px-3 text-sm group" onclick="forwardCurrentMail()">
+                        <button type="button" class="btn-royal btn-royal--dark btn-royal--sm min-h-[34px] px-3 text-sm group" onclick="forwardCurrentMail()">
                             <x-base.lucide icon="CornerDownRight" class="w-4 h-4 mr-1 icon-hover-rise" />
                             Forward
                         </button>
@@ -372,7 +372,7 @@
                     </div>
                 </div>
                 <div class="px-5 py-3 border-t border-slate-200/60 dark:border-darkmode-400 flex justify-end gap-2">
-                    <button type="button" class="btn-tonal btn-tonal--neutral min-h-[38px] px-4 group" onclick="closeViewMailModal()">
+                    <button type="button" class="btn-royal btn-royal--outline btn-royal--sm min-h-[38px] px-4 group" onclick="closeViewMailModal()">
                         <x-base.lucide icon="X" class="w-4 h-4 mr-2 icon-hover-rise" />
                         Close
                     </button>
@@ -485,7 +485,7 @@
                         <div class="mt-6 flex justify-end gap-2">
                             <button
                                 type="button"
-                                class="btn-tonal btn-tonal--neutral min-h-[40px] px-4 group"
+                                class="btn-royal btn-royal--outline btn-royal--sm min-h-[40px] px-4 group"
                                 onclick="closeMailAccountSettingsModal()"
                             >
                                 <x-base.lucide icon="X" class="w-4 h-4 mr-2 icon-hover-rise" />
@@ -493,7 +493,7 @@
                             </button>
                             <button
                                 type="button"
-                                class="btn-tonal btn-tonal--info min-h-[40px] px-4 group"
+                                class="btn-royal btn-royal--dark btn-royal--sm min-h-[40px] px-4 group"
                                 id="test-mail-account-settings-btn"
                             >
                                 <x-base.lucide icon="Activity" class="w-4 h-4 mr-2 icon-hover-rise" />
@@ -501,7 +501,7 @@
                             </button>
                             <button
                                 type="button"
-                                class="btn-tonal btn-tonal--success min-h-[40px] px-4 group"
+                                class="btn-royal btn-royal--gold btn-royal--sm min-h-[40px] px-4 group"
                                 id="save-mail-account-settings-btn"
                             >
                                 <x-base.lucide icon="Save" class="w-4 h-4 mr-2 icon-hover-rise" />
@@ -689,7 +689,7 @@
                         <div class="flex justify-end gap-2 pt-4 border-t">
                             <button
                                 type="button"
-                                class="btn-tonal btn-tonal--neutral min-h-[40px] px-4 group"
+                                class="btn-royal btn-royal--outline btn-royal--sm min-h-[40px] px-4 group"
                                 onclick="closeComposeModal()"
                             >
                                 <x-base.lucide icon="X" class="w-4 h-4 mr-2 icon-hover-rise" />
@@ -698,7 +698,7 @@
                             <button
                                 type="submit"
                                 id="compose-send-mail-btn"
-                                class="btn-tonal btn-tonal--success min-h-[40px] px-4 group"
+                                class="btn-royal btn-royal--gold btn-royal--sm min-h-[40px] px-4 group"
                             >
                                 <x-base.lucide icon="Send" class="w-4 h-4 mr-2 icon-hover-rise" />
                                 Send Mail

@@ -140,7 +140,7 @@
             <button
                 type="button"
                 data-tw-dismiss="modal"
-                class="btn-tonal btn-tonal--neutral w-28 group"
+                class="btn-royal btn-royal--outline btn-royal--sm w-28 group"
             >
                 <x-base.lucide icon="X" class="w-4 h-4 mr-2 icon-hover-rise" />
                 Cancel
@@ -148,7 +148,7 @@
             <button
                 type="submit"
                 form="edit-task-form"
-                class="btn-tonal btn-tonal--success w-36 group"
+                class="btn-royal btn-royal--gold btn-royal--sm w-36 group"
             >
                 <x-base.lucide icon="Save" class="w-4 h-4 mr-2 icon-hover-rise" />
                 Update Task

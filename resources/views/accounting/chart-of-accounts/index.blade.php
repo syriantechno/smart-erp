@@ -218,7 +218,7 @@
                             <button
                                 type="button"
                                 id="clear-advanced-filters"
-                                class="btn-tonal btn-tonal--amber min-h-[42px] px-4 group"
+                                class="btn-royal btn-royal--outline btn-royal--sm min-h-[42px] px-4 group"
                             >
                                 <x-base.lucide icon="RotateCcw" class="w-4 h-4 icon-hover-rise" />
                                 Clear Filters
@@ -226,7 +226,7 @@
                             <button
                                 type="button"
                                 id="apply-filters"
-                                class="btn-tonal btn-tonal--info min-h-[42px] px-4 group"
+                                class="btn-royal btn-royal--dark btn-royal--sm min-h-[42px] px-4 group"
                             >
                                 <x-base.lucide icon="Search" class="w-4 h-4 icon-hover-rise" />
                                 Apply Filters
@@ -308,7 +308,7 @@
                                 <button
                                     id="account-filter-go"
                                     type="button"
-                                    class="btn-tonal btn-tonal--info w-full sm:w-24 group"
+                                    class="btn-royal btn-royal--dark btn-royal--sm w-full sm:w-24 group"
                                 >
                                     <x-base.lucide icon="Search" class="w-4 h-4 icon-hover-rise" />
                                     Go
@@ -316,7 +316,7 @@
                                 <button
                                     id="account-filter-reset"
                                     type="button"
-                                    class="btn-tonal btn-tonal--amber w-full sm:w-24 group"
+                                    class="btn-royal btn-royal--outline btn-royal--sm w-full sm:w-24 group"
                                 >
                                     <x-base.lucide icon="RotateCcw" class="w-4 h-4 icon-hover-rise" />
                                     Reset
@@ -426,45 +426,35 @@
 
             const initialLength = lengthSelect ? parseInt(lengthSelect.value, 10) || 10 : 10;
 
-            const table = window.initDataTable('#account-table', {
-                ajax: {
-                    url: '{{ route("accounting.chart-of-accounts.datatable") }}',
-                    type: 'GET',
-                    data: function (d) {
-                        console.log('DataTable sending data:', d);
-                        if (filterField) {
-                            d.filter_field = filterField.value || 'all';
-                        }
-                        if (filterType) {
-                            d.filter_type = filterType.value || 'contains';
-                        }
-                        if (filterValue) {
-                            d.filter_value = filterValue.value || '';
-                        }
-                        if (typeFilter) {
-                            d.type = typeFilter.value || '';
-                        }
-                        if (categoryFilter) {
-                            d.category = categoryFilter.value || '';
-                        }
-                        if (statusFilter) {
-                            d.status = statusFilter.value || '';
-                        }
-                        if (levelFilter) {
-                            d.level = levelFilter.value || '';
-                        }
-                        d.page_length = lengthSelect ? parseInt(lengthSelect.value, 10) || initialLength : initialLength;
-                    },
-                    error: function (xhr, textStatus, error) {
-                        console.error('DataTables AJAX error:', textStatus, error, xhr.responseText);
+            const table = window.erpCrud.initDataTable({
+                tableSelector: '#account-table',
+                ajaxUrl: '{{ route("accounting.chart-of-accounts.datatable") }}',
+                ajaxData: function (d) {
+                    if (filterField) {
+                        d.filter_field = filterField.value || 'all';
                     }
+                    if (filterType) {
+                        d.filter_type = filterType.value || 'contains';
+                    }
+                    if (filterValue) {
+                        d.filter_value = filterValue.value || '';
+                    }
+                    if (typeFilter) {
+                        d.type = typeFilter.value || '';
+                    }
+                    if (categoryFilter) {
+                        d.category = categoryFilter.value || '';
+                    }
+                    if (statusFilter) {
+                        d.status = statusFilter.value || '';
+                    }
+                    if (levelFilter) {
+                        d.level = levelFilter.value || '';
+                    }
+                    d.page_length = lengthSelect ? parseInt(lengthSelect.value, 10) || initialLength : initialLength;
                 },
                 pageLength: initialLength,
-                lengthChange: false,
-                searching: false,
                 order: [[2, 'asc']],
-                dom:
-                    "t<'datatable-footer flex flex-col md:flex-row md:items-center md:justify-between mt-5 gap-4'<'datatable-info text-slate-500'i><'datatable-pagination'p>>",
                 columns: [
                     { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center font-medium', orderable: false },
                     { data: 'code', name: 'code', className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium text-slate-700 whitespace-nowrap' },
@@ -493,9 +483,10 @@
                         searchable: false
                     }
                 ],
-                rawColumns: ['type_badge', 'status', 'actions'],
                 drawCallback: function () {
-                    console.log('DataTable draw callback - table data:', table.rows().data().toArray());
+                    if (typeof window.lucide !== 'undefined') {
+                        window.lucide.createIcons();
+                    }
                     if (typeof window.Lucide !== 'undefined') {
                         window.Lucide.createIcons();
                     }

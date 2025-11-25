@@ -159,7 +159,7 @@
                         </x-base.form-select>
                         <button
                             type="button"
-                            class="btn-tonal btn-tonal--neutral hidden sm:inline-flex min-h-[36px] px-3 text-xs font-semibold"
+                            class="btn-royal btn-royal--outline btn-royal--sm hidden sm:inline-flex min-h-[36px] px-3 text-xs font-semibold"
                             onclick="clearChat()"
                             title="Clear Conversation"
                         >
@@ -234,7 +234,7 @@
                         <button
                             id="send-button"
                             type="button"
-                            class="btn-tonal btn-tonal--info rounded-full p-3 md:p-3.5 shadow-sm shadow-blue-500/20 group disabled:opacity-60"
+                            class="btn-royal btn-royal--dark btn-royal--sm rounded-full p-3 md:p-3.5 shadow-sm shadow-blue-500/20 group disabled:opacity-60"
                             onclick="sendMessage()"
                             disabled
                         >

@@ -186,7 +186,7 @@
                         <div class="col-span-12 flex justify-end gap-2 mt-2 flex-wrap">
                             <button
                                 type="button"
-                                class="btn-tonal btn-tonal--amber group"
+                                class="btn-royal btn-royal--outline btn-royal--sm group"
                                 onclick="clearSoFilters()"
                             >
                                 <x-base.lucide icon="rotate-ccw" class="w-4 h-4 icon-hover-rise" />
@@ -194,7 +194,7 @@
                             </button>
                             <button
                                 type="button"
-                                class="btn-tonal btn-tonal--info group"
+                                class="btn-royal btn-royal--dark btn-royal--sm group"
                                 onclick="applySoFilters()"
                             >
                                 <x-base.lucide icon="search" class="w-4 h-4 icon-hover-rise" />

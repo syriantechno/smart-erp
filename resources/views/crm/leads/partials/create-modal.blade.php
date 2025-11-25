@@ -66,12 +66,12 @@
 
     <x-slot name="footer">
         <div class="custom-modal-footer">
-            <x-base.button type="button" variant="outline-secondary" class="btn-tonal btn-tonal--warning" data-tw-dismiss="modal" icon="X">
-                Cancel
-            </x-base.button>
-            <x-base.button type="submit" class="btn-tonal btn-tonal--success" icon="Save">
-                Save Lead
-            </x-base.button>
+            <button type="button" class="btn-royal btn-royal--outline btn-royal--sm" data-tw-dismiss="modal">
+                <x-base.lucide icon="x" class="w-4 h-4 mr-1" /> Cancel
+            </button>
+            <button type="submit" class="btn-royal btn-royal--gold btn-royal--sm">
+                <x-base.lucide icon="save" class="w-4 h-4 mr-1" /> Save Lead
+            </button>
         </div>
     </x-slot>
 </x-modal.form>

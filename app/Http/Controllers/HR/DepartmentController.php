@@ -399,29 +399,38 @@ class DepartmentController extends Controller
             if ($department->children()->exists()) {
                 $message = 'Cannot delete department because it has sub-departments.';
                 if (request()->ajax()) {
-                    notify_error_code(6001, 'Cannot delete department with sub-departments');
                     return Reply::error($message, [], 400);
                 }
-                notify_error_code(6001, 'Cannot delete department with sub-departments');
-                return back();
+                return back()->with('error', $message);
             }
             
             if ($department->employees()->exists()) {
                 $message = 'Cannot delete department because it has employees.';
                 if (request()->ajax()) {
-                    notify_error_code(6001, 'Cannot delete department with employees');
                     return Reply::error($message, [], 400);
                 }
-                notify_error_code(6001, 'Cannot delete department with employees');
-                return back();
+                return back()->with('error', $message);
             }
 
+            $departmentName = $department->name;
+            $department->delete();
+            
+            DB::commit();
+
             if (request()->ajax()) {
-                notify_error_code(1004, 'Failed to delete department');
+                return Reply::success('Department "' . $departmentName . '" deleted successfully');
+            }
+            
+            return redirect()->route('hr.departments.index')
+                ->with('success', 'Department "' . $departmentName . '" deleted successfully');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            if (request()->ajax()) {
                 return Reply::error('Error deleting department: ' . $e->getMessage(), [], 500);
             }
             
-            notify_error_code(1004, 'Failed to delete department');
             return back()->with('error', 'Error deleting department: ' . $e->getMessage());
         }
     }

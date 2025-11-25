@@ -15,7 +15,7 @@
         <h2 class="mr-auto text-lg font-medium">Purchase Orders</h2>
         <button
             id="open-create-po-modal"
-            class="btn-tonal btn-tonal--success"
+            class="btn-royal btn-royal--gold btn-royal--sm"
             data-tw-toggle="modal"
             data-tw-target="#create-po-modal"
         >
@@ -63,7 +63,7 @@
 
                         <div class="col-span-12 md:col-span-4 flex items-end gap-2">
                             <button
-                                class="btn-tonal btn-tonal--warning flex-1"
+                                class="btn-royal btn-royal--outline btn-royal--sm flex-1"
                                 type="button"
                                 onclick="clearPoFilters()"
                             >
@@ -71,7 +71,7 @@
                                 Clear
                             </button>
                             <button
-                                class="btn-tonal btn-tonal--info flex-1"
+                                class="btn-royal btn-royal--dark btn-royal--sm flex-1"
                                 type="button"
                                 onclick="applyPoFilters()"
                             >

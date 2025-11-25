@@ -11,7 +11,7 @@
         <h2 class="mr-auto text-lg font-medium">Sale Orders</h2>
         <button
             id="open-create-so-modal"
-            class="btn-tonal btn-tonal--success"
+            class="btn-royal btn-royal--gold btn-royal--sm"
             data-tw-toggle="modal"
             data-tw-target="#create-so-modal"
         >

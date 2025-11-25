@@ -87,9 +87,9 @@
                 </div>
 
                 <div class="pt-2 text-right">
-                    <x-base.button type="submit" variant="primary">
+                    <button type="submit" class="btn-royal btn-royal--gold btn-royal--sm">
                         Save Tax
-                    </x-base.button>
+                    </button>
                 </div>
             </form>
         </div>

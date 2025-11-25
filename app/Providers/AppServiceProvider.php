@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Models\Setting\Company;
 use App\Models\Setting\Setting;
+use App\Models\Work\Task;
+use App\Observers\TaskObserver;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -22,6 +24,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Register observers
+        Task::observe(TaskObserver::class);
+
         // Register view composers
         View::composer('*', \App\View\Composers\ThemeComposer::class);
         View::composer('*', \App\View\Composers\LayoutComposer::class);
