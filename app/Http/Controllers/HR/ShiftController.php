@@ -13,6 +13,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use App\Services\Notifications\NotificationDispatcher;
 
 class ShiftController extends Controller
 {
@@ -193,6 +194,16 @@ class ShiftController extends Controller
                 'break_hours' => $request->break_hours ?: 1.00,
             ]);
 
+            $actor = auth()->user()?->name ?? 'System';
+            NotificationDispatcher::toAllUsers(
+                'shift.created',
+                'Shift Created',
+                "User {$actor} created shift '{$shift->name}'.",
+                route('hr.shifts.index'),
+                'CalendarClock',
+                ['shift_id' => $shift->id, 'actor_id' => auth()->id()]
+            );
+
             return response()->json([
                 'success' => true,
                 'message' => 'Shift created successfully',
@@ -282,6 +293,16 @@ class ShiftController extends Controller
                 'break_hours' => $request->break_hours ?: 1.00,
             ]);
 
+            $actor = auth()->user()?->name ?? 'System';
+            NotificationDispatcher::toAllUsers(
+                'shift.updated',
+                'Shift Updated',
+                "User {$actor} updated shift '{$shift->name}'.",
+                route('hr.shifts.index'),
+                'CalendarClock',
+                ['shift_id' => $shift->id, 'actor_id' => auth()->id()]
+            );
+
             return response()->json([
                 'success' => true,
                 'message' => 'Shift updated successfully',
@@ -310,7 +331,19 @@ class ShiftController extends Controller
                 ], 422);
             }
 
+            $shiftName = $shift->name;
+            $shiftId = $shift->id;
             $shift->delete();
+
+            $actor = auth()->user()?->name ?? 'System';
+            NotificationDispatcher::toAllUsers(
+                'shift.deleted',
+                'Shift Deleted',
+                "User {$actor} deleted shift '{$shiftName}'.",
+                route('hr.shifts.index'),
+                'Trash2',
+                ['shift_id' => $shiftId, 'actor_id' => auth()->id()]
+            );
 
             return response()->json([
                 'success' => true,
@@ -332,6 +365,20 @@ class ShiftController extends Controller
     {
         try {
             $shift->update(['is_active' => !$shift->is_active]);
+
+            $actor = auth()->user()?->name ?? 'System';
+            $eventKey = $shift->is_active ? 'shift.activated' : 'shift.deactivated';
+            $title = $shift->is_active ? 'Shift Activated' : 'Shift Deactivated';
+            $message = "User {$actor} toggled shift '{$shift->name}' status.";
+
+            NotificationDispatcher::toAllUsers(
+                $eventKey,
+                $title,
+                $message,
+                route('hr.shifts.index'),
+                $shift->is_active ? 'Play' : 'Pause',
+                ['shift_id' => $shift->id, 'actor_id' => auth()->id()]
+            );
 
             return response()->json([
                 'success' => true,

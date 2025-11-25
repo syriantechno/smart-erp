@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Yajra\DataTables\Facades\DataTables;
 use App\Helpers\Reply;
+use App\Services\Notifications\NotificationDispatcher;
 
 class PositionController extends Controller
 {
@@ -66,8 +67,15 @@ class PositionController extends Controller
 
             $position = Position::create($validated);
 
-            // Send notification
-            \App\Http\Controllers\NotificationController::positionCreated($position);
+            $actor = auth()->user()?->name ?? 'System';
+            NotificationDispatcher::toAllUsers(
+                'position.created',
+                'New Position Added',
+                "User {$actor} added position '{$position->title}' to department '{$position->department->name}'.",
+                route('hr.positions.index'),
+                'Building',
+                ['position_id' => $position->id, 'actor_id' => auth()->id()]
+            );
 
             DB::commit();
 
@@ -137,7 +145,15 @@ class PositionController extends Controller
                 return Reply::success('Position updated successfully');
             }
 
-            \App\Http\Controllers\NotificationController::positionUpdated($position);
+            $actor = auth()->user()?->name ?? 'System';
+            NotificationDispatcher::toAllUsers(
+                'position.updated',
+                'Position Updated',
+                "User {$actor} updated position '{$position->title}'.",
+                route('hr.positions.index'),
+                'Pencil',
+                ['position_id' => $position->id, 'actor_id' => auth()->id()]
+            );
 
             return redirect()->route('hr.positions.index')
                 ->with('success', 'Position updated successfully');
@@ -174,12 +190,19 @@ class PositionController extends Controller
 
             DB::commit();
 
+            $actor = auth()->user()?->name ?? 'System';
+            NotificationDispatcher::toAllUsers(
+                'position.deleted',
+                'Position Deleted',
+                "User {$actor} deleted position '{$position->title}'.",
+                route('hr.positions.index'),
+                'Trash2',
+                ['position_id' => $position->id, 'actor_id' => auth()->id()]
+            );
+
             if ($request->ajax()) {
-                \App\Http\Controllers\NotificationController::positionDeleted($position);
                 return Reply::success('Position deleted successfully');
             }
-
-            \App\Http\Controllers\NotificationController::positionDeleted($position);
 
             return redirect()->route('hr.positions.index')
                 ->with('success', 'Position deleted successfully');

@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use App\Services\Notifications\NotificationDispatcher;
 use Carbon\Carbon;
 use App\Exports\EmployeesExport;
 use Yajra\DataTables\Facades\DataTables;
@@ -276,7 +277,16 @@ class EmployeeController extends Controller
 
             DB::commit();
 
-            \App\Http\Controllers\NotificationController::employeeCreated($employee);
+            $actor = auth()->user()?->name ?? 'System';
+            $employeeName = trim($employee->first_name . ' ' . $employee->last_name);
+            NotificationDispatcher::toAllUsers(
+                'employee.created',
+                'New Employee Added',
+                "User {$actor} created employee '{$employeeName}'.",
+                route('hr.employees.index'),
+                'UserPlus',
+                ['employee_id' => $employee->id, 'actor_id' => auth()->id()]
+            );
 
             if ($request->ajax()) {
                 return Reply::success('Employee created successfully');
@@ -526,12 +536,21 @@ class EmployeeController extends Controller
 
             DB::commit();
 
+            $actor = auth()->user()?->name ?? 'System';
+            $employeeName = trim($employee->first_name . ' ' . $employee->last_name);
+            NotificationDispatcher::toAllUsers(
+                'employee.deleted',
+                'Employee Deleted',
+                "User {$actor} deleted employee '{$employeeName}'.",
+                route('hr.employees.index'),
+                'UserMinus',
+                ['employee_id' => $employee->id, 'actor_id' => auth()->id()]
+            );
+
             if ($request->ajax()) {
-                \App\Http\Controllers\NotificationController::employeeDeleted($employee);
                 return Reply::success('Employee deleted successfully');
             }
 
-            \App\Http\Controllers\NotificationController::employeeDeleted($employee);
             return redirect()->route('hr.employees.index')
                 ->with('success', 'تم حذف الموظف بنجاح');
         } catch (\Exception $e) {

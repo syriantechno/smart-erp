@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Services\Notifications\NotificationDispatcher;
 use Illuminate\View\View;
 
 class EmployeeDocumentController extends Controller
@@ -71,8 +72,18 @@ class EmployeeDocumentController extends Controller
 
             DB::commit();
 
-            // Notify if the employee document is expiring within the configured window
-            \App\Http\Controllers\NotificationController::employeeDocumentExpiring($document);
+            NotificationDispatcher::toAllUsers(
+                'employee_document.expiring',
+                'Employee Document Expiring Soon',
+                "Document '{$document->document_name}' for employee '{$employee->full_name}' will expire soon.",
+                route('hr.employees.documents.index', $employee),
+                'AlertTriangle',
+                [
+                    'employee_document_id' => $document->id,
+                    'employee_id' => $employee->id,
+                    'actor_id' => auth()->id(),
+                ]
+            );
 
             return redirect()->route('hr.employees.documents.index', $employee)
                 ->with('success', 'Document uploaded successfully');
@@ -142,8 +153,18 @@ class EmployeeDocumentController extends Controller
 
             DB::commit();
 
-            // Notify if the employee document is expiring within the configured window
-            \App\Http\Controllers\NotificationController::employeeDocumentExpiring($document);
+            NotificationDispatcher::toAllUsers(
+                'employee_document.expiring',
+                'Employee Document Expiring Soon',
+                "Document '{$document->document_name}' for employee '{$employee->full_name}' will expire soon.",
+                route('hr.employees.documents.index', $employee),
+                'AlertTriangle',
+                [
+                    'employee_document_id' => $document->id,
+                    'employee_id' => $employee->id,
+                    'actor_id' => auth()->id(),
+                ]
+            );
 
             return redirect()->route('hr.employees.documents.index', $employee)
                 ->with('success', 'Document updated successfully');
