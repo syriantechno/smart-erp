@@ -13,4 +13,9 @@ class EventServiceProvider extends ServiceProvider
             DispatchNotificationChannels::class,
         ],
     ];
+
+    public function boot(): void
+    {
+        parent::boot();
+    }
 }
