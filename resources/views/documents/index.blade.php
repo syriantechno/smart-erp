@@ -253,17 +253,17 @@
 
                             <!-- Action Buttons -->
                             <x-base.tippy content="Export PDF" placement="bottom">
-                                <button id="documents-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                <button id="documents-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
                                     <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Export" placement="bottom">
-                                <button id="documents-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                <button id="documents-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
                                     <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Refresh" placement="bottom">
-                                <button id="documents-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                <button id="documents-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
                                     <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>
@@ -882,7 +882,7 @@
             jq.get('{{ route("documents.show", ":id") }}'.replace(':id', id))
                 .done(function(response) {
                     if (!response.success) {
-                        Swal.fire('Error', response.message || 'Unable to load document details.', 'error');
+                        showError(response.message || 'Unable to load document details.');
                         return;
                     }
 
@@ -934,7 +934,7 @@
                 })
                 .fail(function(xhr) {
                     const msg = xhr.responseJSON?.message || 'Unable to load document details.';
-                    Swal.fire('Error', msg, 'error');
+                    showError(msg);
                 });
         };
 

@@ -249,39 +249,27 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
 <script>
 function confirmDelete(documentId, documentName) {
-    Swal.fire({
-        title: 'Are you sure?',
-        text: `Do you want to delete "${documentName}"?`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#dc2626',
-        cancelButtonColor: '#6b7280',
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonText: 'Cancel'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = `{{ route('hr.employees.documents.index', ['employee' => $employee->id]) }}/${documentId}`;
+    window.confirmDelete(documentName, function() {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `{{ route('hr.employees.documents.index', ['employee' => $employee->id]) }}/${documentId}`;
 
-            const methodInput = document.createElement('input');
-            methodInput.type = 'hidden';
-            methodInput.name = '_method';
-            methodInput.value = 'DELETE';
+        const methodInput = document.createElement('input');
+        methodInput.type = 'hidden';
+        methodInput.name = '_method';
+        methodInput.value = 'DELETE';
 
-            const csrfInput = document.createElement('input');
-            csrfInput.type = 'hidden';
-            csrfInput.name = '_token';
-            csrfInput.value = '{{ csrf_token() }}';
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = '{{ csrf_token() }}';
 
-            form.appendChild(methodInput);
-            form.appendChild(csrfInput);
-            document.body.appendChild(form);
-            form.submit();
-        }
+        form.appendChild(methodInput);
+        form.appendChild(csrfInput);
+        document.body.appendChild(form);
+        form.submit();
     });
 }
 </script>

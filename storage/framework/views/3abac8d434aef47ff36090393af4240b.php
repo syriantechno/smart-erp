@@ -1,11 +1,17 @@
+
+
 <?php $__env->startSection('head'); ?>
     <?php echo $__env->yieldContent('subhead'); ?>
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('content'); ?>
-    <div class="<?php echo \Illuminate\Support\Arr::toCssClasses([
-        'smart-erp enigma pt-0 pb-5 px-5 sm:px-8 md:px-0 bg-slate-100 dark:bg-darkmode-800',
-    ]); ?>">
+    <div
+        id="smart-shell"
+        class="<?php echo \Illuminate\Support\Arr::toCssClasses([
+            // reduce pl so gap when sidebar is open is smaller (closer to collapsed gap)
+            'smart-erp enigma pt-0 pb-5 px-5 sm:px-8 md:px-0 bg-transparent md:pl-[108px] xl:pl-[268px] h-screen overflow-y-auto',
+        ]); ?>"
+    >
         <?php if (isset($component)) { $__componentOriginal382ffb4e125af6203213609160accaa9 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal382ffb4e125af6203213609160accaa9 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.mobile-menu.index','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -27,13 +33,11 @@
 <?php unset($__componentOriginal382ffb4e125af6203213609160accaa9); ?>
 <?php endif; ?>
 
-        
-        <div class="relative z-0 top-bar-pattern">
-            <div
-                id="smart-header"
-                class="px-4 sm:px-6 md:px-8 pt-0 pb-32 md:pt-0 md:pb-48 md:ml-[100px] xl:ml-[260px]"
-            >
-                <?php if (isset($component)) { $__componentOriginalbd52424ca8e15890728f7295a6d830b0 = $component; } ?>
+        <div
+            id="smart-header"
+            class="px-4 sm:px-6 md:px-8 pt-0 pb-32 md:pt-0 md:pb-48"
+        >
+            <?php if (isset($component)) { $__componentOriginalbd52424ca8e15890728f7295a6d830b0 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalbd52424ca8e15890728f7295a6d830b0 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.themes.enigma.top-bar.index','data' => ['layout' => 'side-menu']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('themes.enigma.top-bar'); ?>
@@ -53,12 +57,11 @@
 <?php $component = $__componentOriginalbd52424ca8e15890728f7295a6d830b0; ?>
 <?php unset($__componentOriginalbd52424ca8e15890728f7295a6d830b0); ?>
 <?php endif; ?>
-            </div>
         </div>
 
         <div class="flex mt-0">
             <!-- BEGIN: Side Menu -->
-            <nav id="smart-sidebar" class="side-nav z-[80] mt-0 hidden w-[100px] xl:w-[260px] overflow-y-auto overflow-x-hidden px-5 pb-16 pt-12 md:fixed md:top-2 md:left-2 md:h-screen md:block bg-white/95 rounded-[8px] shadow-lg dark:bg-darkmode-700/80">
+            <nav id="smart-sidebar" class="side-nav z-[80] mt-0 hidden w-[100px] xl:w-[260px] overflow-x-auto overflow-y-auto px-5 pb-16 pt-12 md:fixed md:top-2 md:left-2 md:h-screen md:block bg-transparent rounded-[8px] shadow-lg dark:bg-transparent">
                 
                 <?php
                     $brandName = $appBrandName ?? $appCompany->name ?? config('app.name', 'ERP System');
@@ -124,7 +127,7 @@
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
                                     </div>
-                                    <div class="side-menu__title">
+                                    <div class="side-menu__title" title="<?php echo e($menu['title']); ?>">
                                         <?php echo e($menu['title']); ?>
 
                                         <?php if(isset($menu['sub_menu'])): ?>
@@ -188,7 +191,7 @@
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
                                                     </div>
-                                                    <div class="side-menu__title">
+                                                    <div class="side-menu__title" title="<?php echo e($subMenu['title']); ?>">
                                                         <?php echo e($subMenu['title']); ?>
 
                                                         <?php if(isset($subMenu['sub_menu'])): ?>
@@ -253,7 +256,7 @@
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
                                                                     </div>
-                                                                    <div class="side-menu__title">
+                                                                    <div class="side-menu__title" title="<?php echo e($lastSubMenu['title']); ?>">
                                                                         <?php echo e($lastSubMenu['title']); ?>
 
                                                                     </div>
@@ -273,9 +276,9 @@
             </nav>
             <!-- END: Side Menu -->
             <!-- BEGIN: Content -->
-            <div id="smart-main-content" class="flex-1 w-full flex justify-center md:justify-start -mt-24 md:-mt-28 pr-6 pl-6 md:ml-[100px] xl:ml-[260px] relative z-[70]">
+            <div id="smart-main-content" class="flex-1 w-full flex justify-center md:justify-start -mt-48 md:-mt-48 pr-2 pl-1 relative z-[70]">
                 <div class="<?php echo \Illuminate\Support\Arr::toCssClasses([
-                    'w-full rounded-[8px] px-4 md:px-8 min-h-[calc(100vh-9rem)] bg-white/95 shadow-sm pb-10 mt-6 md:mt-4 relative z-10 dark:bg-darkmode-700/95',
+                    'w-full rounded-[8px] px-2 md:px-2 min-h-[calc(100vh-9rem)] bg-transparent pb-10 mt-6 md:mt-4 relative z-10',
                     "before:content-[''] before:w-full before:h-px before:block",
                 ]); ?>">
                     <?php echo $__env->yieldContent('subcontent'); ?>
@@ -286,19 +289,19 @@
     </div>
 <?php $__env->stopSection(); ?>
 
-<?php if (! $__env->hasRenderedOnce('173dcbae-d5ab-469a-97ed-93b80dc4d398')): $__env->markAsRenderedOnce('173dcbae-d5ab-469a-97ed-93b80dc4d398');
+<?php if (! $__env->hasRenderedOnce('62dd1b82-70b7-4fbf-a2fb-e8d15658a2eb')): $__env->markAsRenderedOnce('62dd1b82-70b7-4fbf-a2fb-e8d15658a2eb');
 $__env->startPush('styles'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/css/vendors/tippy.css'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/css/themes/enigma/side-nav.css'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/css/themes/enigma/top-nav.css'); ?>
 <?php $__env->stopPush(); endif; ?>
 
-<?php if (! $__env->hasRenderedOnce('5bd4d98c-fad5-4136-8101-2dc3a1b629b5')): $__env->markAsRenderedOnce('5bd4d98c-fad5-4136-8101-2dc3a1b629b5');
+<?php if (! $__env->hasRenderedOnce('44a41064-8623-49f0-8bdd-1aedac4f6612')): $__env->markAsRenderedOnce('44a41064-8623-49f0-8bdd-1aedac4f6612');
 $__env->startPush('vendors'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/js/vendors/tippy.js'); ?>
 <?php $__env->stopPush(); endif; ?>
 
-<?php if (! $__env->hasRenderedOnce('c9771bfe-05e3-44b0-840f-be8f24fe6936')): $__env->markAsRenderedOnce('c9771bfe-05e3-44b0-840f-be8f24fe6936');
+<?php if (! $__env->hasRenderedOnce('de68a4a3-5c48-45fa-83ce-e45c4c08f241')): $__env->markAsRenderedOnce('de68a4a3-5c48-45fa-83ce-e45c4c08f241');
 $__env->startPush('scripts'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/js/themes/enigma.js'); ?>
 
@@ -306,10 +309,9 @@ $__env->startPush('scripts'); ?>
         document.addEventListener('DOMContentLoaded', function () {
             var sidebar = document.getElementById('smart-sidebar');
             var toggleBtn = document.getElementById('smart-sidebar-toggle');
-            var mainContent = document.getElementById('smart-main-content');
-            var header = document.getElementById('smart-header');
+            var shell = document.getElementById('smart-shell');
 
-            if (!sidebar || !toggleBtn || !mainContent || !header) return;
+            if (!sidebar || !toggleBtn || !shell) return;
 
             // Restore saved sidebar state from localStorage
             var savedState = localStorage.getItem('sidebar-collapsed');
@@ -318,12 +320,10 @@ $__env->startPush('scripts'); ?>
                 sidebar.classList.add('side-nav--simple');
                 sidebar.classList.remove('w-[100px]', 'xl:w-[260px]');
                 sidebar.classList.add('w-[72px]', 'xl:w-[88px]');
-                
-                mainContent.classList.remove('md:ml-[100px]', 'xl:ml-[260px]');
-                mainContent.classList.add('md:ml-[72px]', 'xl:ml-[88px]');
-                
-                header.classList.remove('md:ml-[100px]', 'xl:ml-[260px]');
-                header.classList.add('md:ml-[72px]', 'xl:ml-[88px]');
+
+                // Reduce shell left padding so main content expands
+                shell.classList.remove('md:pl-[108px]', 'xl:pl-[268px]');
+                shell.classList.add('md:pl-[72px]', 'xl:pl-[88px]');
             }
 
             toggleBtn.addEventListener('click', function () {
@@ -333,29 +333,19 @@ $__env->startPush('scripts'); ?>
                 localStorage.setItem('sidebar-collapsed', isSimple);
 
                 if (isSimple) {
-                    // Sidebar becomes narrower
+                    // Sidebar becomes narrower and shell padding shrinks: content visually expands
                     sidebar.classList.remove('w-[100px]', 'xl:w-[260px]');
                     sidebar.classList.add('w-[72px]', 'xl:w-[88px]');
 
-                    // Content shifts closer
-                    mainContent.classList.remove('md:ml-[100px]', 'xl:ml-[260px]');
-                    mainContent.classList.add('md:ml-[72px]', 'xl:ml-[88px]');
-
-                    // Header (breadcrumb) shifts with content so sidebar doesn't cover it
-                    header.classList.remove('md:ml-[100px]', 'xl:ml-[260px]');
-                    header.classList.add('md:ml-[72px]', 'xl:ml-[88px]');
+                    shell.classList.remove('md:pl-[108px]', 'xl:pl-[268px]');
+                    shell.classList.add('md:pl-[72px]', 'xl:pl-[88px]');
                 } else {
-                    // Sidebar returns to full width
+                    // Sidebar returns to full width and shell padding matches it
                     sidebar.classList.remove('w-[72px]', 'xl:w-[88px]');
                     sidebar.classList.add('w-[100px]', 'xl:w-[260px]');
 
-                    // Content margin matches full sidebar
-                    mainContent.classList.remove('md:ml-[72px]', 'xl:ml-[88px]');
-                    mainContent.classList.add('md:ml-[100px]', 'xl:ml-[260px]');
-
-                    // Header returns to full offset
-                    header.classList.remove('md:ml-[72px]', 'xl:ml-[88px]');
-                    header.classList.add('md:ml-[100px]', 'xl:ml-[260px]');
+                    shell.classList.remove('md:pl-[72px]', 'xl:pl-[88px]');
+                    shell.classList.add('md:pl-[108px]', 'xl:pl-[268px]');
                 }
 
                 // Re-run tooltip logic (enigma.js listens to resize to enable/disable)

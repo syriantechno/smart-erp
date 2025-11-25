@@ -205,22 +205,22 @@
 
                         <div class="mt-5 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
                             <x-base.tippy content="Print" placement="bottom">
-                                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
                                     <x-base.lucide icon="printer" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Export PDF" placement="bottom">
-                                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
                                     <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Export to Excel" placement="bottom">
-                                <button id="vendors-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                <button id="vendors-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
                                     <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Refresh" placement="bottom">
-                                <button id="vendors-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                <button id="vendors-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
                                     <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>
@@ -716,55 +716,83 @@
         }
 
         function viewVendor(id) {
-            Swal.fire({
-                title: 'View Vendor',
-                text: 'View functionality will be implemented soon',
-                icon: 'info'
-            });
+            const msg = 'View functionality will be implemented soon';
+            if (typeof window.showInfo === 'function') {
+                window.showInfo(msg);
+            } else if (typeof window.showToast === 'function') {
+                window.showToast(msg, 'info');
+            } else {
+                console.info(msg);
+            }
         }
 
         function editVendor(id) {
-            Swal.fire({
-                title: 'Edit Vendor',
-                text: 'Edit functionality will be implemented soon',
-                icon: 'info'
-            });
+            const msg = 'Edit functionality will be implemented soon';
+            if (typeof window.showInfo === 'function') {
+                window.showInfo(msg);
+            } else if (typeof window.showToast === 'function') {
+                window.showToast(msg, 'info');
+            } else {
+                console.info(msg);
+            }
         }
 
-        function deleteVendor(id) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const jq = window.jQuery || window.$;
-                    if (!jq) return;
+        function deleteVendor(id, name) {
+            const confirmFn = typeof window.confirmDelete === 'function'
+                ? window.confirmDelete
+                : null;
 
-                    jq.ajax({
-                        url: '{{ route("supplier.vendors.destroy", ":id") }}'.replace(':id', id),
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': jq('meta[name="csrf-token"]').attr('content')
-                        },
-                        success: function(response) {
-                            if (response.success) {
-                                Swal.fire('Deleted!', response.message, 'success');
-                                if (vendorsTable) {
-                                    vendorsTable.ajax.reload();
-                                }
+            const runDelete = () => {
+                const $ = window.jQuery || window.$;
+                $.ajax({
+                    url: `/supplier/vendors/${id}`,
+                    type: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            if (window.vendorsTable) {
+                                window.vendorsTable.ajax.reload();
                             }
-                        },
-                        error: function(xhr) {
-                            Swal.fire('Error!', xhr.responseJSON?.message || 'Failed to delete', 'error');
+
+                            const msg = response.message || 'Vendor deleted successfully';
+                            if (typeof window.showSuccess === 'function') {
+                                window.showSuccess(msg, 'Deleted!');
+                            } else if (typeof window.showToast === 'function') {
+                                window.showToast(msg, 'delete');
+                            } else {
+                                console.log('Deleted:', msg);
+                            }
+                        } else {
+                            const err = response.message || 'Failed to delete vendor';
+                            if (typeof window.showError === 'function') {
+                                window.showError(err);
+                            } else if (typeof window.showToast === 'function') {
+                                window.showToast(err, 'error');
+                            } else {
+                                console.error('Error:', err);
+                            }
                         }
-                    });
-                }
-            });
+                    },
+                    error: function(xhr) {
+                        const err = (xhr.responseJSON && xhr.responseJSON.message) || 'Failed to delete vendor';
+                        if (typeof window.showError === 'function') {
+                            window.showError(err);
+                        } else if (typeof window.showToast === 'function') {
+                            window.showToast(err, 'error');
+                        } else {
+                            console.error('Error:', err);
+                        }
+                    }
+                });
+            };
+
+            if (confirmFn) {
+                confirmFn(name, runDelete);
+            } else if (window.confirm(`Are you sure you want to delete "${name}"?`)) {
+                runDelete();
+            }
         }
     </script>
 @endpush

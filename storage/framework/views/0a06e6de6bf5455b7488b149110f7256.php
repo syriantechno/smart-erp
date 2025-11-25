@@ -36,34 +36,32 @@ foreach ($attributes->all() as $__key => $__value) {
 
 unset($__defined_vars); ?>
 
-<?php if (! $__env->hasRenderedOnce('eb596872-6edd-40c1-8cd9-bb62979c0439')): $__env->markAsRenderedOnce('eb596872-6edd-40c1-8cd9-bb62979c0439');
+<?php if (! $__env->hasRenderedOnce('9205f320-518a-4c79-bc5d-d053d6bffa09')): $__env->markAsRenderedOnce('9205f320-518a-4c79-bc5d-d053d6bffa09');
 $__env->startPush('styles'); ?>
     <style>
         .modal-themed-header {
-            --modal-header-color: var(--color-primary, var(--primary-color, #2563eb));
-            --modal-header-rgb: var(--color-primary-rgb, var(--primary-rgb, 37 99 235));
             display: flex;
             flex-wrap: wrap;
             align-items: center;
             gap: 1rem;
-            background: linear-gradient(135deg,
-                    rgb(var(--modal-header-rgb) / 0.68),
-                    rgb(var(--modal-header-rgb) / 0.38));
+            background: #303030;
             padding: 1rem 1.5rem;
             border-top-left-radius: 0.30rem;
             border-top-right-radius: 0.30rem;
-            color: #f8fafc;
-            box-shadow: 0 15px 35px rgba(var(--modal-header-rgb), 0.25);
+            color: #f9fafb;
+            box-shadow: 0 15px 35px rgba(48, 48, 48, 0.25);
             text-transform: uppercase;
             letter-spacing: 0.08em;
         }
 
         @supports (background: color-mix(in srgb, red 50%, transparent)) {
             .modal-themed-header {
-                background: linear-gradient(135deg,
-                        color-mix(in srgb, var(--modal-header-color) 75%, transparent),
-                        color-mix(in srgb, var(--modal-header-color) 45%, transparent));
-                box-shadow: 0 15px 35px color-mix(in srgb, var(--modal-header-color) 35%, transparent);
+                background: linear-gradient(
+                    135deg,
+                    color-mix(in srgb, #303030 88%, transparent),
+                    color-mix(in srgb, #303030 70%, #d49a24 30%)
+                );
+                color: #f9fafb;
             }
         }
 
@@ -72,7 +70,7 @@ $__env->startPush('styles'); ?>
             font-weight: 700;
             letter-spacing: 0.05em;
             text-transform: none;
-            color: #f8fafc;
+            color: #f9fafb;
         }
 
         .modal-themed-header__subtitle {

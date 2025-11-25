@@ -328,7 +328,7 @@
                             <x-base.tippy content="Journal Entries" placement="bottom">
                                 <button
                                     type="button"
-                                    class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark"
+                                    class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark"
                                     data-tw-toggle="modal"
                                     data-tw-target="#journal-entries-modal"
                                 >
@@ -336,17 +336,17 @@
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Export PDF" placement="bottom">
-                                <button id="account-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                <button id="account-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
                                     <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Export" placement="bottom">
-                                <button id="account-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                <button id="account-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
                                     <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Refresh" placement="bottom">
-                                <button id="account-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                <button id="account-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
                                     <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>

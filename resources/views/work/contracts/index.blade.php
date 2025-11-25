@@ -86,17 +86,17 @@
                     <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
                         <div class="flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
                             <x-base.tippy content="Export PDF" placement="bottom">
-                                <button id="contracts-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                <button id="contracts-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
                                     <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Export" placement="bottom">
-                                <button id="contracts-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                <button id="contracts-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
                                     <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Refresh" placement="bottom">
-                                <button id="contracts-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                <button id="contracts-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
                                     <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>
@@ -106,7 +106,7 @@
                                 <button
                                     type="button"
                                     class="btn-royal btn-royal--gold btn-royal--sm sm:btn-royal--lg group"
-                                    onclick="alert('Create Contract functionality coming soon!')"
+                                    onclick="showInfo('Create Contract functionality coming soon!')"
                                 >
                                     <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
                                     <span class="hidden sm:inline">Add</span>

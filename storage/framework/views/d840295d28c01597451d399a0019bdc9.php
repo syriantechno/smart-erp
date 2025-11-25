@@ -1,3 +1,5 @@
+
+
 <?php $__env->startSection('head'); ?>
     <title>Login - Midone - Tailwind Admin Dashboard Template</title>
 <?php $__env->stopSection(); ?>

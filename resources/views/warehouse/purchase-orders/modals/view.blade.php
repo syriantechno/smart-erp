@@ -243,7 +243,14 @@ function approveApproval(approvalRequestId) {
             })
             .done(function(response) {
                 if (response.success) {
-                    Swal.fire('Approved!', response.message, 'success');
+                    const msg = response.message || 'Purchase order approved successfully';
+                    if (typeof window.showSuccess === 'function') {
+                        window.showSuccess(msg, 'Approved!');
+                    } else if (typeof window.showToast === 'function') {
+                        window.showToast(msg, 'success');
+                    } else {
+                        console.log('Approved:', msg);
+                    }
                     jq('[data-tw-dismiss="modal"]').click();
                     if (purchaseOrdersTable) {
                         purchaseOrdersTable.ajax.reload();
@@ -251,7 +258,14 @@ function approveApproval(approvalRequestId) {
                 }
             })
             .fail(function(xhr) {
-                Swal.fire('Error!', xhr.responseJSON?.message || 'Failed to approve', 'error');
+                const msg = xhr.responseJSON?.message || 'Failed to approve';
+                if (typeof window.showError === 'function') {
+                    window.showError(msg);
+                } else if (typeof window.showToast === 'function') {
+                    window.showToast(msg, 'error');
+                } else {
+                    console.error('Error approving:', msg);
+                }
             });
         }
     });
@@ -280,7 +294,14 @@ function rejectApproval(approvalRequestId) {
             })
             .done(function(response) {
                 if (response.success) {
-                    Swal.fire('Rejected!', response.message, 'success');
+                    const msg = response.message || 'Purchase order rejected successfully';
+                    if (typeof window.showSuccess === 'function') {
+                        window.showSuccess(msg, 'Rejected!');
+                    } else if (typeof window.showToast === 'function') {
+                        window.showToast(msg, 'success');
+                    } else {
+                        console.log('Rejected:', msg);
+                    }
                     jq('[data-tw-dismiss="modal"]').click();
                     if (purchaseOrdersTable) {
                         purchaseOrdersTable.ajax.reload();
@@ -288,7 +309,14 @@ function rejectApproval(approvalRequestId) {
                 }
             })
             .fail(function(xhr) {
-                Swal.fire('Error!', xhr.responseJSON?.message || 'Failed to reject', 'error');
+                const msg = xhr.responseJSON?.message || 'Failed to reject';
+                if (typeof window.showError === 'function') {
+                    window.showError(msg);
+                } else if (typeof window.showToast === 'function') {
+                    window.showToast(msg, 'error');
+                } else {
+                    console.error('Error rejecting:', msg);
+                }
             });
         }
     });

@@ -517,7 +517,7 @@
                                     </div>
                                 </div>
                                 @if($employee)
-                                    <a href="{{ route('hr.employees.documents.index', $employee->id) }}" class="btn-tonal btn-tonal--icon btn-tonal--info" title="View documents">
+                                    <a href="{{ route('hr.employees.documents.index', $employee->id) }}" class="btn-tonal  btn-tonal--info" title="View documents">
                                         <x-base.lucide icon="ExternalLink" class="h-4 w-4" />
                                     </a>
                                 @endif

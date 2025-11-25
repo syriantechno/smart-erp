@@ -222,17 +222,17 @@
 
                         <div class="mt-5 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
                             <x-base.tippy content="Export PDF" placement="bottom">
-                                <button id="material-requests-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                <button id="material-requests-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
                                     <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Export" placement="bottom">
-                                <button id="material-requests-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                <button id="material-requests-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
                                     <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Refresh" placement="bottom">
-                                <button id="material-requests-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                <button id="material-requests-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
                                     <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>

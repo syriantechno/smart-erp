@@ -134,17 +134,17 @@
 
                         <div class="mt-5 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
                             <x-base.tippy content="Export PDF" placement="bottom">
-                                <button id="purchase-orders-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                <button id="purchase-orders-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
                                     <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Export" placement="bottom">
-                                <button id="purchase-orders-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                <button id="purchase-orders-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
                                     <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Refresh" placement="bottom">
-                                <button id="purchase-orders-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                <button id="purchase-orders-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
                                     <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>
@@ -335,7 +335,11 @@
         }
 
         function deletePurchaseOrder(id, name) {
-            if (confirm(`Are you sure you want to delete "${name}"?`)) {
+            const confirmFn = typeof window.confirmDelete === 'function'
+                ? window.confirmDelete
+                : null;
+
+            const runDelete = () => {
                 const $ = window.jQuery || window.$;
                 $.ajax({
                     url: `/warehouse/purchase-orders/${id}`,
@@ -345,14 +349,46 @@
                     },
                     success: function(response) {
                         if (response.success) {
-                            purchaseOrdersTable.ajax.reload();
-                            // Show success message
+                            if (window.purchaseOrdersTable) {
+                                window.purchaseOrdersTable.ajax.reload();
+                            }
+
+                            const msg = response.message || 'Purchase order deleted successfully';
+                            if (typeof window.showSuccess === 'function') {
+                                window.showSuccess(msg, 'Deleted!');
+                            } else if (typeof window.showToast === 'function') {
+                                window.showToast(msg, 'delete');
+                            } else {
+                                console.log('Deleted:', msg);
+                            }
+                        } else {
+                            const err = response.message || 'Failed to delete purchase order';
+                            if (typeof window.showError === 'function') {
+                                window.showError(err);
+                            } else if (typeof window.showToast === 'function') {
+                                window.showToast(err, 'error');
+                            } else {
+                                console.error('Error:', err);
+                            }
                         }
                     },
-                    error: function() {
-                        alert('Error deleting purchase order');
+                    error: function(xhr) {
+                        const err = (xhr.responseJSON && xhr.responseJSON.message) || 'Error deleting purchase order';
+                        if (typeof window.showError === 'function') {
+                            window.showError(err);
+                        } else if (typeof window.showToast === 'function') {
+                            window.showToast(err, 'error');
+                        } else {
+                            console.error('Error:', err);
+                        }
                     }
                 });
+            };
+
+            if (confirmFn) {
+                confirmFn(name, runDelete);
+            } else if (window.confirm(`Are you sure you want to delete "${name}"?`)) {
+                runDelete();
             }
         }
     </script>

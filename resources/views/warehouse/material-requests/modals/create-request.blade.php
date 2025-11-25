@@ -335,11 +335,7 @@
                 const companyAddressEl = document.getElementById('material-request-company-address');
 
                 const showError = (message) => {
-                    if (typeof window.showError === 'function') {
-                        window.showError(message);
-                    } else {
-                        alert(message);
-                    }
+                    window.showError(message);
                 };
 
                 const showSuccess = (message) => {

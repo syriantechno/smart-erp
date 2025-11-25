@@ -183,12 +183,24 @@
                         if (data.success) {
                             window.location.href = '{{ route("warehouse.purchase-orders.show", $purchaseOrder->id) }}';
                         } else {
-                            alert(data.message || 'Error updating purchase order');
+                            const msg = data.message || 'Error updating purchase order';
+                            if (typeof window.showError === 'function') {
+                                window.showError(msg);
+                            } else if (typeof window.showToast === 'function') {
+                                window.showToast(msg, 'error');
+                            } else {
+                                console.error('Error:', msg);
+                            }
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Error updating purchase order');
+                        const msg = 'Error updating purchase order';
+                        if (typeof window.showError === 'function') {
+                            window.showError(msg);
+                        } else if (typeof window.showToast === 'function') {
+                            window.showToast(msg, 'error');
+                        }
                     })
                     .finally(() => {
                         submitBtn.disabled = false;

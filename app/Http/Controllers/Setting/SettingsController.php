@@ -112,7 +112,13 @@ class SettingsController extends Controller
 
         // حفظ الإعدادات في قاعدة البيانات
         Setting::set('app_name', $request->app_name, 'string', 'Application name');
-        Setting::set('app.locale', $request->default_language ?? 'en', 'string', 'Default application locale');
+
+        $selectedLocale = $request->default_language ?? 'en';
+        Setting::set('app.locale', $selectedLocale, 'string', 'Default application locale');
+
+        session(['locale' => $selectedLocale]);
+        app()->setLocale($selectedLocale);
+
         Setting::set('app.timezone', $request->timezone ?? 'UTC', 'string', 'Application timezone');
         Setting::set('date_format', $request->date_format ?? 'Y-m-d', 'string', 'Date format');
         Setting::set('maintenance_mode', $request->boolean('maintenance_mode'), 'boolean', 'Maintenance mode');

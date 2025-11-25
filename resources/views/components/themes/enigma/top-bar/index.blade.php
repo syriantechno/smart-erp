@@ -107,14 +107,39 @@
         </div>
         <!-- END: Search -->
         <div class="intro-x flex items-center gap-2 sm:gap-3">
+            <!-- BEGIN: Language Switcher -->
+            <x-base.menu class="relative">
+                <x-base.menu.button
+                    class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/60 bg-white text-slate-800 shadow-[0_14px_30px_rgba(15,15,20,0.12)] transition hover:-translate-y-0.5 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-200"
+                    title="Change Language"
+                >
+                    <x-base.lucide icon="Languages" class="h-5 w-5" />
+                </x-base.menu.button>
+                <x-base.menu.items class="w-32">
+                    <x-base.menu.item class="{{ app()->getLocale() === 'en' ? 'bg-primary/10' : 'hover:bg-slate-100/50' }}">
+                        <a href="{{ route('lang.switch', 'en') }}" class="flex items-center">
+                            <span class="mr-2">🇺🇸</span>
+                            {{ __('English') }}
+                        </a>
+                    </x-base.menu.item>
+                    <x-base.menu.item class="{{ app()->getLocale() === 'ar' ? 'bg-primary/10' : 'hover:bg-slate-100/50' }}">
+                        <a href="{{ route('lang.switch', 'ar') }}" class="flex items-center">
+                            <span class="mr-2">🇸🇦</span>
+                            {{ __('العربية') }}
+                        </a>
+                    </x-base.menu.item>
+                </x-base.menu.items>
+            </x-base.menu>
+            <!-- END: Language Switcher -->
+
             {{-- Settings pill (first visually) --}}
             <a
                 href="{{ route('settings.index') }}"
-                title="Settings"
+                title="{{ __('messages.settings') }}"
                 class="inline-flex items-center gap-2 h-11 px-5 rounded-full border border-white/60 bg-white text-slate-900 font-medium shadow-[0_14px_30px_rgba(15,15,20,0.12)] transition hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-200"
             >
                 <x-base.lucide icon="Settings" class="h-5 w-5" />
-                <span>Setting</span>
+                <span>{{ __('messages.settings') }}</span>
             </a>
 
             {{-- Quick apps button --}}
@@ -153,7 +178,7 @@
                             <x-base.lucide
                                 class="mr-2 h-4 w-4"
                                 icon="Settings"
-                            /> Settings
+                            /> {{ __('messages.settings') }}
                         </a>
                     </x-base.menu.item>
                     <x-base.menu.item class="hover:bg-white/5">
@@ -161,7 +186,7 @@
                             <x-base.lucide
                                 class="mr-2 h-4 w-4"
                                 icon="User"
-                            /> Profile
+                            /> {{ __('messages.profile') }}
                         </a>
                     </x-base.menu.item>
                     <x-base.menu.item class="hover:bg-white/5">
@@ -169,7 +194,7 @@
                             <x-base.lucide
                                 class="mr-2 h-4 w-4"
                                 icon="Lock"
-                            /> Change Password
+                            /> {{ __('Change Password') }}
                         </a>
                     </x-base.menu.item>
                     <x-base.menu.divider class="bg-white/[0.08]" />
@@ -178,7 +203,7 @@
                             <x-base.lucide
                                 class="mr-2 h-4 w-4"
                                 icon="ToggleRight"
-                            /> Logout
+                            /> {{ __('messages.logout') }}
                         </a>
                     </x-base.menu.item>
                 </x-base.menu.items>

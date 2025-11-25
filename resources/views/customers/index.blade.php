@@ -8,90 +8,15 @@
 @include('components.datatable.theme')
 
 @push('styles')
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+@endpush
 
-    <style>
-        /* Make table more compact with better readability */
-        #customers-table {
-            font-size: 0.95rem; /* 15px - slightly larger */
-            line-height: 1.4;
-        }
-
-        #customers-table tbody tr {
-            height: 2.25rem; /* 36px - more compact */
-        }
-
-        #customers-table th {
-            font-size: 0.8rem; /* 13px - slightly larger headers */
-            font-weight: 700;
-            padding: 0.5rem 1.25rem; /* py-2 px-5 */
-        }
-
-        #customers-table td {
-            padding: 0.375rem 1.25rem; /* py-1.5 px-5 - even more compact */
-        }
-
-        /* Status badges - compact and readable */
-        #customers-table .inline-flex {
-            padding: 0.125rem 0.5rem; /* 2px 8px */
-            font-weight: 600;
-        }
-
-        /* Actions column - keep compact */
-        #customers-table .px-5.py-1\.5 {
-            padding: 0.375rem 1.25rem;
-        }
-
-        #customers-table thead th,
-        #customers-table tbody td {
-            text-align: center;
-            font-size: 0.9rem;
-        }
-
-        #customers-table .datatable-cell-wrap {
-            text-align: center;
-        }
-
-        #customers-table [class^="stats-card-"],
-        #customers-table [class*=" stats-card-"] {
-            font-size: 0.95rem;
-            font-weight: 600;
-            letter-spacing: 0.03em;
-            text-transform: uppercase;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .icon-hover-rise {
-            transition: transform 200ms ease;
-        }
-
-        .group:hover .icon-hover-rise {
-            transform: translateY(-2px);
-        }
-
-        .custom-modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.75rem;
-            padding-top: 1rem;
-            border-top: 1px solid #e2e8f0;
-            margin-top: 1.5rem;
-        }
-
-        .custom-modal-footer button {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            transition: all 200ms ease;
-        }
-    </style>
+@push('scripts')
+    @include('components.datatable.scripts')
+    <script>
+        let customersTable;
+        // ... rest of the script ...
+    </script>
 @endpush
 
 @section('subcontent')
@@ -226,22 +151,22 @@
 
                         <div class="mt-5 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
                             <x-base.tippy content="Print" placement="bottom">
-                                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm group text-royalDark">
                                     <x-base.lucide icon="printer" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Export PDF" placement="bottom">
-                                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm group text-royalDark">
                                     <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Export to Excel" placement="bottom">
-                                <button id="customers-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                <button id="customers-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm group text-royalDark">
                                     <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Refresh" placement="bottom">
-                                <button id="customers-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                                <button id="customers-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm group text-royalDark">
                                     <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>
@@ -568,8 +493,6 @@
 @include('components.datatable.scripts')
 
 @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
-
     <script>
         let customersTable;
 
@@ -729,55 +652,83 @@
         }
 
         function viewCustomer(id) {
-            Swal.fire({
-                title: 'View Customer',
-                text: 'View functionality will be implemented soon',
-                icon: 'info'
-            });
+            const msg = 'View functionality will be implemented soon';
+            if (typeof window.showInfo === 'function') {
+                window.showInfo(msg);
+            } else if (typeof window.showToast === 'function') {
+                window.showToast(msg, 'info');
+            } else {
+                console.info(msg);
+            }
         }
 
         function editCustomer(id) {
-            Swal.fire({
-                title: 'Edit Customer',
-                text: 'Edit functionality will be implemented soon',
-                icon: 'info'
-            });
+            const msg = 'Edit functionality will be implemented soon';
+            if (typeof window.showInfo === 'function') {
+                window.showInfo(msg);
+            } else if (typeof window.showToast === 'function') {
+                window.showToast(msg, 'info');
+            } else {
+                console.info(msg);
+            }
         }
 
-        function deleteCustomer(id) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const jq = window.jQuery || window.$;
-                    if (!jq) return;
+        function deleteCustomer(id, name) {
+            const confirmFn = typeof window.confirmDelete === 'function'
+                ? window.confirmDelete
+                : null;
 
-                    jq.ajax({
-                        url: '{{ route("customers.destroy", ":id") }}'.replace(':id', id),
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': jq('meta[name="csrf-token"]').attr('content')
-                        },
-                        success: function(response) {
-                            if (response.success) {
-                                Swal.fire('Deleted!', response.message, 'success');
-                                if (customersTable) {
-                                    customersTable.ajax.reload();
-                                }
+            const runDelete = () => {
+                const $ = window.jQuery || window.$;
+                $.ajax({
+                    url: `/customers/${id}`,
+                    type: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            if (window.customersTable) {
+                                window.customersTable.ajax.reload();
                             }
-                        },
-                        error: function(xhr) {
-                            Swal.fire('Error!', xhr.responseJSON?.message || 'Failed to delete', 'error');
+
+                            const msg = response.message || 'Customer deleted successfully';
+                            if (typeof window.showSuccess === 'function') {
+                                window.showSuccess(msg, 'Deleted!');
+                            } else if (typeof window.showToast === 'function') {
+                                window.showToast(msg, 'delete');
+                            } else {
+                                console.log('Deleted:', msg);
+                            }
+                        } else {
+                            const err = response.message || 'Failed to delete customer';
+                            if (typeof window.showError === 'function') {
+                                window.showError(err);
+                            } else if (typeof window.showToast === 'function') {
+                                window.showToast(err, 'error');
+                            } else {
+                                console.error('Error:', err);
+                            }
                         }
-                    });
-                }
-            });
+                    },
+                    error: function(xhr) {
+                        const err = (xhr.responseJSON && xhr.responseJSON.message) || 'Failed to delete customer';
+                        if (typeof window.showError === 'function') {
+                            window.showError(err);
+                        } else if (typeof window.showToast === 'function') {
+                            window.showToast(err, 'error');
+                        } else {
+                            console.error('Error:', err);
+                        }
+                    }
+                });
+            };
+
+            if (confirmFn) {
+                confirmFn(name, runDelete);
+            } else if (window.confirm(`Are you sure you want to delete "${name}"?`)) {
+                runDelete();
+            }
         }
     </script>
 @endpush

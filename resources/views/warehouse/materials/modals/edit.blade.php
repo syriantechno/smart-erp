@@ -54,7 +54,7 @@
                         </x-base.form-select>
                         <button
                             type="button"
-                            class="btn-tonal btn-tonal--primary btn-tonal--icon h-10 w-10 mt-auto"
+                            class="btn-tonal btn-tonal--primary  h-10 w-10 mt-auto"
                             data-unit-quick-add-toggle
                             data-target="#edit-unit-quick-add"
                             title="Add Unit"

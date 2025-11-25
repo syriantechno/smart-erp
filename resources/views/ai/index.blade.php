@@ -206,17 +206,17 @@
                 <div class="flex flex-col sm:flex-row sm:items-end xl:items-start mb-4">
                     <div class="flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
                         <x-base.tippy content="Export PDF" placement="bottom">
-                            <button id="ai-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                            <button id="ai-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
                                 <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
                             </button>
                         </x-base.tippy>
                         <x-base.tippy content="Export" placement="bottom">
-                            <button id="ai-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                            <button id="ai-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
                                 <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
                             </button>
                         </x-base.tippy>
                         <x-base.tippy content="Refresh" placement="bottom">
-                            <button id="ai-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark">
+                            <button id="ai-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
                                 <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
                             </button>
                         </x-base.tippy>
@@ -754,13 +754,13 @@
             })
             .done(function(response) {
                 if (response.success) {
-                    alert('AI connection successful!');
+                    showSuccess('AI connection successful!');
                 } else {
-                    alert(response.error || 'Unable to connect to AI service');
+                    showError(response.error || 'Unable to connect to AI service');
                 }
             })
             .fail(function() {
-                alert('Unable to connect to AI service. Please check your AI configuration.');
+                showError('Unable to connect to AI service. Please check your AI configuration.');
             })
             .always(function() {
                 jQuery('#setup-modal button').prop('disabled', false);

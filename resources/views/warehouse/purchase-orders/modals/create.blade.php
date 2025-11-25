@@ -28,7 +28,7 @@
                         />
                         <button
                             type="button"
-                            class="btn-tonal btn-tonal--info btn-tonal--icon"
+                            class="btn-tonal btn-tonal--info "
                             onclick="refreshPurchaseOrderCode()"
                             title="Refresh Code"
                         >
@@ -266,17 +266,22 @@
                                 window.purchaseOrdersTable.ajax.reload();
                             }
                             
-                            // Show success message
-                            if (typeof Swal !== 'undefined') {
-                                Swal.fire('Success!', response.message, 'success');
+                            // Show success message using global notifications
+                            if (typeof window.showSuccess === 'function') {
+                                window.showSuccess(response.message || 'Purchase order created successfully');
+                            } else if (typeof window.showToast === 'function') {
+                                window.showToast(response.message || 'Purchase order created successfully', 'success');
                             } else {
-                                alert(response.message);
+                                console.log('Success:', response.message || 'Purchase order created successfully');
                             }
                         } else {
-                            if (typeof Swal !== 'undefined') {
-                                Swal.fire('Error!', response.message, 'error');
+                            const errorMsg = response.message || 'Failed to create purchase order.';
+                            if (typeof window.showError === 'function') {
+                                window.showError(errorMsg);
+                            } else if (typeof window.showToast === 'function') {
+                                window.showToast(errorMsg, 'error');
                             } else {
-                                alert(response.message);
+                                console.error('Error:', errorMsg);
                             }
                         }
                     },
@@ -285,11 +290,13 @@
                         if (xhr.responseJSON && xhr.responseJSON.message) {
                             message = xhr.responseJSON.message;
                         }
-                        
-                        if (typeof Swal !== 'undefined') {
-                            Swal.fire('Error!', message, 'error');
+
+                        if (typeof window.showError === 'function') {
+                            window.showError(message);
+                        } else if (typeof window.showToast === 'function') {
+                            window.showToast(message, 'error');
                         } else {
-                            alert(message);
+                            console.error('Error:', message);
                         }
                     },
                     complete: function() {

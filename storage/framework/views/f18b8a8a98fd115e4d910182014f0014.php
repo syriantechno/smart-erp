@@ -1,3 +1,5 @@
+
+
 <?php $__env->startSection('subhead'); ?>
     <title>General Dashboard - Smart ERP</title>
 <?php $__env->stopSection(); ?>

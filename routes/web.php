@@ -27,6 +27,36 @@ use App\Http\Controllers\ProfileController;
 |
 */
 
+// Language Switch Route
+Route::get('/lang/{locale}', function ($locale) {
+    if (in_array($locale, ['en', 'ar'])) {
+        session(['locale' => $locale]);
+    }
+    return redirect()->route('test.lang'); // Go to test page for easier testing
+})->name('lang.switch');
+
+// Test Language Route
+Route::get('/test-lang', function () {
+    return view('test-lang', [
+        'debug' => [
+            'app_locale' => app()->getLocale(),
+            'session_locale' => session('locale'),
+            'config_locale' => config('app.locale'),
+        ]
+    ]);
+})->name('test.lang');
+
+// Debug Locale Route
+Route::get('/debug-locale', function () {
+    return response()->json([
+        'app_locale' => app()->getLocale(),
+        'session_locale' => session('locale'),
+        'config_locale' => config('app.locale'),
+        'menu_crm' => __('menu.crm'),
+        'messages_welcome' => __('messages.welcome'),
+    ]);
+})->name('debug.locale');
+
 // Authentication Routes
 Route::middleware('guest')->group(function () {
     Route::get('login', [AuthenticatedSessionController::class, 'create'])

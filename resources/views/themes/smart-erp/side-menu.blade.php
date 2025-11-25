@@ -23,7 +23,7 @@
 
         <div class="flex mt-0">
             <!-- BEGIN: Side Menu -->
-            <nav id="smart-sidebar" class="side-nav z-[80] mt-0 hidden w-[100px] xl:w-[260px] overflow-x-hidden px-5 pb-16 pt-12 md:fixed md:top-2 md:left-2 md:h-screen md:block bg-transparent rounded-[8px] shadow-lg dark:bg-transparent">
+            <nav id="smart-sidebar" class="side-nav z-[80] mt-0 hidden w-[100px] xl:w-[260px] overflow-x-auto overflow-y-auto px-5 pb-16 pt-12 md:fixed md:top-2 md:left-2 md:h-screen md:block bg-transparent rounded-[8px] shadow-lg dark:bg-transparent">
                 {{-- Brand / logo --}}
                 @php
                     $brandName = $appBrandName ?? $appCompany->name ?? config('app.name', 'ERP System');
@@ -68,7 +68,7 @@
                                     <div class="side-menu__icon">
                                         <x-base.lucide icon="{{ $menu['icon'] }}" />
                                     </div>
-                                    <div class="side-menu__title">
+                                    <div class="side-menu__title" title="{{ $menu['title'] }}">
                                         {{ $menu['title'] }}
                                         @if (isset($menu['sub_menu']))
                                             <div
@@ -93,7 +93,7 @@
                                                     <div class="side-menu__icon">
                                                         <x-base.lucide icon="{{ $subMenu['icon'] }}" />
                                                     </div>
-                                                    <div class="side-menu__title">
+                                                    <div class="side-menu__title" title="{{ $subMenu['title'] }}">
                                                         {{ $subMenu['title'] }}
                                                         @if (isset($subMenu['sub_menu']))
                                                             <div
@@ -119,7 +119,7 @@
                                                                     <div class="side-menu__icon">
                                                                         <x-base.lucide icon="{{ $lastSubMenu['icon'] }}" />
                                                                     </div>
-                                                                    <div class="side-menu__title">
+                                                                    <div class="side-menu__title" title="{{ $lastSubMenu['title'] }}">
                                                                         {{ $lastSubMenu['title'] }}
                                                                     </div>
                                                                 </a>

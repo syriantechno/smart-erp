@@ -127,22 +127,22 @@
                         {{-- Toolbar row - icons + Add button same as Positions layout --}}
                         <div class="mt-5 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
                             <x-base.tippy content="Print" placement="bottom">
-                                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark" title="Print">
+                                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark" title="Print">
                                     <x-base.lucide icon="printer" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Export PDF" placement="bottom">
-                                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark" title="Export PDF">
+                                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark" title="Export PDF">
                                     <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Export to Excel" placement="bottom">
-                                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark" title="Export to Excel">
+                                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark" title="Export to Excel">
                                     <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Refresh" placement="bottom">
-                                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark" title="Refresh">
+                                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark" title="Refresh">
                                     <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>

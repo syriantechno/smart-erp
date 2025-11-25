@@ -35,7 +35,7 @@
                         />
                         <button
                             type="button"
-                            class="btn-tonal btn-tonal--info btn-tonal--icon"
+                            class="btn-tonal btn-tonal--info "
                             onclick="refreshInvoiceCode('{{ $type }}')"
                             title="Refresh Code"
                         >
@@ -244,7 +244,7 @@
             <input type="text" class="form-input total-display w-full" readonly placeholder="0.00">
         </td>
         <td class="text-center">
-            <button type="button" class="btn-tonal btn-tonal--danger btn-tonal--icon remove-row" title="Remove">
+            <button type="button" class="btn-tonal btn-tonal--danger  remove-row" title="Remove">
                 <x-base.lucide icon="trash-2" class="w-4 h-4" />
             </button>
         </td>

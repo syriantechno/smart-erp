@@ -329,30 +329,17 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success!',
-                            text: data.message,
-                            timer: 3000,
-                            showConfirmButton: false
-                        }).then(() => {
+                        showSuccess(data.message);
+                        setTimeout(() => {
                             window.location.href = '{{ route("electronic-mail.index") }}';
-                        });
+                        }, 1500);
                     } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error!',
-                            text: data.message || 'Failed to send mail'
-                        });
+                        showError(data.message || 'Failed to send mail');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error!',
-                        text: 'An error occurred while sending the mail'
-                    });
+                    showError('An error occurred while sending the mail');
                 })
                 .finally(() => {
                     submitBtn.disabled = false;

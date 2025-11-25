@@ -12,292 +12,292 @@ class SideMenu
         return [
             'dashboard' => [
                 'icon' => 'home',
-                'title' => 'Dashboard',
+                'title' => __('menu.dashboard'),
                 'sub_menu' => [
                     'dashboard-overview-1' => [
                         'icon' => 'activity',
                         'route_name' => 'dashboard-overview-1',
-                        'title' => 'General'
+                        'title' => __('menu.general')
                     ],
                     'dashboard-overview-2' => [
                         'icon' => 'activity',
                         'route_name' => 'dashboard-overview-2',
-                        'title' => 'Projects'
+                        'title' => __('menu.projects')
                     ],
                     'dashboard-overview-3' => [
                         'icon' => 'activity',
                         'route_name' => 'dashboard-overview-3',
-                        'title' => 'Accounting'
+                        'title' => __('menu.accounting')
                     ],
                     'dashboard-overview-4' => [
                         'icon' => 'activity',
                         'route_name' => 'dashboard-overview-4',
-                        'title' => 'HR'
+                        'title' => __('menu.hr')
                     ]
                 ]
             ],
             'crm' => [
                 'icon' => 'building-2',
-                'title' => 'CRM',
+                'title' => __('menu.crm'),
                 'sub_menu' => [
                     'crm-contacts' => [
                         'icon' => 'user-circle-2',
-                        'title' => 'Contacts',
+                        'title' => __('menu.contacts'),
                         'route_name' => 'crm.contacts.index',
                     ],
                     'crm-leads' => [
                         'icon' => 'sparkles',
-                        'title' => 'Leads',
+                        'title' => __('menu.leads'),
                         'route_name' => 'crm.leads.index',
                     ],
                     'crm-opportunities' => [
                         'icon' => 'target',
-                        'title' => 'Opportunities',
+                        'title' => __('menu.opportunities'),
                         'route_name' => 'crm.opportunities.index',
                     ],
                     'crm-activities' => [
                         'icon' => 'calendar-clock',
-                        'title' => 'Activities',
+                        'title' => __('menu.activities'),
                         'route_name' => 'crm.activities.index',
                     ],
                 ],
             ],
             'hr' => [
                 'icon' => 'users',
-                'title' => 'Human Resources',
+                'title' => __('menu.human_resources'),
                 'sub_menu' => [
                     'departments' => [
                         'icon' => 'layers',
-                        'title' => 'Departments',
+                        'title' => __('menu.departments'),
                         'route_name' => 'hr.departments.index'
                     ],
                     'positions' => [
                         'icon' => 'briefcase',
-                        'title' => 'Positions',
+                        'title' => __('menu.positions'),
                         'route_name' => 'hr.positions.index'
                     ],
                     'employees' => [
                         'icon' => 'users',
-                        'title' => 'Employees',
+                        'title' => __('menu.employees'),
                         'route_name' => 'hr.employees.index'
                     ],
                     'employee-performance' => [
                         'icon' => 'star',
-                        'title' => 'Performance',
+                        'title' => __('menu.performance'),
                         'route_name' => 'hr.employee-evaluations.index',
                     ],
                     'employee-rewards' => [
                         'icon' => 'award',
-                        'title' => 'Rewards',
+                        'title' => __('menu.rewards'),
                         'route_name' => 'hr.employee-rewards.index',
                     ],
                     'attendance' => [
                         'icon' => 'clock',
-                        'title' => 'Attendance',
+                        'title' => __('menu.attendance'),
                         'route_name' => 'hr.attendance.index'
                     ],
                     'shifts' => [
                         'icon' => 'watch',
-                        'title' => 'Shifts',
+                        'title' => __('menu.shifts'),
                         'route_name' => 'hr.shifts.index'
                     ],
                     'leave' => [
                         'icon' => 'calendar',
-                        'title' => 'Leave',
+                        'title' => __('menu.leave'),
                         'route_name' => 'hr.leave.index'
                     ],
                     'payroll' => [
                         'icon' => 'dollar-sign',
-                        'title' => 'Payroll',
+                        'title' => __('menu.payroll'),
                         'route_name' => 'hr.payroll.index'
                     ],
                     'recruitment' => [
                         'icon' => 'user-plus',
-                        'title' => 'Recruitment',
+                        'title' => __('menu.recruitment'),
                         'route_name' => 'hr.recruitment.index'
                     ]
                 ]
             ],
             'approval-system' => [
                 'icon' => 'check-circle',
-                'title' => 'Approval System',
+                'title' => __('menu.approval_system'),
                 'sub_menu' => [
                     'approval-system-requests' => [
                         'icon' => 'list-checks',
                         'route_name' => 'approval-system.index',
-                        'title' => 'Requests',
+                        'title' => __('menu.requests'),
                     ],
                     'approval-system-templates' => [
                         'icon' => 'layers',
                         'route_name' => 'approval-system.templates.index',
-                        'title' => 'Templates',
+                        'title' => __('menu.templates'),
                     ],
                 ],
             ],
             'work' => [
                 'icon' => 'briefcase',
-                'title' => 'Work Management',
+                'title' => __('menu.work_management'),
                 'sub_menu' => [
                     'projects' => [
                         'icon' => 'folder',
                         'route_name' => 'project-management.projects.index',
-                        'title' => 'Projects'
+                        'title' => __('menu.projects')
                     ],
                     'tasks' => [
                         'icon' => 'check-square',
                         'route_name' => 'tasks.index',
-                        'title' => 'Tasks'
+                        'title' => __('menu.tasks')
                     ],
                     'estimates' => [
                         'icon' => 'calculator',
                         'route_name' => 'work.estimates.index',
-                        'title' => 'Estimates'
+                        'title' => __('menu.estimates')
                     ],
                     'contracts' => [
                         'icon' => 'file-signature',
                         'route_name' => 'work.contracts.index',
-                        'title' => 'Contracts'
+                        'title' => __('menu.contracts')
                     ]
                 ]
             ],
             'warehouse' => [
                 'icon' => 'package',
-                'title' => 'Warehouse',
+                'title' => __('menu.warehouse'),
                 'sub_menu' => [
                     'categories' => [
                         'icon' => 'tag',
                         'route_name' => 'warehouse.categories.index',
-                        'title' => 'Categories'
+                        'title' => __('menu.categories')
                     ],
                     'warehouses' => [
                         'icon' => 'home',
                         'route_name' => 'warehouse.warehouses.index',
-                        'title' => 'Warehouses'
+                        'title' => __('menu.warehouses')
                     ],
                     'materials' => [
                         'icon' => 'box',
                         'route_name' => 'warehouse.materials.index',
-                        'title' => 'Materials'
+                        'title' => __('menu.materials')
                     ],
                     'inventory' => [
                         'icon' => 'clipboard-list',
                         'route_name' => 'warehouse.inventory.index',
-                        'title' => 'Inventory'
+                        'title' => __('menu.inventory')
                     ],
                     'material-requests' => [
                         'icon' => 'file-text',
                         'route_name' => 'warehouse.material-requests.index',
-                        'title' => 'Material Requests'
+                        'title' => __('menu.material_requests')
                     ],
                     'purchase-orders' => [
                         'icon' => 'shopping-cart',
                         'route_name' => 'warehouse.purchase-orders.index',
-                        'title' => 'Purchase Orders'
+                        'title' => __('menu.purchase_orders')
                     ],
                     'sale-orders' => [
                         'icon' => 'truck',
                         'route_name' => 'warehouse.sale-orders.index',
-                        'title' => 'Sale Orders'
+                        'title' => __('menu.sale_orders')
                     ],
                     'delivery-orders' => [
                         'icon' => 'send',
                         'route_name' => 'warehouse.delivery-orders.index',
-                        'title' => 'Delivery Orders'
+                        'title' => __('menu.delivery_orders')
                     ]
                 ]
             ],
             'supplier' => [
                 'icon' => 'truck',
-                'title' => 'Supplier',
+                'title' => __('menu.suppliers'),
                 'sub_menu' => [
                     'supplier-vendors' => [
                         'icon' => 'building-2',
                         'route_name' => 'supplier.vendors.index',
-                        'title' => 'Vendors',
+                        'title' => __('menu.vendors'),
                     ],
                 ],
             ],
             'customers' => [
                 'icon' => 'users',
-                'title' => 'Customers',
+                'title' => __('menu.customers'),
                 'sub_menu' => [
                     'customers-index' => [
                         'icon' => 'user-plus',
                         'route_name' => 'customers.index',
-                        'title' => 'All Customers',
+                        'title' => __('menu.all_customers'),
                     ],
                 ],
             ],
             'accounting' => [
                 'icon' => 'file-text',
-                'title' => 'Accounting',
+                'title' => __('menu.accounts'),
                 'sub_menu' => [
                     'accounting-chart-of-accounts' => [
                         'icon' => 'layers',
                         'route_name' => 'accounting.chart-of-accounts.index',
-                        'title' => 'Chart of Accounts',
+                        'title' => __('menu.chart_of_accounts'),
                     ],
                     'accounting-journal-entries' => [
                         'icon' => 'book-open',
                         'route_name' => 'accounting.journal-entries.index',
-                        'title' => 'Journal Entries',
+                        'title' => __('menu.journal_entries'),
                     ],
                     'accounting-invoices' => [
                         'icon' => 'file-text',
                         'route_name' => 'accounting.invoices.index',
-                        'title' => 'Invoices',
+                        'title' => __('menu.invoices'),
                     ],
                     'accounting-payment-vouchers' => [
                         'icon' => 'corner-down-right',
                         'route_name' => 'accounting.payment-vouchers.index',
-                        'title' => 'Payment Vouchers',
+                        'title' => __('menu.payment_vouchers'),
                     ],
                     'accounting-receipt-vouchers' => [
                         'icon' => 'corner-up-right',
                         'route_name' => 'accounting.receipt-vouchers.index',
-                        'title' => 'Receipt Vouchers',
+                        'title' => __('menu.receipt_vouchers'),
                     ],
                     'accounting-cash-boxes' => [
                         'icon' => 'wallet',
                         'route_name' => 'accounting.cash-boxes.index',
-                        'title' => 'Cash Boxes',
+                        'title' => __('menu.cash_boxes'),
                     ],
                     'accounting-bank-accounts' => [
                         'icon' => 'banknote',
                         'route_name' => 'accounting.bank-accounts.index',
-                        'title' => 'Bank Accounts',
+                        'title' => __('menu.bank_accounts'),
                     ],
                 ],
             ],
             'settings' => [
                 'icon' => 'settings',
                 'route_name' => 'settings.index',
-                'title' => 'Settings'
+                'title' => __('menu.settings')
             ],
             'manufacturing' => [
                 'icon' => 'settings',
                 'route_name' => 'manufacturing.index',
-                'title' => 'Manufacturing'
+                'title' => __('menu.manufacturing')
             ],
             'electronic-mail' => [
                 'icon' => 'mail',
                 'route_name' => 'electronic-mail.index',
-                'title' => 'Electronic Mail'
+                'title' => __('menu.electronic_mail')
             ],
             'chat' => [
                 'icon' => 'message-square',
                 'route_name' => 'chat.index',
-                'title' => 'Internal Chat'
+                'title' => __('menu.internal_chat')
             ],
             'documents' => [
                 'icon' => 'file-text',
                 'route_name' => 'documents.index',
-                'title' => 'Document Management'
+                'title' => __('menu.document_management')
             ],
             'ai' => [
                 'icon' => 'bot',
                 'route_name' => 'ai.index',
-                'title' => 'AI Assistant'
+                'title' => __('menu.ai_assistant')
             ],
             'e-commerce' => [
                 'icon' => 'shopping-bag',

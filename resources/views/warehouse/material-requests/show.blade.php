@@ -20,26 +20,6 @@
     $stampBgColor = $showApprovedStamp ? '#ecfdf5' : '#fee2e2';
 @endphp
 
-@push('styles')
-    <style>
-        .mr-approval-stamp {
-            letter-spacing: 0.35em;
-            text-indent: 0.35em;
-            font-size: 15px;
-            font-weight: 900;
-            text-transform: uppercase;
-            background-image: radial-gradient(circle at center, transparent 60%, rgba(0, 0, 0, 0.08));
-        }
-
-        @media print {
-            .mr-approval-stamp {
-                -webkit-print-color-adjust: exact !important;
-                color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-        }
-    </style>
-@endpush
 
 @section('subcontent')
     <div class="intro-y mt-8 space-y-6">
@@ -325,7 +305,7 @@
                             window.location.reload();
                         })
                         .fail((xhr) => {
-                            Swal.fire('Error', xhr.responseJSON?.message || 'Failed to approve request.', 'error');
+                            showError(xhr.responseJSON?.message || 'Failed to approve request.');
                         });
                     }
                 });
@@ -354,7 +334,7 @@
                             window.location.reload();
                         })
                         .fail((xhr) => {
-                            Swal.fire('Error', xhr.responseJSON?.message || 'Failed to reject request.', 'error');
+                            showError(xhr.responseJSON?.message || 'Failed to reject request.');
                         });
                     }
                 });

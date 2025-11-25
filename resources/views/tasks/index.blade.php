@@ -398,29 +398,7 @@
     <script>
     // Define showToast function if not available
     if (typeof showToast === 'undefined') {
-        window.showToast = function(message, type = 'info') {
-            console.log(`🔔 ${type.toUpperCase()}: ${message}`);
-            
-            // Try to use SweetAlert if available
-            if (typeof Swal !== 'undefined') {
-                let iconType = 'info';
-                if (type === 'success') {
-                    iconType = 'success';
-                } else if (type === 'error') {
-                    iconType = 'error';
-                }
-                
-                Swal.fire({
-                    text: message,
-                    icon: iconType,
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true
-                });
-            }
-        };
+        // showToast is already defined globally, no need for fallback
     }
 
     try {

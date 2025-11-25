@@ -4,7 +4,7 @@
     .side-nav {
         /* Enhanced sidebar styling with smooth transitions */
         /* Disable vertical scrolling on the sidebar itself so we have a single main scrollbar */
-        overflow-y: hidden;
+        overflow-y: auto;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
@@ -171,7 +171,7 @@
             align-items: center;
             padding-left: theme("spacing.3");
             color: #303030;
-            /* عناصر القائمة أقرب لبعض */
+          
             margin-bottom: theme("spacing.2");
             position: relative;
             border-radius: theme("borderRadius.xl");
@@ -200,12 +200,19 @@
                 width: 100%;
                 margin-left: theme("spacing.3");
                 transition: all 0.2s ease;
-                /* تكبير خط نص القائمة قليلاً */
+               
                 font-size: 0.95rem;
                 line-height: 1.4;
+                
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                word-wrap: break-word;
+                max-width: 180px; 
                 @media screen(xl) {
                     display: flex;
                 }
+
                 .side-menu__sub-icon {
                     transition-property: theme("transitionProperty.DEFAULT");
                     transition-timing-function: theme(

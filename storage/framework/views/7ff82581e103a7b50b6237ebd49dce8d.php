@@ -39,7 +39,8 @@
                 Material Information
             </h4>
             <div class="grid grid-cols-12 gap-4 gap-y-4">
-                <div class="col-span-12 md:col-span-6">
+                <!-- First Row: Code, Name, Category, Unit, Status -->
+                <div class="col-span-12 md:col-span-2 xl:col-span-15/100">
                     <?php if (isset($component)) { $__componentOriginal0b5a207e31917d1ae3d42744188acbdf = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'edit-code']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -81,7 +82,7 @@
 <?php endif; ?>
                 </div>
 
-                <div class="col-span-12 md:col-span-6">
+                <div class="col-span-12 md:col-span-3 xl:col-span-25/100">
                     <?php if (isset($component)) { $__componentOriginal0b5a207e31917d1ae3d42744188acbdf = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'edit-name']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -123,7 +124,7 @@
 <?php endif; ?>
                 </div>
 
-                <div class="col-span-12 md:col-span-6">
+                <div class="col-span-12 md:col-span-2 xl:col-span-15/100">
                     <?php if (isset($component)) { $__componentOriginal0b5a207e31917d1ae3d42744188acbdf = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'edit-category']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -154,9 +155,7 @@
 <?php endif; ?>
 <?php $component->withAttributes(['id' => 'edit-category','name' => 'category_id','class' => 'w-full','required' => true]); ?>
                         <option value="">Select Category</option>
-                        <?php $__currentLoopData = $categories ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <option value="<?php echo e($category->id); ?>"><?php echo e($category->name); ?></option>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        <!-- Categories will be populated by JavaScript -->
                      <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a)): ?>
@@ -169,7 +168,7 @@
 <?php endif; ?>
                 </div>
 
-                <div class="col-span-12 md:col-span-6">
+                <div class="col-span-12 md:col-span-2 xl:col-span-20/100">
                     <?php if (isset($component)) { $__componentOriginal0b5a207e31917d1ae3d42744188acbdf = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'edit-unit']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -201,12 +200,7 @@
 <?php endif; ?>
 <?php $component->withAttributes(['id' => 'edit-unit','name' => 'unit_id','class' => 'w-full','required' => true]); ?>
                             <option value="">Select Unit</option>
-                            <?php $__currentLoopData = ($units ?? []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $unit): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <option value="<?php echo e($unit->id); ?>">
-                                    <?php echo e($unit->name); ?><?php echo e($unit->symbol ? ' (' . $unit->symbol . ')' : ''); ?>
-
-                                </option>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            <!-- Units will be populated by JavaScript -->
                          <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a)): ?>
@@ -219,7 +213,7 @@
 <?php endif; ?>
                         <button
                             type="button"
-                            class="btn-tonal btn-tonal--primary btn-tonal--icon h-10 w-10 mt-auto"
+                            class="btn-tonal btn-tonal--primary  h-10 w-10 mt-auto"
                             data-unit-quick-add-toggle
                             data-target="#edit-unit-quick-add"
                             title="Add Unit"
@@ -432,7 +426,52 @@
                     </div>
                 </div>
 
-                <div class="col-span-12 md:col-span-6">
+                <div class="col-span-12 md:col-span-2 xl:col-span-10/100">
+                    <?php if (isset($component)) { $__componentOriginal0b5a207e31917d1ae3d42744188acbdf = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'edit-status']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.form-label'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['for' => 'edit-status']); ?>Status <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal0b5a207e31917d1ae3d42744188acbdf)): ?>
+<?php $attributes = $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf; ?>
+<?php unset($__attributesOriginal0b5a207e31917d1ae3d42744188acbdf); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal0b5a207e31917d1ae3d42744188acbdf)): ?>
+<?php $component = $__componentOriginal0b5a207e31917d1ae3d42744188acbdf; ?>
+<?php unset($__componentOriginal0b5a207e31917d1ae3d42744188acbdf); ?>
+<?php endif; ?>
+                    <?php if (isset($component)) { $__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-select.index','data' => ['id' => 'edit-status','name' => 'is_active','class' => 'w-full','required' => true]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.form-select'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['id' => 'edit-status','name' => 'is_active','class' => 'w-full','required' => true]); ?>
+                        <option value="1">Active</option>
+                        <option value="0">Inactive</option>
+                     <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a)): ?>
+<?php $attributes = $__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a; ?>
+<?php unset($__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a)): ?>
+<?php $component = $__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a; ?>
+<?php unset($__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a); ?>
+<?php endif; ?>
+                </div>
+
+                <!-- Second Row: SKU, Barcode, Price, Opening Balance -->
+                <div class="col-span-12 md:col-span-3 xl:col-span-25/100">
                     <?php if (isset($component)) { $__componentOriginal0b5a207e31917d1ae3d42744188acbdf = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'edit-sku','class' => 'flex items-center gap-2']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -477,7 +516,7 @@
 <?php endif; ?>
                 </div>
 
-                <div class="col-span-12 md:col-span-6">
+                <div class="col-span-12 md:col-span-3 xl:col-span-25/100">
                     <?php if (isset($component)) { $__componentOriginal0b5a207e31917d1ae3d42744188acbdf = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'edit-barcode','class' => 'flex items-center gap-2']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -522,7 +561,7 @@
 <?php endif; ?>
                 </div>
 
-                <div class="col-span-12 md:col-span-6">
+                <div class="col-span-12 md:col-span-2 xl:col-span-15/100">
                     <?php if (isset($component)) { $__componentOriginal0b5a207e31917d1ae3d42744188acbdf = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'edit-price']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -564,7 +603,7 @@
 <?php endif; ?>
                 </div>
 
-                <div class="col-span-12 md:col-span-6">
+                <div class="col-span-12 md:col-span-3 xl:col-span-20/100">
                     <?php if (isset($component)) { $__componentOriginal0b5a207e31917d1ae3d42744188acbdf = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'edit-opening-quantity']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -603,50 +642,6 @@
 <?php if (isset($__componentOriginal40054831fd8fc1521987609af4b37cc0)): ?>
 <?php $component = $__componentOriginal40054831fd8fc1521987609af4b37cc0; ?>
 <?php unset($__componentOriginal40054831fd8fc1521987609af4b37cc0); ?>
-<?php endif; ?>
-                </div>
-
-                <div class="col-span-12 md:col-span-6">
-                    <?php if (isset($component)) { $__componentOriginal0b5a207e31917d1ae3d42744188acbdf = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'edit-status']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.form-label'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['for' => 'edit-status']); ?>Status <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal0b5a207e31917d1ae3d42744188acbdf)): ?>
-<?php $attributes = $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf; ?>
-<?php unset($__attributesOriginal0b5a207e31917d1ae3d42744188acbdf); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal0b5a207e31917d1ae3d42744188acbdf)): ?>
-<?php $component = $__componentOriginal0b5a207e31917d1ae3d42744188acbdf; ?>
-<?php unset($__componentOriginal0b5a207e31917d1ae3d42744188acbdf); ?>
-<?php endif; ?>
-                    <?php if (isset($component)) { $__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-select.index','data' => ['id' => 'edit-status','name' => 'is_active','class' => 'w-full','required' => true]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.form-select'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['id' => 'edit-status','name' => 'is_active','class' => 'w-full','required' => true]); ?>
-                        <option value="1">Active</option>
-                        <option value="0">Inactive</option>
-                     <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a)): ?>
-<?php $attributes = $__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a; ?>
-<?php unset($__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a)): ?>
-<?php $component = $__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a; ?>
-<?php unset($__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a); ?>
 <?php endif; ?>
                 </div>
 
@@ -788,7 +783,7 @@
         <div class="flex w-full flex-wrap justify-end gap-2">
             <button
                 type="button"
-                class="btn-tonal btn-tonal--neutral group"
+                class="btn-royal btn-royal--outline group"
                 data-tw-dismiss="modal"
             >
                 <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
@@ -817,7 +812,7 @@
                 type="submit"
                 form="edit-material-form"
                 id="edit-material-btn"
-                class="btn-tonal btn-tonal--success group"
+                class="btn-royal btn-royal--gold group"
             >
                 <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
@@ -839,7 +834,7 @@
 <?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
-                Save
+                Update
             </button>
         </div>
     <?php $__env->endSlot(); ?>
@@ -903,6 +898,10 @@
             const $ = jq;
             const form = document.getElementById('edit-material-form');
             const submitBtn = $('#edit-material-btn');
+            
+            // Populate categories and units dropdowns
+            populateDropdowns();
+
             const imageInput = document.getElementById('edit-material-image');
             const previewImage = document.getElementById('edit-material-image-preview');
             const placeholder = document.getElementById('edit-material-image-placeholder');
@@ -911,6 +910,25 @@
 
             if (!form) {
                 return;
+            }
+
+            function populateDropdowns() {
+                // Populate categories
+                const categorySelect = $('#edit-category');
+                if (window.materialsCategories && window.materialsCategories.length > 0) {
+                    window.materialsCategories.forEach(function(category) {
+                        categorySelect.append('<option value="' + category.id + '">' + category.name + '</option>');
+                    });
+                }
+
+                // Populate units
+                const unitSelect = $('#edit-unit');
+                if (window.materialsUnits && window.materialsUnits.length > 0) {
+                    window.materialsUnits.forEach(function(unit) {
+                        const label = unit.symbol ? unit.name + ' (' + unit.symbol + ')' : unit.name;
+                        unitSelect.append('<option value="' + unit.id + '">' + label + '</option>');
+                    });
+                }
             }
 
             const resetImagePreview = () => {

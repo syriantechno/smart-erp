@@ -234,17 +234,17 @@
                 <div class="flex w-full sm:w-auto">
                     <!-- Action Buttons -->
                     <x-base.tippy content="Export PDF" placement="bottom">
-                        <button id="email-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark mr-2">
+                        <button id="email-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark mr-2">
                             <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
                         </button>
                     </x-base.tippy>
                     <x-base.tippy content="Export" placement="bottom">
-                        <button id="email-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark mr-2">
+                        <button id="email-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark mr-2">
                             <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
                         </button>
                     </x-base.tippy>
                     <x-base.tippy content="Refresh" placement="bottom">
-                        <button id="email-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark mr-2">
+                        <button id="email-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark mr-2">
                             <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
                         </button>
                     </x-base.tippy>

@@ -131,28 +131,28 @@
 
                         <div class="mt-5 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
                             <x-base.tippy content="Print" placement="bottom">
-                                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark" title="Print">
+                                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark" title="Print">
                                     <x-base.lucide icon="printer" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Export PDF" placement="bottom">
-                                <button id="employees-export-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark" title="Export PDF">
+                                <button id="employees-export-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark" title="Export PDF">
                                     <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Export to Excel" placement="bottom">
-                                <button id="employees-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark" title="Export to Excel">
+                                <button id="employees-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark" title="Export to Excel">
                                     <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Import employees" placement="bottom">
-                                <button id="employees-import" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark" title="Import employees">
+                                <button id="employees-import" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark" title="Import employees">
                                     <x-base.lucide icon="upload-cloud" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>
                             <input type="file" id="employees-import-input" accept=".csv,text/csv" class="hidden" />
                             <x-base.tippy content="Refresh" placement="bottom">
-                                <button id="employees-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm btn-tonal--icon group text-royalDark" title="Refresh">
+                                <button id="employees-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark" title="Refresh">
                                     <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>
