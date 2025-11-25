@@ -165,6 +165,48 @@ class Task extends BaseModel
     }
 
     /**
+     * Get the likes for this task.
+     */
+    public function likes(): HasMany
+    {
+        return $this->hasMany(TaskLike::class);
+    }
+
+    /**
+     * Get likes count.
+     */
+    public function getLikesCountAttribute(): int
+    {
+        return $this->likes()->count();
+    }
+
+    /**
+     * Check if current user liked this task.
+     */
+    public function getIsLikedByUserAttribute(): bool
+    {
+        if (!auth()->check()) return false;
+        return $this->likes()->where('user_id', auth()->id())->exists();
+    }
+
+    /**
+     * Toggle like for current user.
+     */
+    public function toggleLike(): array
+    {
+        $userId = auth()->id();
+        $existing = $this->likes()->where('user_id', $userId)->first();
+
+        if ($existing) {
+            $existing->delete();
+            return ['action' => 'unliked', 'likes_count' => $this->fresh()->likes_count];
+        } else {
+            $this->likes()->create(['user_id' => $userId]);
+            return ['action' => 'liked', 'likes_count' => $this->fresh()->likes_count];
+        }
+    }
+
+    /**
      * Get the priority badge class.
      */
     public function getPriorityBadgeClass(): string

@@ -129,6 +129,40 @@ class Employee extends Model
         return (int) $this->rewards->sum('points');
     }
 
+    /**
+     * Get tasks assigned to this employee.
+     */
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(\App\Models\Work\Task::class);
+    }
+
+    /**
+     * Get total likes received on tasks.
+     */
+    public function getTaskLikesCountAttribute(): int
+    {
+        return \App\Models\Work\TaskLike::whereHas('task', function($q) {
+            $q->where('employee_id', $this->id);
+        })->count();
+    }
+
+    /**
+     * Get points from task likes (1 like = 1 point).
+     */
+    public function getTaskLikesPointsAttribute(): int
+    {
+        return $this->task_likes_count;
+    }
+
+    /**
+     * Get total points including task likes.
+     */
+    public function getTotalPointsWithLikesAttribute(): int
+    {
+        return $this->total_points + $this->task_likes_points;
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

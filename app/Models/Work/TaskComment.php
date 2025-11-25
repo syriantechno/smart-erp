@@ -5,6 +5,7 @@ namespace App\Models\Work;
 use App\Models\BaseModel;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TaskComment extends BaseModel
 {
@@ -22,6 +23,8 @@ class TaskComment extends BaseModel
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    protected $appends = ['likes_count', 'dislikes_count', 'user_reaction'];
 
     /**
      * Get the task that owns this comment.
@@ -85,5 +88,68 @@ class TaskComment extends BaseModel
     public function getTimeAgoAttribute(): string
     {
         return $this->created_at->diffForHumans();
+    }
+
+    /**
+     * Get reactions for this comment.
+     */
+    public function reactions(): HasMany
+    {
+        return $this->hasMany(TaskCommentReaction::class, 'comment_id');
+    }
+
+    /**
+     * Get likes count.
+     */
+    public function getLikesCountAttribute(): int
+    {
+        return $this->reactions()->where('type', 'like')->count();
+    }
+
+    /**
+     * Get dislikes count.
+     */
+    public function getDislikesCountAttribute(): int
+    {
+        return $this->reactions()->where('type', 'dislike')->count();
+    }
+
+    /**
+     * Get current user's reaction.
+     */
+    public function getUserReactionAttribute(): ?string
+    {
+        if (!auth()->check()) return null;
+        
+        $reaction = $this->reactions()->where('user_id', auth()->id())->first();
+        return $reaction?->type;
+    }
+
+    /**
+     * Toggle reaction (like/dislike).
+     */
+    public function toggleReaction(string $type): array
+    {
+        $userId = auth()->id();
+        $existing = $this->reactions()->where('user_id', $userId)->first();
+
+        if ($existing) {
+            if ($existing->type === $type) {
+                // Remove reaction if same type
+                $existing->delete();
+                return ['action' => 'removed', 'type' => null];
+            } else {
+                // Change reaction type
+                $existing->update(['type' => $type]);
+                return ['action' => 'changed', 'type' => $type];
+            }
+        } else {
+            // Add new reaction
+            $this->reactions()->create([
+                'user_id' => $userId,
+                'type' => $type,
+            ]);
+            return ['action' => 'added', 'type' => $type];
+        }
     }
 }

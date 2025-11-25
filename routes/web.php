@@ -217,17 +217,24 @@ Route::middleware('auth')->group(function () {
         Route::get('/preview-code', [App\Http\Controllers\Work\TaskController::class, 'previewCode'])->name('preview-code');
         Route::get('/create', [App\Http\Controllers\Work\TaskController::class, 'create'])->name('create');
         Route::post('/', [App\Http\Controllers\Work\TaskController::class, 'store'])->name('store');
+        
+        // Task Steps Routes (before {task} routes)
+        Route::post('/steps/{step}/complete', [App\Http\Controllers\Work\TaskController::class, 'completeStep'])->name('steps.complete');
+        Route::post('/steps/{step}/uncomplete', [App\Http\Controllers\Work\TaskController::class, 'uncompleteStep'])->name('steps.uncomplete');
+        
+        // Task Comments Routes (before {task} routes)
+        Route::post('/comments/{comment}/reaction', [App\Http\Controllers\Work\TaskController::class, 'toggleCommentReaction'])->name('comments.reaction');
+        Route::delete('/comments/{comment}', [App\Http\Controllers\Work\TaskController::class, 'deleteComment'])->name('comments.destroy');
+        
+        // Task Like Route (before show route)
+        Route::post('/{task}/like', [App\Http\Controllers\Work\TaskController::class, 'toggleLike'])->name('like');
+        Route::post('/{task}/comments', [App\Http\Controllers\Work\TaskController::class, 'addComment'])->name('comments.store');
+        
+        // Task CRUD Routes
         Route::get('/{task}', [App\Http\Controllers\Work\TaskController::class, 'show'])->name('show');
         Route::get('/{task}/edit', [App\Http\Controllers\Work\TaskController::class, 'edit'])->name('edit');
         Route::put('/{task}', [App\Http\Controllers\Work\TaskController::class, 'update'])->name('update');
         Route::delete('/{task}', [App\Http\Controllers\Work\TaskController::class, 'destroy'])->name('destroy');
-        
-        // Task Steps Routes
-        Route::post('/steps/{step}/complete', [App\Http\Controllers\Work\TaskController::class, 'completeStep'])->name('steps.complete');
-        Route::post('/steps/{step}/uncomplete', [App\Http\Controllers\Work\TaskController::class, 'uncompleteStep'])->name('steps.uncomplete');
-        
-        // Task Comments Routes
-        Route::post('/{task}/comments', [App\Http\Controllers\Work\TaskController::class, 'addComment'])->name('comments.store');
 
         // Enhanced Task Routes
         Route::get('/statistics', [App\Http\Controllers\Work\TaskController::class, 'statistics'])->name('statistics');

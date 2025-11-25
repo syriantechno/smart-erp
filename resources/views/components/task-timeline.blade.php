@@ -170,84 +170,70 @@
     @endif
 </div>
 
-<!-- Delegation Modal -->
-<div id="delegate-step-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
-        <div class="fixed inset-0 transition-opacity bg-slate-900/50" onclick="closeDelegateModal()"></div>
-        
-        <div class="relative z-10 w-full max-w-md p-6 mx-auto bg-white rounded-xl shadow-2xl dark:bg-darkmode-600">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-slate-800 dark:text-white flex items-center gap-2">
-                    <x-base.lucide icon="send" class="w-5 h-5 text-purple-500" />
-                    Delegate Step
-                </h3>
-                <button type="button" onclick="closeDelegateModal()" class="text-slate-400 hover:text-slate-600">
-                    <x-base.lucide icon="x" class="w-5 h-5" />
-                </button>
-            </div>
-            
-            <form id="delegate-step-form">
-                <input type="hidden" id="delegate-task-id" name="task_id">
-                <input type="hidden" id="delegate-step-id" name="step_id">
-                
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Step</label>
-                    <div id="delegate-step-title" class="p-3 bg-slate-50 dark:bg-darkmode-700 rounded-lg text-sm font-medium"></div>
-                </div>
-                
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                        Assign to Employee <span class="text-red-500">*</span>
-                    </label>
-                    <select id="delegate-employee-id" name="employee_id" required
-                            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-darkmode-400 dark:bg-darkmode-700">
-                        <option value="">Select Employee...</option>
-                    </select>
-                </div>
-                
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Due Date</label>
-                    <input type="date" id="delegate-due-date" name="due_date"
-                           class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-darkmode-400 dark:bg-darkmode-700">
-                </div>
-                
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Priority</label>
-                    <select id="delegate-priority" name="priority"
-                            class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-darkmode-400 dark:bg-darkmode-700">
-                        <option value="low">Low</option>
-                        <option value="medium" selected>Medium</option>
-                        <option value="high">High</option>
-                    </select>
-                </div>
-                
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Additional Notes</label>
-                    <textarea id="delegate-description" name="description" rows="2"
-                              placeholder="Add any additional instructions..."
-                              class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-darkmode-400 dark:bg-darkmode-700 resize-none"></textarea>
-                </div>
-                
-                <div class="flex justify-end gap-2">
-                    <button type="button" onclick="closeDelegateModal()" 
-                            class="btn-royal btn-royal--outline btn-royal--sm">
-                        Cancel
-                    </button>
-                    <button type="submit" 
-                            class="btn-royal btn-royal--gold btn-royal--sm flex items-center gap-2">
-                        <x-base.lucide icon="send" class="w-4 h-4" />
-                        Delegate
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
 @if($totalSteps > 0)
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             let employeesLoaded = false;
+            
+            // Create and append modal to body
+            if (!document.getElementById('delegate-step-modal')) {
+                const modalHTML = `
+                    <div id="delegate-step-modal" class="fixed inset-0 hidden" style="z-index: 99999;">
+                        <div class="fixed inset-0 bg-black/70" onclick="closeDelegateModal()"></div>
+                        <div class="fixed inset-0 flex items-center justify-center p-4" style="z-index: 100000;">
+                            <div class="relative w-full max-w-md p-6 bg-white rounded-xl shadow-2xl dark:bg-darkmode-600">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="text-lg font-semibold text-slate-800 dark:text-white flex items-center gap-2">
+                                        <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                                        Delegate Step
+                                    </h3>
+                                    <button type="button" onclick="closeDelegateModal()" class="text-slate-400 hover:text-slate-600">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                    </button>
+                                </div>
+                                <form id="delegate-step-form">
+                                    <input type="hidden" id="delegate-task-id" name="task_id">
+                                    <input type="hidden" id="delegate-step-id" name="step_id">
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Step</label>
+                                        <div id="delegate-step-title" class="p-3 bg-slate-50 dark:bg-darkmode-700 rounded-lg text-sm font-medium"></div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Assign to Employee <span class="text-red-500">*</span></label>
+                                        <select id="delegate-employee-id" name="employee_id" required class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-darkmode-400 dark:bg-darkmode-700">
+                                            <option value="">Select Employee...</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Due Date</label>
+                                        <input type="date" id="delegate-due-date" name="due_date" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-darkmode-400 dark:bg-darkmode-700">
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Priority</label>
+                                        <select id="delegate-priority" name="priority" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-darkmode-400 dark:bg-darkmode-700">
+                                            <option value="low">Low</option>
+                                            <option value="medium" selected>Medium</option>
+                                            <option value="high">High</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Additional Notes</label>
+                                        <textarea id="delegate-description" name="description" rows="2" placeholder="Add any additional instructions..." class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-darkmode-400 dark:bg-darkmode-700 resize-none"></textarea>
+                                    </div>
+                                    <div class="flex justify-end gap-2">
+                                        <button type="button" onclick="closeDelegateModal()" class="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200">Cancel</button>
+                                        <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 flex items-center gap-2">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                                            Delegate
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+            }
             
             // Handle step completion
             document.addEventListener('click', function(e) {

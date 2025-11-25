@@ -751,7 +751,7 @@ unset($__defined_vars); ?>
 <!-- END: Top Bar -->
 
 
-<?php if (! $__env->hasRenderedOnce('0691ba1e-ef06-4c6d-9c20-91af863ef296')): $__env->markAsRenderedOnce('0691ba1e-ef06-4c6d-9c20-91af863ef296');
+<?php if (! $__env->hasRenderedOnce('de0b7aae-ce0f-45aa-b773-585150ff64f4')): $__env->markAsRenderedOnce('de0b7aae-ce0f-45aa-b773-585150ff64f4');
 $__env->startPush('scripts'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/js/components/themes/enigma/top-bar.js'); ?>
 <?php $__env->stopPush(); endif; ?>

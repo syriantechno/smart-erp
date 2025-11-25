@@ -282,7 +282,19 @@ class TaskController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Comment added successfully',
-                'comment' => $comment
+                'comment' => [
+                    'id' => $comment->id,
+                    'comment' => $comment->comment,
+                    'is_internal' => $comment->is_internal,
+                    'time_ago' => $comment->time_ago,
+                    'user' => [
+                        'name' => $comment->user->name,
+                        'initial' => strtoupper(substr($comment->user->name, 0, 1)),
+                    ],
+                    'likes_count' => 0,
+                    'dislikes_count' => 0,
+                    'user_reaction' => null,
+                ]
             ]);
 
         } catch (\Exception $e) {
@@ -295,6 +307,66 @@ class TaskController extends Controller
                 'success' => false,
                 'message' => 'Failed to add comment'
             ], 500);
+        }
+    }
+
+    /**
+     * Toggle reaction on a comment.
+     */
+    public function toggleCommentReaction(Request $request, TaskComment $comment): JsonResponse
+    {
+        $request->validate([
+            'type' => 'required|in:like,dislike'
+        ]);
+
+        try {
+            $result = $comment->toggleReaction($request->type);
+
+            return Reply::success('Reaction updated', [
+                'action' => $result['action'],
+                'user_reaction' => $result['type'],
+                'likes_count' => $comment->fresh()->likes_count,
+                'dislikes_count' => $comment->fresh()->dislikes_count,
+            ]);
+        } catch (\Exception $e) {
+            return Reply::error('Failed to update reaction', [], 500);
+        }
+    }
+
+    /**
+     * Delete a comment.
+     */
+    public function deleteComment(TaskComment $comment): JsonResponse
+    {
+        try {
+            // Check if user owns the comment or is admin
+            if ($comment->user_id !== auth()->id()) {
+                return Reply::error('Unauthorized', [], 403);
+            }
+
+            $comment->delete();
+
+            return Reply::success('Comment deleted successfully');
+        } catch (\Exception $e) {
+            return Reply::error('Failed to delete comment', [], 500);
+        }
+    }
+
+    /**
+     * Toggle like on a task.
+     */
+    public function toggleLike(Task $task): JsonResponse
+    {
+        try {
+            $result = $task->toggleLike();
+
+            return Reply::success('Like updated', [
+                'action' => $result['action'],
+                'likes_count' => $result['likes_count'],
+                'is_liked' => $result['action'] === 'liked',
+            ]);
+        } catch (\Exception $e) {
+            return Reply::error('Failed to update like', [], 500);
         }
     }
 
