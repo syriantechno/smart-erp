@@ -9,7 +9,9 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('expiry_notification_settings', function (Blueprint $table) {
+        // Check if table already exists
+        if (!Schema::hasTable('expiry_notification_settings')) {
+            Schema::create('expiry_notification_settings', function (Blueprint $table) {
             $table->id();
             $table->string('type')->unique(); // employee_documents, company_documents, tasks, projects, contracts, etc.
             $table->string('label'); // Display name
@@ -21,10 +23,11 @@ return new class extends Migration
             $table->boolean('notify_owner')->default(true); // Notify the owner/assignee
             $table->string('frequency')->default('daily'); // daily, weekly, once
             $table->timestamps();
-        });
+            });
 
-        // Insert default settings
-        $defaults = [
+            // Insert default settings only if table is empty
+            if (DB::table('expiry_notification_settings')->count() == 0) {
+                $defaults = [
             [
                 'type' => 'employee_documents',
                 'label' => 'Employee Documents',
@@ -73,12 +76,14 @@ return new class extends Migration
         ];
 
         foreach ($defaults as $default) {
-            DB::table('expiry_notification_settings')->insert(array_merge($default, [
-                'enabled' => true,
-                'frequency' => 'daily',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]));
+                    DB::table('expiry_notification_settings')->insert(array_merge($default, [
+                        'enabled' => true,
+                        'frequency' => 'daily',
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]));
+                }
+            }
         }
     }
 
