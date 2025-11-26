@@ -294,7 +294,6 @@
 <x-modal.form id="edit-company-modal" title="تعديل بيانات الشركة">
     <form id="edit-company-form" method="POST" enctype="multipart/form-data">
         @csrf
-        @method('PUT')
         <input type="hidden" id="edit-company-id" name="id">
         <div class="grid grid-cols-12 gap-4 gap-y-4">
             <div class="col-span-12 md:col-span-6">
