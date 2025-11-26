@@ -79,10 +79,15 @@ Route::middleware('auth')->group(function () {
     Route::post('/settings/prefix', [SettingsController::class, 'updatePrefix'])->name('settings.prefix.update');
     Route::post('/settings/permissions/roles/{role}', [SettingsController::class, 'updateRolePermissions'])->name('settings.permissions.roles.update');
     Route::post('/settings/company', [SettingsController::class, 'updateCompany'])->name('settings.company.update');
+    Route::post('/settings/companies', [SettingsController::class, 'storeCompany'])->name('settings.company.store');
+    Route::post('/settings/companies/{company}', [SettingsController::class, 'updateCompanyById'])->name('settings.company.update.id');
+    Route::delete('/settings/companies/{company}', [SettingsController::class, 'destroyCompany'])->name('settings.company.destroy');
     Route::post('/settings/attendance', [SettingsController::class, 'updateAttendance'])->name('settings.attendance.update');
     Route::post('/settings/notifications', [SettingsController::class, 'updateNotifications'])->name('settings.notifications.update');
     Route::post('/settings/ai', [SettingsController::class, 'updateAiSettings'])->name('settings.ai.update');
     Route::post('/settings/taxes', [SettingsController::class, 'storeTax'])->name('settings.taxes.store');
+    Route::post('/settings/taxes/{tax}', [SettingsController::class, 'updateTax'])->name('settings.taxes.update');
+    Route::delete('/settings/taxes/{tax}', [SettingsController::class, 'destroyTax'])->name('settings.taxes.destroy');
     
     // Roles & Permissions
     Route::get('/settings/roles/{role}/permissions', [SettingsController::class, 'getRolePermissions'])->name('settings.roles.permissions');
@@ -207,6 +212,27 @@ Route::middleware('auth')->group(function () {
         Route::post('payroll/bulk-paid', [App\Http\Controllers\HR\PayrollController::class, 'bulkPaid'])->name('payroll.bulk-paid');
         Route::get('payroll/{payroll}/payslip', [App\Http\Controllers\HR\PayrollController::class, 'printPayslip'])->name('payroll.payslip');
         Route::get('payroll/export', [App\Http\Controllers\HR\PayrollController::class, 'export'])->name('payroll.export');
+        
+        // Penalties
+        Route::get('penalties', [App\Http\Controllers\HR\PenaltyController::class, 'index'])->name('penalties.index');
+        Route::get('penalties/data', [App\Http\Controllers\HR\PenaltyController::class, 'getData'])->name('penalties.data');
+        Route::post('penalties', [App\Http\Controllers\HR\PenaltyController::class, 'store'])->name('penalties.store');
+        Route::get('penalties/{penalty}', [App\Http\Controllers\HR\PenaltyController::class, 'show'])->name('penalties.show');
+        Route::put('penalties/{penalty}', [App\Http\Controllers\HR\PenaltyController::class, 'update'])->name('penalties.update');
+        Route::delete('penalties/{penalty}', [App\Http\Controllers\HR\PenaltyController::class, 'destroy'])->name('penalties.destroy');
+        Route::post('penalties/{penalty}/approve', [App\Http\Controllers\HR\PenaltyController::class, 'approve'])->name('penalties.approve');
+        Route::post('penalties/{penalty}/reject', [App\Http\Controllers\HR\PenaltyController::class, 'reject'])->name('penalties.reject');
+        
+        // Advances (Loans & Salary Advances)
+        Route::get('advances', [App\Http\Controllers\HR\AdvanceController::class, 'index'])->name('advances.index');
+        Route::get('advances/data', [App\Http\Controllers\HR\AdvanceController::class, 'getData'])->name('advances.data');
+        Route::post('advances', [App\Http\Controllers\HR\AdvanceController::class, 'store'])->name('advances.store');
+        Route::get('advances/{advance}', [App\Http\Controllers\HR\AdvanceController::class, 'show'])->name('advances.show');
+        Route::put('advances/{advance}', [App\Http\Controllers\HR\AdvanceController::class, 'update'])->name('advances.update');
+        Route::delete('advances/{advance}', [App\Http\Controllers\HR\AdvanceController::class, 'destroy'])->name('advances.destroy');
+        Route::post('advances/{advance}/approve', [App\Http\Controllers\HR\AdvanceController::class, 'approve'])->name('advances.approve');
+        Route::post('advances/{advance}/reject', [App\Http\Controllers\HR\AdvanceController::class, 'reject'])->name('advances.reject');
+        Route::post('advances/{advance}/disburse', [App\Http\Controllers\HR\AdvanceController::class, 'disburse'])->name('advances.disburse');
         
         // Recruitment
         Route::get('recruitment', [App\Http\Controllers\HR\RecruitmentController::class, 'index'])->name('recruitment.index');
@@ -560,12 +586,33 @@ Route::middleware('auth')->group(function () {
             ->name('payment-vouchers.index');
         Route::post('payment-vouchers', [App\Http\Controllers\Accounting\PaymentVoucherController::class, 'store'])
             ->name('payment-vouchers.store');
+        Route::delete('payment-vouchers/{paymentVoucher}', [App\Http\Controllers\Accounting\PaymentVoucherController::class, 'destroy'])
+            ->name('payment-vouchers.destroy');
 
         // Receipt Vouchers
         Route::get('receipt-vouchers', [App\Http\Controllers\Accounting\ReceiptVoucherController::class, 'index'])
             ->name('receipt-vouchers.index');
         Route::post('receipt-vouchers', [App\Http\Controllers\Accounting\ReceiptVoucherController::class, 'store'])
             ->name('receipt-vouchers.store');
+        Route::delete('receipt-vouchers/{receiptVoucher}', [App\Http\Controllers\Accounting\ReceiptVoucherController::class, 'destroy'])
+            ->name('receipt-vouchers.destroy');
+
+        // Invoices Delete
+        Route::delete('invoices/{invoice}', [App\Http\Controllers\Accounting\InvoiceController::class, 'destroy'])
+            ->name('invoices.destroy');
+    });
+
+    // Reports Routes
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Report\ReportController::class, 'index'])->name('index');
+        Route::get('/financial', [App\Http\Controllers\Report\ReportController::class, 'financial'])->name('financial');
+        Route::get('/hr', [App\Http\Controllers\Report\ReportController::class, 'hr'])->name('hr');
+        Route::get('/inventory', [App\Http\Controllers\Report\ReportController::class, 'inventory'])->name('inventory');
+        Route::get('/sales', [App\Http\Controllers\Report\ReportController::class, 'sales'])->name('sales');
+        Route::get('/projects', [App\Http\Controllers\Report\ReportController::class, 'projects'])->name('projects');
+        Route::get('/custom', [App\Http\Controllers\Report\ReportController::class, 'custom'])->name('custom');
+        Route::post('/custom/generate', [App\Http\Controllers\Report\ReportController::class, 'generateCustom'])->name('custom.generate');
+        Route::get('/data', [App\Http\Controllers\Report\ReportController::class, 'getData'])->name('data');
     });
 
     // Document Management Routes

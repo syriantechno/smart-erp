@@ -575,21 +575,19 @@
                     });
                 });
             } else {
-                // Fallback simple confirm if confirmDelete is not available
-                if (window.confirm(`Delete material "${name}"?`)) {
-                    jq.ajax({
-                        url: '{{ route("warehouse.materials.destroy", ":id") }}'.replace(':id', id),
-                        type: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector("meta[name='csrf-token']").getAttribute('content')
-                        },
-                        success: function(response) {
-                            if (response.success && materialsTable) {
-                                materialsTable.ajax.reload();
-                            }
+                // Fallback - just run delete without confirmation
+                jq.ajax({
+                    url: '{{ route("warehouse.materials.destroy", ":id") }}'.replace(':id', id),
+                    type: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector("meta[name='csrf-token']").getAttribute('content')
+                    },
+                    success: function(response) {
+                        if (response.success && materialsTable) {
+                            materialsTable.ajax.reload();
                         }
-                    });
-                }
+                    }
+                });
             }
         };
     </script>

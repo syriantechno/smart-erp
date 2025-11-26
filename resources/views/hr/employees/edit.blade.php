@@ -362,7 +362,7 @@
                             class="w-32"
                         >
                             <x-base.lucide icon="Save" class="w-4 h-4 mr-2 animate-pulse" />
-                            Save Changes
+                            Save
                         </x-base.button>
                     </div>
                 </form>

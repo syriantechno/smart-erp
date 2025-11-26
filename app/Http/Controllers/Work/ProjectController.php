@@ -7,7 +7,9 @@ use App\Models\Work\Project;
 use App\Models\Setting\Company;
 use App\Models\HR\Department;
 use App\Models\HR\Employee;
+use App\Models\User;
 use App\Services\DocumentCodeGenerator;
+use App\Services\Notifications\NotificationDispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
@@ -353,6 +355,33 @@ class ProjectController extends Controller
             ]);
 
             Log::info('Project created successfully:', $project->toArray());
+
+            // Notify project team
+            $projectManagers = User::whereHas('roles', fn($q) => $q->whereIn('name', ['admin', 'project_manager']))->pluck('id')->toArray();
+            if (!empty($projectManagers)) {
+                NotificationDispatcher::toUsers(
+                    $projectManagers,
+                    'project.created',
+                    'New Project Created',
+                    "Project '{$project->name}' ({$project->code}) has been created.",
+                    route('project-management.projects.show', $project->id),
+                    'folder-plus',
+                    ['type' => 'info', 'actor_id' => auth()->id()]
+                );
+            }
+
+            // Notify assigned manager
+            if ($project->manager_id && $project->manager && $project->manager->user_id) {
+                NotificationDispatcher::toUser(
+                    $project->manager->user_id,
+                    'project.assigned',
+                    'Project Assigned to You',
+                    "You have been assigned as manager for project '{$project->name}'.",
+                    route('project-management.projects.show', $project->id),
+                    'briefcase',
+                    ['type' => 'info', 'actor_id' => auth()->id()]
+                );
+            }
 
             notify_created('المشروع');
 

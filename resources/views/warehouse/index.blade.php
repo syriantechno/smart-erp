@@ -389,20 +389,19 @@
                     });
                 });
             } else {
-                if (window.confirm(`Delete warehouse "${name}"?`)) {
-                    jq.ajax({
-                        url: '{{ route("warehouse.warehouses.destroy", ":id") }}'.replace(':id', id),
-                        type: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector("meta[name='csrf-token']").getAttribute('content')
-                        },
-                        success: function(response) {
-                            if (response.success && warehousesTable) {
-                                warehousesTable.ajax.reload();
-                            }
+                // Fallback - just run delete
+                jq.ajax({
+                    url: '{{ route("warehouse.warehouses.destroy", ":id") }}'.replace(':id', id),
+                    type: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector("meta[name='csrf-token']").getAttribute('content')
+                    },
+                    success: function(response) {
+                        if (response.success && warehousesTable) {
+                            warehousesTable.ajax.reload();
                         }
-                    });
-                }
+                    }
+                });
             }
         };
     </script>

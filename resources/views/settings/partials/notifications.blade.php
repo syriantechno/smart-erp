@@ -91,6 +91,77 @@
             ],
         ];
 
+        // Payroll Notifications
+        $payrollNotifications = [
+            'payroll.generated' => [
+                'label' => 'Payroll Generated',
+                'description' => 'When payroll is generated for employees',
+                'value' => \App\Models\Setting\Setting::get('notifications.payroll.generated', true),
+            ],
+            'payroll.approved' => [
+                'label' => 'Payroll Approved',
+                'description' => 'When payroll is approved',
+                'value' => \App\Models\Setting\Setting::get('notifications.payroll.approved', true),
+            ],
+            'payroll.paid' => [
+                'label' => 'Salary Paid',
+                'description' => 'When salary is paid to employee',
+                'value' => \App\Models\Setting\Setting::get('notifications.payroll.paid', true),
+            ],
+        ];
+
+        // Penalty Notifications
+        $penaltyNotifications = [
+            'penalty.created' => [
+                'label' => 'Penalty Created',
+                'description' => 'When a penalty is issued to employee',
+                'value' => \App\Models\Setting\Setting::get('notifications.penalty.created', true),
+            ],
+            'penalty.approved' => [
+                'label' => 'Penalty Approved',
+                'description' => 'When a penalty is approved',
+                'value' => \App\Models\Setting\Setting::get('notifications.penalty.approved', true),
+            ],
+        ];
+
+        // Advance Notifications
+        $advanceNotifications = [
+            'advance.requested' => [
+                'label' => 'Advance Requested',
+                'description' => 'When employee requests advance/loan',
+                'value' => \App\Models\Setting\Setting::get('notifications.advance.requested', true),
+            ],
+            'advance.approved' => [
+                'label' => 'Advance Approved',
+                'description' => 'When advance request is approved',
+                'value' => \App\Models\Setting\Setting::get('notifications.advance.approved', true),
+            ],
+            'advance.disbursed' => [
+                'label' => 'Advance Disbursed',
+                'description' => 'When advance is disbursed',
+                'value' => \App\Models\Setting\Setting::get('notifications.advance.disbursed', true),
+            ],
+        ];
+
+        // Leave Notifications
+        $leaveNotifications = [
+            'leave.requested' => [
+                'label' => 'Leave Requested',
+                'description' => 'When employee requests leave',
+                'value' => \App\Models\Setting\Setting::get('notifications.leave.requested', true),
+            ],
+            'leave.approved' => [
+                'label' => 'Leave Approved',
+                'description' => 'When leave request is approved',
+                'value' => \App\Models\Setting\Setting::get('notifications.leave.approved', true),
+            ],
+            'leave.rejected' => [
+                'label' => 'Leave Rejected',
+                'description' => 'When leave request is rejected',
+                'value' => \App\Models\Setting\Setting::get('notifications.leave.rejected', true),
+            ],
+        ];
+
         $documentsExpiryReminderDays = \App\Models\Setting\Setting::get('notifications.documents.expiry_reminder_days', 30);
     @endphp
 
@@ -189,6 +260,106 @@
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 @foreach ($hrNotifications as $key => $notification)
+                    @php $fieldName = 'notifications_' . str_replace('.', '_', $key); @endphp
+                    <div class="flex items-center justify-between p-3 rounded-lg border border-slate-200 dark:border-darkmode-400">
+                        <div class="flex-1">
+                            <div class="font-medium text-sm text-slate-800 dark:text-slate-100">{{ $notification['label'] }}</div>
+                            <div class="text-xs text-slate-500">{{ $notification['description'] }}</div>
+                        </div>
+                        <input type="hidden" name="{{ $fieldName }}" value="0">
+                        <label class="inline-flex cursor-pointer items-center ml-3">
+                            <input type="checkbox" name="{{ $fieldName }}" value="1" {{ $notification['value'] ? 'checked' : '' }} class="sr-only peer" />
+                            <div class="relative w-11 h-6 rounded-full bg-slate-200 transition-colors duration-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/25 dark:bg-darkmode-600 peer-checked:bg-primary after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition-all after:duration-200 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"></div>
+                        </label>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
+        <!-- Payroll Notifications Section -->
+        <div class="mb-8">
+            <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-4 flex items-center border-b border-slate-200 dark:border-darkmode-400 pb-3">
+                <x-base.lucide icon="wallet" class="w-5 h-5 mr-2 text-emerald-500" />
+                Payroll Notifications
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                @foreach ($payrollNotifications as $key => $notification)
+                    @php $fieldName = 'notifications_' . str_replace('.', '_', $key); @endphp
+                    <div class="flex items-center justify-between p-3 rounded-lg border border-slate-200 dark:border-darkmode-400">
+                        <div class="flex-1">
+                            <div class="font-medium text-sm text-slate-800 dark:text-slate-100">{{ $notification['label'] }}</div>
+                            <div class="text-xs text-slate-500">{{ $notification['description'] }}</div>
+                        </div>
+                        <input type="hidden" name="{{ $fieldName }}" value="0">
+                        <label class="inline-flex cursor-pointer items-center ml-3">
+                            <input type="checkbox" name="{{ $fieldName }}" value="1" {{ $notification['value'] ? 'checked' : '' }} class="sr-only peer" />
+                            <div class="relative w-11 h-6 rounded-full bg-slate-200 transition-colors duration-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/25 dark:bg-darkmode-600 peer-checked:bg-primary after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition-all after:duration-200 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"></div>
+                        </label>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
+        <!-- Penalty Notifications Section -->
+        <div class="mb-8">
+            <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-4 flex items-center border-b border-slate-200 dark:border-darkmode-400 pb-3">
+                <x-base.lucide icon="alert-triangle" class="w-5 h-5 mr-2 text-orange-500" />
+                Penalty Notifications
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                @foreach ($penaltyNotifications as $key => $notification)
+                    @php $fieldName = 'notifications_' . str_replace('.', '_', $key); @endphp
+                    <div class="flex items-center justify-between p-3 rounded-lg border border-slate-200 dark:border-darkmode-400">
+                        <div class="flex-1">
+                            <div class="font-medium text-sm text-slate-800 dark:text-slate-100">{{ $notification['label'] }}</div>
+                            <div class="text-xs text-slate-500">{{ $notification['description'] }}</div>
+                        </div>
+                        <input type="hidden" name="{{ $fieldName }}" value="0">
+                        <label class="inline-flex cursor-pointer items-center ml-3">
+                            <input type="checkbox" name="{{ $fieldName }}" value="1" {{ $notification['value'] ? 'checked' : '' }} class="sr-only peer" />
+                            <div class="relative w-11 h-6 rounded-full bg-slate-200 transition-colors duration-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/25 dark:bg-darkmode-600 peer-checked:bg-primary after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition-all after:duration-200 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"></div>
+                        </label>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
+        <!-- Advance Notifications Section -->
+        <div class="mb-8">
+            <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-4 flex items-center border-b border-slate-200 dark:border-darkmode-400 pb-3">
+                <x-base.lucide icon="hand-coins" class="w-5 h-5 mr-2 text-violet-500" />
+                Advance & Loan Notifications
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                @foreach ($advanceNotifications as $key => $notification)
+                    @php $fieldName = 'notifications_' . str_replace('.', '_', $key); @endphp
+                    <div class="flex items-center justify-between p-3 rounded-lg border border-slate-200 dark:border-darkmode-400">
+                        <div class="flex-1">
+                            <div class="font-medium text-sm text-slate-800 dark:text-slate-100">{{ $notification['label'] }}</div>
+                            <div class="text-xs text-slate-500">{{ $notification['description'] }}</div>
+                        </div>
+                        <input type="hidden" name="{{ $fieldName }}" value="0">
+                        <label class="inline-flex cursor-pointer items-center ml-3">
+                            <input type="checkbox" name="{{ $fieldName }}" value="1" {{ $notification['value'] ? 'checked' : '' }} class="sr-only peer" />
+                            <div class="relative w-11 h-6 rounded-full bg-slate-200 transition-colors duration-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/25 dark:bg-darkmode-600 peer-checked:bg-primary after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition-all after:duration-200 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"></div>
+                        </label>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
+        <!-- Leave Notifications Section -->
+        <div class="mb-8">
+            <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-4 flex items-center border-b border-slate-200 dark:border-darkmode-400 pb-3">
+                <x-base.lucide icon="calendar-off" class="w-5 h-5 mr-2 text-sky-500" />
+                Leave Notifications
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                @foreach ($leaveNotifications as $key => $notification)
                     @php $fieldName = 'notifications_' . str_replace('.', '_', $key); @endphp
                     <div class="flex items-center justify-between p-3 rounded-lg border border-slate-200 dark:border-darkmode-400">
                         <div class="flex-1">

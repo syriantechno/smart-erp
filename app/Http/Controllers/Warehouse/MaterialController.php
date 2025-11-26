@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Warehouse\Material;
 use App\Models\Warehouse\Category;
 use App\Models\Warehouse\MeasurementUnit;
+use App\Models\User;
 use App\Services\DocumentCodeGenerator;
+use App\Services\Notifications\NotificationDispatcher;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -219,9 +221,23 @@ class MaterialController extends Controller
                 $materialData['image_path'] = $request->file('image')->store('materials', 'public');
             }
 
-            Material::create($materialData);
+            $material = Material::create($materialData);
 
             DB::commit();
+
+            // Notify warehouse managers
+            $warehouseManagers = User::whereHas('roles', fn($q) => $q->whereIn('name', ['admin', 'warehouse_manager']))->pluck('id')->toArray();
+            if (!empty($warehouseManagers)) {
+                NotificationDispatcher::toUsers(
+                    $warehouseManagers,
+                    'material.created',
+                    'New Material Added',
+                    "Material '{$material->name}' ({$material->code}) has been added to inventory.",
+                    route('warehouse.materials.index'),
+                    'package-plus',
+                    ['type' => 'info', 'actor_id' => auth()->id()]
+                );
+            }
 
             return response()->json([
                 'success' => true,

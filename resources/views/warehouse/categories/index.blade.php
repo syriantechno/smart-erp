@@ -653,20 +653,19 @@
                     });
                 });
             } else {
-                if (window.confirm(`Delete category "${name}"?`)) {
-                    jq.ajax({
-                        url: '{{ route("warehouse.categories.destroy", ":id") }}'.replace(':id', id),
-                        type: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector("meta[name='csrf-token']").getAttribute('content')
-                        },
-                        success: function(response) {
-                            if (response.success && categoriesTable) {
-                                categoriesTable.ajax.reload();
-                            }
+                // Fallback - just run delete
+                jq.ajax({
+                    url: '{{ route("warehouse.categories.destroy", ":id") }}'.replace(':id', id),
+                    type: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector("meta[name='csrf-token']").getAttribute('content')
+                    },
+                    success: function(response) {
+                        if (response.success && categoriesTable) {
+                            categoriesTable.ajax.reload();
                         }
-                    });
-                }
+                    }
+                });
             }
         };
 

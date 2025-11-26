@@ -1,4 +1,4 @@
-<?php if (! $__env->hasRenderedOnce('4b766b57-5017-4707-b4d1-e482584a6ab2')): $__env->markAsRenderedOnce('4b766b57-5017-4707-b4d1-e482584a6ab2');
+<?php if (! $__env->hasRenderedOnce('d9eb486b-647b-477e-9ca0-dc20631e8cb4')): $__env->markAsRenderedOnce('d9eb486b-647b-477e-9ca0-dc20631e8cb4');
 $__env->startPush('styles'); ?>
     <style>
         /* Global Notification Styles */
@@ -540,7 +540,7 @@ $__env->startPush('styles'); ?>
     </div>
 </div>
 
-<?php if (! $__env->hasRenderedOnce('5ec631cb-45b3-489f-a951-aede0c5b3886')): $__env->markAsRenderedOnce('5ec631cb-45b3-489f-a951-aede0c5b3886');
+<?php if (! $__env->hasRenderedOnce('a9711d90-4d26-4260-a7ae-42ee687d9b86')): $__env->markAsRenderedOnce('a9711d90-4d26-4260-a7ae-42ee687d9b86');
 $__env->startPush('scripts'); ?>
 <script>
     // Global Notification System
@@ -751,6 +751,206 @@ $__env->startPush('scripts'); ?>
             type: 'warning',
             confirmText: 'Continue',
             confirmButtonClass: 'bg-orange-600 hover:bg-orange-700',
+            onConfirm: onConfirm
+        });
+    };
+
+    /**
+     * Confirm Approval Action (Approve/Reject with optional comment)
+     * @param {Object} options - Configuration options
+     * @param {string} options.title - Modal title
+     * @param {string} options.message - Description message
+     * @param {string} options.itemName - Name of item being approved
+     * @param {string} options.type - 'approve', 'reject', 'pay', 'confirm'
+     * @param {boolean} options.showComment - Show comment textarea
+     * @param {boolean} options.requireComment - Require comment before submit
+     * @param {function} options.onConfirm - Callback with comment parameter
+     */
+    window.confirmApproval = function(options = {}) {
+        const defaults = {
+            title: 'Confirm Action',
+            message: 'Are you sure you want to proceed?',
+            itemName: '',
+            type: 'approve', // approve, reject, pay, confirm
+            showComment: false,
+            requireComment: false,
+            commentLabel: 'Comment (optional)',
+            confirmText: 'Confirm',
+            cancelText: 'Cancel',
+            onConfirm: () => {}
+        };
+
+        const config = { ...defaults, ...options };
+
+        // Icon and color based on type
+        const typeConfig = {
+            approve: {
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`,
+                color: '#22c55e',
+                bgColor: 'rgba(34, 197, 94, 0.08)',
+                shadowColor: 'rgba(34, 197, 94, 0.25)',
+                btnClass: 'btn-royal--success'
+            },
+            reject: {
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`,
+                color: '#ef4444',
+                bgColor: 'rgba(239, 68, 68, 0.08)',
+                shadowColor: 'rgba(239, 68, 68, 0.25)',
+                btnClass: 'btn-royal--danger'
+            },
+            pay: {
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>`,
+                color: '#0ea5e9',
+                bgColor: 'rgba(14, 165, 233, 0.08)',
+                shadowColor: 'rgba(14, 165, 233, 0.25)',
+                btnClass: 'btn-royal--info'
+            },
+            confirm: {
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>`,
+                color: '#8b5cf6',
+                bgColor: 'rgba(139, 92, 246, 0.08)',
+                shadowColor: 'rgba(139, 92, 246, 0.25)',
+                btnClass: 'btn-royal--primary'
+            }
+        };
+
+        const tc = typeConfig[config.type] || typeConfig.confirm;
+
+        // Build comment input HTML
+        const commentHtml = config.showComment ? `
+            <div style="margin-top: 16px; text-align: left;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 500; color: #475569; margin-bottom: 6px;">
+                    ${config.commentLabel}${config.requireComment ? ' <span style="color: #ef4444;">*</span>' : ''}
+                </label>
+                <textarea id="swal-comment" rows="3" placeholder="Enter your comment here..."
+                    style="width: 100%; padding: 10px 12px; border: 1px solid rgba(148, 163, 184, 0.4); border-radius: 8px; font-size: 0.9rem; resize: vertical; min-height: 80px; outline: none; transition: border-color 0.2s;"
+                    onfocus="this.style.borderColor='rgb(var(--primary-rgb, 37 99 235))'"
+                    onblur="this.style.borderColor='rgba(148, 163, 184, 0.4)'"
+                ></textarea>
+            </div>
+        ` : '';
+
+        if (typeof Swal !== 'undefined') {
+            return Swal.fire({
+                title: config.title,
+                html: `
+                    <div class="swal-modern-card">
+                        <div class="swal-modern-icon" style="background: ${tc.bgColor}; color: ${tc.color}; box-shadow: inset 0 0 0 1px ${tc.color}20, 0 18px 30px ${tc.shadowColor};">
+                            ${tc.icon}
+                        </div>
+                        <div class="swal-modern-text">
+                            ${config.message}
+                            ${config.itemName ? `<br><span style="color: ${tc.color};">"${config.itemName}"</span>` : ''}
+                        </div>
+                        ${commentHtml}
+                    </div>
+                `,
+                icon: undefined,
+                showCancelButton: true,
+                reverseButtons: true,
+                focusCancel: true,
+                confirmButtonText: `
+                    <span class="swal-btn-icon">${tc.icon}</span>
+                    <span class="swal-btn-label">${config.confirmText}</span>
+                `,
+                cancelButtonText: `
+                    <span class="swal-btn-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </span>
+                    <span class="swal-btn-label">${config.cancelText}</span>
+                `,
+                buttonsStyling: false,
+                customClass: {
+                    popup: 'swal-modern-popup',
+                    actions: 'swal-modern-actions',
+                    confirmButton: `swal-modern-btn btn-royal btn-royal--action ${tc.btnClass}`,
+                    cancelButton: 'swal-modern-btn btn-royal btn-royal--outline btn-royal--sm',
+                },
+                backdrop: 'rgba(15,23,42,0.55)',
+                preConfirm: () => {
+                    if (config.showComment) {
+                        const comment = document.getElementById('swal-comment')?.value || '';
+                        if (config.requireComment && !comment.trim()) {
+                            Swal.showValidationMessage('Please enter a comment');
+                            return false;
+                        }
+                        return { comment: comment };
+                    }
+                    return { comment: '' };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    config.onConfirm(result.value?.comment || '');
+                }
+                return result.isConfirmed;
+            });
+        }
+
+        // Fallback to native confirm
+        const confirmed = window.confirm(config.message);
+        if (confirmed) {
+            config.onConfirm('');
+        }
+        return Promise.resolve(confirmed);
+    };
+
+    /**
+     * Quick approval confirmation
+     */
+    window.confirmApprove = function(itemName, onConfirm) {
+        return confirmApproval({
+            title: 'Approve',
+            message: 'Are you sure you want to approve',
+            itemName: itemName,
+            type: 'approve',
+            confirmText: 'Approve',
+            onConfirm: onConfirm
+        });
+    };
+
+    /**
+     * Quick rejection confirmation with required comment
+     */
+    window.confirmReject = function(itemName, onConfirm) {
+        return confirmApproval({
+            title: 'Reject',
+            message: 'Are you sure you want to reject',
+            itemName: itemName,
+            type: 'reject',
+            showComment: true,
+            requireComment: true,
+            commentLabel: 'Rejection Reason',
+            confirmText: 'Reject',
+            onConfirm: onConfirm
+        });
+    };
+
+    /**
+     * Quick payment confirmation
+     */
+    window.confirmPayment = function(itemName, onConfirm) {
+        return confirmApproval({
+            title: 'Mark as Paid',
+            message: 'Are you sure you want to mark as paid',
+            itemName: itemName,
+            type: 'pay',
+            confirmText: 'Mark Paid',
+            onConfirm: onConfirm
+        });
+    };
+
+    /**
+     * Quick action confirmation
+     */
+    window.confirmAction = function(title, message, onConfirm) {
+        return confirmApproval({
+            title: title,
+            message: message,
+            type: 'confirm',
+            confirmText: 'Confirm',
             onConfirm: onConfirm
         });
     };

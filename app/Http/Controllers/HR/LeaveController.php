@@ -6,7 +6,9 @@ use App\Helpers\Reply;
 use App\Http\Controllers\Controller;
 use App\Models\HR\Employee;
 use App\Models\HR\Leave;
+use App\Models\User;
 use App\Services\DocumentCodeGenerator;
+use App\Services\Notifications\NotificationDispatcher;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -64,7 +66,22 @@ class LeaveController extends Controller
         $validated['code'] = $this->codeGenerator->generate('leave');
         $validated['days_count'] = $this->calculateDays($validated['start_date'], $validated['end_date']);
 
-        Leave::create($validated);
+        $leave = Leave::create($validated);
+
+        // Notify HR managers about new leave request
+        $hrManagers = User::whereHas('roles', fn($q) => $q->whereIn('name', ['admin', 'hr_manager']))->pluck('id')->toArray();
+        if (!empty($hrManagers)) {
+            $typeLabel = $this->leaveTypeOptions()[$validated['leave_type']] ?? ucfirst($validated['leave_type']);
+            NotificationDispatcher::toUsers(
+                $hrManagers,
+                'leave.requested',
+                'New Leave Request',
+                "{$employee->full_name} has requested {$typeLabel} from {$validated['start_date']} to {$validated['end_date']}",
+                route('hr.leave.index'),
+                'calendar-off',
+                ['type' => 'info', 'actor_id' => auth()->id()]
+            );
+        }
 
         return Reply::success('Leave request created successfully.');
     }
@@ -82,6 +99,7 @@ class LeaveController extends Controller
     public function update(Request $request, Leave $leave): JsonResponse
     {
         $validated = $this->validateLeave($request, $leave->id);
+        $oldStatus = $leave->status;
 
         $employee = Employee::findOrFail($validated['employee_id']);
         $validated['department_id'] = $validated['department_id'] ?? $employee->department_id;
@@ -89,6 +107,33 @@ class LeaveController extends Controller
         $validated['days_count'] = $this->calculateDays($validated['start_date'], $validated['end_date']);
 
         $leave->update($validated);
+
+        // Notify employee if status changed
+        if (isset($validated['status']) && $oldStatus !== $validated['status'] && $leave->employee && $leave->employee->user_id) {
+            $typeLabel = $this->leaveTypeOptions()[$leave->leave_type] ?? ucfirst($leave->leave_type);
+            
+            if ($validated['status'] === 'approved') {
+                NotificationDispatcher::toUser(
+                    $leave->employee->user_id,
+                    'leave.approved',
+                    'Leave Approved',
+                    "Your {$typeLabel} request from {$leave->start_date->format('M d')} to {$leave->end_date->format('M d')} has been approved.",
+                    route('hr.leave.index'),
+                    'check-circle',
+                    ['type' => 'success', 'actor_id' => auth()->id()]
+                );
+            } elseif ($validated['status'] === 'rejected') {
+                NotificationDispatcher::toUser(
+                    $leave->employee->user_id,
+                    'leave.rejected',
+                    'Leave Rejected',
+                    "Your {$typeLabel} request from {$leave->start_date->format('M d')} to {$leave->end_date->format('M d')} has been rejected.",
+                    route('hr.leave.index'),
+                    'x-circle',
+                    ['type' => 'error', 'actor_id' => auth()->id()]
+                );
+            }
+        }
 
         return Reply::success('Leave request updated successfully.');
     }

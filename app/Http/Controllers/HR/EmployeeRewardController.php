@@ -5,6 +5,7 @@ namespace App\Http\Controllers\HR;
 use App\Http\Controllers\Controller;
 use App\Models\HR\Employee;
 use App\Models\HR\EmployeeReward;
+use App\Services\Notifications\NotificationDispatcher;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -49,6 +50,24 @@ class EmployeeRewardController extends Controller
         $reward->save();
 
         $reward->load(['employee.department', 'granter']);
+
+        // Send notification to employee
+        $employee = Employee::find($validated['employee_id']);
+        if ($employee && $employee->user_id) {
+            $message = "You have received a reward of {$validated['points']} points";
+            if (!empty($validated['amount'])) {
+                $message .= " and " . number_format($validated['amount'], 2) . " bonus";
+            }
+            NotificationDispatcher::toUser(
+                $employee->user_id,
+                'reward.granted',
+                'Reward Received! 🎉',
+                $message,
+                route('hr.employee-rewards.index'),
+                'gift',
+                ['type' => 'success', 'actor_id' => auth()->id()]
+            );
+        }
 
         if ($request->expectsJson()) {
             $rowHtml = view('hr.rewards._row', compact('reward'))->render();

@@ -277,56 +277,64 @@ function markAllNotificationsAsRead() {
 }
 
 function deleteNotification(notificationId) {
-    if (!confirm('Are you sure you want to delete this notification?')) {
-        return;
-    }
+    const doDelete = () => {
+        fetch(`{{ url('/notifications') }}/${notificationId}`, {
+            method: 'DELETE',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                notifications = notifications.filter(n => n.id !== notificationId);
+                renderNotifications();
+                updateBadge();
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting notification:', error);
+        });
+    };
 
-    fetch(`{{ url('/notifications') }}/${notificationId}`, {
-        method: 'DELETE',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            notifications = notifications.filter(n => n.id !== notificationId);
-            renderNotifications();
-            updateBadge();
-        }
-    })
-    .catch(error => {
-        console.error('Error deleting notification:', error);
-    });
+    if (typeof window.confirmDelete === 'function') {
+        window.confirmDelete('this notification', doDelete);
+    } else {
+        doDelete();
+    }
 }
 
 function deleteAllNotifications() {
-    if (!confirm('Are you sure you want to delete all notifications? This action cannot be undone.')) {
-        return;
-    }
+    const doDeleteAll = () => {
+        fetch('{{ route("notifications.delete-all") }}', {
+            method: 'DELETE',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                notifications = [];
+                unreadCount = 0;
+                renderNotifications();
+                updateBadge();
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting all notifications:', error);
+        });
+    };
 
-    fetch('{{ route("notifications.delete-all") }}', {
-        method: 'DELETE',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            notifications = [];
-            unreadCount = 0;
-            renderNotifications();
-            updateBadge();
-        }
-    })
-    .catch(error => {
-        console.error('Error deleting all notifications:', error);
-    });
+    if (typeof window.confirmDelete === 'function') {
+        window.confirmDelete('all notifications', doDeleteAll);
+    } else {
+        doDeleteAll();
+    }
 }
 
 function handleNotificationClick(notificationId) {

@@ -253,8 +253,8 @@ function calculateMaterials() {
                 <td class="py-3 text-center ${m.sufficient ? 'text-green-600' : 'text-red-600'}">${m.available_quantity}</td>
                 <td class="py-3 text-center">
                     ${m.sufficient 
-                        ? '<span class="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">✓ Available</span>'
-                        : '<span class="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">✗ Insufficient</span>'
+                        ? '<span class="inline-flex items-center text-sm font-semibold text-lime-600"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Available</span>'
+                        : '<span class="inline-flex items-center text-sm font-semibold text-rose-500"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>Insufficient</span>'
                     }
                 </td>
                 <td class="py-3 text-right font-medium">$${m.total_cost.toFixed(2)}</td>

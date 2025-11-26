@@ -8,6 +8,8 @@ use App\Models\Manufacturing\ProductionMachine;
 use App\Models\Manufacturing\ProductionStage;
 use App\Models\Manufacturing\QualityCheck;
 use App\Models\Manufacturing\ProductionReport;
+use App\Models\User;
+use App\Services\Notifications\NotificationDispatcher;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -61,7 +63,21 @@ class ManufacturingController extends Controller
         $validated['created_by'] = auth()->id();
         $validated['total_cost'] = $validated['quantity'] * $validated['unit_cost'];
 
-        ProductionOrder::create($validated);
+        $order = ProductionOrder::create($validated);
+
+        // Notify manufacturing team
+        $manufacturingTeam = User::whereHas('roles', fn($q) => $q->whereIn('name', ['admin', 'production_manager']))->pluck('id')->toArray();
+        if (!empty($manufacturingTeam)) {
+            NotificationDispatcher::toUsers(
+                $manufacturingTeam,
+                'production.created',
+                'New Production Order',
+                "Production order {$order->order_number} for '{$order->product_name}' (Qty: {$order->quantity}) has been created.",
+                route('manufacturing.orders.index'),
+                'factory',
+                ['type' => 'info', 'actor_id' => auth()->id()]
+            );
+        }
 
         return redirect()->route('manufacturing.orders.index')->with('success', 'Production order created successfully');
     }
@@ -92,8 +108,25 @@ class ManufacturingController extends Controller
         ]);
 
         $validated['total_cost'] = $validated['quantity'] * $validated['unit_cost'];
+        $oldStatus = $order->status;
 
         $order->update($validated);
+
+        // Notify if status changed to completed
+        if ($oldStatus !== 'completed' && $validated['status'] === 'completed') {
+            $manufacturingTeam = User::whereHas('roles', fn($q) => $q->whereIn('name', ['admin', 'production_manager']))->pluck('id')->toArray();
+            if (!empty($manufacturingTeam)) {
+                NotificationDispatcher::toUsers(
+                    $manufacturingTeam,
+                    'production.completed',
+                    'Production Order Completed',
+                    "Production order {$order->order_number} for '{$order->product_name}' has been completed.",
+                    route('manufacturing.orders.index'),
+                    'check-circle',
+                    ['type' => 'success', 'actor_id' => auth()->id()]
+                );
+            }
+        }
 
         return redirect()->route('manufacturing.orders.index')->with('success', 'Production order updated successfully');
     }

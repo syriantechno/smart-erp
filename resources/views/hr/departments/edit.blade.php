@@ -101,7 +101,7 @@
                                 type="submit"
                             >
                                 <x-base.lucide icon="Save" class="w-4 h-4 ml-2" />
-                                Save Changes
+                                Save
                             </x-base.button>
                         </div>
                     </form>

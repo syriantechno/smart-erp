@@ -64,14 +64,78 @@ class SettingsController extends Controller
             Tax::where('company_id', $data['company_id'] ?? null)->update(['is_default' => false]);
         }
 
-        Tax::create($data);
+        $tax = Tax::create($data);
 
         if ($request->ajax() || $request->wantsJson()) {
-            return redirect()->route('settings.index', ['#taxes'])
-                ->with('success', 'Tax created successfully.');
+            return response()->json([
+                'success' => true,
+                'message' => 'تم إضافة الضريبة بنجاح',
+                'tax' => $tax
+            ]);
         }
 
         return redirect()->route('settings.index')->with('success', 'Tax created successfully.');
+    }
+
+    /**
+     * Update a specific tax
+     */
+    public function updateTax(Request $request, Tax $tax)
+    {
+        $data = $request->validate([
+            'company_id' => ['nullable', 'exists:companies,id'],
+            'name' => ['required', 'string', 'max:255'],
+            'code' => ['nullable', 'string', 'max:50'],
+            'rate' => ['required', 'numeric', 'min:0', 'max:100'],
+            'type' => ['required', 'in:value_added,withholding,other'],
+            'sales_account_id' => ['nullable', 'exists:accountings,id'],
+            'purchase_account_id' => ['nullable', 'exists:accountings,id'],
+            'is_default' => ['nullable', 'boolean'],
+            'is_active' => ['nullable', 'boolean'],
+            'description' => ['nullable', 'string'],
+        ]);
+
+        $data['is_default'] = $request->boolean('is_default', false);
+        $data['is_active'] = $request->boolean('is_active', false);
+
+        // If a default tax is set, unset previous defaults for the same company (or global)
+        if ($data['is_default']) {
+            Tax::where('company_id', $data['company_id'] ?? null)
+                ->where('id', '!=', $tax->id)
+                ->update(['is_default' => false]);
+        }
+
+        $tax->update($data);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'تم تحديث الضريبة بنجاح',
+                'tax' => $tax->fresh()
+            ]);
+        }
+
+        return redirect()->route('settings.index')->with('success', 'تم تحديث الضريبة بنجاح');
+    }
+
+    /**
+     * Delete a tax
+     */
+    public function destroyTax(Tax $tax)
+    {
+        try {
+            $tax->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم حذف الضريبة بنجاح'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في حذف الضريبة: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function update(Request $request)
@@ -207,6 +271,117 @@ class SettingsController extends Controller
         }
 
         return redirect()->route('settings.index')->with('success', 'Company settings updated successfully!');
+    }
+
+    /**
+     * Store a new company
+     */
+    public function storeCompany(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'address' => 'nullable|string',
+            'commercial_registration' => 'nullable|string|max:255',
+            'tax_number' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'website' => 'nullable|url|max:255',
+            'country' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:255',
+            'postal_code' => 'nullable|string|max:255',
+            'is_active' => 'nullable|boolean',
+        ]);
+
+        $data = $request->except('logo');
+        $data['is_active'] = $request->boolean('is_active', true);
+        
+        // Handle logo upload
+        if ($request->hasFile('logo')) {
+            $data['logo'] = $request->file('logo')->store('companies', 'public');
+        }
+
+        $company = Company::create($data);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'تم إضافة الشركة بنجاح',
+                'company' => $company
+            ]);
+        }
+
+        return redirect()->route('settings.index')->with('success', 'تم إضافة الشركة بنجاح');
+    }
+
+    /**
+     * Update a specific company
+     */
+    public function updateCompanyById(Request $request, Company $company)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'address' => 'nullable|string',
+            'commercial_registration' => 'nullable|string|max:255',
+            'tax_number' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'website' => 'nullable|url|max:255',
+            'country' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:255',
+            'postal_code' => 'nullable|string|max:255',
+            'is_active' => 'nullable|boolean',
+        ]);
+
+        $data = $request->except(['logo', '_token', '_method']);
+        $data['is_active'] = $request->boolean('is_active', false);
+        
+        // Handle logo upload
+        if ($request->hasFile('logo')) {
+            // Delete old logo
+            if ($company->logo) {
+                Storage::disk('public')->delete($company->logo);
+            }
+            $data['logo'] = $request->file('logo')->store('companies', 'public');
+        }
+
+        $company->update($data);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'تم تحديث الشركة بنجاح',
+                'company' => $company->fresh()
+            ]);
+        }
+
+        return redirect()->route('settings.index')->with('success', 'تم تحديث الشركة بنجاح');
+    }
+
+    /**
+     * Delete a company
+     */
+    public function destroyCompany(Company $company)
+    {
+        try {
+            // Delete logo if exists
+            if ($company->logo) {
+                Storage::disk('public')->delete($company->logo);
+            }
+            
+            $company->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم حذف الشركة بنجاح'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في حذف الشركة: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function updateAppearance(Request $request)

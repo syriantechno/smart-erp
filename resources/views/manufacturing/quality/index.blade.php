@@ -217,7 +217,7 @@
                 </div>
                 <div class="flex justify-end gap-3 pt-4">
                     <button type="button" onclick="document.getElementById('add-check-modal').classList.add('hidden')" class="h-10 px-5 rounded-full text-sm font-semibold text-slate-600 border border-slate-300 hover:bg-slate-50">Cancel</button>
-                    <button type="submit" class="h-10 px-5 rounded-full text-sm font-semibold text-white bg-[#303030] hover:bg-[#404040]">Save Check</button>
+                    <button type="submit" class="h-10 px-5 rounded-full text-sm font-semibold text-white bg-[#303030] hover:bg-[#404040]">Save</button>
                 </div>
             </form>
         </div>

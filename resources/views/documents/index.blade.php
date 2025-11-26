@@ -1005,7 +1005,7 @@
                     }
                 },
                 complete: function() {
-                    jq('#edit-document-save-btn').prop('disabled', false).text('Save Changes');
+                    jq('#edit-document-save-btn').prop('disabled', false).text('Save');
                 }
             });
         }

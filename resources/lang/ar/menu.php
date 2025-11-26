@@ -71,4 +71,13 @@ return [
     'human_resources' => 'الموارد البشرية',
     'contacts' => 'جهات الاتصال',
     'task_extension_requests' => 'طلبات تمديد المهام',
+    'penalties' => 'العقوبات',
+    'advances' => 'السلف والقروض',
+    'reports_dashboard' => 'لوحة التقارير',
+    'financial_reports' => 'التقارير المالية',
+    'hr_reports' => 'تقارير الموارد البشرية',
+    'inventory_reports' => 'تقارير المخزون',
+    'sales_reports' => 'تقارير المبيعات',
+    'project_reports' => 'تقارير المشاريع',
+    'custom_reports' => 'تقارير مخصصة',
 ];

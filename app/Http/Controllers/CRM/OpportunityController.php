@@ -10,6 +10,8 @@ use App\Models\CRM\Lead;
 use App\Models\CRM\Opportunity;
 use App\Models\CRM\Pipeline;
 use App\Models\CRM\PipelineStage;
+use App\Models\User;
+use App\Services\Notifications\NotificationDispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -113,6 +115,21 @@ class OpportunityController extends Controller
 
         $opportunity = Opportunity::create($validated);
 
+        // Notify sales team
+        $salesTeam = User::whereHas('roles', fn($q) => $q->whereIn('name', ['admin', 'sales_manager']))->pluck('id')->toArray();
+        if (!empty($salesTeam)) {
+            $amount = $opportunity->amount ? ' - Value: ' . number_format($opportunity->amount, 2) . ' ' . $opportunity->currency : '';
+            NotificationDispatcher::toUsers(
+                $salesTeam,
+                'opportunity.created',
+                'New Opportunity Created',
+                "Opportunity '{$opportunity->title}' ({$opportunity->code}) has been created{$amount}",
+                route('crm.opportunities.index'),
+                'target',
+                ['type' => 'info', 'actor_id' => auth()->id()]
+            );
+        }
+
         return response()->json([
             'success' => true,
             'message' => __('CRM opportunity created successfully.'),
@@ -147,8 +164,37 @@ class OpportunityController extends Controller
 
         $validated['updated_by'] = $request->user()->id;
         $validated['tags'] = $validated['tags'] ?? [];
+        $oldStatus = $opportunity->status;
 
         $opportunity->update($validated);
+
+        // Notify if opportunity won or lost
+        if ($oldStatus !== $validated['status']) {
+            $salesTeam = User::whereHas('roles', fn($q) => $q->whereIn('name', ['admin', 'sales_manager']))->pluck('id')->toArray();
+            if (!empty($salesTeam)) {
+                if ($validated['status'] === 'won') {
+                    NotificationDispatcher::toUsers(
+                        $salesTeam,
+                        'opportunity.won',
+                        'Opportunity Won!',
+                        "Opportunity '{$opportunity->title}' has been won! Value: " . number_format($opportunity->amount, 2),
+                        route('crm.opportunities.index'),
+                        'trophy',
+                        ['type' => 'success', 'actor_id' => auth()->id()]
+                    );
+                } elseif ($validated['status'] === 'lost') {
+                    NotificationDispatcher::toUsers(
+                        $salesTeam,
+                        'opportunity.lost',
+                        'Opportunity Lost',
+                        "Opportunity '{$opportunity->title}' has been marked as lost.",
+                        route('crm.opportunities.index'),
+                        'x-circle',
+                        ['type' => 'warning', 'actor_id' => auth()->id()]
+                    );
+                }
+            }
+        }
 
         return response()->json([
             'success' => true,

@@ -9,6 +9,8 @@ use App\Models\Accounting\InvoiceLine;
 use App\Models\Accounting\Tax;
 use App\Models\Company;
 use App\Models\Customer;
+use App\Models\User;
+use App\Services\Notifications\NotificationDispatcher;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -108,6 +110,20 @@ class InvoiceController extends Controller
 
         // Post to customer account
         $this->postInvoiceToCustomerAccount($invoice);
+
+        // Notify accounting team
+        $accountingTeam = User::whereHas('roles', fn($q) => $q->whereIn('name', ['admin', 'accountant']))->pluck('id')->toArray();
+        if (!empty($accountingTeam)) {
+            NotificationDispatcher::toUsers(
+                $accountingTeam,
+                'invoice.created',
+                'New Invoice Created',
+                "Invoice {$invoice->number} for {$invoice->customer->name} - Total: " . number_format($invoice->total, 2),
+                route('accounting.invoices.index'),
+                'file-text',
+                ['type' => 'info', 'actor_id' => auth()->id()]
+            );
+        }
 
         return redirect()
             ->route('accounting.invoices.index')

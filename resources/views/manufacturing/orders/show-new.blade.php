@@ -126,10 +126,15 @@
                             <td class="py-4 text-center font-medium">{{ number_format($material->required_quantity, 2) }}</td>
                             <td class="py-4 text-center">{{ number_format($material->consumed_quantity, 2) }}</td>
                             <td class="py-4 text-center">
-                                <span class="inline-flex px-2 py-1 rounded-full text-xs font-medium
-                                    @if($material->status === 'consumed') bg-green-100 text-green-700
-                                    @elseif($material->status === 'reserved') bg-blue-100 text-blue-700
-                                    @else bg-slate-100 text-slate-600 @endif">
+                                <span class="inline-flex items-center text-sm font-semibold
+                                    @if($material->status === 'consumed') text-lime-600
+                                    @elseif($material->status === 'reserved') text-sky-600
+                                    @else text-slate-500 @endif">
+                                    @if($material->status === 'consumed')
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                    @elseif($material->status === 'reserved')
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                    @endif
                                     {{ ucfirst($material->status) }}
                                 </span>
                             </td>
@@ -263,7 +268,14 @@
                         <td class="py-4 text-center text-green-600 font-medium">{{ $output->good_quantity }}</td>
                         <td class="py-4 text-center text-red-600">{{ $output->defect_quantity }}</td>
                         <td class="py-4 text-center">
-                            <span class="inline-flex px-2 py-1 rounded-full text-xs font-medium {{ $output->quality_rate >= 95 ? 'bg-green-100 text-green-700' : ($output->quality_rate >= 80 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700') }}">
+                            <span class="inline-flex items-center text-sm font-semibold {{ $output->quality_rate >= 95 ? 'text-lime-600' : ($output->quality_rate >= 80 ? 'text-amber-600' : 'text-rose-500') }}">
+                                @if($output->quality_rate >= 95)
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                @elseif($output->quality_rate >= 80)
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                @else
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                                @endif
                                 {{ $output->quality_rate }}%
                             </span>
                         </td>

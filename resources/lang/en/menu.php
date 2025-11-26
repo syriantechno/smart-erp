@@ -70,4 +70,13 @@ return [
     'hr' => 'HR',
     'human_resources' => 'Human Resources',
     'contacts' => 'Contacts',
+    'penalties' => 'Penalties',
+    'advances' => 'Advances & Loans',
+    'reports_dashboard' => 'Reports Dashboard',
+    'financial_reports' => 'Financial Reports',
+    'hr_reports' => 'HR Reports',
+    'inventory_reports' => 'Inventory Reports',
+    'sales_reports' => 'Sales Reports',
+    'project_reports' => 'Project Reports',
+    'custom_reports' => 'Custom Reports',
 ];

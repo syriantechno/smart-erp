@@ -1,4 +1,4 @@
-<?php if (! $__env->hasRenderedOnce('43c035e6-bf54-41bf-a5f9-8647736e2022')): $__env->markAsRenderedOnce('43c035e6-bf54-41bf-a5f9-8647736e2022');
+<?php if (! $__env->hasRenderedOnce('2f492259-8ff5-4726-bd3e-4c8a5cc98704')): $__env->markAsRenderedOnce('2f492259-8ff5-4726-bd3e-4c8a5cc98704');
 $__env->startPush('scripts'); ?>
 <script>
     console.log('Settings scripts loaded successfully');

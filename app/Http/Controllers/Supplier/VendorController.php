@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Supplier;
 
 use App\Http\Controllers\Controller;
 use App\Models\Supplier\Vendor;
+use App\Models\User;
 use App\Services\Accounting\LinkedAccountManager;
 use App\Services\DocumentCodeGenerator;
+use App\Services\Notifications\NotificationDispatcher;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -111,6 +113,21 @@ class VendorController extends Controller
         }
 
         $vendor = Vendor::create($validatedData);
+
+        // Notify purchasing team
+        $purchasingTeam = User::whereHas('roles', fn($q) => $q->whereIn('name', ['admin', 'purchasing_manager']))->pluck('id')->toArray();
+        if (!empty($purchasingTeam)) {
+            NotificationDispatcher::toUsers(
+                $purchasingTeam,
+                'vendor.created',
+                'New Vendor Added',
+                "Vendor '{$vendor->name}' ({$vendor->code}) has been added.",
+                route('supplier.vendors.index'),
+                'truck',
+                ['type' => 'info', 'actor_id' => auth()->id()]
+            );
+        }
+
         return response()->json(['success' => true, 'message' => 'Vendor created successfully', 'vendor' => $vendor]);
     }
 

@@ -159,7 +159,7 @@
                 Cancel
             </a>
             <button type="submit" class="h-11 rounded-full px-6 flex items-center justify-center text-sm font-semibold text-white bg-[#303030] hover:bg-[#404040] transition-all">
-                <x-base.lucide icon="save" class="w-4 h-4 mr-2" /> Save Changes
+                <x-base.lucide icon="save" class="w-4 h-4 mr-2" /> Save
             </button>
         </div>
     </form>

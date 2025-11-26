@@ -9,6 +9,8 @@ use App\Models\Accounting\BankAccount;
 use App\Models\Accounting\ReceiptVoucher;
 use App\Models\Accounting\Tax;
 use App\Models\Company;
+use App\Models\User;
+use App\Services\Notifications\NotificationDispatcher;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -38,7 +40,7 @@ class ReceiptVoucherController extends Controller
         ));
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
         $data = $request->validate([
             'company_id' => ['required', 'exists:companies,id'],
@@ -56,11 +58,17 @@ class ReceiptVoucherController extends Controller
         if ($data['method'] === 'cash') {
             $data['bank_account_id'] = null;
             if (empty($data['cash_box_id'])) {
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json(['success' => false, 'message' => 'الصندوق النقدي مطلوب للقبض النقدي'], 422);
+                }
                 return back()->withErrors(['cash_box_id' => 'Cash box is required for cash receipts.'])->withInput();
             }
         } else {
             $data['cash_box_id'] = null;
             if (empty($data['bank_account_id'])) {
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json(['success' => false, 'message' => 'الحساب البنكي مطلوب للقبض البنكي'], 422);
+                }
                 return back()->withErrors(['bank_account_id' => 'Bank account is required for bank receipts.'])->withInput();
             }
         }
@@ -79,10 +87,61 @@ class ReceiptVoucherController extends Controller
         $data['total_amount'] = $amount + $taxAmount;
         $data['status'] = 'draft';
 
-        ReceiptVoucher::create($data);
+        $voucher = ReceiptVoucher::create($data);
+
+        // Notify accounting team
+        $accountingTeam = User::whereHas('roles', fn($q) => $q->whereIn('name', ['admin', 'accountant']))->pluck('id')->toArray();
+        if (!empty($accountingTeam)) {
+            NotificationDispatcher::toUsers(
+                $accountingTeam,
+                'receipt.created',
+                'سند قبض جديد',
+                "تم إنشاء سند قبض بمبلغ " . number_format($voucher->total_amount, 2),
+                route('accounting.receipt-vouchers.index'),
+                'banknote',
+                ['type' => 'success', 'actor_id' => auth()->id()]
+            );
+        }
+
+        // Return JSON for AJAX requests
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'تم إنشاء سند القبض بنجاح',
+                'voucher' => [
+                    'id' => $voucher->id,
+                    'number' => 'RV-' . str_pad($voucher->id, 5, '0', STR_PAD_LEFT),
+                    'voucher_date' => $voucher->voucher_date->format('Y-m-d'),
+                    'company_name' => $voucher->company->name ?? '-',
+                    'method' => $voucher->method,
+                    'account_name' => $voucher->account->name ?? '-',
+                    'total_amount' => number_format($voucher->total_amount, 2),
+                    'status' => $voucher->status,
+                ]
+            ]);
+        }
 
         return redirect()
             ->route('accounting.receipt-vouchers.index')
-            ->with('success', 'Receipt voucher created successfully.');
+            ->with('success', 'تم إنشاء سند القبض بنجاح');
+    }
+
+    public function destroy(Request $request, ReceiptVoucher $receiptVoucher)
+    {
+        try {
+            $receiptVoucher->delete();
+            
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => true, 'message' => 'تم حذف السند بنجاح']);
+            }
+            
+            return redirect()->route('accounting.receipt-vouchers.index')->with('success', 'تم حذف السند بنجاح');
+        } catch (\Exception $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'فشل في حذف السند'], 500);
+            }
+            
+            return back()->with('error', 'فشل في حذف السند');
+        }
     }
 }

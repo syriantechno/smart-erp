@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\User;
 use App\Services\Accounting\LinkedAccountManager;
 use App\Services\DocumentCodeGenerator;
+use App\Services\Notifications\NotificationDispatcher;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -115,6 +116,21 @@ class CustomerController extends Controller
             $validatedData['created_by'] = $request->user()->id;
 
             $customer = Customer::create($validatedData);
+
+            // Notify sales team
+            $salesTeam = User::whereHas('roles', fn($q) => $q->whereIn('name', ['admin', 'sales_manager']))->pluck('id')->toArray();
+            if (!empty($salesTeam)) {
+                NotificationDispatcher::toUsers(
+                    $salesTeam,
+                    'customer.created',
+                    'New Customer Added',
+                    "Customer '{$customer->name}' ({$customer->code}) has been added.",
+                    route('customers.index'),
+                    'user-plus',
+                    ['type' => 'info', 'actor_id' => auth()->id()]
+                );
+            }
+
             return response()->json(['success' => true, 'message' => 'Customer created successfully', 'customer' => $customer]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Error: ' . $e->getMessage()], 500);

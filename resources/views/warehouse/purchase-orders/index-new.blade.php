@@ -212,7 +212,7 @@
         }
 
         function deletePurchaseOrder(id, name) {
-            if (confirm(`Are you sure you want to delete "${name}"?`)) {
+            const doDelete = () => {
                 const $ = window.jQuery || window.$;
                 $.ajax({
                     url: `/warehouse/purchase-orders/${id}`,
@@ -223,13 +223,23 @@
                     success: function(response) {
                         if (response.success) {
                             purchaseOrdersTable.ajax.reload();
-                            // Show success message
+                            if (typeof window.showSuccess === 'function') {
+                                window.showSuccess('Purchase order deleted successfully');
+                            }
                         }
                     },
                     error: function() {
-                        alert('Error deleting purchase order');
+                        if (typeof window.showError === 'function') {
+                            window.showError('Error deleting purchase order');
+                        }
                     }
                 });
+            };
+
+            if (typeof window.confirmDelete === 'function') {
+                window.confirmDelete(name, doDelete);
+            } else {
+                doDelete();
             }
         }
     </script>

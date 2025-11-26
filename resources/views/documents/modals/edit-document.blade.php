@@ -130,7 +130,7 @@
                 variant="primary"
             >
                 <x-base.lucide icon="Save" class="w-4 h-4 mr-2" />
-                Save Changes
+                Save
             </x-base.button>
         </div>
     @endslot

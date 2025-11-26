@@ -726,7 +726,9 @@
 
             if (confirmFn) {
                 confirmFn(name, runDelete);
-            } else if (window.confirm(`Are you sure you want to delete "${name}"?`)) {
+            } else if (typeof window.confirmDelete === 'function') {
+                window.confirmDelete(name, runDelete);
+            } else {
                 runDelete();
             }
         }

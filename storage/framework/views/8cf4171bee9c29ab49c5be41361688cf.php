@@ -46,7 +46,7 @@ foreach ($attributes->all() as $__key => $__value) {
 
 unset($__defined_vars); ?>
 
-<?php if (! $__env->hasRenderedOnce('77d39cd6-188e-4d33-b765-5c292e072665')): $__env->markAsRenderedOnce('77d39cd6-188e-4d33-b765-5c292e072665');
+<?php if (! $__env->hasRenderedOnce('daf06c71-475c-4321-9220-5cfdb494e7be')): $__env->markAsRenderedOnce('daf06c71-475c-4321-9220-5cfdb494e7be');
 $__env->startPush('vendors'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/js/vendors/transition.js'); ?>
 <?php $__env->stopPush(); endif; ?>

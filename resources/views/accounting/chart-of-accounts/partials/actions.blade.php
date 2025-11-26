@@ -37,9 +37,8 @@ window.editAccount = function(id, name, type) {
 // Toggle Account Status
 window.toggleAccountStatus = function(id, name, isActive) {
     const action = isActive ? 'deactivate' : 'activate';
-    const confirmMessage = 'Are you sure you want to ' + action + ' account "' + name + '"?';
 
-    if (confirm(confirmMessage)) {
+    const doToggle = () => {
         fetch('/accounting/chart-of-accounts/' + id + '/status', {
             method: 'PUT',
             headers: {
@@ -71,6 +70,16 @@ window.toggleAccountStatus = function(id, name, isActive) {
             console.error('Error toggling account status:', error);
             showToast('An error occurred while updating account status', 'error');
         });
+    };
+
+    if (typeof window.confirmAction === 'function') {
+        window.confirmAction(
+            action.charAt(0).toUpperCase() + action.slice(1) + ' Account',
+            'Are you sure you want to ' + action + ' this account?',
+            doToggle
+        );
+    } else {
+        doToggle();
     }
 };
 </script>

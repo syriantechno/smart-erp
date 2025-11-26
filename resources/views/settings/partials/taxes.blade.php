@@ -1,151 +1,622 @@
-<div class="intro-y box p-5">
-    <h2 class="mb-4 text-lg font-medium">Tax Settings</h2>
+@php 
+    $taxCollection = $taxes ?? collect(); 
+@endphp
 
-    <div class="grid grid-cols-12 gap-6">
-        <div class="col-span-12 lg:col-span-4">
-            <h3 class="mb-3 text-base font-semibold">Add New Tax</h3>
+<div class="mt-5 grid grid-cols-12 gap-6">
+    <div class="intro-y col-span-12">
+        <x-base.preview-component class="intro-y box bg-white/80 border border-slate-200/70 shadow-[0_18px_45px_rgba(15,23,42,0.10)]">
+            <div class="p-5">
+                {{-- Title --}}
+                <h2 class="flex items-center gap-2 text-xl font-semibold text-slate-700 mb-5">
+                    <x-base.lucide icon="percent" class="w-6 h-6 text-amber-600" />
+                    <span>إدارة الضرائب</span>
+                </h2>
 
-            <form method="POST" action="{{ route('settings.taxes.store') }}" class="space-y-4">
-                @csrf
+                {{-- Filters & Actions Toolbar --}}
+                <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
+                    <form id="taxes-filter-form" class="w-full sm:mr-auto xl:flex">
+                        <div class="items-center sm:mr-4 sm:flex">
+                            <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial text-slate-500">الحقل</label>
+                            <x-base.form-select id="tax-filter-field" class="mt-2 w-full sm:mt-0 sm:w-auto 2xl:w-full">
+                                <option value="all">الكل</option>
+                                <option value="name">الاسم</option>
+                                <option value="code">الكود</option>
+                                <option value="type">النوع</option>
+                            </x-base.form-select>
+                        </div>
+                        <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
+                            <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial text-slate-500">القيمة</label>
+                            <x-base.form-input id="tax-filter-value" type="text" placeholder="بحث..." class="mt-2 w-full sm:mt-0 sm:w-48 2xl:w-full" />
+                        </div>
+                        <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
+                            <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial text-slate-500">الحالة</label>
+                            <x-base.form-select id="tax-filter-status" class="mt-2 w-full sm:mt-0 sm:w-auto">
+                                <option value="">الكل</option>
+                                <option value="active">نشطة</option>
+                                <option value="inactive">غير نشطة</option>
+                            </x-base.form-select>
+                        </div>
+                        <div class="mt-4 flex flex-wrap gap-2 sm:items-center xl:mt-0">
+                            <x-base.tippy content="تطبيق الفلتر" placement="top">
+                                <button id="tax-filter-go" type="button" class="btn-royal btn-royal--dark btn-royal--sm w-full sm:w-24 group">
+                                    <x-base.lucide icon="search" class="w-4 h-4 icon-hover-rise" />
+                                    بحث
+                                </button>
+                            </x-base.tippy>
+                            <x-base.tippy content="إعادة تعيين" placement="top">
+                                <button id="tax-filter-reset" type="button" class="btn-royal btn-royal--outline btn-royal--sm w-full sm:w-24 group">
+                                    <x-base.lucide icon="rotate-ccw" class="w-4 h-4 icon-hover-rise" />
+                                    إعادة
+                                </button>
+                            </x-base.tippy>
+                        </div>
+                    </form>
 
-                <div>
-                    <x-base.form-label for="tax_company_id">Company</x-base.form-label>
-                    <x-base.form-select id="tax_company_id" name="company_id">
-                        <option value="">All Companies</option>
-                        @foreach($companies as $companyItem)
-                            <option value="{{ $companyItem->id }}" @selected(old('company_id') == $companyItem->id)>
-                                {{ $companyItem->name }}
-                            </option>
-                        @endforeach
-                    </x-base.form-select>
-                </div>
-
-                <div>
-                    <x-base.form-label for="tax_name">Name <span class="text-danger">*</span></x-base.form-label>
-                    <x-base.form-input id="tax_name" name="name" type="text" value="{{ old('name') }}" required />
-                </div>
-
-                <div class="grid grid-cols-12 gap-4">
-                    <div class="col-span-6">
-                        <x-base.form-label for="tax_code">Code</x-base.form-label>
-                        <x-base.form-input id="tax_code" name="code" type="text" value="{{ old('code') }}" />
+                    <div class="mt-5 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
+                        <x-base.tippy content="طباعة" placement="bottom">
+                            <button type="button" class="btn-royal btn-royal--outline btn-royal--sm group text-royalDark">
+                                <x-base.lucide icon="printer" class="w-5 h-5 icon-hover-rise" />
+                            </button>
+                        </x-base.tippy>
+                        <x-base.tippy content="تصدير Excel" placement="bottom">
+                            <button id="tax-export-excel" type="button" class="btn-royal btn-royal--outline btn-royal--sm group text-royalDark">
+                                <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
+                            </button>
+                        </x-base.tippy>
+                        <x-base.tippy content="تحديث" placement="bottom">
+                            <button id="tax-refresh-table" type="button" class="btn-royal btn-royal--outline btn-royal--sm group text-royalDark" onclick="location.reload()">
+                                <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
+                            </button>
+                        </x-base.tippy>
+                        {{-- Add Button --}}
+                        <x-base.tippy content="إضافة ضريبة جديدة" placement="bottom">
+                            <button type="button" class="btn-royal btn-royal--gold btn-royal--sm sm:btn-royal--lg group" data-tw-toggle="modal" data-tw-target="#create-tax-modal">
+                                <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
+                                <span class="hidden sm:inline">إضافة</span>
+                            </button>
+                        </x-base.tippy>
                     </div>
-                    <div class="col-span-6">
-                        <x-base.form-label for="tax_rate">Rate (%) <span class="text-danger">*</span></x-base.form-label>
-                        <x-base.form-input id="tax_rate" name="rate" type="number" min="0" max="100" step="0.001" value="{{ old('rate', 15) }}" required />
-                    </div>
                 </div>
 
-                <div>
-                    <x-base.form-label for="tax_type">Type</x-base.form-label>
-                    <x-base.form-select id="tax_type" name="type">
-                        <option value="value_added" @selected(old('type') == 'value_added')>Value Added</option>
-                        <option value="withholding" @selected(old('type') == 'withholding')>Withholding</option>
-                        <option value="other" @selected(old('type') == 'other')>Other</option>
-                    </x-base.form-select>
-                </div>
-
-                <div>
-                    <x-base.form-label for="sales_account_id">Sales Tax Account</x-base.form-label>
-                    <x-base.form-select id="sales_account_id" name="sales_account_id">
-                        <option value="">Select account</option>
-                        @foreach($accounts as $account)
-                            <option value="{{ $account->id }}" @selected(old('sales_account_id') == $account->id)>
-                                {{ $account->code }} - {{ $account->name }}
-                            </option>
-                        @endforeach
-                    </x-base.form-select>
-                </div>
-
-                <div>
-                    <x-base.form-label for="purchase_account_id">Purchase Tax Account</x-base.form-label>
-                    <x-base.form-select id="purchase_account_id" name="purchase_account_id">
-                        <option value="">Select account</option>
-                        @foreach($accounts as $account)
-                            <option value="{{ $account->id }}" @selected(old('purchase_account_id') == $account->id)>
-                                {{ $account->code }} - {{ $account->name }}
-                            </option>
-                        @endforeach
-                    </x-base.form-select>
-                </div>
-
-                <div>
-                    <x-base.form-label for="tax_description">Description</x-base.form-label>
-                    <x-base.form-textarea id="tax_description" name="description" rows="2">{{ old('description') }}</x-base.form-textarea>
-                </div>
-
-                <div class="flex flex-col gap-2">
-                    <x-base.form-switch>
-                        <x-base.form-switch.input id="tax_is_default" name="is_default" type="checkbox" value="1" @checked(old('is_default')) />
-                        <x-base.form-switch.label for="tax_is_default">Set as default tax</x-base.form-switch.label>
-                    </x-base.form-switch>
-
-                    <x-base.form-switch>
-                        <x-base.form-switch.input id="tax_is_active" name="is_active" type="checkbox" value="1" @checked(old('is_active', true)) />
-                        <x-base.form-switch.label for="tax_is_active">Active</x-base.form-switch.label>
-                    </x-base.form-switch>
-                </div>
-
-                <div class="pt-2 text-right">
-                    <button type="submit" class="btn-royal btn-royal--gold btn-royal--sm">
-                        Save Tax
-                    </button>
-                </div>
-            </form>
-        </div>
-
-        <div class="col-span-12 lg:col-span-8">
-            <h3 class="mb-3 text-base font-semibold">Existing Taxes</h3>
-
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm">
-                    <thead>
-                        <tr class="border-b border-slate-200 text-xs font-semibold uppercase text-slate-500">
-                            <th class="py-2 pr-4">Name</th>
-                            <th class="py-2 pr-4">Rate</th>
-                            <th class="py-2 pr-4">Type</th>
-                            <th class="py-2 pr-4">Company</th>
-                            <th class="py-2 pr-4">Default</th>
-                            <th class="py-2 pr-4">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($taxes as $tax)
-                            <tr class="border-b border-slate-100 text-xs text-slate-700 dark:text-slate-300">
-                                <td class="py-2 pr-4">
-                                    <div class="font-semibold">{{ $tax->name }}</div>
-                                    @if($tax->code)
-                                        <div class="text-[11px] text-slate-500">Code: {{ $tax->code }}</div>
-                                    @endif
-                                </td>
-                                <td class="py-2 pr-4">{{ number_format($tax->rate, 3) }}%</td>
-                                <td class="py-2 pr-4">{{ ucfirst(str_replace('_', ' ', $tax->type)) }}</td>
-                                <td class="py-2 pr-4">{{ $tax->company->name ?? 'All Companies' }}</td>
-                                <td class="py-2 pr-4">
-                                    @if($tax->is_default)
-                                        <span class="rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-semibold text-blue-700">Default</span>
-                                    @else
-                                        <span class="text-[11px] text-slate-400">-</span>
-                                    @endif
-                                </td>
-                                <td class="py-2 pr-4">
-                                    @if($tax->is_active)
-                                        <span class="rounded-full bg-green-100 px-2 py-0.5 text-[11px] font-semibold text-green-700">Active</span>
-                                    @else
-                                        <span class="rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-semibold text-red-700">Inactive</span>
-                                    @endif
-                                </td>
-                            </tr>
-                        @empty
+                <div class="overflow-x-auto sm:overflow-visible mt-5" data-erp-table-wrapper>
+                    <table id="taxes-table" data-tw-merge data-erp-table class="w-full min-w-full table-auto text-left text-sm">
+                        <thead>
                             <tr>
-                                <td colspan="6" class="py-4 text-center text-xs text-slate-500">
-                                    No taxes defined yet.
+                                <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center w-12">#</th>
+                                <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">الضريبة</th>
+                                <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">النسبة</th>
+                                <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">النوع</th>
+                                <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">الشركة</th>
+                                <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">الحسابات</th>
+                                <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">الحالة</th>
+                                <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($taxCollection as $tax)
+                            @php
+                                $taxData = json_encode([
+                                    'id' => $tax->id,
+                                    'name' => $tax->name,
+                                    'code' => $tax->code,
+                                    'rate' => $tax->rate,
+                                    'type' => $tax->type,
+                                    'company_id' => $tax->company_id,
+                                    'sales_account_id' => $tax->sales_account_id,
+                                    'purchase_account_id' => $tax->purchase_account_id,
+                                    'description' => $tax->description,
+                                    'is_default' => $tax->is_default,
+                                    'is_active' => $tax->is_active,
+                                ]);
+                            @endphp
+                            <tr class="intro-x" data-id="{{ $tax->id }}">
+                                <td data-tw-merge class="px-5 py-3 border-b dark:border-darkmode-300 text-center text-slate-500">
+                                    {{ $loop->iteration }}
+                                </td>
+                                <td data-tw-merge class="px-5 py-3 border-b dark:border-darkmode-300">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-100 to-amber-50 flex items-center justify-center">
+                                            <x-base.lucide icon="percent" class="w-5 h-5 text-amber-600" />
+                                        </div>
+                                        <div>
+                                            <div class="font-semibold text-slate-800 dark:text-slate-100">{{ $tax->name }}</div>
+                                            @if($tax->code)
+                                                <div class="text-xs text-slate-400">{{ $tax->code }}</div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </td>
+                                <td data-tw-merge class="px-5 py-3 border-b dark:border-darkmode-300">
+                                    <span class="inline-flex items-center gap-1 px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-sm font-bold">
+                                        {{ number_format($tax->rate, 2) }}%
+                                    </span>
+                                </td>
+                                <td data-tw-merge class="px-5 py-3 border-b dark:border-darkmode-300">
+                                    @php
+                                        $typeLabels = [
+                                            'value_added' => ['label' => 'قيمة مضافة', 'color' => 'blue'],
+                                            'withholding' => ['label' => 'استقطاع', 'color' => 'purple'],
+                                            'other' => ['label' => 'أخرى', 'color' => 'slate'],
+                                        ];
+                                        $typeInfo = $typeLabels[$tax->type] ?? ['label' => $tax->type, 'color' => 'slate'];
+                                    @endphp
+                                    <span class="inline-flex items-center px-2 py-1 bg-{{ $typeInfo['color'] }}-100 text-{{ $typeInfo['color'] }}-600 rounded text-xs font-medium">
+                                        {{ $typeInfo['label'] }}
+                                    </span>
+                                </td>
+                                <td data-tw-merge class="px-5 py-3 border-b dark:border-darkmode-300">
+                                    <span class="text-sm">{{ $tax->company->name ?? 'جميع الشركات' }}</span>
+                                </td>
+                                <td data-tw-merge class="px-5 py-3 border-b dark:border-darkmode-300">
+                                    <div class="text-xs space-y-1">
+                                        @if($tax->salesAccount)
+                                            <div class="flex items-center gap-1">
+                                                <span class="text-slate-400">مبيعات:</span>
+                                                <span class="font-medium">{{ $tax->salesAccount->code }}</span>
+                                            </div>
+                                        @endif
+                                        @if($tax->purchaseAccount)
+                                            <div class="flex items-center gap-1">
+                                                <span class="text-slate-400">مشتريات:</span>
+                                                <span class="font-medium">{{ $tax->purchaseAccount->code }}</span>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td data-tw-merge class="px-5 py-3 border-b dark:border-darkmode-300 text-center">
+                                    <div class="flex flex-col items-center gap-1">
+                                        @if($tax->is_active)
+                                            <span class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-100 text-emerald-600 rounded text-xs font-semibold">
+                                                <x-base.lucide icon="check-circle" class="w-3 h-3" /> نشطة
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1 px-2 py-1 bg-slate-100 text-slate-500 rounded text-xs font-semibold">
+                                                <x-base.lucide icon="pause-circle" class="w-3 h-3" /> غير نشطة
+                                            </span>
+                                        @endif
+                                        @if($tax->is_default)
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-600 rounded text-xs font-semibold">
+                                                <x-base.lucide icon="star" class="w-3 h-3" /> افتراضية
+                                            </span>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td data-tw-merge class="px-5 py-3 border-b dark:border-darkmode-300 text-center">
+                                    <div class="flex justify-center gap-1">
+                                        <button class="btn-tax-edit p-1.5 rounded hover:bg-blue-50 text-blue-600 hover:text-blue-800 transition-colors" 
+                                                data-id="{{ $tax->id }}"
+                                                data-tax="{{ $taxData }}"
+                                                title="تعديل">
+                                            <x-base.lucide icon="edit" class="w-4 h-4" />
+                                        </button>
+                                        <button class="btn-tax-delete p-1.5 rounded hover:bg-red-50 text-slate-500 hover:text-red-600 transition-colors" 
+                                                data-id="{{ $tax->id }}" 
+                                                data-name="{{ $tax->name }}" 
+                                                title="حذف">
+                                            <x-base.lucide icon="trash-2" class="w-4 h-4" />
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                            @empty
+                            <tr>
+                                <td colspan="8" class="px-5 py-8 text-center text-slate-400">
+                                    <x-base.lucide icon="percent" class="w-12 h-12 mx-auto mb-2 opacity-50" />
+                                    لا توجد ضرائب مسجلة
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
+        </x-base.preview-component>
     </div>
 </div>
+
+{{-- Create Tax Modal (Unified Theme) --}}
+<x-modal.form id="create-tax-modal" title="إضافة ضريبة جديدة">
+    <form id="create-tax-form" action="{{ route('settings.taxes.store') }}" method="POST">
+        @csrf
+        <div class="grid grid-cols-12 gap-4 gap-y-4">
+            <div class="col-span-12 md:col-span-6">
+                <x-base.form-label for="create-tax-name">اسم الضريبة <span class="text-danger">*</span></x-base.form-label>
+                <x-base.form-input id="create-tax-name" name="name" type="text" placeholder="مثال: ضريبة القيمة المضافة" class="w-full" required />
+            </div>
+            <div class="col-span-12 md:col-span-3">
+                <x-base.form-label for="create-tax-code">الكود</x-base.form-label>
+                <x-base.form-input id="create-tax-code" name="code" type="text" placeholder="VAT" class="w-full" />
+            </div>
+            <div class="col-span-12 md:col-span-3">
+                <x-base.form-label for="create-tax-rate">النسبة (%) <span class="text-danger">*</span></x-base.form-label>
+                <x-base.form-input id="create-tax-rate" name="rate" type="number" min="0" max="100" step="0.01" value="15" class="w-full" required />
+            </div>
+
+            <div class="col-span-12 md:col-span-6">
+                <x-base.form-label for="create-tax-type">النوع</x-base.form-label>
+                <x-base.form-select id="create-tax-type" name="type" class="w-full">
+                    <option value="value_added">قيمة مضافة</option>
+                    <option value="withholding">استقطاع</option>
+                    <option value="other">أخرى</option>
+                </x-base.form-select>
+            </div>
+            <div class="col-span-12 md:col-span-6">
+                <x-base.form-label for="create-tax-company">الشركة</x-base.form-label>
+                <x-base.form-select id="create-tax-company" name="company_id" class="w-full">
+                    <option value="">جميع الشركات</option>
+                    @foreach($companies ?? [] as $companyItem)
+                        <option value="{{ $companyItem->id }}">{{ $companyItem->name }}</option>
+                    @endforeach
+                </x-base.form-select>
+            </div>
+
+            <div class="col-span-12 md:col-span-6">
+                <x-base.form-label for="create-tax-sales-account">حساب ضريبة المبيعات</x-base.form-label>
+                <x-base.form-select id="create-tax-sales-account" name="sales_account_id" class="w-full">
+                    <option value="">اختر الحساب</option>
+                    @foreach($accounts ?? [] as $account)
+                        <option value="{{ $account->id }}">{{ $account->code }} - {{ $account->name }}</option>
+                    @endforeach
+                </x-base.form-select>
+            </div>
+            <div class="col-span-12 md:col-span-6">
+                <x-base.form-label for="create-tax-purchase-account">حساب ضريبة المشتريات</x-base.form-label>
+                <x-base.form-select id="create-tax-purchase-account" name="purchase_account_id" class="w-full">
+                    <option value="">اختر الحساب</option>
+                    @foreach($accounts ?? [] as $account)
+                        <option value="{{ $account->id }}">{{ $account->code }} - {{ $account->name }}</option>
+                    @endforeach
+                </x-base.form-select>
+            </div>
+
+            <div class="col-span-12">
+                <x-base.form-label for="create-tax-description">الوصف</x-base.form-label>
+                <x-base.form-textarea id="create-tax-description" name="description" rows="2" placeholder="وصف الضريبة" class="w-full"></x-base.form-textarea>
+            </div>
+
+            <div class="col-span-12 md:col-span-6">
+                <div class="flex items-center gap-4 mt-2">
+                    <label class="inline-flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" name="is_default" value="1" class="form-checkbox rounded text-primary">
+                        <span>ضريبة افتراضية</span>
+                    </label>
+                </div>
+            </div>
+            <div class="col-span-12 md:col-span-6">
+                <div class="flex items-center gap-4 mt-2">
+                    <label class="inline-flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" name="is_active" value="1" checked class="form-checkbox rounded text-primary">
+                        <span>نشطة</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    @slot('footer')
+        <div class="flex w-full flex-wrap justify-end gap-2">
+            <button type="button" class="btn-royal btn-royal--outline group" data-tw-dismiss="modal">
+                <x-base.lucide icon="x-circle" class="w-5 h-5 icon-hover-rise" />
+                إلغاء
+            </button>
+            <button type="button" id="save-tax-btn" class="btn-royal btn-royal--gold group">
+                <x-base.lucide icon="save" class="w-5 h-5 icon-hover-rise" />
+                حفظ
+            </button>
+        </div>
+    @endslot
+</x-modal.form>
+
+{{-- Edit Tax Modal (Unified Theme) --}}
+<x-modal.form id="edit-tax-modal" title="تعديل بيانات الضريبة">
+    <form id="edit-tax-form" method="POST">
+        @csrf
+        @method('PUT')
+        <input type="hidden" id="edit-tax-id" name="id">
+        <div class="grid grid-cols-12 gap-4 gap-y-4">
+            <div class="col-span-12 md:col-span-6">
+                <x-base.form-label for="edit-tax-name">اسم الضريبة <span class="text-danger">*</span></x-base.form-label>
+                <x-base.form-input id="edit-tax-name" name="name" type="text" placeholder="مثال: ضريبة القيمة المضافة" class="w-full" required />
+            </div>
+            <div class="col-span-12 md:col-span-3">
+                <x-base.form-label for="edit-tax-code">الكود</x-base.form-label>
+                <x-base.form-input id="edit-tax-code" name="code" type="text" placeholder="VAT" class="w-full" />
+            </div>
+            <div class="col-span-12 md:col-span-3">
+                <x-base.form-label for="edit-tax-rate">النسبة (%) <span class="text-danger">*</span></x-base.form-label>
+                <x-base.form-input id="edit-tax-rate" name="rate" type="number" min="0" max="100" step="0.01" class="w-full" required />
+            </div>
+
+            <div class="col-span-12 md:col-span-6">
+                <x-base.form-label for="edit-tax-type">النوع</x-base.form-label>
+                <x-base.form-select id="edit-tax-type" name="type" class="w-full">
+                    <option value="value_added">قيمة مضافة</option>
+                    <option value="withholding">استقطاع</option>
+                    <option value="other">أخرى</option>
+                </x-base.form-select>
+            </div>
+            <div class="col-span-12 md:col-span-6">
+                <x-base.form-label for="edit-tax-company">الشركة</x-base.form-label>
+                <x-base.form-select id="edit-tax-company" name="company_id" class="w-full">
+                    <option value="">جميع الشركات</option>
+                    @foreach($companies ?? [] as $companyItem)
+                        <option value="{{ $companyItem->id }}">{{ $companyItem->name }}</option>
+                    @endforeach
+                </x-base.form-select>
+            </div>
+
+            <div class="col-span-12 md:col-span-6">
+                <x-base.form-label for="edit-tax-sales-account">حساب ضريبة المبيعات</x-base.form-label>
+                <x-base.form-select id="edit-tax-sales-account" name="sales_account_id" class="w-full">
+                    <option value="">اختر الحساب</option>
+                    @foreach($accounts ?? [] as $account)
+                        <option value="{{ $account->id }}">{{ $account->code }} - {{ $account->name }}</option>
+                    @endforeach
+                </x-base.form-select>
+            </div>
+            <div class="col-span-12 md:col-span-6">
+                <x-base.form-label for="edit-tax-purchase-account">حساب ضريبة المشتريات</x-base.form-label>
+                <x-base.form-select id="edit-tax-purchase-account" name="purchase_account_id" class="w-full">
+                    <option value="">اختر الحساب</option>
+                    @foreach($accounts ?? [] as $account)
+                        <option value="{{ $account->id }}">{{ $account->code }} - {{ $account->name }}</option>
+                    @endforeach
+                </x-base.form-select>
+            </div>
+
+            <div class="col-span-12">
+                <x-base.form-label for="edit-tax-description">الوصف</x-base.form-label>
+                <x-base.form-textarea id="edit-tax-description" name="description" rows="2" placeholder="وصف الضريبة" class="w-full"></x-base.form-textarea>
+            </div>
+
+            <div class="col-span-12 md:col-span-6">
+                <div class="flex items-center gap-4 mt-2">
+                    <label class="inline-flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="edit-tax-is-default" name="is_default" value="1" class="form-checkbox rounded text-primary">
+                        <span>ضريبة افتراضية</span>
+                    </label>
+                </div>
+            </div>
+            <div class="col-span-12 md:col-span-6">
+                <div class="flex items-center gap-4 mt-2">
+                    <label class="inline-flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="edit-tax-is-active" name="is_active" value="1" class="form-checkbox rounded text-primary">
+                        <span>نشطة</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    @slot('footer')
+        <div class="flex w-full flex-wrap justify-end gap-2">
+            <button type="button" class="btn-royal btn-royal--outline group" data-tw-dismiss="modal">
+                <x-base.lucide icon="x-circle" class="w-5 h-5 icon-hover-rise" />
+                إلغاء
+            </button>
+            <button type="button" id="update-tax-btn" class="btn-royal btn-royal--gold group">
+                <x-base.lucide icon="save" class="w-5 h-5 icon-hover-rise" />
+                تحديث
+            </button>
+        </div>
+    @endslot
+</x-modal.form>
+
+@push('styles')
+<style>
+    #taxes-table { font-size: 0.95rem; line-height: 1.4; }
+    #taxes-table tbody tr { height: 2.25rem; }
+    #taxes-table th { font-size: 0.8rem; font-weight: 700; padding: 0.5rem 1.25rem; }
+    #taxes-table td { padding: 0.375rem 1.25rem; }
+    .icon-hover-rise { transition: transform 200ms ease; }
+    .group:hover .icon-hover-rise { transform: translateY(-2px); }
+</style>
+@endpush
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+    // Create Tax
+    const saveTaxBtn = document.getElementById('save-tax-btn');
+    if (saveTaxBtn) {
+        saveTaxBtn.addEventListener('click', function() {
+            const form = document.getElementById('create-tax-form');
+            const formData = new FormData(form);
+            
+            saveTaxBtn.disabled = true;
+            saveTaxBtn.innerHTML = '<span class="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></span> جاري الحفظ...';
+            
+            fetch('{{ route("settings.taxes.store") }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (typeof window.showSuccess === 'function') {
+                        window.showSuccess(data.message || 'تم إضافة الضريبة بنجاح');
+                    }
+                    const modal = tailwind.Modal.getOrCreateInstance(document.getElementById('create-tax-modal'));
+                    modal.hide();
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    if (typeof window.showError === 'function') {
+                        window.showError(data.message || 'فشل في إضافة الضريبة');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                if (typeof window.showError === 'function') {
+                    window.showError('حدث خطأ أثناء الحفظ');
+                }
+            })
+            .finally(() => {
+                saveTaxBtn.disabled = false;
+                saveTaxBtn.innerHTML = '<i data-lucide="save" class="w-5 h-5 icon-hover-rise"></i> حفظ';
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            });
+        });
+    }
+
+    // Edit Tax - Open Modal
+    document.querySelectorAll('.btn-tax-edit').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const tax = JSON.parse(this.dataset.tax);
+            
+            document.getElementById('edit-tax-id').value = tax.id;
+            document.getElementById('edit-tax-name').value = tax.name || '';
+            document.getElementById('edit-tax-code').value = tax.code || '';
+            document.getElementById('edit-tax-rate').value = tax.rate || '';
+            document.getElementById('edit-tax-type').value = tax.type || 'value_added';
+            document.getElementById('edit-tax-company').value = tax.company_id || '';
+            document.getElementById('edit-tax-sales-account').value = tax.sales_account_id || '';
+            document.getElementById('edit-tax-purchase-account').value = tax.purchase_account_id || '';
+            document.getElementById('edit-tax-description').value = tax.description || '';
+            document.getElementById('edit-tax-is-default').checked = tax.is_default;
+            document.getElementById('edit-tax-is-active').checked = tax.is_active;
+            
+            const modal = tailwind.Modal.getOrCreateInstance(document.getElementById('edit-tax-modal'));
+            modal.show();
+        });
+    });
+
+    // Update Tax
+    const updateTaxBtn = document.getElementById('update-tax-btn');
+    if (updateTaxBtn) {
+        updateTaxBtn.addEventListener('click', function() {
+            const form = document.getElementById('edit-tax-form');
+            const formData = new FormData(form);
+            const taxId = document.getElementById('edit-tax-id').value;
+            
+            updateTaxBtn.disabled = true;
+            updateTaxBtn.innerHTML = '<span class="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></span> جاري التحديث...';
+            
+            fetch(`/settings/taxes/${taxId}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (typeof window.showSuccess === 'function') {
+                        window.showSuccess(data.message || 'تم تحديث الضريبة بنجاح');
+                    }
+                    const modal = tailwind.Modal.getOrCreateInstance(document.getElementById('edit-tax-modal'));
+                    modal.hide();
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    if (typeof window.showError === 'function') {
+                        window.showError(data.message || 'فشل في تحديث الضريبة');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                if (typeof window.showError === 'function') {
+                    window.showError('حدث خطأ أثناء التحديث');
+                }
+            })
+            .finally(() => {
+                updateTaxBtn.disabled = false;
+                updateTaxBtn.innerHTML = '<i data-lucide="save" class="w-5 h-5 icon-hover-rise"></i> تحديث';
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            });
+        });
+    }
+
+    // Delete Tax
+    document.querySelectorAll('.btn-tax-delete').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.dataset.id;
+            const name = this.dataset.name;
+            const row = this.closest('tr');
+
+            if (typeof window.confirmDelete === 'function') {
+                window.confirmDelete(name, () => {
+                    fetch(`/settings/taxes/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            if (typeof window.showSuccess === 'function') {
+                                window.showSuccess(data.message || 'تم حذف الضريبة بنجاح');
+                            }
+                            row.remove();
+                        } else {
+                            if (typeof window.showError === 'function') {
+                                window.showError(data.message || 'فشل في حذف الضريبة');
+                            }
+                        }
+                    })
+                    .catch(() => {
+                        if (typeof window.showError === 'function') {
+                            window.showError('حدث خطأ أثناء الحذف');
+                        }
+                    });
+                });
+            }
+        });
+    });
+
+    // Filter functionality
+    const taxFilterGo = document.getElementById('tax-filter-go');
+    const taxFilterReset = document.getElementById('tax-filter-reset');
+    
+    if (taxFilterGo) {
+        taxFilterGo.addEventListener('click', function() {
+            const field = document.getElementById('tax-filter-field').value;
+            const value = document.getElementById('tax-filter-value').value.toLowerCase();
+            const status = document.getElementById('tax-filter-status').value;
+            
+            document.querySelectorAll('#taxes-table tbody tr').forEach(row => {
+                if (row.querySelector('td[colspan]')) return;
+                
+                let show = true;
+                const text = row.textContent.toLowerCase();
+                
+                if (value && !text.includes(value)) {
+                    show = false;
+                }
+                
+                if (status) {
+                    const isActive = row.querySelector('.bg-emerald-100') !== null;
+                    if (status === 'active' && !isActive) show = false;
+                    if (status === 'inactive' && isActive) show = false;
+                }
+                
+                row.style.display = show ? '' : 'none';
+            });
+        });
+    }
+    
+    if (taxFilterReset) {
+        taxFilterReset.addEventListener('click', function() {
+            document.getElementById('tax-filter-field').value = 'all';
+            document.getElementById('tax-filter-value').value = '';
+            document.getElementById('tax-filter-status').value = '';
+            document.querySelectorAll('#taxes-table tbody tr').forEach(row => {
+                row.style.display = '';
+            });
+        });
+    }
+});
+</script>
+@endpush

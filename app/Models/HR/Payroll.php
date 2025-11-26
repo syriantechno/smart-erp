@@ -18,6 +18,7 @@ class Payroll extends Model
         'actual_working_days',
         'working_hours_per_day',
         'hourly_rate',
+        'earned_salary',
         'overtime_hours',
         'overtime_multiplier',
         'overtime_amount',
@@ -49,6 +50,7 @@ class Payroll extends Model
     protected $casts = [
         'basic_salary' => 'decimal:2',
         'hourly_rate' => 'decimal:2',
+        'earned_salary' => 'decimal:2',
         'overtime_hours' => 'decimal:2',
         'overtime_multiplier' => 'decimal:2',
         'overtime_amount' => 'decimal:2',

@@ -7,6 +7,7 @@ use App\Models\HR\Employee;
 use App\Models\HR\EmployeeEvaluation;
 use App\Models\HR\EmployeeEvaluationItem;
 use App\Models\HR\EvaluationCriterion;
+use App\Services\Notifications\NotificationDispatcher;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -85,6 +86,21 @@ class EmployeeEvaluationController extends Controller
         }
 
         $evaluation->load(['employee.department', 'evaluator']);
+
+        // Send notification to employee
+        $employee = Employee::find($validated['employee_id']);
+        if ($employee && $employee->user_id) {
+            $ratingText = $overall >= 8 ? 'Excellent' : ($overall >= 6 ? 'Good' : ($overall >= 4 ? 'Average' : 'Needs Improvement'));
+            NotificationDispatcher::toUser(
+                $employee->user_id,
+                'evaluation.completed',
+                'Performance Evaluation Completed',
+                "Your performance evaluation has been completed. Overall Rating: {$overall}/10 ({$ratingText})",
+                route('hr.employee-evaluations.index'),
+                'clipboard-check',
+                ['type' => $overall >= 6 ? 'success' : 'warning', 'actor_id' => auth()->id()]
+            );
+        }
 
         if ($request->expectsJson()) {
             $rowHtml = view('hr.evaluations._row', compact('evaluation'))->render();

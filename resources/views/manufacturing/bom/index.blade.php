@@ -117,7 +117,7 @@
                     <a href="{{ route('manufacturing.bom.edit', $template) }}" class="h-8 w-8 rounded-full flex items-center justify-center hover:bg-white text-slate-400 hover:text-amber-600 transition-all">
                         <x-base.lucide icon="edit" class="w-4 h-4" />
                     </a>
-                    <form action="{{ route('manufacturing.bom.destroy', $template) }}" method="POST" class="inline" onsubmit="return confirm('Delete this BOM template?')">
+                    <form action="{{ route('manufacturing.bom.destroy', $template) }}" method="POST" class="inline delete-form" data-name="{{ $template->name }}">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="h-8 w-8 rounded-full flex items-center justify-center hover:bg-white text-slate-400 hover:text-red-600 transition-all">
@@ -263,7 +263,7 @@
                 </button>
                 <button type="button" onclick="saveBom()" id="save-bom-btn" class="h-10 px-5 rounded-full text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition-all flex items-center gap-2">
                     <x-base.lucide icon="save" class="w-4 h-4" />
-                    <span>Save BOM</span>
+                    <span>Save</span>
                 </button>
             </div>
         </div>
@@ -430,5 +430,20 @@ function showNotification(message, type = 'info') {
         setTimeout(() => notification.remove(), 300);
     }, 3000);
 }
+
+// Delete confirmation with SweetAlert
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.delete-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = this.dataset.name || 'this BOM template';
+            if (typeof window.confirmDelete === 'function') {
+                window.confirmDelete(name, () => this.submit());
+            } else {
+                this.submit();
+            }
+        });
+    });
+});
 </script>
 @endsection

@@ -139,7 +139,7 @@
                             <a href="{{ route('manufacturing.orders.edit', $order) }}" class="h-8 w-8 rounded-full flex items-center justify-center hover:bg-slate-100 text-slate-400 hover:text-amber-600 transition-all" title="Edit">
                                 <x-base.lucide icon="edit" class="w-4 h-4" />
                             </a>
-                            <form action="{{ route('manufacturing.orders.destroy', $order) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure?')">
+                            <form action="{{ route('manufacturing.orders.destroy', $order) }}" method="POST" class="inline delete-form" data-name="{{ $order->product_name }}">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="h-8 w-8 rounded-full flex items-center justify-center hover:bg-slate-100 text-slate-400 hover:text-red-600 transition-all" title="Delete">
@@ -173,4 +173,22 @@
         @endif
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.delete-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = this.dataset.name || 'this order';
+            if (typeof window.confirmDelete === 'function') {
+                window.confirmDelete(name, () => this.submit());
+            } else {
+                this.submit();
+            }
+        });
+    });
+});
+</script>
+@endpush
 @endsection

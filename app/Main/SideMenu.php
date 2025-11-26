@@ -107,9 +107,19 @@ class SideMenu
                         'route_name' => 'hr.leave.index'
                     ],
                     'payroll' => [
-                        'icon' => 'dollar-sign',
+                        'icon' => 'wallet',
                         'title' => __('menu.payroll'),
                         'route_name' => 'hr.payroll.index'
+                    ],
+                    'penalties' => [
+                        'icon' => 'alert-triangle',
+                        'title' => __('menu.penalties'),
+                        'route_name' => 'hr.penalties.index'
+                    ],
+                    'advances' => [
+                        'icon' => 'hand-coins',
+                        'title' => __('menu.advances'),
+                        'route_name' => 'hr.advances.index'
                     ],
                     'recruitment' => [
                         'icon' => 'user-plus',
@@ -266,6 +276,47 @@ class SideMenu
                         'icon' => 'banknote',
                         'route_name' => 'accounting.bank-accounts.index',
                         'title' => __('menu.bank_accounts'),
+                    ],
+                ],
+            ],
+            'reports' => [
+                'icon' => 'bar-chart-3',
+                'title' => __('menu.reports'),
+                'sub_menu' => [
+                    'reports-dashboard' => [
+                        'icon' => 'layout-dashboard',
+                        'route_name' => 'reports.index',
+                        'title' => __('menu.reports_dashboard'),
+                    ],
+                    'reports-financial' => [
+                        'icon' => 'trending-up',
+                        'route_name' => 'reports.financial',
+                        'title' => __('menu.financial_reports'),
+                    ],
+                    'reports-hr' => [
+                        'icon' => 'users',
+                        'route_name' => 'reports.hr',
+                        'title' => __('menu.hr_reports'),
+                    ],
+                    'reports-inventory' => [
+                        'icon' => 'package',
+                        'route_name' => 'reports.inventory',
+                        'title' => __('menu.inventory_reports'),
+                    ],
+                    'reports-sales' => [
+                        'icon' => 'shopping-cart',
+                        'route_name' => 'reports.sales',
+                        'title' => __('menu.sales_reports'),
+                    ],
+                    'reports-projects' => [
+                        'icon' => 'folder',
+                        'route_name' => 'reports.projects',
+                        'title' => __('menu.project_reports'),
+                    ],
+                    'reports-custom' => [
+                        'icon' => 'file-plus',
+                        'route_name' => 'reports.custom',
+                        'title' => __('menu.custom_reports'),
                     ],
                 ],
             ],

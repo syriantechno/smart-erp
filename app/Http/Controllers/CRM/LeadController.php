@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\CRM\Contact;
 use App\Models\CRM\Lead;
+use App\Models\User;
+use App\Services\Notifications\NotificationDispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -105,6 +107,21 @@ class LeadController extends Controller
         $validated['tags'] = $validated['tags'] ?? [];
 
         $lead = Lead::create($validated);
+
+        // Notify sales team
+        $salesTeam = User::whereHas('roles', fn($q) => $q->whereIn('name', ['admin', 'sales_manager']))->pluck('id')->toArray();
+        if (!empty($salesTeam)) {
+            $value = $lead->estimated_value ? ' - Est. Value: ' . number_format($lead->estimated_value, 2) : '';
+            NotificationDispatcher::toUsers(
+                $salesTeam,
+                'lead.created',
+                'New Lead Created',
+                "Lead '{$lead->title}' ({$lead->code}) has been created{$value}",
+                route('crm.leads.index'),
+                'user-search',
+                ['type' => 'info', 'actor_id' => auth()->id()]
+            );
+        }
 
         return response()->json([
             'success' => true,

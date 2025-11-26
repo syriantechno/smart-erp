@@ -119,10 +119,10 @@
 
         {{-- Actions --}}
         <div class="flex items-center justify-between">
-            <form action="{{ route('manufacturing.orders.destroy', $order) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this order?')">
+            <form id="delete-order-form" action="{{ route('manufacturing.orders.destroy', $order) }}" method="POST" class="inline">
                 @csrf
                 @method('DELETE')
-                <button type="submit" class="h-11 rounded-full px-6 flex items-center justify-center text-sm font-semibold text-red-600 border border-red-300 hover:bg-red-50 transition-all">
+                <button type="button" onclick="deleteOrder()" class="h-11 rounded-full px-6 flex items-center justify-center text-sm font-semibold text-red-600 border border-red-300 hover:bg-red-50 transition-all">
                     <x-base.lucide icon="trash-2" class="w-4 h-4 mr-2" /> Delete Order
                 </button>
             </form>
@@ -131,10 +131,24 @@
                     Cancel
                 </a>
                 <button type="submit" class="h-11 rounded-full px-6 flex items-center justify-center text-sm font-semibold text-white bg-[#303030] hover:bg-[#404040] transition-all">
-                    <x-base.lucide icon="save" class="w-4 h-4 mr-2" /> Save Changes
+                    <x-base.lucide icon="save" class="w-4 h-4 mr-2" /> Save
                 </button>
             </div>
         </div>
     </form>
 </div>
+
+@push('scripts')
+<script>
+function deleteOrder() {
+    if (typeof window.confirmDelete === 'function') {
+        window.confirmDelete('{{ $order->product_name }}', () => {
+            document.getElementById('delete-order-form').submit();
+        });
+    } else {
+        document.getElementById('delete-order-form').submit();
+    }
+}
+</script>
+@endpush
 @endsection

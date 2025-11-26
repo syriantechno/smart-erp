@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\HR\Employee;
 use App\Models\HR\Payroll;
 use App\Models\HR\Attendance;
+use App\Models\HR\Penalty;
+use App\Models\HR\Advance;
 use App\Models\Setting\Setting;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -96,39 +98,62 @@ class PayrollService
 
     /**
      * Calculate payroll for a single employee
+     * 
+     * Logic:
+     * 1. Daily Rate = Monthly Salary / Required Working Days
+     * 2. Hourly Rate = Daily Rate / Working Hours Per Day
+     * 3. Earned Salary = Daily Rate × Actual Working Days (present + half_days×0.5)
+     * 4. Overtime Amount = OT Hours × Hourly Rate × OT Multiplier
+     * 5. Net Salary = Earned Salary + Overtime + Bonuses - Deductions (Penalties + Advances)
      */
     public function calculatePayroll(Employee $employee): array
     {
-        $basicSalary = (float) $employee->salary;
+        $monthlySalary = (float) $employee->salary;
         
-        // Calculate hourly rate
-        $hourlyRate = $basicSalary / $this->workingDaysPerMonth / $this->workingHoursPerDay;
+        // Calculate daily and hourly rates
+        $dailyRate = $monthlySalary / $this->workingDaysPerMonth;
+        $hourlyRate = $dailyRate / $this->workingHoursPerDay;
 
         // Get attendance data for the month
         $attendanceData = $this->getAttendanceData($employee->id);
 
-        // Calculate overtime
+        // Calculate actual working days (present days + half days as 0.5)
+        $actualWorkingDays = $attendanceData['present_days'] + ($attendanceData['half_days'] * 0.5);
+        
+        // Calculate earned salary based on actual working days
+        $earnedSalary = $dailyRate * $actualWorkingDays;
+
+        // Calculate overtime (separate from basic salary)
         $overtimeAmount = $attendanceData['overtime_hours'] * $hourlyRate * $this->overtimeMultiplier;
         $weekendOvertimeAmount = $attendanceData['weekend_overtime_hours'] * $hourlyRate * $this->weekendOvertimeMultiplier;
         $totalOvertimeAmount = $overtimeAmount + $weekendOvertimeAmount;
 
-        // Calculate deductions
-        $dailyRate = $basicSalary / $this->workingDaysPerMonth;
-        $absentDeduction = $attendanceData['absent_days'] * $dailyRate;
-        $halfDayDeduction = $attendanceData['half_days'] * ($dailyRate / 2);
+        // Calculate late deduction
         $lateDeduction = $this->calculateLateDeduction($attendanceData['late_minutes'], $hourlyRate);
 
-        // Calculate totals
-        $grossSalary = $basicSalary + $totalOvertimeAmount;
-        $totalDeductions = $absentDeduction + $halfDayDeduction + $lateDeduction;
+        // Get pending penalties (financial, approved, not yet deducted)
+        $penaltiesData = $this->getPendingPenalties($employee->id);
+        
+        // Get pending advance installments
+        $advancesData = $this->getPendingAdvanceInstallments($employee->id);
+
+        // Calculate total deductions
+        $totalDeductions = $lateDeduction + $penaltiesData['total'] + $advancesData['total'];
+
+        // Gross salary = Earned salary + Overtime
+        $grossSalary = $earnedSalary + $totalOvertimeAmount;
+        
+        // Net salary = Gross - All Deductions
         $netSalary = $grossSalary - $totalDeductions;
 
         return [
-            'basic_salary' => $basicSalary,
+            'basic_salary' => $monthlySalary,
             'working_days' => $this->workingDaysPerMonth,
-            'actual_working_days' => $attendanceData['present_days'],
+            'actual_working_days' => $actualWorkingDays,
             'working_hours_per_day' => $this->workingHoursPerDay,
             'hourly_rate' => round($hourlyRate, 2),
+            
+            'earned_salary' => round($earnedSalary, 2),
             
             'overtime_hours' => $attendanceData['overtime_hours'],
             'overtime_multiplier' => $this->overtimeMultiplier,
@@ -141,15 +166,24 @@ class PayrollService
             'total_overtime_amount' => round($totalOvertimeAmount, 2),
             
             'absent_days' => $attendanceData['absent_days'],
-            'absent_deduction' => round($absentDeduction, 2),
+            'absent_deduction' => 0,
             
             'half_days' => $attendanceData['half_days'],
-            'half_day_deduction' => round($halfDayDeduction, 2),
+            'half_day_deduction' => 0,
             
             'late_minutes' => $attendanceData['late_minutes'],
             'late_deduction' => round($lateDeduction, 2),
             
+            // Deduction details
             'deductions' => round($totalDeductions, 2),
+            'deduction_details' => [
+                'late' => round($lateDeduction, 2),
+                'penalties' => $penaltiesData['total'],
+                'penalty_ids' => $penaltiesData['ids'],
+                'advances' => $advancesData['total'],
+                'advance_ids' => $advancesData['ids'],
+            ],
+            
             'bonuses' => 0,
             
             'gross_salary' => round($grossSalary, 2),
@@ -157,6 +191,80 @@ class PayrollService
             
             'status' => 'pending',
         ];
+    }
+
+    /**
+     * Get pending financial penalties for an employee
+     */
+    protected function getPendingPenalties(int $employeeId): array
+    {
+        $penalties = Penalty::where('employee_id', $employeeId)
+            ->where('type', 'financial')
+            ->where('status', 'approved')
+            ->where('deduct_from_salary', true)
+            ->where('deducted', false)
+            ->get();
+
+        return [
+            'total' => round($penalties->sum('amount'), 2),
+            'ids' => $penalties->pluck('id')->toArray(),
+            'count' => $penalties->count(),
+        ];
+    }
+
+    /**
+     * Get pending advance installments for an employee
+     */
+    protected function getPendingAdvanceInstallments(int $employeeId): array
+    {
+        $advances = Advance::where('employee_id', $employeeId)
+            ->where('status', 'disbursed')
+            ->where('remaining_amount', '>', 0)
+            ->where('start_deduction_date', '<=', Carbon::create($this->year, $this->month, 1)->endOfMonth())
+            ->get();
+
+        $total = 0;
+        $ids = [];
+
+        foreach ($advances as $advance) {
+            $total += $advance->installment_amount;
+            $ids[] = $advance->id;
+        }
+
+        return [
+            'total' => round($total, 2),
+            'ids' => $ids,
+            'count' => count($ids),
+        ];
+    }
+
+    /**
+     * Apply deductions after payroll is approved/paid
+     */
+    public function applyDeductions(Payroll $payroll): void
+    {
+        $details = $payroll->deduction_details;
+        
+        if (!$details) return;
+
+        // Mark penalties as deducted
+        if (!empty($details['penalty_ids'])) {
+            Penalty::whereIn('id', $details['penalty_ids'])->update([
+                'deducted' => true,
+                'deducted_in_payroll_id' => $payroll->id,
+                'status' => 'applied',
+            ]);
+        }
+
+        // Record advance deductions
+        if (!empty($details['advance_ids'])) {
+            foreach ($details['advance_ids'] as $advanceId) {
+                $advance = Advance::find($advanceId);
+                if ($advance) {
+                    $advance->recordDeduction($advance->installment_amount, $payroll->id);
+                }
+            }
+        }
     }
 
     /**

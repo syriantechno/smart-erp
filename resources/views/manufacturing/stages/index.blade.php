@@ -53,7 +53,7 @@
                         <button class="h-8 w-8 rounded-full flex items-center justify-center hover:bg-white text-slate-400 hover:text-amber-600 transition-all">
                             <x-base.lucide icon="edit" class="w-4 h-4" />
                         </button>
-                        <form action="{{ route('manufacturing.stages.destroy', $stage->id) }}" method="POST" class="inline" onsubmit="return confirm('Delete this stage?')">
+                        <form action="{{ route('manufacturing.stages.destroy', $stage->id) }}" method="POST" class="inline delete-form" data-name="{{ $stage->name }}">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="h-8 w-8 rounded-full flex items-center justify-center hover:bg-white text-slate-400 hover:text-red-600 transition-all">
@@ -108,10 +108,28 @@
                 </div>
                 <div class="flex justify-end gap-3 pt-4">
                     <button type="button" onclick="document.getElementById('add-stage-modal').classList.add('hidden')" class="h-10 px-5 rounded-full text-sm font-semibold text-slate-600 border border-slate-300 hover:bg-slate-50">Cancel</button>
-                    <button type="submit" class="h-10 px-5 rounded-full text-sm font-semibold text-white bg-[#303030] hover:bg-[#404040]">Add Stage</button>
+                    <button type="submit" class="h-10 px-5 rounded-full text-sm font-semibold text-white bg-[#303030] hover:bg-[#404040]">Save</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.delete-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = this.dataset.name || 'this stage';
+            if (typeof window.confirmDelete === 'function') {
+                window.confirmDelete(name, () => this.submit());
+            } else {
+                this.submit();
+            }
+        });
+    });
+});
+</script>
+@endpush
 @endsection

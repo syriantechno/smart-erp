@@ -7,6 +7,7 @@ use App\Models\HR\Payroll;
 use App\Models\HR\Employee;
 use App\Models\HR\Department;
 use App\Services\PayrollService;
+use App\Services\Notifications\NotificationDispatcher;
 use App\Helpers\Reply;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -86,9 +87,13 @@ class PayrollController extends Controller
                     'photo' => $payroll->employee->profile_picture_url ?? null,
                 ],
                 'basic_salary' => number_format($payroll->basic_salary, 2),
+                'working_days' => $payroll->working_days,
+                'actual_working_days' => $payroll->actual_working_days,
+                'earned_salary' => number_format($payroll->earned_salary ?? $payroll->gross_salary, 2),
                 'overtime_hours' => $payroll->overtime_hours + $payroll->weekend_overtime_hours,
                 'overtime_amount' => number_format($payroll->total_overtime_amount, 2),
                 'deductions' => number_format($payroll->deductions, 2),
+                'installments' => number_format($payroll->advance_deductions ?? 0, 2),
                 'bonuses' => number_format($payroll->bonuses, 2),
                 'net_salary' => number_format($payroll->net_salary, 2),
                 'status' => $payroll->status,
@@ -100,13 +105,14 @@ class PayrollController extends Controller
         // Calculate summary
         $summary = [
             'total_employees' => $payrolls->count(),
-            'total_basic' => number_format($payrolls->sum('basic_salary'), 2),
+            'total_earned' => number_format($payrolls->sum('earned_salary') ?: $payrolls->sum('gross_salary'), 2),
             'total_overtime' => number_format($payrolls->sum('total_overtime_amount'), 2),
             'total_deductions' => number_format($payrolls->sum('deductions'), 2),
+            'total_installments' => number_format($payrolls->sum('advance_deductions'), 2),
             'total_net' => number_format($payrolls->sum('net_salary'), 2),
-            'pending' => $payrolls->where('status', 'pending')->count(),
-            'approved' => $payrolls->where('status', 'approved')->count(),
-            'paid' => $payrolls->where('status', 'paid')->count(),
+            'pending_count' => $payrolls->where('status', 'pending')->count(),
+            'approved_count' => $payrolls->where('status', 'approved')->count(),
+            'paid_count' => $payrolls->where('status', 'paid')->count(),
         ];
 
         return response()->json([
@@ -171,6 +177,7 @@ class PayrollController extends Controller
                 'working_days' => $payroll->working_days,
                 'actual_working_days' => $payroll->actual_working_days,
                 'hourly_rate' => $payroll->hourly_rate,
+                'earned_salary' => $payroll->earned_salary ?? $payroll->gross_salary,
                 
                 'overtime_hours' => $payroll->overtime_hours,
                 'overtime_multiplier' => $payroll->overtime_multiplier,
@@ -267,6 +274,21 @@ class PayrollController extends Controller
 
         try {
             $this->payrollService->approvePayroll($payroll);
+
+            // Notify employee
+            if ($payroll->employee && $payroll->employee->user_id) {
+                $monthName = Carbon::create($payroll->year, $payroll->month)->format('F Y');
+                NotificationDispatcher::toUser(
+                    $payroll->employee->user_id,
+                    'payroll.approved',
+                    'Payroll Approved',
+                    "Your payroll for {$monthName} has been approved. Net Salary: " . number_format($payroll->net_salary, 2),
+                    route('hr.payroll.index'),
+                    'wallet',
+                    ['type' => 'success', 'actor_id' => auth()->id()]
+                );
+            }
+
             return Reply::success('Payroll approved successfully');
         } catch (\Exception $e) {
             return Reply::error('Failed to approve payroll: ' . $e->getMessage(), [], 500);
@@ -323,6 +345,21 @@ class PayrollController extends Controller
 
         try {
             $this->payrollService->markAsPaid($payroll, $request->payment_method, $request->payment_date);
+
+            // Notify employee
+            if ($payroll->employee && $payroll->employee->user_id) {
+                $monthName = Carbon::create($payroll->year, $payroll->month)->format('F Y');
+                NotificationDispatcher::toUser(
+                    $payroll->employee->user_id,
+                    'payroll.paid',
+                    'Salary Paid',
+                    "Your salary for {$monthName} has been paid. Amount: " . number_format($payroll->net_salary, 2),
+                    route('hr.payroll.index'),
+                    'banknote',
+                    ['type' => 'success', 'actor_id' => auth()->id()]
+                );
+            }
+
             return Reply::success('Payroll marked as paid');
         } catch (\Exception $e) {
             return Reply::error('Failed to mark payroll as paid: ' . $e->getMessage(), [], 500);

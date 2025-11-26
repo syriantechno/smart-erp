@@ -111,6 +111,77 @@
             ],
         ];
 
+        // Payroll Notifications
+        $payrollNotifications = [
+            'payroll.generated' => [
+                'label' => 'Payroll Generated',
+                'description' => 'When payroll is generated for employees',
+                'value' => \App\Models\Setting\Setting::get('notifications.payroll.generated', true),
+            ],
+            'payroll.approved' => [
+                'label' => 'Payroll Approved',
+                'description' => 'When payroll is approved',
+                'value' => \App\Models\Setting\Setting::get('notifications.payroll.approved', true),
+            ],
+            'payroll.paid' => [
+                'label' => 'Salary Paid',
+                'description' => 'When salary is paid to employee',
+                'value' => \App\Models\Setting\Setting::get('notifications.payroll.paid', true),
+            ],
+        ];
+
+        // Penalty Notifications
+        $penaltyNotifications = [
+            'penalty.created' => [
+                'label' => 'Penalty Created',
+                'description' => 'When a penalty is issued to employee',
+                'value' => \App\Models\Setting\Setting::get('notifications.penalty.created', true),
+            ],
+            'penalty.approved' => [
+                'label' => 'Penalty Approved',
+                'description' => 'When a penalty is approved',
+                'value' => \App\Models\Setting\Setting::get('notifications.penalty.approved', true),
+            ],
+        ];
+
+        // Advance Notifications
+        $advanceNotifications = [
+            'advance.requested' => [
+                'label' => 'Advance Requested',
+                'description' => 'When employee requests advance/loan',
+                'value' => \App\Models\Setting\Setting::get('notifications.advance.requested', true),
+            ],
+            'advance.approved' => [
+                'label' => 'Advance Approved',
+                'description' => 'When advance request is approved',
+                'value' => \App\Models\Setting\Setting::get('notifications.advance.approved', true),
+            ],
+            'advance.disbursed' => [
+                'label' => 'Advance Disbursed',
+                'description' => 'When advance is disbursed',
+                'value' => \App\Models\Setting\Setting::get('notifications.advance.disbursed', true),
+            ],
+        ];
+
+        // Leave Notifications
+        $leaveNotifications = [
+            'leave.requested' => [
+                'label' => 'Leave Requested',
+                'description' => 'When employee requests leave',
+                'value' => \App\Models\Setting\Setting::get('notifications.leave.requested', true),
+            ],
+            'leave.approved' => [
+                'label' => 'Leave Approved',
+                'description' => 'When leave request is approved',
+                'value' => \App\Models\Setting\Setting::get('notifications.leave.approved', true),
+            ],
+            'leave.rejected' => [
+                'label' => 'Leave Rejected',
+                'description' => 'When leave request is rejected',
+                'value' => \App\Models\Setting\Setting::get('notifications.leave.rejected', true),
+            ],
+        ];
+
         $documentsExpiryReminderDays = \App\Models\Setting\Setting::get('notifications.documents.expiry_reminder_days', 30);
     ?>
 
@@ -308,6 +379,182 @@
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <?php $__currentLoopData = $hrNotifications; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $notification): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <?php $fieldName = 'notifications_' . str_replace('.', '_', $key); ?>
+                    <div class="flex items-center justify-between p-3 rounded-lg border border-slate-200 dark:border-darkmode-400">
+                        <div class="flex-1">
+                            <div class="font-medium text-sm text-slate-800 dark:text-slate-100"><?php echo e($notification['label']); ?></div>
+                            <div class="text-xs text-slate-500"><?php echo e($notification['description']); ?></div>
+                        </div>
+                        <input type="hidden" name="<?php echo e($fieldName); ?>" value="0">
+                        <label class="inline-flex cursor-pointer items-center ml-3">
+                            <input type="checkbox" name="<?php echo e($fieldName); ?>" value="1" <?php echo e($notification['value'] ? 'checked' : ''); ?> class="sr-only peer" />
+                            <div class="relative w-11 h-6 rounded-full bg-slate-200 transition-colors duration-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/25 dark:bg-darkmode-600 peer-checked:bg-primary after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition-all after:duration-200 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"></div>
+                        </label>
+                    </div>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            </div>
+        </div>
+
+        <!-- Payroll Notifications Section -->
+        <div class="mb-8">
+            <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-4 flex items-center border-b border-slate-200 dark:border-darkmode-400 pb-3">
+                <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'wallet','class' => 'w-5 h-5 mr-2 text-emerald-500']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.lucide'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['icon' => 'wallet','class' => 'w-5 h-5 mr-2 text-emerald-500']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+                Payroll Notifications
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <?php $__currentLoopData = $payrollNotifications; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $notification): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <?php $fieldName = 'notifications_' . str_replace('.', '_', $key); ?>
+                    <div class="flex items-center justify-between p-3 rounded-lg border border-slate-200 dark:border-darkmode-400">
+                        <div class="flex-1">
+                            <div class="font-medium text-sm text-slate-800 dark:text-slate-100"><?php echo e($notification['label']); ?></div>
+                            <div class="text-xs text-slate-500"><?php echo e($notification['description']); ?></div>
+                        </div>
+                        <input type="hidden" name="<?php echo e($fieldName); ?>" value="0">
+                        <label class="inline-flex cursor-pointer items-center ml-3">
+                            <input type="checkbox" name="<?php echo e($fieldName); ?>" value="1" <?php echo e($notification['value'] ? 'checked' : ''); ?> class="sr-only peer" />
+                            <div class="relative w-11 h-6 rounded-full bg-slate-200 transition-colors duration-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/25 dark:bg-darkmode-600 peer-checked:bg-primary after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition-all after:duration-200 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"></div>
+                        </label>
+                    </div>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            </div>
+        </div>
+
+        <!-- Penalty Notifications Section -->
+        <div class="mb-8">
+            <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-4 flex items-center border-b border-slate-200 dark:border-darkmode-400 pb-3">
+                <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'alert-triangle','class' => 'w-5 h-5 mr-2 text-orange-500']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.lucide'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['icon' => 'alert-triangle','class' => 'w-5 h-5 mr-2 text-orange-500']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+                Penalty Notifications
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <?php $__currentLoopData = $penaltyNotifications; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $notification): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <?php $fieldName = 'notifications_' . str_replace('.', '_', $key); ?>
+                    <div class="flex items-center justify-between p-3 rounded-lg border border-slate-200 dark:border-darkmode-400">
+                        <div class="flex-1">
+                            <div class="font-medium text-sm text-slate-800 dark:text-slate-100"><?php echo e($notification['label']); ?></div>
+                            <div class="text-xs text-slate-500"><?php echo e($notification['description']); ?></div>
+                        </div>
+                        <input type="hidden" name="<?php echo e($fieldName); ?>" value="0">
+                        <label class="inline-flex cursor-pointer items-center ml-3">
+                            <input type="checkbox" name="<?php echo e($fieldName); ?>" value="1" <?php echo e($notification['value'] ? 'checked' : ''); ?> class="sr-only peer" />
+                            <div class="relative w-11 h-6 rounded-full bg-slate-200 transition-colors duration-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/25 dark:bg-darkmode-600 peer-checked:bg-primary after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition-all after:duration-200 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"></div>
+                        </label>
+                    </div>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            </div>
+        </div>
+
+        <!-- Advance Notifications Section -->
+        <div class="mb-8">
+            <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-4 flex items-center border-b border-slate-200 dark:border-darkmode-400 pb-3">
+                <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'hand-coins','class' => 'w-5 h-5 mr-2 text-violet-500']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.lucide'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['icon' => 'hand-coins','class' => 'w-5 h-5 mr-2 text-violet-500']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+                Advance & Loan Notifications
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <?php $__currentLoopData = $advanceNotifications; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $notification): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <?php $fieldName = 'notifications_' . str_replace('.', '_', $key); ?>
+                    <div class="flex items-center justify-between p-3 rounded-lg border border-slate-200 dark:border-darkmode-400">
+                        <div class="flex-1">
+                            <div class="font-medium text-sm text-slate-800 dark:text-slate-100"><?php echo e($notification['label']); ?></div>
+                            <div class="text-xs text-slate-500"><?php echo e($notification['description']); ?></div>
+                        </div>
+                        <input type="hidden" name="<?php echo e($fieldName); ?>" value="0">
+                        <label class="inline-flex cursor-pointer items-center ml-3">
+                            <input type="checkbox" name="<?php echo e($fieldName); ?>" value="1" <?php echo e($notification['value'] ? 'checked' : ''); ?> class="sr-only peer" />
+                            <div class="relative w-11 h-6 rounded-full bg-slate-200 transition-colors duration-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/25 dark:bg-darkmode-600 peer-checked:bg-primary after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition-all after:duration-200 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"></div>
+                        </label>
+                    </div>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            </div>
+        </div>
+
+        <!-- Leave Notifications Section -->
+        <div class="mb-8">
+            <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-4 flex items-center border-b border-slate-200 dark:border-darkmode-400 pb-3">
+                <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'calendar-off','class' => 'w-5 h-5 mr-2 text-sky-500']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.lucide'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['icon' => 'calendar-off','class' => 'w-5 h-5 mr-2 text-sky-500']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+                Leave Notifications
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <?php $__currentLoopData = $leaveNotifications; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $notification): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <?php $fieldName = 'notifications_' . str_replace('.', '_', $key); ?>
                     <div class="flex items-center justify-between p-3 rounded-lg border border-slate-200 dark:border-darkmode-400">
                         <div class="flex-1">

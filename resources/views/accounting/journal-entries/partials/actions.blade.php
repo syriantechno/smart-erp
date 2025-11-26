@@ -57,19 +57,48 @@ window.editJournalEntry = function(id, reference) {
 
 // Post Journal Entry
 window.postJournalEntry = function(id, reference) {
-    if (confirm('Are you sure you want to post journal entry "' + reference + '"? This action cannot be undone.')) {
+    const doPost = () => {
         showToast('Posting journal entry...', 'info');
         // Here you would make an API call to post the entry
         console.log('Posting journal entry:', id);
+    };
+
+    if (typeof window.confirmApproval === 'function') {
+        window.confirmApproval({
+            title: 'Post Journal Entry',
+            message: 'Are you sure you want to post this journal entry? This action cannot be undone.',
+            itemName: reference,
+            type: 'approve',
+            confirmText: 'Post',
+            onConfirm: doPost
+        });
+    } else {
+        doPost();
     }
 };
 
 // Void Journal Entry
 window.voidJournalEntry = function(id, reference) {
-    if (confirm('Are you sure you want to void journal entry "' + reference + '"? This action cannot be undone.')) {
+    const doVoid = () => {
         showToast('Voiding journal entry...', 'info');
         // Here you would make an API call to void the entry
         console.log('Voiding journal entry:', id);
+    };
+
+    if (typeof window.confirmApproval === 'function') {
+        window.confirmApproval({
+            title: 'Void Journal Entry',
+            message: 'Are you sure you want to void this journal entry? This action cannot be undone.',
+            itemName: reference,
+            type: 'reject',
+            showComment: true,
+            requireComment: true,
+            commentLabel: 'Reason for voiding',
+            confirmText: 'Void',
+            onConfirm: doVoid
+        });
+    } else {
+        doVoid();
     }
 };
 </script>
