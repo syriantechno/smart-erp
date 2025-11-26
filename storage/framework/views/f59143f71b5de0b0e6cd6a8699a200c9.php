@@ -64,6 +64,11 @@
                 <div class="settings-content hidden intro-y" id="attendance-content">
                     <?php echo $__env->make('settings.partials.attendance', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
                 </div>
+
+                <!-- Expiry Notifications Settings Tab -->
+                <div class="settings-content hidden intro-y" id="expiry-notifications-content">
+                    <?php echo $__env->make('settings.partials.expiry-notifications', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+                </div>
             </div>
         </div>
     </div>

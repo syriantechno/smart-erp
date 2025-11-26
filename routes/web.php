@@ -89,6 +89,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/settings/roles/{role}/permissions', [SettingsController::class, 'updateRolePermissions'])->name('settings.roles.permissions.update');
     Route::post('/settings/roles', [SettingsController::class, 'storeRole'])->name('settings.roles.store');
     Route::post('/settings/users/{user}/roles', [SettingsController::class, 'assignUserRoles'])->name('settings.users.roles');
+    Route::post('/settings/expiry-notifications', [SettingsController::class, 'updateExpiryNotifications'])->name('settings.expiry-notifications.update');
 
     // Notifications API
     Route::get('notifications/recent', [NotificationController::class, 'recent'])->name('notifications.recent');

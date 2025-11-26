@@ -2,11 +2,15 @@
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 use App\Services\DocumentCodeGenerator;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote')->hourly();
+
+// Schedule expiry notifications to run daily at 8:00 AM
+Schedule::command('notifications:send-expiry')->dailyAt('08:00');
 
 Artisan::command('fix:employee-codes', function (DocumentCodeGenerator $codeGenerator) {
     $this->info('Fixing employee code numbers...');

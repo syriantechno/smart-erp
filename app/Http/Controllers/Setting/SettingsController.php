@@ -659,4 +659,30 @@ CSS;
             'message' => 'User roles updated successfully!',
         ]);
     }
+
+    /**
+     * Update expiry notification settings
+     */
+    public function updateExpiryNotifications(Request $request)
+    {
+        $settings = $request->input('settings', []);
+
+        foreach ($settings as $settingData) {
+            $setting = \App\Models\Setting\ExpiryNotificationSetting::find($settingData['id']);
+            if ($setting) {
+                $setting->update([
+                    'enabled' => $settingData['enabled'] ?? false,
+                    'days_before' => $settingData['days_before'] ?? 30,
+                    'notify_roles' => $settingData['notify_roles'] ?? [],
+                    'notify_super_admin' => $settingData['notify_super_admin'] ?? false,
+                    'notify_owner' => $settingData['notify_owner'] ?? false,
+                ]);
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Expiry notification settings updated successfully!',
+        ]);
+    }
 }

@@ -45,6 +45,10 @@
                 <x-base.lucide icon="shield-check" class="w-4 h-4 mr-2" />
                 Roles & Permissions
             </a>
+            <a href="#" class="settings-tab flex items-center px-3 py-2.5 text-sm font-medium rounded-lg text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-darkmode-400 transition-colors" data-tab="expiry-notifications">
+                <x-base.lucide icon="calendar-clock" class="w-4 h-4 mr-2" />
+                Expiry Notifications
+            </a>
         </nav>
     </div>
 </div>

@@ -64,6 +64,11 @@
                 <div class="settings-content hidden intro-y" id="attendance-content">
                     @include('settings.partials.attendance')
                 </div>
+
+                <!-- Expiry Notifications Settings Tab -->
+                <div class="settings-content hidden intro-y" id="expiry-notifications-content">
+                    @include('settings.partials.expiry-notifications')
+                </div>
             </div>
         </div>
     </div>
