@@ -121,7 +121,7 @@
 </head>
 <!-- END: Head -->
 
-<body class="<?php echo e(setting('dark_mode', false) ? 'dark' : ''); ?> <?php echo e(setting('font_size', 'medium')); ?> <?php echo e(setting('animations_enabled', true) ? '' : 'no-animations'); ?>">
+<body class="<?php echo e(setting('dark_mode', false) ? 'dark' : ''); ?> <?php echo e(setting('font_size', 'medium')); ?> <?php echo e(setting('animations_enabled', true) ? '' : 'no-animations'); ?> overflow-x-hidden">
 
 
 <?php echo $__env->yieldContent('content'); ?>

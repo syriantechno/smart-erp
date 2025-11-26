@@ -178,11 +178,14 @@ Route::middleware('auth')->group(function () {
         
         // Attendance
         Route::get('attendance', [App\Http\Controllers\HR\AttendanceController::class, 'index'])->name('attendance.index');
+        Route::get('attendance/data', [App\Http\Controllers\HR\AttendanceController::class, 'getData'])->name('attendance.data');
         Route::post('attendance', [App\Http\Controllers\HR\AttendanceController::class, 'store'])->name('attendance.store');
+        Route::post('attendance/bulk-store', [App\Http\Controllers\HR\AttendanceController::class, 'bulkStore'])->name('attendance.bulk-store');
         Route::put('attendance/{id}', [App\Http\Controllers\HR\AttendanceController::class, 'update'])->name('attendance.update');
         Route::delete('attendance/{id}', [App\Http\Controllers\HR\AttendanceController::class, 'destroy'])->name('attendance.destroy');
         Route::post('attendance/bulk-update', [App\Http\Controllers\HR\AttendanceController::class, 'bulkUpdate'])->name('attendance.bulk-update');
         Route::get('attendance/stats', [App\Http\Controllers\HR\AttendanceController::class, 'getMonthlyStats'])->name('attendance.stats');
+        Route::get('attendance/export', [App\Http\Controllers\HR\AttendanceController::class, 'export'])->name('attendance.export');
         
         // Leave Management
         Route::get('leave/datatable', [App\Http\Controllers\HR\LeaveController::class, 'datatable'])->name('leave.datatable');
@@ -193,6 +196,17 @@ Route::middleware('auth')->group(function () {
         
         // Payroll
         Route::get('payroll', [App\Http\Controllers\HR\PayrollController::class, 'index'])->name('payroll.index');
+        Route::get('payroll/data', [App\Http\Controllers\HR\PayrollController::class, 'getData'])->name('payroll.data');
+        Route::post('payroll/generate', [App\Http\Controllers\HR\PayrollController::class, 'generate'])->name('payroll.generate');
+        Route::get('payroll/{payroll}', [App\Http\Controllers\HR\PayrollController::class, 'show'])->name('payroll.show');
+        Route::put('payroll/{payroll}', [App\Http\Controllers\HR\PayrollController::class, 'update'])->name('payroll.update');
+        Route::delete('payroll/{payroll}', [App\Http\Controllers\HR\PayrollController::class, 'destroy'])->name('payroll.destroy');
+        Route::post('payroll/{payroll}/approve', [App\Http\Controllers\HR\PayrollController::class, 'approve'])->name('payroll.approve');
+        Route::post('payroll/{payroll}/mark-paid', [App\Http\Controllers\HR\PayrollController::class, 'markPaid'])->name('payroll.mark-paid');
+        Route::post('payroll/bulk-approve', [App\Http\Controllers\HR\PayrollController::class, 'bulkApprove'])->name('payroll.bulk-approve');
+        Route::post('payroll/bulk-paid', [App\Http\Controllers\HR\PayrollController::class, 'bulkPaid'])->name('payroll.bulk-paid');
+        Route::get('payroll/{payroll}/payslip', [App\Http\Controllers\HR\PayrollController::class, 'printPayslip'])->name('payroll.payslip');
+        Route::get('payroll/export', [App\Http\Controllers\HR\PayrollController::class, 'export'])->name('payroll.export');
         
         // Recruitment
         Route::get('recruitment', [App\Http\Controllers\HR\RecruitmentController::class, 'index'])->name('recruitment.index');

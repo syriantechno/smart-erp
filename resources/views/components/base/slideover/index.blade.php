@@ -9,7 +9,7 @@
     aria-hidden="true"
     tabindex="-1"
     {{ $attributes->class([
-            'modal group bg-black/60 transition-[visibility,opacity] w-screen h-screen fixed left-0 top-0',
+            'modal group bg-black/60 transition-[visibility,opacity] fixed inset-0 overflow-hidden',
             '[&:not(.show)]:duration-[0s,0.2s] [&:not(.show)]:delay-[0.2s,0s] [&:not(.show)]:invisible [&:not(.show)]:opacity-0',
             '[&.show]:visible [&.show]:opacity-100 [&.show]:duration-[0s,0.4s]',
         ])->merge($attributes->whereDoesntStartWith('class')->getAttributes()) }}

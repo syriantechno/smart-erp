@@ -308,7 +308,7 @@
     </x-base.dialog.panel>
 </x-base.dialog>
 
-@push('scripts')
+@pushonce('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -508,4 +508,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-@endpush
+@endpushonce

@@ -1,5 +1,5 @@
 <!-- Expiry Notifications Settings -->
-<div class="bg-white dark:bg-darkmode-600 rounded-lg shadow-sm border border-slate-200/60 dark:border-darkmode-400 mt-5">
+<div class="box mt-5">
     <div class="flex items-center justify-between border-b border-slate-200/60 p-5 dark:border-darkmode-400">
         <div>
             <h2 class="text-base font-medium flex items-center">
@@ -132,7 +132,7 @@
     </div>
 </div>
 
-@push('scripts')
+@pushonce('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -201,4 +201,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-@endpush
+@endpushonce

@@ -121,7 +121,7 @@
 </head>
 <!-- END: Head -->
 
-<body class="{{ setting('dark_mode', false) ? 'dark' : '' }} {{ setting('font_size', 'medium') }} {{ setting('animations_enabled', true) ? '' : 'no-animations' }}">
+<body class="{{ setting('dark_mode', false) ? 'dark' : '' }} {{ setting('font_size', 'medium') }} {{ setting('animations_enabled', true) ? '' : 'no-animations' }} overflow-x-hidden">
 
 
 @yield('content')

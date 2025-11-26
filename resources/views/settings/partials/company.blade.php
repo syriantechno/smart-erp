@@ -228,14 +228,13 @@
             </div>
         </div>
 
-            <div class="mt-5 flex justify-end">
-                <button type="submit" class="btn-royal btn-royal--gold btn-royal--sm w-32">
-                    <x-base.lucide icon="save" class="w-4 h-4 mr-2" />
-                    Save
-                </button>
-            </div>
-        </form>
-    </div>
+        <div class="mt-5 flex justify-end">
+            <button type="submit" class="btn-royal btn-royal--gold btn-royal--sm w-32">
+                <x-base.lucide icon="save" class="w-4 h-4 mr-2" />
+                Save
+            </button>
+        </div>
+    </form>
 </div>
 
 @php $companyCollection = $companies ?? collect(); @endphp

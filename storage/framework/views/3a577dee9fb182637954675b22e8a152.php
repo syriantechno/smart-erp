@@ -1,5 +1,5 @@
 <!-- Expiry Notifications Settings -->
-<div class="bg-white dark:bg-darkmode-600 rounded-lg shadow-sm border border-slate-200/60 dark:border-darkmode-400 mt-5">
+<div class="box mt-5">
     <div class="flex items-center justify-between border-b border-slate-200/60 p-5 dark:border-darkmode-400">
         <div>
             <h2 class="text-base font-medium flex items-center">
@@ -209,7 +209,8 @@
     </div>
 </div>
 
-<?php $__env->startPush('scripts'); ?>
+<?php if (! $__env->hasRenderedOnce('4983f416-ffda-41f6-94c5-2af73bf9c726')): $__env->markAsRenderedOnce('4983f416-ffda-41f6-94c5-2af73bf9c726');
+$__env->startPush('scripts'); ?>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -278,5 +279,5 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-<?php $__env->stopPush(); ?>
+<?php $__env->stopPush(); endif; ?>
 <?php /**PATH E:\ERP System\Source\resources\views/settings/partials/expiry-notifications.blade.php ENDPATH**/ ?>

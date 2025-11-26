@@ -621,9 +621,9 @@
             </div>
         </div>
 
-            <div class="mt-5 flex justify-end">
-                <button type="submit" class="btn-royal btn-royal--gold btn-royal--sm w-32">
-                    <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+        <div class="mt-5 flex justify-end">
+            <button type="submit" class="btn-royal btn-royal--gold btn-royal--sm w-32">
+                <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'save','class' => 'w-4 h-4 mr-2']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.lucide'); ?>
@@ -643,11 +643,10 @@
 <?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
-                    Save
-                </button>
-            </div>
-        </form>
-    </div>
+                Save
+            </button>
+        </div>
+    </form>
 </div>
 
 <?php $companyCollection = $companies ?? collect(); ?>

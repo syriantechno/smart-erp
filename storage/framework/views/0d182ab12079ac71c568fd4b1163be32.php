@@ -959,7 +959,8 @@
 <?php unset($__componentOriginalad7e71e98d6bc7c4deec90df8ba81dfd); ?>
 <?php endif; ?>
 
-<?php $__env->startPush('scripts'); ?>
+<?php if (! $__env->hasRenderedOnce('deb9bfee-51b4-48c7-abda-97c91d846120')): $__env->markAsRenderedOnce('deb9bfee-51b4-48c7-abda-97c91d846120');
+$__env->startPush('scripts'); ?>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -1159,5 +1160,5 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-<?php $__env->stopPush(); ?>
+<?php $__env->stopPush(); endif; ?>
 <?php /**PATH E:\ERP System\Source\resources\views/settings/partials/permissions.blade.php ENDPATH**/ ?>

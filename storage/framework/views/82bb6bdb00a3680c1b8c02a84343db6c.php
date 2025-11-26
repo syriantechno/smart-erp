@@ -28,7 +28,7 @@ foreach ($attributes->all() as $__key => $__value) {
 
 unset($__defined_vars); ?>
 
-<?php if (! $__env->hasRenderedOnce('fbcaa582-4d38-4a90-bbc3-787bda843edc')): $__env->markAsRenderedOnce('fbcaa582-4d38-4a90-bbc3-787bda843edc');
+<?php if (! $__env->hasRenderedOnce('07090d30-c442-4994-8cef-27e9a1270865')): $__env->markAsRenderedOnce('07090d30-c442-4994-8cef-27e9a1270865');
 $__env->startPush('vendors'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/js/vendors/modal.js'); ?>
 <?php $__env->stopPush(); endif; ?>
@@ -39,7 +39,7 @@ $__env->startPush('vendors'); ?>
     aria-hidden="true"
     tabindex="-1"
     <?php echo e($attributes->class([
-            'modal group bg-black/60 transition-[visibility,opacity] w-screen h-screen fixed left-0 top-0',
+            'modal group bg-black/60 transition-[visibility,opacity] fixed inset-0 overflow-hidden',
             '[&:not(.show)]:duration-[0s,0.2s] [&:not(.show)]:delay-[0.2s,0s] [&:not(.show)]:invisible [&:not(.show)]:opacity-0',
             '[&.show]:visible [&.show]:opacity-100 [&.show]:duration-[0s,0.4s]',
         ])->merge($attributes->whereDoesntStartWith('class')->getAttributes())); ?>

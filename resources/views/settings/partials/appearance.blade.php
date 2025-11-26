@@ -14,11 +14,6 @@
     >
         @csrf
 
-        @php
-            $palettes = config('theme.palettes', []);
-            $activePalette = setting('theme_palette', config('theme.default_palette'));
-        @endphp
-
         <div class="grid grid-cols-12 gap-6">
             <!-- Dark Mode -->
             <div class="col-span-12 md:col-span-6">
@@ -68,54 +63,6 @@
                 </div>
             </div>
 
-            <!-- Theme palettes -->
-            <div class="col-span-12">
-                <x-base.form-label>Accent Colors</x-base.form-label>
-                <p class="text-xs text-slate-500 mb-3">Choose a curated palette to keep the UI consistent.</p>
-                <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                    @foreach($palettes as $key => $palette)
-                        @php
-                            $isActive = $activePalette === $key;
-                            $gradient = "linear-gradient(120deg, {$palette['primary']} 0%, {$palette['secondary']} 50%, {$palette['accent']} 100%)";
-                        @endphp
-                        <label
-                            class="relative flex cursor-pointer flex-col rounded-2xl border border-slate-200/80 bg-slate-50 p-4 transition hover:border-primary/60 hover:shadow-lg dark:border-darkmode-500 dark:bg-darkmode-600"
-                            data-palette-card
-                        >
-                            <input
-                                type="radio"
-                                name="theme_palette"
-                                value="{{ $key }}"
-                                class="sr-only"
-                                data-palette-input
-                                {{ $isActive ? 'checked' : '' }}
-                            >
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="font-semibold text-slate-700 dark:text-slate-100">{{ $palette['label'] }}</p>
-                                    <p class="text-xs text-slate-500 dark:text-slate-400">{{ $palette['description'] }}</p>
-                                </div>
-                                <div class="rounded-xl border border-white/70 shadow-inner" style="background-image: {{ $gradient }}; width: 72px; height: 32px"></div>
-                            </div>
-                            <div class="mt-4 flex gap-2">
-                                <span class="flex-1 rounded-lg border border-white/60 bg-white/80 py-1 text-center text-[11px] font-semibold text-slate-600 dark:text-slate-200" style="color: {{ $palette['primary'] }}">
-                                    {{ $palette['primary'] }}
-                                </span>
-                                <span class="flex-1 rounded-lg border border-white/60 bg-white/80 py-1 text-center text-[11px] font-semibold text-slate-600 dark:text-slate-200" style="color: {{ $palette['secondary'] }}">
-                                    {{ $palette['secondary'] }}
-                                </span>
-                                <span class="flex-1 rounded-lg border border-white/60 bg-white/80 py-1 text-center text-[11px] font-semibold text-slate-600 dark:text-slate-200" style="color: {{ $palette['accent'] }}">
-                                    {{ $palette['accent'] }}
-                                </span>
-                            </div>
-                            <span class="pointer-events-none absolute right-4 top-4 rounded-full border border-primary/20 bg-white/80 p-1 text-primary opacity-0 scale-90 transition" data-palette-check>
-                                <x-base.lucide icon="Check" class="h-4 w-4" />
-                            </span>
-                        </label>
-                    @endforeach
-                </div>
-            </div>
-
             <!-- Font Size -->
             <div class="col-span-12 md:col-span-6">
                 <x-base.form-label>Font Size</x-base.form-label>
@@ -129,55 +76,11 @@
             </div>
         </div>
 
-        <div class="mt-5 flex items-center justify-between">
+        <div class="mt-5 flex items-center justify-end">
             <button type="submit" class="btn-royal btn-royal--gold btn-royal--sm w-40">
                 <x-base.lucide icon="save" class="w-4 h-4 mr-2" />
                 Save Appearance
             </button>
-
-            <button type="button" class="btn-royal btn-royal--outline btn-royal--sm" onclick="event.preventDefault(); if (confirm('Reset theme colors to default values?')) window.resetThemeSettings && window.resetThemeSettings();">
-                Reset Theme
-            </button>
         </div>
     </form>
 </div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const paletteInputs = document.querySelectorAll('[data-palette-input]');
-        const paletteCards = document.querySelectorAll('[data-palette-card]');
-
-        function updatePaletteState() {
-            paletteCards.forEach(card => {
-                const input = card.querySelector('[data-palette-input]');
-                const check = card.querySelector('[data-palette-check]');
-                const isActive = input?.checked;
-
-                card.classList.toggle('ring-2', !!isActive);
-                card.classList.toggle('ring-primary/60', !!isActive);
-                card.classList.toggle('bg-slate-100/80', !!isActive);
-                card.classList.toggle('dark:bg-darkmode-500/80', !!isActive);
-                if (check) {
-                    check.classList.toggle('opacity-100', !!isActive);
-                    check.classList.toggle('opacity-0', !isActive);
-                    check.classList.toggle('scale-100', !!isActive);
-                    check.classList.toggle('scale-90', !isActive);
-                }
-            });
-        }
-
-        paletteInputs.forEach(input => {
-            input.addEventListener('change', () => {
-                paletteInputs.forEach(other => {
-                    if (other !== input) {
-                        other.checked = false;
-                    }
-                });
-                input.checked = true;
-                updatePaletteState();
-            });
-        });
-
-        updatePaletteState();
-    });
-</script>
