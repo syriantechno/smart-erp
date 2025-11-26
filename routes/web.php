@@ -83,6 +83,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/settings/notifications', [SettingsController::class, 'updateNotifications'])->name('settings.notifications.update');
     Route::post('/settings/ai', [SettingsController::class, 'updateAiSettings'])->name('settings.ai.update');
     Route::post('/settings/taxes', [SettingsController::class, 'storeTax'])->name('settings.taxes.store');
+    
+    // Roles & Permissions
+    Route::get('/settings/roles/{role}/permissions', [SettingsController::class, 'getRolePermissions'])->name('settings.roles.permissions');
+    Route::post('/settings/roles/{role}/permissions', [SettingsController::class, 'updateRolePermissions'])->name('settings.roles.permissions.update');
+    Route::post('/settings/roles', [SettingsController::class, 'storeRole'])->name('settings.roles.store');
 
     // Notifications API
     Route::get('notifications/recent', [NotificationController::class, 'recent'])->name('notifications.recent');
@@ -226,6 +231,14 @@ Route::middleware('auth')->group(function () {
         Route::post('/comments/{comment}/reaction', [App\Http\Controllers\Work\TaskController::class, 'toggleCommentReaction'])->name('comments.reaction');
         Route::delete('/comments/{comment}', [App\Http\Controllers\Work\TaskController::class, 'deleteComment'])->name('comments.destroy');
         
+        // Extension Requests (MUST be before {task} routes)
+        Route::get('/extension-requests', [App\Http\Controllers\Work\TaskExtensionRequestController::class, 'index'])->name('extension-requests.index');
+        Route::get('/extension-requests/datatable', [App\Http\Controllers\Work\TaskExtensionRequestController::class, 'datatable'])->name('extension-requests.datatable');
+        Route::get('/extension-requests/pending-count', [App\Http\Controllers\Work\TaskExtensionRequestController::class, 'pendingCount'])->name('extension-requests.pending-count');
+        Route::get('/extension-requests/{extensionRequest}', [App\Http\Controllers\Work\TaskExtensionRequestController::class, 'show'])->name('extension-requests.show');
+        Route::post('/extension-requests/{extensionRequest}/approve', [App\Http\Controllers\Work\TaskExtensionRequestController::class, 'approve'])->name('extension-requests.approve');
+        Route::post('/extension-requests/{extensionRequest}/reject', [App\Http\Controllers\Work\TaskExtensionRequestController::class, 'reject'])->name('extension-requests.reject');
+
         // Task Like Route (before show route)
         Route::post('/{task}/like', [App\Http\Controllers\Work\TaskController::class, 'toggleLike'])->name('like');
         Route::post('/{task}/comments', [App\Http\Controllers\Work\TaskController::class, 'addComment'])->name('comments.store');
@@ -271,6 +284,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/employees-for-delegation', [App\Http\Controllers\Work\TaskController::class, 'getEmployeesForDelegation'])->name('employees-for-delegation');
         Route::get('/{task}/steps/{step}', [App\Http\Controllers\Work\TaskController::class, 'getStep'])->name('steps.show');
         Route::post('/{task}/steps/{step}/delegate', [App\Http\Controllers\Work\TaskController::class, 'delegateStep'])->name('steps.delegate');
+
+        // Extension Requests (task-specific routes)
+        Route::post('/{task}/extension-requests', [App\Http\Controllers\Work\TaskExtensionRequestController::class, 'store'])->name('extension-requests.store');
+        Route::get('/{task}/extension-requests', [App\Http\Controllers\Work\TaskExtensionRequestController::class, 'taskRequests'])->name('extension-requests.task');
     });
 
     // Warehouse Routes

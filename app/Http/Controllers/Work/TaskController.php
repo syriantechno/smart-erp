@@ -223,6 +223,9 @@ class TaskController extends Controller
                 ]);
             }
 
+            // Send notification to assigned employee
+            $this->taskService->notifyAssignee($task);
+
             DB::commit();
 
             if ($request->ajax()) {
@@ -278,6 +281,9 @@ class TaskController extends Controller
                 'user_id' => auth()->id(),
                 'type' => $comment->type
             ]);
+
+            // Send notification
+            $this->taskService->notifyTaskComment($task, $request->comment);
 
             return response()->json([
                 'success' => true,
@@ -359,6 +365,11 @@ class TaskController extends Controller
     {
         try {
             $result = $task->toggleLike();
+
+            // Send notification only when liked (not unliked)
+            if ($result['action'] === 'liked') {
+                $this->taskService->notifyTaskLike($task);
+            }
 
             return Reply::success('Like updated', [
                 'action' => $result['action'],
@@ -460,13 +471,38 @@ class TaskController extends Controller
         try {
             DB::beginTransaction();
 
+            // Track changed fields for notification
+            $oldValues = $task->only(['title', 'description', 'priority', 'due_date', 'status', 'employee_id']);
+
             if (!empty($validated['due_date'])) {
                 $validated['due_date'] = Carbon::createFromFormat('d M, Y', $validated['due_date'])->format('Y-m-d');
             }
 
             $validated['is_active'] = $request->boolean('is_active', true);
 
+            // Check for status change
+            $statusChanged = isset($validated['status']) && $task->status !== $validated['status'];
+            $oldStatus = $task->status;
+
             $task->update($validated);
+
+            // Send status change notification
+            if ($statusChanged) {
+                // Use TaskService for status notifications
+                $task = $task->fresh();
+                $this->taskService->updateTask($task->fresh(), ['status' => $validated['status']]);
+            } else {
+                // Send general update notification
+                $changedFields = [];
+                foreach (['title', 'description', 'priority', 'due_date'] as $field) {
+                    if (isset($validated[$field]) && $oldValues[$field] != $validated[$field]) {
+                        $changedFields[] = $field;
+                    }
+                }
+                if (!empty($changedFields)) {
+                    $this->taskService->notifyTaskUpdate($task, $changedFields);
+                }
+            }
 
             DB::commit();
 
@@ -585,8 +621,14 @@ class TaskController extends Controller
         try {
             DB::beginTransaction();
 
-            $task->status = $request->input('status');
+            $oldStatus = $task->status;
+            $newStatus = $request->input('status');
+            
+            $task->status = $newStatus;
             $task->save();
+
+            // Use TaskService for status change notification
+            $this->taskService->updateTask($task->fresh(), ['status' => $newStatus]);
 
             DB::commit();
 

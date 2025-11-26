@@ -8,7 +8,7 @@ return [
             'enabled' => true,
         ],
         'mail' => [
-            'enabled' => env('NOTIFICATIONS_EMAIL_ENABLED', true),
+            'enabled' => env('NOTIFICATIONS_EMAIL_ENABLED', false),
         ],
         'sms' => [
             'enabled' => env('NOTIFICATIONS_SMS_ENABLED', false),
@@ -36,5 +36,18 @@ return [
         'approval.pending' => ['database', 'mail', 'sms'],
         'approval.approved' => ['database', 'mail'],
         'approval.rejected' => ['database', 'mail'],
+
+        // Task Extension Requests
+        'task_extension.requested' => ['database', 'mail'],
+        'task_extension.approved' => ['database', 'mail'],
+        'task_extension.rejected' => ['database', 'mail'],
+
+        // Task Notifications
+        'task.assigned' => ['database', 'mail'],
+        'task.started' => ['database'],
+        'task.completed' => ['database', 'mail'],
+        'task.updated' => ['database'],
+        'task.commented' => ['database'],
+        'task.liked' => ['database'],
     ],
 ];

@@ -39,6 +39,7 @@ class PrefixSettingsSeeder extends Seeder
             ['document_type' => 'receipts', 'prefix' => 'REC'],
             ['document_type' => 'projects', 'prefix' => 'PRJ'],
             ['document_type' => 'vendors', 'prefix' => 'VND'],
+            ['document_type' => 'task_extension_requests', 'prefix' => 'TER'],
         ];
 
         foreach ($documentTypes as $type) {

@@ -69,6 +69,25 @@
 
             <button
                 type="button"
+                class="btn-royal btn-royal--outline btn-royal--sm hidden sm:inline-flex min-h-[44px] items-center gap-2 px-4 group"
+                data-tw-toggle="modal"
+                data-tw-target="#how-to-work-modal"
+            >
+                <x-base.lucide icon="book-open" class="w-4 h-4 icon-hover-rise" />
+                How to Work
+            </button>
+
+            <a
+                href="{{ route('tasks.extension-requests.index') }}"
+                class="btn-royal btn-royal--outline btn-royal--sm hidden sm:inline-flex min-h-[44px] items-center gap-2 px-4 group relative"
+            >
+                <x-base.lucide icon="clock" class="w-4 h-4 icon-hover-rise" />
+                طلبات التمديد
+                <span id="extension-requests-badge" class="absolute -top-1 -right-1 hidden items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full"></span>
+            </a>
+
+            <button
+                type="button"
                 class="btn-royal btn-royal--gold btn-royal--sm w-36 sm:w-auto sm:ml-2 group"
                 data-tw-toggle="modal"
                 data-tw-target="#create-task-modal"
@@ -357,6 +376,7 @@
 
     @include('tasks.modals.create')
     @include('tasks.modals.edit')
+    @include('tasks.partials.how-to-work')
     @stack('modals')
 
     <!-- Hidden button to trigger edit modal -->
@@ -1198,6 +1218,23 @@
         if (typeof window.Lucide !== 'undefined') {
             window.Lucide.createIcons();
         }
+
+        // Load pending extension requests count
+        fetch('{{ route("tasks.extension-requests.pending-count") }}', {
+            headers: { 'Accept': 'application/json' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.data.count > 0) {
+                const badge = document.getElementById('extension-requests-badge');
+                if (badge) {
+                    badge.textContent = data.data.count;
+                    badge.classList.remove('hidden');
+                    badge.classList.add('flex');
+                }
+            }
+        })
+        .catch(error => console.error('Error loading extension requests count:', error));
     });
     </script>
 @endpush

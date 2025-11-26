@@ -357,20 +357,54 @@ class SettingsController extends Controller
 
     public function updateNotifications(Request $request)
     {
-        $keys = [
-            'notifications.department.created' => 'Notify when a department is created',
-            'notifications.department.updated' => 'Notify when a department is updated',
-            'notifications.department.deleted' => 'Notify when a department is deleted',
-
-            'notifications.position.created' => 'Notify when a position is created',
-            'notifications.position.updated' => 'Notify when a position is updated',
-            'notifications.position.deleted' => 'Notify when a position is deleted',
-
-            'notifications.employee.created' => 'Notify when an employee is created',
-            'notifications.employee.deleted' => 'Notify when an employee is deleted',
+        // Notification Channels
+        $channelKeys = [
+            'notifications.channels.database' => 'In-app notifications enabled',
+            'notifications.channels.mail' => 'Email notifications enabled',
         ];
 
-        foreach ($keys as $key => $description) {
+        foreach ($channelKeys as $key => $description) {
+            $fieldName = str_replace('.', '_', $key);
+            $value = $request->boolean($fieldName);
+            Setting::set($key, $value, 'boolean', $description);
+        }
+
+        // Task Notifications
+        $taskKeys = [
+            'notifications.task.assigned' => 'Notify when a task is assigned',
+            'notifications.task.started' => 'Notify when a task is started',
+            'notifications.task.completed' => 'Notify when a task is completed',
+            'notifications.task.updated' => 'Notify when a task is updated',
+            'notifications.task.commented' => 'Notify when a comment is added',
+            'notifications.task.liked' => 'Notify when a task is liked',
+        ];
+
+        foreach ($taskKeys as $key => $description) {
+            $fieldName = str_replace('.', '_', $key);
+            $value = $request->boolean($fieldName);
+            Setting::set($key, $value, 'boolean', $description);
+        }
+
+        // Task Extension Notifications
+        $extensionKeys = [
+            'notifications.task_extension.requested' => 'Notify when extension is requested',
+            'notifications.task_extension.approved' => 'Notify when extension is approved',
+            'notifications.task_extension.rejected' => 'Notify when extension is rejected',
+        ];
+
+        foreach ($extensionKeys as $key => $description) {
+            $fieldName = str_replace('.', '_', $key);
+            $value = $request->boolean($fieldName);
+            Setting::set($key, $value, 'boolean', $description);
+        }
+
+        // HR Notifications
+        $hrKeys = [
+            'notifications.department.created' => 'Notify when a department is created',
+            'notifications.employee.created' => 'Notify when an employee is created',
+        ];
+
+        foreach ($hrKeys as $key => $description) {
             $fieldName = str_replace('.', '_', $key);
             $value = $request->boolean($fieldName);
             Setting::set($key, $value, 'boolean', $description);
@@ -379,7 +413,6 @@ class SettingsController extends Controller
         // Documents expiry reminder days (numeric setting)
         if ($request->filled('notifications_documents_expiry_reminder_days')) {
             $days = (int) $request->input('notifications_documents_expiry_reminder_days', 30);
-            // Clamp between 1 and 365 days
             $days = max(1, min(365, $days));
             Setting::set(
                 'notifications.documents.expiry_reminder_days',
@@ -389,17 +422,8 @@ class SettingsController extends Controller
             );
         }
 
-        // Employee documents expiry reminder days (numeric setting)
-        if ($request->filled('notifications_employee_documents_expiry_reminder_days')) {
-            $days = (int) $request->input('notifications_employee_documents_expiry_reminder_days', 30);
-            $days = max(1, min(365, $days));
-            Setting::set(
-                'notifications.employee_documents.expiry_reminder_days',
-                $days,
-                'number',
-                'Days before an employee document expiry to trigger reminders'
-            );
-        }
+        // Clear cache to apply new settings
+        \Artisan::call('cache:clear');
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
@@ -556,5 +580,85 @@ CSS;
         $b = max(0, min(255, hexdec(substr($hex, 4, 2)) + $steps));
 
         return sprintf("#%02x%02x%02x", $r, $g, $b);
+    }
+
+    /**
+     * Get role permissions for editing
+     */
+    public function getRolePermissions(Role $role)
+    {
+        $permissions = Permission::all()->groupBy(function($permission) {
+            $parts = explode(' ', $permission->name);
+            return end($parts);
+        });
+
+        return response()->json([
+            'success' => true,
+            'role' => [
+                'id' => $role->id,
+                'name' => ucwords(str_replace('-', ' ', $role->name)),
+            ],
+            'permissions_grouped' => $permissions,
+            'role_permissions' => $role->permissions->pluck('id')->toArray(),
+        ]);
+    }
+
+    /**
+     * Update role permissions
+     */
+    public function updateRolePermissions(Request $request, Role $role)
+    {
+        if ($role->name === 'super-admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot modify super-admin permissions',
+            ], 403);
+        }
+
+        $permissionIds = $request->input('permissions', []);
+        $permissions = Permission::whereIn('id', $permissionIds)->get();
+        
+        $role->syncPermissions($permissions);
+        
+        // Clear permission cache
+        app()['cache']->forget('spatie.permission.cache');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Role permissions updated successfully!',
+        ]);
+    }
+
+    /**
+     * Store a new role
+     */
+    public function storeRole(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255|unique:roles,name',
+            'copy_from' => 'nullable|exists:roles,id',
+        ]);
+
+        $role = Role::create([
+            'name' => strtolower(str_replace(' ', '-', $request->name)),
+            'guard_name' => 'web',
+        ]);
+
+        // Copy permissions from another role if specified
+        if ($request->filled('copy_from')) {
+            $sourceRole = Role::find($request->copy_from);
+            if ($sourceRole) {
+                $role->syncPermissions($sourceRole->permissions);
+            }
+        }
+
+        // Clear permission cache
+        app()['cache']->forget('spatie.permission.cache');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Role created successfully!',
+            'role' => $role,
+        ]);
     }
 }

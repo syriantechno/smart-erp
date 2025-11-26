@@ -301,6 +301,30 @@ class Task extends BaseModel
         return $this->hasMany(TaskActivity::class)->latest();
     }
 
+    /**
+     * Get the extension requests for this task.
+     */
+    public function extensionRequests(): HasMany
+    {
+        return $this->hasMany(TaskExtensionRequest::class)->latest();
+    }
+
+    /**
+     * Get pending extension request.
+     */
+    public function pendingExtensionRequest()
+    {
+        return $this->hasOne(TaskExtensionRequest::class)->pending()->latest();
+    }
+
+    /**
+     * Check if task has pending extension request.
+     */
+    public function hasPendingExtensionRequest(): bool
+    {
+        return $this->extensionRequests()->pending()->exists();
+    }
+
     // ============================================
     // SCOPES
     // ============================================

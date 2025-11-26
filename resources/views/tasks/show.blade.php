@@ -294,6 +294,17 @@
                                     <x-base.lucide icon="share" class="w-4 h-4 mr-2" />
                                     Share Task
                                 </button>
+
+                                @if($task->due_date && $task->status !== 'completed')
+                                    <button type="button" 
+                                            class="btn-royal btn-royal--outline w-full request-extension-btn" 
+                                            data-task-id="{{ $task->id }}"
+                                            data-due-date="{{ $task->due_date->format('Y-m-d') }}"
+                                            data-has-pending="{{ $task->hasPendingExtensionRequest() ? 'true' : 'false' }}">
+                                        <x-base.lucide icon="clock" class="w-4 h-4 mr-2" />
+                                        طلب تمديد الوقت
+                                    </button>
+                                @endif
                             </div>
                         </div>
 
@@ -322,6 +333,8 @@
             </div>
         </x-base.preview-component>
     </div>
+    <!-- Extension Request Modal -->
+    @include('tasks.modals.extension-request')
 @endsection
 
 @push('scripts')
@@ -422,6 +435,19 @@ document.addEventListener('DOMContentLoaded', function() {
             navigator.clipboard.writeText(window.location.href).then(() => {
                 window.showSuccess && showSuccess('Task link copied to clipboard!');
             });
+        });
+    });
+
+    // Request Extension Button
+    document.querySelectorAll('.request-extension-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const taskId = this.getAttribute('data-task-id');
+            const dueDate = this.getAttribute('data-due-date');
+            const hasPending = this.getAttribute('data-has-pending') === 'true';
+            
+            if (typeof openExtensionRequestModal === 'function') {
+                openExtensionRequestModal(taskId, dueDate, hasPending);
+            }
         });
     });
 

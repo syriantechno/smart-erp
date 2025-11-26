@@ -70,4 +70,5 @@ return [
     'hr' => 'الموارد البشرية',
     'human_resources' => 'الموارد البشرية',
     'contacts' => 'جهات الاتصال',
+    'task_extension_requests' => 'طلبات تمديد المهام',
 ];

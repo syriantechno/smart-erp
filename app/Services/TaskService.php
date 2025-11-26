@@ -7,9 +7,7 @@ use App\Models\Work\TaskActivity;
 use App\Models\Work\TaskTimeLog;
 use App\Models\HR\Employee;
 use App\Models\User;
-use App\Notifications\TaskAssignedNotification;
-use App\Notifications\TaskStatusChangedNotification;
-use App\Notifications\TaskCommentAddedNotification;
+use App\Services\Notifications\NotificationDispatcher;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -308,12 +306,25 @@ class TaskService
         if (!$task->employee_id) return;
 
         $employee = $task->employee;
-        if (!$employee || !$employee->user) return;
+        if (!$employee || !$employee->user_id) return;
 
-        $assignedByName = auth()->user()?->name ?? 'System';
+        $assignedByName = auth()->user()?->name ?? 'النظام';
 
         try {
-            $employee->user->notify(new TaskAssignedNotification($task, $assignedByName));
+            NotificationDispatcher::toUser(
+                $employee->user_id,
+                'task.assigned',
+                'مهمة جديدة مسندة إليك',
+                "{$assignedByName} أسند إليك مهمة: {$task->title}",
+                route('tasks.show', $task->id),
+                'clipboard-list',
+                [
+                    'type' => 'task_assigned',
+                    'task_id' => $task->id,
+                    'task_code' => $task->code,
+                    'actor_id' => auth()->id(),
+                ]
+            );
         } catch (\Exception $e) {
             Log::error('Failed to send task assignment notification', [
                 'task_id' => $task->id,
@@ -324,37 +335,224 @@ class TaskService
     }
 
     /**
-     * Notify watchers about status change.
+     * Notify task creator about status change.
      */
     protected function notifyStatusChange(Task $task, string $oldStatus, string $newStatus): void
     {
-        $changedByName = auth()->user()?->name ?? 'System';
-        $usersToNotify = collect();
-
-        // Notify assigned employee
-        if ($task->employee?->user) {
-            $usersToNotify->push($task->employee->user);
+        $changedByName = auth()->user()?->name ?? 'النظام';
+        
+        // Get status labels in Arabic
+        $statusLabels = [
+            'pending' => 'قيد الانتظار',
+            'in_progress' => 'قيد التنفيذ',
+            'completed' => 'مكتملة',
+            'cancelled' => 'ملغية',
+        ];
+        
+        $newStatusLabel = $statusLabels[$newStatus] ?? $newStatus;
+        
+        // Determine notification type and message based on status
+        $eventKey = 'task.updated';
+        $title = 'تحديث حالة المهمة';
+        $icon = 'refresh-cw';
+        
+        if ($newStatus === 'in_progress') {
+            $eventKey = 'task.started';
+            $title = 'بدء العمل على المهمة';
+            $icon = 'play-circle';
+        } elseif ($newStatus === 'completed') {
+            $eventKey = 'task.completed';
+            $title = 'اكتمال المهمة';
+            $icon = 'check-circle';
         }
-
-        // Notify watchers
-        if ($task->watchers) {
-            $watcherUsers = User::whereIn('id', $task->watchers)->get();
-            $usersToNotify = $usersToNotify->merge($watcherUsers);
-        }
-
-        // Remove current user from notifications
-        $usersToNotify = $usersToNotify->unique('id')->filter(fn($user) => $user->id !== auth()->id());
-
-        foreach ($usersToNotify as $user) {
+        
+        $message = "{$changedByName} قام بتغيير حالة المهمة '{$task->title}' إلى: {$newStatusLabel}";
+        
+        // Notify task creator (assigned_by)
+        if ($task->assigned_by && $task->assigned_by !== auth()->id()) {
             try {
-                $user->notify(new TaskStatusChangedNotification($task, $oldStatus, $newStatus, $changedByName));
+                NotificationDispatcher::toUser(
+                    $task->assigned_by,
+                    $eventKey,
+                    $title,
+                    $message,
+                    route('tasks.show', $task->id),
+                    $icon,
+                    [
+                        'type' => 'task_status_changed',
+                        'task_id' => $task->id,
+                        'task_code' => $task->code,
+                        'old_status' => $oldStatus,
+                        'new_status' => $newStatus,
+                        'actor_id' => auth()->id(),
+                    ]
+                );
             } catch (\Exception $e) {
-                Log::error('Failed to send task status notification', [
+                Log::error('Failed to send task status notification to creator', [
                     'task_id' => $task->id,
-                    'user_id' => $user->id,
                     'error' => $e->getMessage(),
                 ]);
             }
+        }
+        
+        // Notify assigned employee if different from current user and creator
+        if ($task->employee?->user_id && 
+            $task->employee->user_id !== auth()->id() && 
+            $task->employee->user_id !== $task->assigned_by) {
+            try {
+                NotificationDispatcher::toUser(
+                    $task->employee->user_id,
+                    $eventKey,
+                    $title,
+                    $message,
+                    route('tasks.show', $task->id),
+                    $icon,
+                    [
+                        'type' => 'task_status_changed',
+                        'task_id' => $task->id,
+                        'task_code' => $task->code,
+                        'old_status' => $oldStatus,
+                        'new_status' => $newStatus,
+                        'actor_id' => auth()->id(),
+                    ]
+                );
+            } catch (\Exception $e) {
+                Log::error('Failed to send task status notification to assignee', [
+                    'task_id' => $task->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+    }
+
+    /**
+     * Notify about task comment.
+     */
+    public function notifyTaskComment(Task $task, string $comment): void
+    {
+        $commenterName = auth()->user()?->name ?? 'مستخدم';
+        $recipientIds = [];
+        
+        // Notify task creator
+        if ($task->assigned_by && $task->assigned_by !== auth()->id()) {
+            $recipientIds[] = $task->assigned_by;
+        }
+        
+        // Notify assigned employee
+        if ($task->employee?->user_id && 
+            $task->employee->user_id !== auth()->id() &&
+            !in_array($task->employee->user_id, $recipientIds)) {
+            $recipientIds[] = $task->employee->user_id;
+        }
+        
+        if (empty($recipientIds)) return;
+        
+        try {
+            NotificationDispatcher::toUsers(
+                $recipientIds,
+                'task.commented',
+                'تعليق جديد على المهمة',
+                "{$commenterName} أضاف تعليقاً على المهمة: {$task->title}",
+                route('tasks.show', $task->id),
+                'message-circle',
+                [
+                    'type' => 'task_commented',
+                    'task_id' => $task->id,
+                    'task_code' => $task->code,
+                    'comment_preview' => mb_substr($comment, 0, 100),
+                    'actor_id' => auth()->id(),
+                ]
+            );
+        } catch (\Exception $e) {
+            Log::error('Failed to send task comment notification', [
+                'task_id' => $task->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Notify about task like.
+     */
+    public function notifyTaskLike(Task $task): void
+    {
+        $likerName = auth()->user()?->name ?? 'مستخدم';
+        
+        // Notify assigned employee only
+        if (!$task->employee?->user_id || $task->employee->user_id === auth()->id()) {
+            return;
+        }
+        
+        try {
+            NotificationDispatcher::toUser(
+                $task->employee->user_id,
+                'task.liked',
+                'إعجاب بمهمتك',
+                "{$likerName} أعجب بمهمتك: {$task->title}",
+                route('tasks.show', $task->id),
+                'heart',
+                [
+                    'type' => 'task_liked',
+                    'task_id' => $task->id,
+                    'task_code' => $task->code,
+                    'actor_id' => auth()->id(),
+                ]
+            );
+        } catch (\Exception $e) {
+            Log::error('Failed to send task like notification', [
+                'task_id' => $task->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Notify about task update (general changes).
+     */
+    public function notifyTaskUpdate(Task $task, array $changedFields): void
+    {
+        $updaterName = auth()->user()?->name ?? 'مستخدم';
+        $recipientIds = [];
+        
+        // Notify assigned employee
+        if ($task->employee?->user_id && $task->employee->user_id !== auth()->id()) {
+            $recipientIds[] = $task->employee->user_id;
+        }
+        
+        if (empty($recipientIds)) return;
+        
+        $fieldLabels = [
+            'title' => 'العنوان',
+            'description' => 'الوصف',
+            'priority' => 'الأولوية',
+            'due_date' => 'تاريخ الاستحقاق',
+            'estimated_hours' => 'الساعات المقدرة',
+        ];
+        
+        $changedFieldNames = array_map(fn($f) => $fieldLabels[$f] ?? $f, $changedFields);
+        $fieldsText = implode('، ', $changedFieldNames);
+        
+        try {
+            NotificationDispatcher::toUsers(
+                $recipientIds,
+                'task.updated',
+                'تحديث المهمة',
+                "{$updaterName} قام بتحديث المهمة '{$task->title}': {$fieldsText}",
+                route('tasks.show', $task->id),
+                'edit',
+                [
+                    'type' => 'task_updated',
+                    'task_id' => $task->id,
+                    'task_code' => $task->code,
+                    'changed_fields' => $changedFields,
+                    'actor_id' => auth()->id(),
+                ]
+            );
+        } catch (\Exception $e) {
+            Log::error('Failed to send task update notification', [
+                'task_id' => $task->id,
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 }

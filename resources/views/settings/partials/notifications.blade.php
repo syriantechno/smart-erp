@@ -1,98 +1,222 @@
-<!-- Notification Settings Content Loaded -->
+<!-- Notification Settings Content -->
 <div class="bg-white dark:bg-darkmode-600 rounded-lg shadow-sm border border-slate-200/60 dark:border-darkmode-400 mt-5">
     <div class="flex items-center border-b border-slate-200/60 p-5 dark:border-darkmode-400">
         <h2 class="mr-auto text-base font-medium flex items-center">
             <x-base.lucide icon="Bell" class="w-5 h-5 mr-2 text-yellow-500" />
-            Notification Settings
+            {{ __('settings.notification_settings') }}
         </h2>
     </div>
 
     @php
-        $notificationSettings = [
-            // Departments
-            'notifications.department.created' => [
-                'label' => 'Department Created',
-                'description' => 'Send a bell notification when a new department is created.',
+        // Notification Channels
+        $channelSettings = [
+            'database' => [
+                'label' => __('settings.in_app_notifications'),
+                'description' => __('settings.in_app_notifications_desc'),
+                'icon' => 'bell',
+                'value' => \App\Models\Setting\Setting::get('notifications.channels.database', true),
+            ],
+            'mail' => [
+                'label' => __('settings.email_notifications'),
+                'description' => __('settings.email_notifications_desc'),
+                'icon' => 'mail',
+                'value' => \App\Models\Setting\Setting::get('notifications.channels.mail', false),
+            ],
+        ];
+
+        // Task Notifications
+        $taskNotifications = [
+            'task.assigned' => [
+                'label' => __('settings.task_assigned'),
+                'description' => __('settings.task_assigned_desc'),
+                'value' => \App\Models\Setting\Setting::get('notifications.task.assigned', true),
+            ],
+            'task.started' => [
+                'label' => __('settings.task_started'),
+                'description' => __('settings.task_started_desc'),
+                'value' => \App\Models\Setting\Setting::get('notifications.task.started', true),
+            ],
+            'task.completed' => [
+                'label' => __('settings.task_completed'),
+                'description' => __('settings.task_completed_desc'),
+                'value' => \App\Models\Setting\Setting::get('notifications.task.completed', true),
+            ],
+            'task.updated' => [
+                'label' => __('settings.task_updated'),
+                'description' => __('settings.task_updated_desc'),
+                'value' => \App\Models\Setting\Setting::get('notifications.task.updated', true),
+            ],
+            'task.commented' => [
+                'label' => __('settings.task_commented'),
+                'description' => __('settings.task_commented_desc'),
+                'value' => \App\Models\Setting\Setting::get('notifications.task.commented', true),
+            ],
+            'task.liked' => [
+                'label' => __('settings.task_liked'),
+                'description' => __('settings.task_liked_desc'),
+                'value' => \App\Models\Setting\Setting::get('notifications.task.liked', true),
+            ],
+        ];
+
+        // Task Extension Notifications
+        $extensionNotifications = [
+            'task_extension.requested' => [
+                'label' => __('settings.extension_requested'),
+                'description' => __('settings.extension_requested_desc'),
+                'value' => \App\Models\Setting\Setting::get('notifications.task_extension.requested', true),
+            ],
+            'task_extension.approved' => [
+                'label' => __('settings.extension_approved'),
+                'description' => __('settings.extension_approved_desc'),
+                'value' => \App\Models\Setting\Setting::get('notifications.task_extension.approved', true),
+            ],
+            'task_extension.rejected' => [
+                'label' => __('settings.extension_rejected'),
+                'description' => __('settings.extension_rejected_desc'),
+                'value' => \App\Models\Setting\Setting::get('notifications.task_extension.rejected', true),
+            ],
+        ];
+
+        // HR Notifications
+        $hrNotifications = [
+            'department.created' => [
+                'label' => __('settings.department_created'),
+                'description' => __('settings.department_created_desc'),
                 'value' => \App\Models\Setting\Setting::get('notifications.department.created', true),
             ],
-            'notifications.department.updated' => [
-                'label' => 'Department Updated',
-                'description' => 'Send a bell notification when a department is updated.',
-                'value' => \App\Models\Setting\Setting::get('notifications.department.updated', true),
-            ],
-            'notifications.department.deleted' => [
-                'label' => 'Department Deleted',
-                'description' => 'Send a bell notification when a department is deleted.',
-                'value' => \App\Models\Setting\Setting::get('notifications.department.deleted', true),
-            ],
-
-            // Positions
-            'notifications.position.created' => [
-                'label' => 'Position Created',
-                'description' => 'Send a bell notification when a new position is created.',
-                'value' => \App\Models\Setting\Setting::get('notifications.position.created', true),
-            ],
-            'notifications.position.updated' => [
-                'label' => 'Position Updated',
-                'description' => 'Send a bell notification when a position is updated.',
-                'value' => \App\Models\Setting\Setting::get('notifications.position.updated', true),
-            ],
-            'notifications.position.deleted' => [
-                'label' => 'Position Deleted',
-                'description' => 'Send a bell notification when a position is deleted.',
-                'value' => \App\Models\Setting\Setting::get('notifications.position.deleted', true),
-            ],
-
-            // Employees
-            'notifications.employee.created' => [
-                'label' => 'Employee Created',
-                'description' => 'Send a bell notification when a new employee is created.',
+            'employee.created' => [
+                'label' => __('settings.employee_created'),
+                'description' => __('settings.employee_created_desc'),
                 'value' => \App\Models\Setting\Setting::get('notifications.employee.created', true),
-            ],
-            'notifications.employee.deleted' => [
-                'label' => 'Employee Deleted',
-                'description' => 'Send a bell notification when an employee is deleted.',
-                'value' => \App\Models\Setting\Setting::get('notifications.employee.deleted', true),
             ],
         ];
 
         $documentsExpiryReminderDays = \App\Models\Setting\Setting::get('notifications.documents.expiry_reminder_days', 30);
-        $employeeDocumentsExpiryReminderDays = \App\Models\Setting\Setting::get('notifications.employee_documents.expiry_reminder_days', 30);
     @endphp
 
     <form id="notification-settings-form" action="{{ route('settings.notifications.update') }}" method="POST" class="p-5">
         @csrf
-        <div class="grid grid-cols-12 gap-6">
-            <!-- HR - Departments -->
-            <div class="col-span-12 md:col-span-6 lg:col-span-4">
-                <h3 class="mb-3 flex items-center text-sm font-semibold text-slate-800 dark:text-slate-100">
-                    <x-base.lucide icon="Building" class="w-4 h-4 mr-2 text-primary" />
-                    HR - Departments
-                </h3>
-                @foreach (['notifications.department.created', 'notifications.department.updated', 'notifications.department.deleted'] as $key)
-                    @php 
-                        $field = $notificationSettings[$key];
-                        $fieldName = str_replace('.', '_', $key);
-                    @endphp
-                    <div class="mb-4 flex items-center justify-between">
-                        <div class="flex-1">
-                            <div class="font-medium text-sm text-slate-800 dark:text-slate-100">{{ $field['label'] }}</div>
-                            <div class="text-xs text-slate-500 dark:text-slate-400">{{ $field['description'] }}</div>
-                        </div>
+        
+        <!-- Notification Channels Section -->
+        <div class="mb-8">
+            <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-4 flex items-center border-b border-slate-200 dark:border-darkmode-400 pb-3">
+                <x-base.lucide icon="radio" class="w-5 h-5 mr-2 text-primary" />
+                {{ __('settings.notification_channels') }}
+            </h3>
+            <p class="text-sm text-slate-500 mb-4">{{ __('settings.notification_channels_desc') }}</p>
             
-            <!-- Documents expiry reminder -->
-            <div class="col-span-12 md:col-span-6 lg:col-span-4">
-                <h3 class="mb-3 flex items-center text-sm font-semibold text-slate-800 dark:text-slate-100">
-                    <x-base.lucide icon="FileWarning" class="w-4 h-4 mr-2 text-primary" />
-                    Documents
-                </h3>
-
-                <div class="mb-4">
-                    <div class="font-medium text-sm text-slate-800 dark:text-slate-100">
-                        Expiry reminder (days before)
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                @foreach ($channelSettings as $key => $channel)
+                    @php $fieldName = 'notifications_channels_' . $key; @endphp
+                    <div class="p-4 rounded-lg border border-slate-200 dark:border-darkmode-400 bg-slate-50 dark:bg-darkmode-700">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                    <x-base.lucide icon="{{ $channel['icon'] }}" class="w-5 h-5 text-primary" />
+                                </div>
+                                <div>
+                                    <div class="font-medium text-slate-800 dark:text-slate-100">{{ $channel['label'] }}</div>
+                                    <div class="text-xs text-slate-500">{{ $channel['description'] }}</div>
+                                </div>
+                            </div>
+                            <input type="hidden" name="{{ $fieldName }}" value="0">
+                            <label class="inline-flex cursor-pointer items-center">
+                                <input type="checkbox" name="{{ $fieldName }}" value="1" {{ $channel['value'] ? 'checked' : '' }} class="sr-only peer" />
+                                <div class="relative w-11 h-6 rounded-full bg-slate-200 transition-colors duration-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/25 dark:bg-darkmode-600 peer-checked:bg-primary after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition-all after:duration-200 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"></div>
+                            </label>
+                        </div>
                     </div>
-                    <div class="text-xs text-slate-500 dark:text-slate-400 mb-2">
-                        Number of days before a document's expiry date to start showing reminders.
+                @endforeach
+            </div>
+        </div>
+
+        <!-- Task Notifications Section -->
+        <div class="mb-8">
+            <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-4 flex items-center border-b border-slate-200 dark:border-darkmode-400 pb-3">
+                <x-base.lucide icon="clipboard-list" class="w-5 h-5 mr-2 text-blue-500" />
+                {{ __('settings.task_notifications') }}
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                @foreach ($taskNotifications as $key => $notification)
+                    @php $fieldName = 'notifications_' . str_replace('.', '_', $key); @endphp
+                    <div class="flex items-center justify-between p-3 rounded-lg border border-slate-200 dark:border-darkmode-400">
+                        <div class="flex-1">
+                            <div class="font-medium text-sm text-slate-800 dark:text-slate-100">{{ $notification['label'] }}</div>
+                            <div class="text-xs text-slate-500">{{ $notification['description'] }}</div>
+                        </div>
+                        <input type="hidden" name="{{ $fieldName }}" value="0">
+                        <label class="inline-flex cursor-pointer items-center ml-3">
+                            <input type="checkbox" name="{{ $fieldName }}" value="1" {{ $notification['value'] ? 'checked' : '' }} class="sr-only peer" />
+                            <div class="relative w-11 h-6 rounded-full bg-slate-200 transition-colors duration-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/25 dark:bg-darkmode-600 peer-checked:bg-primary after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition-all after:duration-200 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"></div>
+                        </label>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
+        <!-- Task Extension Notifications Section -->
+        <div class="mb-8">
+            <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-4 flex items-center border-b border-slate-200 dark:border-darkmode-400 pb-3">
+                <x-base.lucide icon="clock" class="w-5 h-5 mr-2 text-yellow-500" />
+                {{ __('settings.extension_notifications') }}
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                @foreach ($extensionNotifications as $key => $notification)
+                    @php $fieldName = 'notifications_' . str_replace('.', '_', $key); @endphp
+                    <div class="flex items-center justify-between p-3 rounded-lg border border-slate-200 dark:border-darkmode-400">
+                        <div class="flex-1">
+                            <div class="font-medium text-sm text-slate-800 dark:text-slate-100">{{ $notification['label'] }}</div>
+                            <div class="text-xs text-slate-500">{{ $notification['description'] }}</div>
+                        </div>
+                        <input type="hidden" name="{{ $fieldName }}" value="0">
+                        <label class="inline-flex cursor-pointer items-center ml-3">
+                            <input type="checkbox" name="{{ $fieldName }}" value="1" {{ $notification['value'] ? 'checked' : '' }} class="sr-only peer" />
+                            <div class="relative w-11 h-6 rounded-full bg-slate-200 transition-colors duration-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/25 dark:bg-darkmode-600 peer-checked:bg-primary after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition-all after:duration-200 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"></div>
+                        </label>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
+        <!-- HR Notifications Section -->
+        <div class="mb-8">
+            <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-4 flex items-center border-b border-slate-200 dark:border-darkmode-400 pb-3">
+                <x-base.lucide icon="users" class="w-5 h-5 mr-2 text-green-500" />
+                {{ __('settings.hr_notifications') }}
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                @foreach ($hrNotifications as $key => $notification)
+                    @php $fieldName = 'notifications_' . str_replace('.', '_', $key); @endphp
+                    <div class="flex items-center justify-between p-3 rounded-lg border border-slate-200 dark:border-darkmode-400">
+                        <div class="flex-1">
+                            <div class="font-medium text-sm text-slate-800 dark:text-slate-100">{{ $notification['label'] }}</div>
+                            <div class="text-xs text-slate-500">{{ $notification['description'] }}</div>
+                        </div>
+                        <input type="hidden" name="{{ $fieldName }}" value="0">
+                        <label class="inline-flex cursor-pointer items-center ml-3">
+                            <input type="checkbox" name="{{ $fieldName }}" value="1" {{ $notification['value'] ? 'checked' : '' }} class="sr-only peer" />
+                            <div class="relative w-11 h-6 rounded-full bg-slate-200 transition-colors duration-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/25 dark:bg-darkmode-600 peer-checked:bg-primary after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition-all after:duration-200 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"></div>
+                        </label>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
+        <!-- Document Expiry Settings -->
+        <div class="mb-8">
+            <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-4 flex items-center border-b border-slate-200 dark:border-darkmode-400 pb-3">
+                <x-base.lucide icon="file-warning" class="w-5 h-5 mr-2 text-red-500" />
+                {{ __('settings.document_expiry') }}
+            </h3>
+            
+            <div class="p-4 rounded-lg border border-slate-200 dark:border-darkmode-400 bg-slate-50 dark:bg-darkmode-700">
+                <div class="flex items-center gap-4">
+                    <div class="flex-1">
+                        <div class="font-medium text-slate-800 dark:text-slate-100">{{ __('settings.expiry_reminder_days') }}</div>
+                        <div class="text-xs text-slate-500">{{ __('settings.expiry_reminder_days_desc') }}</div>
                     </div>
                     <x-base.form-input
                         type="number"
@@ -100,112 +224,18 @@
                         max="365"
                         name="notifications_documents_expiry_reminder_days"
                         value="{{ $documentsExpiryReminderDays }}"
-                        class="w-32"
+                        class="w-24 text-center"
                     />
+                    <span class="text-sm text-slate-500">{{ __('settings.days') }}</span>
                 </div>
-
-                <div class="mt-4 mb-2 border-t border-dashed border-slate-200 dark:border-darkmode-400 pt-4">
-                    <div class="font-medium text-sm text-slate-800 dark:text-slate-100 flex items-center">
-                        <x-base.lucide icon="IdCard" class="w-4 h-4 mr-2 text-primary" />
-                        Employee documents expiry (days before)
-                    </div>
-                    <div class="text-xs text-slate-500 dark:text-slate-400 mb-2">
-                        Number of days before an employee document expiry date (passport, visa, ID, etc.) to start showing reminders.
-                    </div>
-                    <x-base.form-input
-                        type="number"
-                        min="1"
-                        max="365"
-                        name="notifications_employee_documents_expiry_reminder_days"
-                        value="{{ $employeeDocumentsExpiryReminderDays }}"
-                        class="w-32"
-                    />
-                </div>
-            </div>
-                        <input type="hidden" name="{{ $fieldName }}" value="0">
-                        <label class="inline-flex cursor-pointer items-center ml-3">
-                            <input
-                            id="{{ $fieldName }}"
-                            name="{{ $fieldName }}"
-                            type="checkbox"
-                            value="1"
-                            {{ $field['value'] ? 'checked' : '' }}
-                            class="sr-only peer"
-                            />
-                            <div class="relative w-11 h-6 rounded-full bg-slate-200 transition-colors duration-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/25 dark:bg-darkmode-600 peer-checked:bg-primary after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition-all after:duration-200 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"></div>
-                        </label>
-                    </div>
-                @endforeach
-            </div>
-
-            <!-- HR - Positions -->
-            <div class="col-span-12 md:col-span-6 lg:col-span-4">
-                <h3 class="mb-3 flex items-center text-sm font-semibold text-slate-800 dark:text-slate-100">
-                    <x-base.lucide icon="Briefcase" class="w-4 h-4 mr-2 text-primary" />
-                    HR - Positions
-                </h3>
-                @foreach (['notifications.position.created', 'notifications.position.updated', 'notifications.position.deleted'] as $key)
-                    @php 
-                        $field = $notificationSettings[$key];
-                        $fieldName = str_replace('.', '_', $key);
-                    @endphp
-                    <div class="mb-4 flex items-center justify-between">
-                        <div class="flex-1">
-                            <div class="font-medium text-sm text-slate-800 dark:text-slate-100">{{ $field['label'] }}</div>
-                            <div class="text-xs text-slate-500 dark:text-slate-400">{{ $field['description'] }}</div>
-                        </div>
-                        <input type="hidden" name="{{ $fieldName }}" value="0">
-                        <label class="inline-flex cursor-pointer items-center ml-3">
-                            <input
-                            id="{{ $fieldName }}"
-                            name="{{ $fieldName }}"
-                            type="checkbox"
-                            value="1"
-                            {{ $field['value'] ? 'checked' : '' }}
-                            class="sr-only peer"
-                            />
-                            <div class="relative w-11 h-6 rounded-full bg-slate-200 transition-colors duration-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/25 dark:bg-darkmode-600 peer-checked:bg-primary after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition-all after:duration-200 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"></div>
-                        </label>
-                    </div>
-                @endforeach
-            </div>
-
-            <!-- HR - Employees -->
-            <div class="col-span-12 md:col-span-6 lg:col-span-4">
-                <h3 class="mb-3 flex items-center text-sm font-semibold text-slate-800 dark:text-slate-100">
-                    <x-base.lucide icon="User" class="w-4 h-4 mr-2 text-primary" />
-                    HR - Employees
-                </h3>
-                @foreach (['notifications.employee.created', 'notifications.employee.deleted'] as $key)
-                    @php 
-                        $field = $notificationSettings[$key];
-                        $fieldName = str_replace('.', '_', $key);
-                    @endphp
-                    <div class="mb-4 flex items-center justify-between">
-                        <div class="flex-1">
-                            <div class="font-medium text-sm text-slate-800 dark:text-slate-100">{{ $field['label'] }}</div>
-                            <div class="text-xs text-slate-500 dark:text-slate-400">{{ $field['description'] }}</div>
-                        </div>
-                        <input type="hidden" name="{{ $fieldName }}" value="0">
-                        <label class="inline-flex cursor-pointer items-center ml-3">
-                            <input
-                            id="{{ $fieldName }}"
-                            name="{{ $fieldName }}"
-                            type="checkbox"
-                            value="1"
-                            {{ $field['value'] ? 'checked' : '' }}
-                            class="sr-only peer"
-                            />
-                            <div class="relative w-11 h-6 rounded-full bg-slate-200 transition-colors duration-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/25 dark:bg-darkmode-600 peer-checked:bg-primary after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition-all after:duration-200 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"></div>
-                        </label>
-                    </div>
-                @endforeach
             </div>
         </div>
-        <div class="mt-5 flex justify-end">
+
+        <!-- Save Button -->
+        <div class="flex justify-end border-t border-slate-200 dark:border-darkmode-400 pt-5">
             <button type="submit" class="btn-royal btn-royal--gold btn-royal--sm w-48">
                 <x-base.lucide icon="save" class="w-4 h-4 mr-2" />
-                Save Notifications
+                {{ __('settings.save_settings') }}
             </button>
         </div>
     </form>
