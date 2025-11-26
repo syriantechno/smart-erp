@@ -70,6 +70,65 @@
             </div>
         </div>
 
+        <!-- Users by Role Table -->
+        <div class="mb-6">
+            <h3 class="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-4 flex items-center">
+                <x-base.lucide icon="users-round" class="w-4 h-4 mr-2 text-primary" />
+                Users by Role
+            </h3>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="bg-slate-50 dark:bg-darkmode-700">
+                            <th class="px-4 py-3 text-left font-medium text-slate-700 dark:text-slate-300">User</th>
+                            <th class="px-4 py-3 text-left font-medium text-slate-700 dark:text-slate-300">Email</th>
+                            <th class="px-4 py-3 text-left font-medium text-slate-700 dark:text-slate-300">Roles</th>
+                            <th class="px-4 py-3 text-center font-medium text-slate-700 dark:text-slate-300">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 dark:divide-darkmode-400">
+                        @php
+                            $users = \App\Models\User::with('roles')->orderBy('name')->get();
+                        @endphp
+                        @foreach($users as $user)
+                            <tr class="hover:bg-slate-50 dark:hover:bg-darkmode-700">
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                                            <span class="text-xs font-medium text-primary">{{ strtoupper(substr($user->name, 0, 2)) }}</span>
+                                        </div>
+                                        <span class="font-medium text-slate-800 dark:text-slate-100">{{ $user->name }}</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-slate-600 dark:text-slate-400">{{ $user->email }}</td>
+                                <td class="px-4 py-3">
+                                    <div class="flex flex-wrap gap-1">
+                                        @forelse($user->roles as $userRole)
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium 
+                                                {{ $userRole->name === 'super-admin' ? 'bg-yellow-100 text-yellow-700' : 
+                                                   ($userRole->name === 'admin' ? 'bg-red-100 text-red-700' : 
+                                                   ($userRole->name === 'hr-manager' ? 'bg-blue-100 text-blue-700' : 
+                                                   ($userRole->name === 'project-manager' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-700'))) }}">
+                                                {{ ucwords(str_replace('-', ' ', $userRole->name)) }}
+                                            </span>
+                                        @empty
+                                            <span class="text-slate-400 text-xs">No roles</span>
+                                        @endforelse
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <button type="button" class="assign-role-btn text-primary hover:text-primary/80" data-user-id="{{ $user->id }}" data-user-name="{{ $user->name }}" data-user-roles="{{ $user->roles->pluck('id')->join(',') }}">
+                                        <x-base.lucide icon="user-cog" class="w-4 h-4" />
+                                    </button>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- Permissions by Module -->
         <div>
             <h3 class="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-4 flex items-center">
@@ -192,6 +251,57 @@
                 <button type="submit" class="btn-royal btn-royal--gold">
                     <x-base.lucide icon="plus" class="w-4 h-4 mr-2" />
                     Create Role
+                </button>
+            </x-base.dialog.footer>
+        </form>
+    </x-base.dialog.panel>
+</x-base.dialog>
+
+<!-- Assign Role to User Modal -->
+<x-base.dialog id="assign-role-modal">
+    <x-base.dialog.panel>
+        <x-base.dialog.title class="bg-gradient-to-r from-blue-600 to-blue-500 text-white">
+            <h2 class="text-lg font-semibold" id="assign-role-title">Assign Roles to User</h2>
+            <button type="button" data-tw-dismiss="modal" class="text-white/80 hover:text-white">
+                <x-base.lucide icon="x" class="w-5 h-5" />
+            </button>
+        </x-base.dialog.title>
+        <form id="assign-role-form">
+            <input type="hidden" id="assign-user-id" name="user_id">
+            <x-base.dialog.description class="p-6">
+                <p class="text-sm text-slate-600 mb-4">Select roles to assign to <strong id="assign-user-name"></strong>:</p>
+                <div class="space-y-2" id="assign-roles-list">
+                    @foreach($roles as $role)
+                        <label class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 dark:border-darkmode-400 hover:bg-slate-50 dark:hover:bg-darkmode-700 cursor-pointer">
+                            <input type="checkbox" name="roles[]" value="{{ $role->id }}" class="rounded border-slate-300 text-primary focus:ring-primary user-role-checkbox">
+                            <div class="flex items-center gap-2">
+                                @php
+                                    $roleIcons = [
+                                        'super-admin' => 'crown',
+                                        'admin' => 'shield',
+                                        'hr-manager' => 'users',
+                                        'project-manager' => 'briefcase',
+                                        'team-leader' => 'user-check',
+                                        'accountant' => 'calculator',
+                                        'warehouse-manager' => 'warehouse',
+                                        'employee' => 'user',
+                                    ];
+                                @endphp
+                                <x-base.lucide icon="{{ $roleIcons[$role->name] ?? 'user' }}" class="w-4 h-4 text-primary" />
+                                <span class="font-medium">{{ ucwords(str_replace('-', ' ', $role->name)) }}</span>
+                                <span class="text-xs text-slate-500">({{ $role->permissions_count }} permissions)</span>
+                            </div>
+                        </label>
+                    @endforeach
+                </div>
+            </x-base.dialog.description>
+            <x-base.dialog.footer class="bg-slate-50 dark:bg-darkmode-600">
+                <button type="button" data-tw-dismiss="modal" class="btn-royal btn-royal--outline">
+                    Cancel
+                </button>
+                <button type="submit" class="btn-royal btn-royal--gold">
+                    <x-base.lucide icon="save" class="w-4 h-4 mr-2" />
+                    Save Roles
                 </button>
             </x-base.dialog.footer>
         </form>
@@ -344,6 +454,56 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => {
             console.error('Error:', error);
             window.showError && showError('Failed to create role');
+        });
+    });
+
+    // Assign Role Button
+    document.querySelectorAll('.assign-role-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const userId = this.dataset.userId;
+            const userName = this.dataset.userName;
+            const userRoles = this.dataset.userRoles ? this.dataset.userRoles.split(',').map(Number) : [];
+            
+            document.getElementById('assign-user-id').value = userId;
+            document.getElementById('assign-user-name').textContent = userName;
+            
+            // Reset all checkboxes and check user's current roles
+            document.querySelectorAll('.user-role-checkbox').forEach(cb => {
+                cb.checked = userRoles.includes(parseInt(cb.value));
+            });
+            
+            const modal = tailwind.Modal.getOrCreateInstance(document.getElementById('assign-role-modal'));
+            modal.show();
+        });
+    });
+
+    // Assign Role Form Submit
+    document.getElementById('assign-role-form')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const userId = document.getElementById('assign-user-id').value;
+        const formData = new FormData(this);
+        
+        fetch(`{{ url('settings/users') }}/${userId}/roles`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.showSuccess && showSuccess(data.message);
+                tailwind.Modal.getOrCreateInstance(document.getElementById('assign-role-modal')).hide();
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                window.showError && showError(data.message || 'Failed to assign roles');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            window.showError && showError('Failed to assign roles');
         });
     });
 });

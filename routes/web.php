@@ -88,6 +88,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/settings/roles/{role}/permissions', [SettingsController::class, 'getRolePermissions'])->name('settings.roles.permissions');
     Route::post('/settings/roles/{role}/permissions', [SettingsController::class, 'updateRolePermissions'])->name('settings.roles.permissions.update');
     Route::post('/settings/roles', [SettingsController::class, 'storeRole'])->name('settings.roles.store');
+    Route::post('/settings/users/{user}/roles', [SettingsController::class, 'assignUserRoles'])->name('settings.users.roles');
 
     // Notifications API
     Route::get('notifications/recent', [NotificationController::class, 'recent'])->name('notifications.recent');

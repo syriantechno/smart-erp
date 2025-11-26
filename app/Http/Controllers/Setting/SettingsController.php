@@ -74,27 +74,6 @@ class SettingsController extends Controller
         return redirect()->route('settings.index')->with('success', 'Tax created successfully.');
     }
 
-    public function updateRolePermissions(Request $request, Role $role)
-    {
-        $data = $request->validate([
-            'permissions' => 'array',
-            'permissions.*' => 'integer|exists:permissions,id',
-        ]);
-
-        $permissionIds = $data['permissions'] ?? [];
-        $permissions = Permission::whereIn('id', $permissionIds)->get();
-        $role->syncPermissions($permissions);
-
-        if ($request->ajax() || $request->wantsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Role permissions updated successfully.',
-            ]);
-        }
-
-        return redirect()->route('settings.index', ['#permissions'])->with('success', 'Role permissions updated successfully.');
-    }
-
     public function update(Request $request)
     {
         $request->validate([
@@ -659,6 +638,25 @@ CSS;
             'success' => true,
             'message' => 'Role created successfully!',
             'role' => $role,
+        ]);
+    }
+
+    /**
+     * Assign roles to a user
+     */
+    public function assignUserRoles(Request $request, \App\Models\User $user)
+    {
+        $roleIds = $request->input('roles', []);
+        $roles = Role::whereIn('id', $roleIds)->get();
+        
+        $user->syncRoles($roles);
+        
+        // Clear permission cache
+        app()['cache']->forget('spatie.permission.cache');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'User roles updated successfully!',
         ]);
     }
 }
