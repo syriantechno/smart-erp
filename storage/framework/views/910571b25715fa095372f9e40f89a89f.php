@@ -32,9 +32,8 @@ unset($__defined_vars); ?>
 <div class="relative" id="notification-dropdown">
     
     <button
-        class="relative notification-bell inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/60 bg-white text-slate-800 shadow-[0_14px_30px_rgba(15,15,20,0.12)] transition hover:-translate-y-0.5 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-200"
-        data-tw-toggle="modal"
-        data-tw-target="#notifications-slideover"
+        id="notification-bell-btn"
+        class="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/60 bg-white text-slate-800 shadow-[0_14px_30px_rgba(15,15,20,0.12)] transition hover:-translate-y-0.5 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-200"
         :class="{ 'text-blue-600': unreadCount > 0 }"
     >
         <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
@@ -61,59 +60,36 @@ unset($__defined_vars); ?>
         
         <div
             id="notification-badge"
-            class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs font-medium text-white"
+            class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs font-medium text-white animate-pulse"
             style="display: <?php echo e($unreadCount > 0 ? 'flex' : 'none'); ?>;"
         >
             <?php echo e($unreadCount > 99 ? '99+' : $unreadCount); ?>
 
         </div>
     </button>
-</div>
 
-
-<?php if (isset($component)) { $__componentOriginal7b984b2f83e0e1ed46be48207486a493 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal7b984b2f83e0e1ed46be48207486a493 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.slideover.index','data' => ['id' => 'notifications-slideover','size' => 'md']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.slideover'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['id' => 'notifications-slideover','size' => 'md']); ?>
-    <?php if (isset($component)) { $__componentOriginalbf24d1b6c00bc08aa4e052383ee60570 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalbf24d1b6c00bc08aa4e052383ee60570 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.slideover.panel','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.slideover.panel'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes([]); ?>
-        
-        <?php if (isset($component)) { $__componentOriginala9479a745407756aa806bba6e780c74f = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginala9479a745407756aa806bba6e780c74f = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.slideover.title','data' => ['class' => 'p-5 border-b border-slate-200/60']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.slideover.title'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['class' => 'p-5 border-b border-slate-200/60']); ?>
-            <div class="flex items-center justify-between w-full">
-                <div class="flex items-center gap-2">
-                    <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+    
+    <div
+        id="notifications-dropdown"
+        class="absolute right-0 top-full z-50 mt-2 w-96 max-w-sm opacity-0 invisible transform translate-y-2 transition-all duration-200 ease-out"
+        style="display: none;"
+    >
+        <div class="bg-white rounded-xl shadow-2xl border border-slate-200/60 overflow-hidden">
+            
+            <div class="flex items-center justify-between p-4 bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200/60">
+                <div class="flex items-center gap-3">
+                    <div class="relative">
+                        <div class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center">
+                            <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Bell','class' => 'h-5 w-5 text-yellow-500']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Bell','class' => 'h-4 w-4 text-white']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.lucide'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['icon' => 'Bell','class' => 'h-5 w-5 text-yellow-500']); ?>
+<?php $component->withAttributes(['icon' => 'Bell','class' => 'h-4 w-4 text-white']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
@@ -124,107 +100,161 @@ unset($__defined_vars); ?>
 <?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
-                    <h3 class="text-base font-medium text-slate-800">Notifications</h3>
+                        </div>
+                        <div
+                            id="dropdown-unread-badge"
+                            class="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full border border-white"
+                            style="display: <?php echo e($unreadCount > 0 ? 'block' : 'none'); ?>;"
+                        ></div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-semibold text-slate-800">Notifications</h3>
+                        <p class="text-xs text-slate-600"><?php echo e($unreadCount); ?> unread</p>
+                    </div>
                 </div>
-                <div class="flex space-x-2">
+
+                <div class="flex items-center gap-1">
                     <button
                         onclick="markAllNotificationsAsRead()"
-                        class="text-xs text-blue-600 hover:text-blue-800"
+                        class="text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-2 py-1 rounded-md transition-colors"
                         id="mark-all-read-btn"
                     >
                         Mark all read
                     </button>
                     <button
                         onclick="deleteAllNotifications()"
-                        class="text-xs text-red-600 hover:text-red-800"
+                        class="text-xs text-red-600 hover:text-red-800 hover:bg-red-50 px-2 py-1 rounded-md transition-colors"
                     >
                         Clear all
                     </button>
                 </div>
             </div>
-         <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginala9479a745407756aa806bba6e780c74f)): ?>
-<?php $attributes = $__attributesOriginala9479a745407756aa806bba6e780c74f; ?>
-<?php unset($__attributesOriginala9479a745407756aa806bba6e780c74f); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginala9479a745407756aa806bba6e780c74f)): ?>
-<?php $component = $__componentOriginala9479a745407756aa806bba6e780c74f; ?>
-<?php unset($__componentOriginala9479a745407756aa806bba6e780c74f); ?>
-<?php endif; ?>
 
-        
-        <?php if (isset($component)) { $__componentOriginal52a8e2b085d6c4797e2849447438b96c = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal52a8e2b085d6c4797e2849447438b96c = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.slideover.description','data' => ['class' => 'px-0 py-0']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.slideover.description'); ?>
+            
+            <div class="max-h-96 overflow-y-auto">
+                <div id="notifications-list" class="divide-y divide-slate-100">
+                    <div class="px-4 py-8 text-center">
+                        <div class="animate-pulse flex flex-col items-center gap-2">
+                            <div class="h-4 w-4 bg-slate-300 rounded-full"></div>
+                            <div class="h-3 w-32 bg-slate-300 rounded"></div>
+                        </div>
+                        <p class="text-sm text-slate-500 mt-2">Loading notifications...</p>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div id="notifications-footer" class="p-3 bg-slate-50 border-t border-slate-200/60" style="display: none;">
+                <a
+                    href="<?php echo e(route('notifications.index')); ?>"
+                    class="flex items-center justify-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors"
+                >
+                    <span>View all notifications</span>
+                    <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'ArrowRight','class' => 'h-3 w-3']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.lucide'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['class' => 'px-0 py-0']); ?>
-            <div class="max-h-[420px] overflow-y-auto">
-                <div id="notifications-list" class="divide-y divide-gray-100">
-                    <!-- Notifications will be loaded here -->
-                    <div class="px-4 py-8 text-center text-sm text-gray-500">
-                        Loading notifications...
-                    </div>
-                </div>
+<?php $component->withAttributes(['icon' => 'ArrowRight','class' => 'h-3 w-3']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
+<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
+<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
+<?php endif; ?>
+                </a>
             </div>
-         <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal52a8e2b085d6c4797e2849447438b96c)): ?>
-<?php $attributes = $__attributesOriginal52a8e2b085d6c4797e2849447438b96c; ?>
-<?php unset($__attributesOriginal52a8e2b085d6c4797e2849447438b96c); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal52a8e2b085d6c4797e2849447438b96c)): ?>
-<?php $component = $__componentOriginal52a8e2b085d6c4797e2849447438b96c; ?>
-<?php unset($__componentOriginal52a8e2b085d6c4797e2849447438b96c); ?>
-<?php endif; ?>
+        </div>
 
         
-        <div id="notifications-footer" class="px-5 py-3 border-t border-slate-200/60 bg-slate-50" style="display: none;">
-            <a
-                href="<?php echo e(route('notifications.index')); ?>"
-                class="text-sm text-blue-600 hover:text-blue-800 font-medium"
-            >
-                View all notifications →
-            </a>
+        <div class="absolute top-0 right-4 transform -translate-y-full">
+            <div class="w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-white"></div>
+            <div class="absolute top-0 right-0 transform translate-x-px translate-y-px w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-slate-200/60"></div>
         </div>
-     <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginalbf24d1b6c00bc08aa4e052383ee60570)): ?>
-<?php $attributes = $__attributesOriginalbf24d1b6c00bc08aa4e052383ee60570; ?>
-<?php unset($__attributesOriginalbf24d1b6c00bc08aa4e052383ee60570); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginalbf24d1b6c00bc08aa4e052383ee60570)): ?>
-<?php $component = $__componentOriginalbf24d1b6c00bc08aa4e052383ee60570; ?>
-<?php unset($__componentOriginalbf24d1b6c00bc08aa4e052383ee60570); ?>
-<?php endif; ?>
- <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal7b984b2f83e0e1ed46be48207486a493)): ?>
-<?php $attributes = $__attributesOriginal7b984b2f83e0e1ed46be48207486a493; ?>
-<?php unset($__attributesOriginal7b984b2f83e0e1ed46be48207486a493); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal7b984b2f83e0e1ed46be48207486a493)): ?>
-<?php $component = $__componentOriginal7b984b2f83e0e1ed46be48207486a493; ?>
-<?php unset($__componentOriginal7b984b2f83e0e1ed46be48207486a493); ?>
-<?php endif; ?>
+    </div>
+</div>
 
 
 <script>
 let notifications = [];
 let unreadCount = <?php echo e($unreadCount ?? 0); ?>;
 let pollingInterval = null;
+let dropdownOpen = false;
 
 function initNotifications() {
     loadRecentNotifications();
     startPolling();
     updateBadge();
+    initDropdownEvents();
 }
 
+function initDropdownEvents() {
+    const bellBtn = document.getElementById('notification-bell-btn');
+    const dropdown = document.getElementById('notifications-dropdown');
+
+    if (bellBtn && dropdown) {
+        bellBtn.addEventListener('click', toggleDropdown);
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!bellBtn.contains(event.target) && !dropdown.contains(event.target)) {
+                closeDropdown();
+            }
+        });
+
+        // Close dropdown on escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && dropdownOpen) {
+                closeDropdown();
+            }
+        });
+    }
+}
+
+function toggleDropdown() {
+    if (dropdownOpen) {
+        closeDropdown();
+    } else {
+        openDropdown();
+    }
+}
+
+function openDropdown() {
+    const dropdown = document.getElementById('notifications-dropdown');
+    if (dropdown) {
+        dropdown.style.display = 'block';
+        // Force reflow
+        dropdown.offsetHeight;
+        dropdown.classList.remove('opacity-0', 'invisible', 'translate-y-2');
+        dropdown.classList.add('opacity-100', 'visible', 'translate-y-0');
+        dropdownOpen = true;
+    }
+}
+
+function closeDropdown() {
+    const dropdown = document.getElementById('notifications-dropdown');
+    if (dropdown) {
+        dropdown.classList.remove('opacity-100', 'visible', 'translate-y-0');
+        dropdown.classList.add('opacity-0', 'invisible', 'translate-y-2');
+
+        // Hide after transition
+        setTimeout(() => {
+            dropdown.style.display = 'none';
+        }, 200);
+
+        dropdownOpen = false;
+    }
+}
+
+// Rest of the functions remain the same...
 function loadRecentNotifications() {
     fetch('<?php echo e(route("notifications.recent")); ?>?limit=10', {
         headers: {
@@ -491,7 +521,7 @@ function handleNotificationClick(notificationId) {
     }
 
     // Close dropdown
-    closeNotificationDropdown();
+    closeDropdown();
 }
 
 function getTypeColor(type) {

@@ -33,15 +33,23 @@ class AppServiceProvider extends ServiceProvider
         View::composer('*', \App\View\Composers\MenuComposer::class);
 
         // Share primary company info globally (logo/name for branding)
-        $primaryCompany = Company::first();
+        $primaryCompany = null;
+        if (\Illuminate\Support\Facades\Schema::hasTable('companies')) {
+            $primaryCompany = Company::first();
+        }
         View::share('appCompany', $primaryCompany);
         View::share('appCompanyLogoUrl', $primaryCompany && $primaryCompany->logo
             ? asset('storage/' . $primaryCompany->logo)
             : null);
 
-        $appBrandName = Setting::get('app_name', config('app.name', 'ERP System'));
-        $appLogoPath = Setting::get('app.logo');
-        $appBrandLogoUrl = $appLogoPath ? asset('storage/' . $appLogoPath) : null;
+        // Share app settings globally
+        $appBrandName = config('app.name', 'ERP System');
+        $appBrandLogoUrl = null;
+        if (\Illuminate\Support\Facades\Schema::hasTable('settings')) {
+            $appBrandName = Setting::get('app_name', config('app.name', 'ERP System'));
+            $appLogoPath = Setting::get('app.logo');
+            $appBrandLogoUrl = $appLogoPath ? asset('storage/' . $appLogoPath) : null;
+        }
 
         View::share('appBrandName', $appBrandName);
         View::share('appBrandLogoUrl', $appBrandLogoUrl);
