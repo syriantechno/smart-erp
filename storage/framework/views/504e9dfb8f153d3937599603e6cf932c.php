@@ -1,4 +1,5 @@
-@pushonce('scripts')
+<?php if (! $__env->hasRenderedOnce('eed6516e-31e3-4ffa-ae05-e9c7a1e880fa')): $__env->markAsRenderedOnce('eed6516e-31e3-4ffa-ae05-e9c7a1e880fa');
+$__env->startPush('scripts'); ?>
 <script>
     console.log('Settings scripts loaded successfully');
 
@@ -99,7 +100,7 @@
                 submitBtn.disabled = true;
                 submitBtn.textContent = 'Saving...';
 
-                fetch('{{ route("settings.update") }}', {
+                fetch('<?php echo e(route("settings.update")); ?>', {
                     method: 'POST',
                     body: formData,
                     headers: {
@@ -206,7 +207,7 @@
                     submitBtn.textContent = 'Saving...';
                 }
 
-                fetch('{{ route("settings.ai.update") }}', {
+                fetch('<?php echo e(route("settings.ai.update")); ?>', {
                     method: 'POST',
                     body: formData,
                     headers: {
@@ -270,7 +271,7 @@
                     testBtn.disabled = true;
                     testBtn.textContent = 'Testing...';
 
-                    fetch('{{ route("ai.interact") }}', {
+                    fetch('<?php echo e(route("ai.interact")); ?>', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -332,7 +333,7 @@
                     submitBtn.textContent = 'Saving...';
                 }
 
-                fetch('{{ route("settings.appearance.update") }}', {
+                fetch('<?php echo e(route("settings.appearance.update")); ?>', {
                     method: 'POST',
                     body: formData,
                     headers: {
@@ -395,7 +396,7 @@
                 submitBtn.disabled = true;
                 submitBtn.textContent = 'Saving...';
 
-                fetch('{{ route("settings.prefix.update") }}', {
+                fetch('<?php echo e(route("settings.prefix.update")); ?>', {
                     method: 'POST',
                     body: formData,
                     headers: {
@@ -444,7 +445,7 @@
                 submitBtn.disabled = true;
                 submitBtn.textContent = 'Saving...';
 
-                fetch('{{ route("settings.company.update") }}', {
+                fetch('<?php echo e(route("settings.company.update")); ?>', {
                     method: 'POST',
                     body: formData,
                     headers: {
@@ -493,7 +494,7 @@
                 submitBtn.disabled = true;
                 submitBtn.textContent = 'Saving...';
 
-                fetch('{{ route("settings.notifications.update") }}', {
+                fetch('<?php echo e(route("settings.notifications.update")); ?>', {
                     method: 'POST',
                     body: formData,
                     headers: {
@@ -585,7 +586,7 @@
                 submitBtn.disabled = true;
                 submitBtn.textContent = 'Saving...';
 
-                fetch('{{ route("settings.attendance.update") }}', {
+                fetch('<?php echo e(route("settings.attendance.update")); ?>', {
                     method: 'POST',
                     body: formData,
                     headers: {
@@ -810,4 +811,5 @@
     }
 
 </script>
-@endpushonce
+<?php $__env->stopPush(); endif; ?>
+<?php /**PATH D:\laravel\smart-erp\resources\views/settings/partials/scripts.blade.php ENDPATH**/ ?>

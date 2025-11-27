@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 
 <html
-    lang="{{ str_replace('_', '-', app()->getLocale()) }}"
+    lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>"
 >
 <!-- BEGIN: Head -->
 
@@ -9,7 +9,7 @@
     <meta charset="utf-8">
     <meta
         name="csrf-token"
-        content="{{ csrf_token() }}"
+        content="<?php echo e(csrf_token()); ?>"
     >
     <meta
         name="viewport"
@@ -28,16 +28,16 @@
         content="LEFT4CODE"
     >
 
-    @yield('head')
+    <?php echo $__env->yieldContent('head'); ?>
 
     <!-- BEGIN: CSS Assets-->
-    @stack('styles')
-    @vite('resources/css/app.css')
+    <?php echo $__env->yieldPushContent('styles'); ?>
+    <?php echo app('Illuminate\Foundation\Vite')('resources/css/app.css'); ?>
 
     <!-- Custom Theme CSS -->
-    @if(file_exists(public_path('css/custom-theme.css')))
-        <link rel="stylesheet" href="{{ asset('css/custom-theme.css?v=' . filemtime(public_path('css/custom-theme.css'))) }}">
-    @endif
+    <?php if(file_exists(public_path('css/custom-theme.css'))): ?>
+        <link rel="stylesheet" href="<?php echo e(asset('css/custom-theme.css?v=' . filemtime(public_path('css/custom-theme.css')))); ?>">
+    <?php endif; ?>
 
     <style>
         :root {
@@ -100,32 +100,32 @@
     </style>
 
     <!-- Dark Mode CSS -->
-    @vite('resources/css/dark-mode.css')
+    <?php echo app('Illuminate\Foundation\Vite')('resources/css/dark-mode.css'); ?>
 
     <!-- DataTables Local CSS -->
-    <link rel="stylesheet" href="{{ asset('vendor/datatables/datatables.min.css') }}">
+    <link rel="stylesheet" href="<?php echo e(asset('vendor/datatables/datatables.min.css')); ?>">
 </head>
 <!-- END: Head -->
 
-<body class="{{ setting('dark_mode', false) ? 'dark' : '' }} {{ setting('font_size', 'medium') }} {{ setting('animations_enabled', true) ? '' : 'no-animations' }} overflow-x-hidden">
+<body class="<?php echo e(setting('dark_mode', false) ? 'dark' : ''); ?> <?php echo e(setting('font_size', 'medium')); ?> <?php echo e(setting('animations_enabled', true) ? '' : 'no-animations'); ?> overflow-x-hidden">
 
 
-@yield('content')
+<?php echo $__env->yieldContent('content'); ?>
 
 
  <!-- BEGIN: Vendor JS Assets-->
-    @vite('resources/js/vendors/dom.js')
-    @vite('resources/js/vendors/tailwind-merge.js')
-    @stack('vendors')
+    <?php echo app('Illuminate\Foundation\Vite')('resources/js/vendors/dom.js'); ?>
+    <?php echo app('Illuminate\Foundation\Vite')('resources/js/vendors/tailwind-merge.js'); ?>
+    <?php echo $__env->yieldPushContent('vendors'); ?>
 
     <!-- BEGIN: Pages, layouts, components JS Assets-->
 
-    @include('components.global-notifications')
+    <?php echo $__env->make('components.global-notifications', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
     <!-- DataTables Local JavaScript -->
-    <script src="{{ asset('vendor/datatables/jquery-3.7.1.min.js') }}"></script>
-    <script src="{{ asset('vendor/datatables/datatables.min.js') }}"></script>
-    <script src="{{ asset('vendor/datatables/sweetalert2.min.js') }}"></script>
+    <script src="<?php echo e(asset('vendor/datatables/jquery-3.7.1.min.js')); ?>"></script>
+    <script src="<?php echo e(asset('vendor/datatables/datatables.min.js')); ?>"></script>
+    <script src="<?php echo e(asset('vendor/datatables/sweetalert2.min.js')); ?>"></script>
 
     <!-- Alpine.js CDN -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -156,7 +156,7 @@
     </script>
 
     <!-- Lucide Icons Local JavaScript -->
-    <script src="{{ asset('vendor/lucide/lucide.umd.min.js') }}" defer></script>
+    <script src="<?php echo e(asset('vendor/lucide/lucide.umd.min.js')); ?>" defer></script>
     <script>
         // Initialize Lucide Icons with performance optimization
         document.addEventListener('DOMContentLoaded', function() {
@@ -174,13 +174,14 @@
             }
         });
     </script>
-    @vite(['resources/js/app.js', 'resources/js/accessibility-fixes.js'])
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/js/app.js', 'resources/js/accessibility-fixes.js']); ?>
     
     
-    @stack('scripts')
+    <?php echo $__env->yieldPushContent('scripts'); ?>
     <!-- END: Pages, layouts, components JS Assets-->
 
 
 </body>
 
 </html>
+<?php /**PATH D:\laravel\smart-erp\resources\views////themes/base.blade.php ENDPATH**/ ?>
