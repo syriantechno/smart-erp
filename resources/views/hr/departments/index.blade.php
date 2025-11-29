@@ -30,7 +30,7 @@
                         <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
                             <x-base.lucide icon="pause-circle" class="w-4 h-4" />
                         </div>
-                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                        <div id="stats-inactive" class="text-6xl md:text-7xl font-semibold tracking-tight">
                             {{ $departmentsInactive ?? '—' }}
                         </div>
                     </div>
@@ -45,7 +45,7 @@
                         <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
                             <x-base.lucide icon="check-circle-2" class="w-4 h-4" />
                         </div>
-                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                        <div id="stats-active" class="text-6xl md:text-7xl font-semibold tracking-tight">
                             {{ $departmentsActive ?? '—' }}
                         </div>
                     </div>
@@ -60,7 +60,7 @@
                         <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
                             <x-base.lucide icon="building" class="w-4 h-4" />
                         </div>
-                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                        <div id="stats-total" class="text-6xl md:text-7xl font-semibold tracking-tight">
                             {{ $departmentsTotal ?? '—' }}
                         </div>
                     </div>
@@ -76,112 +76,82 @@
         <div class="intro-y col-span-12">
             <x-base.preview-component class="intro-y box bg-white/80 border border-slate-200/70 shadow-[0_18px_45px_rgba(15,23,42,0.10)]">
                 <div class="p-5">
-                    @if (session('success'))
-                        <x-base.alert class="mb-4" variant="success">
-                            <div class="flex items-center">
-                                <x-base.lucide icon="CheckCircle" class="w-5 h-5 mr-2" />
-                                {{ session('success') }}
-                            </div>
-                        </x-base.alert>
-                    @endif
+                    {{-- Filters & Actions in One Row --}}
+                    <div class="flex flex-wrap items-center gap-2 mb-4">
+                        {{-- Search Input --}}
+                        <div class="relative min-w-[180px]">
+                            <x-base.lucide icon="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <x-base.form-input 
+                                id="departments-filter-value" 
+                                type="text" 
+                                placeholder="Search..." 
+                                class="pl-9 w-full text-sm py-1.5"
+                            />
+                        </div>
 
-                    @if (session('error'))
-                        <x-base.alert class="mb-4" variant="danger">
-                            <div class="flex items-center">
-                                <x-base.lucide icon="AlertTriangle" class="w-5 h-5 mr-2" />
-                                {{ session('error') }}
-                            </div>
-                        </x-base.alert>
-                    @endif
+                        {{-- Company Filter --}}
+                        <x-base.form-select id="company-filter" class="w-auto text-sm py-1.5">
+                            <option value="">All Companies</option>
+                            @foreach($companies ?? [] as $company)
+                                <option value="{{ $company->id }}">{{ $company->name }}</option>
+                            @endforeach
+                        </x-base.form-select>
 
-                    <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
-                        <form id="departments-filter-form" class="w-full sm:mr-auto xl:flex">
-                            <div class="items-center sm:mr-4 sm:flex">
-                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
-                                    Field
-                                </label>
-                                <x-base.form-select id="departments-filter-field" class="mt-2 w-full sm:mt-0 sm:w-auto 2xl:w-full">
-                                    <option value="all">All Fields</option>
-                                    <option value="name">Name</option>
-                                    <option value="company">Company</option>
-                                    <option value="manager">Manager</option>
-                                    <option value="employees_count">Employees</option>
-                                    <option value="status">Status</option>
-                                </x-base.form-select>
-                            </div>
-                            <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
-                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
-                                    Type
-                                </label>
-                                <x-base.form-select id="departments-filter-type" class="mt-2 w-full sm:mt-0 sm:w-auto">
-                                    <option value="contains">Contains</option>
-                                    <option value="equals">Equals</option>
-                                </x-base.form-select>
-                            </div>
-                            <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
-                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
-                                    Value
-                                </label>
-                                <x-base.form-input id="departments-filter-value" type="text" placeholder="Search..." class="mt-2 w-full sm:mt-0 sm:w-48 2xl:w-full" />
-                            </div>
-                            <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
-                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
-                                    Show
-                                </label>
-                                <x-base.form-select id="departments-filter-length" class="mt-2 w-full sm:mt-0 sm:w-auto">
-                                    <option value="10">10</option>
-                                    <option value="25" selected>25</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                </x-base.form-select>
-                            </div>
-                            <div class="mt-4 flex flex-wrap gap-2 sm:items-center xl:mt-0">
-                                <x-base.tippy content="Apply filters" placement="top">
-                                    <button id="departments-filter-go" type="button" class="btn-royal btn-royal--dark btn-royal--sm w-full sm:w-24 group">
-                                        <x-base.lucide icon="search" class="w-4 h-4 icon-hover-rise" />
-                                        Go
-                                    </button>
-                                </x-base.tippy>
-                                <x-base.tippy content="Reset filters" placement="top">
-                                    <button id="departments-filter-reset" type="button" class="btn-royal btn-royal--outline btn-royal--sm w-full sm:w-24 group">
-                                        <x-base.lucide icon="rotate-ccw" class="w-4 h-4 icon-hover-rise" />
-                                        Reset
-                                    </button>
-                                </x-base.tippy>
-                            </div>
-                        </form>
+                        {{-- Status Filter --}}
+                        <x-base.form-select id="status-filter" class="w-auto text-sm py-1.5">
+                            <option value="">Status</option>
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </x-base.form-select>
 
-                        <div class="mt-5 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
+                        {{-- Page Length --}}
+                        <x-base.form-select id="departments-filter-length" class="w-auto text-sm py-1.5">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </x-base.form-select>
+
+                        {{-- Reset Button --}}
+                        <x-base.tippy as="button" id="departments-filter-reset" type="button" content="Reset filters" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                            <x-base.lucide icon="x" class="w-4 h-4" />
+                        </x-base.tippy>
+
+                        {{-- Spacer --}}
+                        <div class="flex-1"></div>
+
+                        {{-- Action Buttons --}}
+                        <div class="flex items-center gap-1">
                             <x-base.tippy content="Print" placement="bottom">
-                                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
-                                    <x-base.lucide icon="printer" class="w-5 h-5 icon-hover-rise" />
+                                <button type="button" id="departments-print" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                                    <x-base.lucide icon="printer" class="w-4 h-4" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Export PDF" placement="bottom">
-                                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
-                                    <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
+                                <button type="button" id="departments-export-pdf" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                                    <x-base.lucide icon="file-text" class="w-4 h-4" />
                                 </button>
                             </x-base.tippy>
-                            <x-base.tippy content="Export to Excel" placement="bottom">
-                                <button id="departments-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
-                                    <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
+                            <x-base.tippy content="Export Excel" placement="bottom">
+                                <button id="departments-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                                    <x-base.lucide icon="file-spreadsheet" class="w-4 h-4" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Refresh" placement="bottom">
-                                <button id="departments-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
-                                    <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
+                                <button id="departments-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                                    <x-base.lucide icon="refresh-cw" class="w-4 h-4" />
                                 </button>
                             </x-base.tippy>
 
-                            {{-- Add Department button at the right end of the toolbar --}}
-                            <x-base.tippy content="Add new department" placement="bottom">
+                            {{-- Add Department Button --}}
+                            <x-base.tippy content="Add department" placement="bottom">
                                 <button
                                     type="button"
-                                    class="btn-royal btn-royal--gold btn-royal--sm sm:btn-royal--lg group"
+                                    class="btn-royal btn-royal--gold btn-royal--sm"
                                     data-tw-toggle="modal"
                                     data-tw-target="#create-department-modal"
                                 >
-                                    <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
+                                    <x-base.lucide icon="plus-circle" class="w-4 h-4 mr-2" />
                                     <span class="hidden sm:inline">Add</span>
                                 </button>
                             </x-base.tippy>
@@ -221,7 +191,11 @@
     @include('hr.departments.modals.create')
     @include('hr.departments.modals.edit')
     <button id="edit-department-trigger" data-tw-toggle="modal" data-tw-target="#edit-department-modal" class="hidden"></button>
+
+    <form id="departments-export-pdf-form" action="{{ route('hr.departments.export-pdf') }}" method="POST" target="_blank" class="hidden">
+        @csrf
+    </form>
+    <form id="departments-export-excel-form" action="{{ route('hr.departments.export-excel') }}" method="GET" target="_blank" class="hidden"></form>
 @endsection
 @stack('modals')
 @include('components.datatable.scripts')
-

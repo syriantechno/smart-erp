@@ -276,7 +276,7 @@
                                     <div class="flex items-center justify-between rounded-2xl border border-slate-100 px-3 py-2 dark:border-darkmode-500">
                                         <div class="flex items-center gap-3">
                                             <div class="h-12 w-12 overflow-hidden rounded-full">
-                                                <img src="{{ $emp->profile_picture_url ?? asset('build/assets/profile-1-0441b45e.jpg') }}" alt="{{ $emp->full_name }}" class="h-full w-full object-cover" />
+                                                <img src="{{ $emp->profile_picture_url ?? asset('images/default-avatar.jpg') }}" alt="{{ $emp->full_name }}" class="h-full w-full object-cover" />
                                             </div>
                                             <div>
                                                 <p class="font-semibold">{{ $emp->full_name }}</p>
@@ -319,7 +319,7 @@
                                     <div class="flex items-center justify-between rounded-2xl border border-slate-100 px-3 py-2 dark:border-darkmode-500">
                                         <div class="flex items-center gap-3">
                                             <div class="h-12 w-12 overflow-hidden rounded-full">
-                                                <img src="{{ $emp->profile_picture_url ?? asset('build/assets/profile-1-0441b45e.jpg') }}" alt="{{ $emp->full_name }}" class="h-full w-full object-cover" />
+                                                <img src="{{ $emp->profile_picture_url ?? asset('images/default-avatar.jpg') }}" alt="{{ $emp->full_name }}" class="h-full w-full object-cover" />
                                             </div>
                                             <div>
                                                 <p class="font-semibold">{{ $emp->full_name }}</p>

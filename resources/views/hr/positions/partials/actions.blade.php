@@ -4,7 +4,7 @@
         icon="Edit"
         variant="primary"
         title="Edit Position"
-        onclick="openEditModal({{ $position->id }}, '{{ addslashes($position->title) }}', '{{ $position->code }}', {{ $position->department_id }}, '{{ $position->salary_range_min }}', '{{ $position->salary_range_max }}', '{{ addslashes($position->description ?? '') }}', '{{ addslashes($position->requirements ?? '') }}', {{ $position->is_active ? 'true' : 'false' }})"
+        onclick="openEditModal({{ $position->id }}, '{{ addslashes($position->title) }}', '{{ $position->code }}', {{ $position->department_id ?? 'null' }}, '{{ $position->salary_range_min }}', '{{ $position->salary_range_max }}', '{{ addslashes($position->description ?? '') }}', '{{ addslashes($position->requirements ?? '') }}', {{ $position->is_active ? 'true' : 'false' }})"
     />
 
     <!-- Delete Position -->

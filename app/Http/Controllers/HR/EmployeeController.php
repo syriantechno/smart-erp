@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -61,44 +62,80 @@ class EmployeeController extends Controller
         $code = $this->codeGenerator->preview('employees');
         return Reply::success('', ['code' => $code]);
     }
+
+    /**
+     * Get filtered stats for employees
+     */
+    public function stats(Request $request): JsonResponse
+    {
+        $query = Employee::query();
+
+        // Apply same filters as datatable
+        if ($request->filled('search_value')) {
+            $searchValue = $request->search_value;
+            $query->where(function ($q) use ($searchValue) {
+                $q->where('code', 'like', "%{$searchValue}%")
+                  ->orWhere('first_name', 'like', "%{$searchValue}%")
+                  ->orWhere('last_name', 'like', "%{$searchValue}%")
+                  ->orWhere('employee_id', 'like', "%{$searchValue}%")
+                  ->orWhere('email', 'like', "%{$searchValue}%")
+                  ->orWhere('position', 'like', "%{$searchValue}%")
+                  ->orWhere('translated_name', 'like', "%{$searchValue}%");
+            });
+        }
+
+        if ($request->filled('company_id') && $request->company_id !== '') {
+            $query->where('company_id', $request->company_id);
+        }
+
+        if ($request->filled('department_id') && $request->department_id !== '') {
+            $query->where('department_id', $request->department_id);
+        }
+
+        // Don't filter by status for stats - we want to show both counts
+        $total = (clone $query)->count();
+        $active = (clone $query)->where('is_active', true)->count();
+        $inactive = (clone $query)->where('is_active', false)->count();
+
+        return response()->json([
+            'total' => $total,
+            'active' => $active,
+            'inactive' => $inactive,
+        ]);
+    }
     
     public function datatable(Request $request): JsonResponse
     {
         $baseQuery = Employee::query()
             ->with(['department:id,name', 'company:id,name']);
 
-        // Apply filters
-        if ($request->filled('filter_field') && $request->filled('filter_value')) {
-            $field = $request->filter_field;
-            $type = $request->filter_type ?? 'contains';
-            $value = $request->filter_value;
-
-            if ($field === 'all') {
-                $baseQuery->where(function ($query) use ($value, $type) {
-                    $query->where('code', $type === 'equals' ? '=' : 'like', $type === 'equals' ? $value : "%{$value}%")
-                          ->orWhere('first_name', $type === 'equals' ? '=' : 'like', $type === 'equals' ? $value : "%{$value}%")
-                          ->orWhere('last_name', $type === 'equals' ? '=' : 'like', $type === 'equals' ? $value : "%{$value}%")
-                          ->orWhere('employee_id', $type === 'equals' ? '=' : 'like', $type === 'equals' ? $value : "%{$value}%")
-                          ->orWhere('email', $type === 'equals' ? '=' : 'like', $type === 'equals' ? $value : "%{$value}%");
-                });
-            } else {
-                $operator = $type === 'equals' ? '=' : 'like';
-                $searchValue = $type === 'equals' ? $value : "%{$value}%";
-                $baseQuery->where($field, $operator, $searchValue);
-            }
+        // Apply search filter
+        if ($request->filled('search_value')) {
+            $searchValue = $request->search_value;
+            $baseQuery->where(function ($query) use ($searchValue) {
+                $query->where('code', 'like', "%{$searchValue}%")
+                      ->orWhere('first_name', 'like', "%{$searchValue}%")
+                      ->orWhere('last_name', 'like', "%{$searchValue}%")
+                      ->orWhere('employee_id', 'like', "%{$searchValue}%")
+                      ->orWhere('email', 'like', "%{$searchValue}%")
+                      ->orWhere('position', 'like', "%{$searchValue}%")
+                      ->orWhere('translated_name', 'like', "%{$searchValue}%");
+            });
         }
 
-        // Apply advanced filters
+        // Apply company filter
         if ($request->filled('company_id') && $request->company_id !== '') {
             $baseQuery->where('company_id', $request->company_id);
         }
 
+        // Apply department filter
         if ($request->filled('department_id') && $request->department_id !== '') {
             $baseQuery->where('department_id', $request->department_id);
         }
 
-        if ($request->filled('position_filter') && $request->position_filter !== '') {
-            $baseQuery->where('position', '=', $request->position_filter);
+        // Apply status filter
+        if ($request->filled('status') && $request->status !== '') {
+            $baseQuery->where('is_active', $request->status);
         }
 
         return DataTables::of($baseQuery)
@@ -350,8 +387,8 @@ class EmployeeController extends Controller
             'is_active' => 'nullable|boolean',
             'has_system_access' => 'nullable|boolean',
             'system_password' => 'nullable|string|min:6',
-            // In edit form the input name is `photo`, but the column is `profile_picture`
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'remove_profile_picture' => 'nullable|boolean',
         ]);
 
         try {
@@ -385,13 +422,27 @@ class EmployeeController extends Controller
                 unset($validated['system_password']);
             }
 
-            // Map photo input to profile_picture column
-            if ($request->hasFile('photo')) {
-                $file = $request->file('photo');
+            // Handle profile picture upload or removal
+            if ($request->hasFile('profile_picture')) {
+                // Delete old profile picture if exists
+                if ($employee->profile_picture && Storage::disk('public')->exists($employee->profile_picture)) {
+                    Storage::disk('public')->delete($employee->profile_picture);
+                }
+                $file = $request->file('profile_picture');
                 $filename = time() . '_' . ($employee->employee_id ?? ('EMP' . strtoupper(Str::random(8)))) . '.' . $file->getClientOriginalExtension();
                 $path = $file->storeAs('employees/profile_pictures', $filename, 'public');
                 $validated['profile_picture'] = $path;
+            } elseif ($request->boolean('remove_profile_picture')) {
+                // Remove profile picture if requested
+                if ($employee->profile_picture && Storage::disk('public')->exists($employee->profile_picture)) {
+                    Storage::disk('public')->delete($employee->profile_picture);
+                }
+                $validated['profile_picture'] = null;
+            } else {
+                // Keep existing profile picture
+                unset($validated['profile_picture']);
             }
+            unset($validated['remove_profile_picture']);
 
             // Do not allow changing code or employee_id from this form even if present
             unset($validated['code'], $validated['employee_id']);

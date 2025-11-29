@@ -980,9 +980,16 @@ function initializePositionsPage() {
     const filterGoBtn = document.getElementById('positions-filter-go');
     const filterResetBtn = document.getElementById('positions-filter-reset');
     const exportBtn = document.getElementById('positions-export');
+    const pdfBtn = document.getElementById('positions-export-pdf');
+    const printBtn = document.getElementById('positions-print');
+    const exportPdfForm = document.getElementById('positions-export-pdf-form');
+    const exportExcelForm = document.getElementById('positions-export-excel-form');
     const refreshBtn = document.getElementById('positions-refresh');
     const createForm = document.getElementById('create-position-form');
     const codeInput = createForm?.querySelector('#position-code');
+    const editForm = document.getElementById('edit-position-form');
+    const editTrigger = document.getElementById('edit-modal-trigger');
+    const updateUrlBase = editForm?.dataset.updateUrlBase;
 
     const waitForDependencies = () => {
         if (typeof window.jQuery === 'undefined' || typeof window.erpCrud?.initDataTable !== 'function') {
@@ -1056,6 +1063,7 @@ function initializePositionsPage() {
             reloadTable();
         });
         refreshBtn?.addEventListener('click', reloadTable);
+        printBtn?.addEventListener('click', () => window.print());
 
         const createPreviewUrl = createForm?.dataset.previewUrl;
 
@@ -1106,39 +1114,71 @@ function initializePositionsPage() {
             });
         }
 
-        exportBtn?.addEventListener('click', () => {
-            try {
-                const rows = tableInstance.rows({ search: 'applied' }).data().toArray();
-                if (!rows.length) {
-                    window.showToast?.('No data available for export', 'error');
-                    return;
+        window.openPositionEditModal = function (payload) {
+            if (!payload || !editForm || !editTrigger) {
+                return;
+            }
+
+            editForm.action = updateUrlBase ? `${updateUrlBase}/${payload.id}` : editForm.action;
+
+            const setValue = (selector, value) => {
+                const el = editForm.querySelector(selector);
+                if (el) {
+                    el.value = value ?? '';
                 }
+            };
 
-                const headers = ['#', 'Code', 'Title', 'Department', 'Salary Range', 'Status'];
-                const csvRows = [headers.join(',')];
+            setValue('#edit-position-code', payload.code || '');
+            setValue('#edit-title', payload.title || '');
+            setValue('#edit-department_id', payload.department_id ?? '');
+            setValue('#edit-salary_range_min', payload.salary_min ?? '');
+            setValue('#edit-salary_range_max', payload.salary_max ?? '');
+            setValue('#edit-description', payload.description || '');
+            setValue('#edit-requirements', payload.requirements || '');
 
-                rows.forEach((row) => {
-                    csvRows.push([
-                        row.DT_RowIndex,
-                        `"${(row.code || '').replace(/"/g, '""')}"`,
-                        `"${(row.title || '').replace(/"/g, '""')}"`,
-                        `"${((row.department && row.department.name) ? row.department.name : '').replace(/"/g, '""')}"`,
-                        `"${(row.salary_range || '').replace(/"/g, '""')}"`,
-                        row.is_active ? 'Active' : 'Inactive'
-                    ].join(','));
-                });
+            editTrigger.click();
+        };
 
-                const blob = new Blob(['\ufeff' + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = 'positions_export.csv';
-                link.click();
-                URL.revokeObjectURL(link.href);
+        // Backwards compatibility for legacy inline handlers
+        window.openEditModal = function (
+            id,
+            title,
+            code,
+            departmentId,
+            salaryMin,
+            salaryMax,
+            description,
+            requirements
+        ) {
+            window.openPositionEditModal?.({
+                id,
+                title,
+                code,
+                department_id: departmentId,
+                salary_min: salaryMin,
+                salary_max: salaryMax,
+                description,
+                requirements,
+            });
+        };
 
-                window.showToast?.('Data exported successfully', 'success');
-            } catch (error) {
-                console.error('[Positions] Export failed:', error);
-                window.showToast?.('Failed to export data', 'error');
+        window.deletePosition = function (id, name) {
+            window.erpDeleteRecord?.(id, name);
+        };
+
+        exportBtn?.addEventListener('click', () => {
+            if (exportExcelForm) {
+                exportExcelForm.submit();
+            } else {
+                console.warn('[Positions] Export Excel form not found');
+            }
+        });
+
+        pdfBtn?.addEventListener('click', () => {
+            if (exportPdfForm) {
+                exportPdfForm.submit();
+            } else {
+                console.warn('[Positions] Export PDF form not found');
             }
         });
     };
@@ -1155,13 +1195,17 @@ function initializeDepartmentsPage() {
 
     const datatableUrl = tableEl.dataset.departmentsDatatableUrl;
     const deleteUrlBase = tableEl.dataset.departmentsDeleteUrlBase;
-    const filterField = document.getElementById('departments-filter-field');
-    const filterType = document.getElementById('departments-filter-type');
+    // New filters
     const filterValue = document.getElementById('departments-filter-value');
+    const companyFilter = document.getElementById('company-filter');
+    const statusFilter = document.getElementById('status-filter');
     const lengthSelect = document.getElementById('departments-filter-length');
-    const filterGoBtn = document.getElementById('departments-filter-go');
     const filterResetBtn = document.getElementById('departments-filter-reset');
     const exportBtn = document.getElementById('departments-export');
+    const pdfBtn = document.getElementById('departments-export-pdf');
+    const printBtn = document.getElementById('departments-print');
+    const exportPdfForm = document.getElementById('departments-export-pdf-form');
+    const exportExcelForm = document.getElementById('departments-export-excel-form');
     const refreshBtn = document.getElementById('departments-refresh');
     const createForm = document.getElementById('create-department-form');
     const codeInput = createForm?.querySelector('#code');
@@ -1170,6 +1214,8 @@ function initializeDepartmentsPage() {
     const updateUrlBase = editForm?.dataset.updateUrlBase;
     const createPreviewUrl = createForm?.dataset.previewUrl;
 
+    let searchTimeout = null;
+
     const waitForDependencies = () => {
         if (typeof window.jQuery === 'undefined' || typeof window.erpCrud?.initDataTable !== 'function') {
             setTimeout(waitForDependencies, 100);
@@ -1177,15 +1223,15 @@ function initializeDepartmentsPage() {
         }
 
         const $ = window.jQuery;
-        const initialLength = lengthSelect ? parseInt(lengthSelect.value, 10) || 25 : 25;
+        const initialLength = lengthSelect ? parseInt(lengthSelect.value, 10) || 10 : 10;
 
         const tableInstance = window.erpCrud.initDataTable({
             tableSelector: '#departments-table',
             ajaxUrl: datatableUrl,
             ajaxData: function (d) {
-                d.filter_field = filterField?.value || 'all';
-                d.filter_type = filterType?.value || 'contains';
-                d.filter_value = filterValue?.value || '';
+                d.search_value = filterValue?.value?.trim() || '';
+                d.company_id = companyFilter?.value || '';
+                d.status = statusFilter?.value || '';
                 d.page_length = lengthSelect ? parseInt(lengthSelect.value, 10) || initialLength : initialLength;
             },
             pageLength: initialLength,
@@ -1220,30 +1266,62 @@ function initializeDepartmentsPage() {
             return;
         }
 
-        const reloadTable = () => tableInstance.ajax.reload(null, false);
+        // Stats elements
+        const statsTotal = document.getElementById('stats-total');
+        const statsActive = document.getElementById('stats-active');
+        const statsInactive = document.getElementById('stats-inactive');
+
+        // Update stats based on current filters
+        const updateStats = () => {
+            const params = new URLSearchParams();
+            if (filterValue?.value?.trim()) params.append('search_value', filterValue.value.trim());
+            if (companyFilter?.value) params.append('company_id', companyFilter.value);
+
+            fetch(datatableUrl.replace('/datatable', '/stats') + '?' + params.toString(), {
+                credentials: 'same-origin',
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (statsTotal) statsTotal.textContent = data.total;
+                if (statsActive) statsActive.textContent = data.active;
+                if (statsInactive) statsInactive.textContent = data.inactive;
+            })
+            .catch(() => {});
+        };
+
+        const reloadTable = () => {
+            tableInstance.ajax.reload(null, false);
+            updateStats();
+        };
+
+        // Search with debounce
+        filterValue?.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(reloadTable, 400);
+        });
+
+        // Instant filter on dropdown change
+        companyFilter?.addEventListener('change', reloadTable);
+        statusFilter?.addEventListener('change', reloadTable);
 
         lengthSelect?.addEventListener('change', () => {
             const newLength = parseInt(lengthSelect.value, 10) || initialLength;
             tableInstance.page.len(newLength).draw();
         });
 
-        filterGoBtn?.addEventListener('click', reloadTable);
-        filterValue?.addEventListener('keyup', (event) => {
-            if (event.key === 'Enter') {
-                reloadTable();
-            }
-        });
         filterResetBtn?.addEventListener('click', () => {
-            if (filterField) filterField.value = 'all';
-            if (filterType) filterType.value = 'contains';
             if (filterValue) filterValue.value = '';
+            if (companyFilter) companyFilter.value = '';
+            if (statusFilter) statusFilter.value = '';
             if (lengthSelect) {
-                lengthSelect.value = '25';
-                tableInstance.page.len(25).draw();
+                lengthSelect.value = '10';
+                tableInstance.page.len(10).draw();
             }
             reloadTable();
         });
         refreshBtn?.addEventListener('click', reloadTable);
+        printBtn?.addEventListener('click', () => window.print());
 
         const refreshDepartmentCode = () => {
             if (!createPreviewUrl || !codeInput) {
@@ -1325,38 +1403,18 @@ function initializeDepartmentsPage() {
         };
 
         exportBtn?.addEventListener('click', () => {
-            try {
-                const rows = tableInstance.rows({ search: 'applied' }).data().toArray();
-                if (!rows.length) {
-                    window.showToast?.('No data available for export', 'error');
-                    return;
-                }
+            if (exportExcelForm) {
+                exportExcelForm.submit();
+            } else {
+                console.warn('[Departments] Export Excel form not found');
+            }
+        });
 
-                const headers = ['#', 'Name', 'Company', 'Manager', 'Employees', 'Status'];
-                const csvRows = [headers.join(',')];
-
-                rows.forEach((row) => {
-                    csvRows.push([
-                        row.DT_RowIndex,
-                        `"${(row.name || '').replace(/"/g, '""')}"`,
-                        `"${((row.company && row.company.name) ? row.company.name : '').replace(/"/g, '""')}"`,
-                        `"${((row.manager && row.manager.full_name) ? row.manager.full_name : '').replace(/"/g, '""')}"`,
-                        row.employees_count ?? '',
-                        row.is_active ? 'Active' : 'Inactive'
-                    ].join(','));
-                });
-
-                const blob = new Blob(['\ufeff' + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `departments_${new Date().toISOString().split('T')[0]}.csv`;
-                link.click();
-                URL.revokeObjectURL(url);
-                window.showToast?.('Data exported successfully', 'success');
-            } catch (error) {
-                console.error('Export error:', error);
-                window.showToast?.('Failed to export data', 'error');
+        pdfBtn?.addEventListener('click', () => {
+            if (exportPdfForm) {
+                exportPdfForm.submit();
+            } else {
+                console.warn('[Departments] Export PDF form not found');
             }
         });
 

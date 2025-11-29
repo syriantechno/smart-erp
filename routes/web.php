@@ -118,6 +118,8 @@ Route::middleware('auth')->group(function () {
         // DataTable route for departments
         Route::get('departments/datatable', [App\Http\Controllers\HR\DepartmentController::class, 'datatable'])
             ->name('departments.datatable');
+        Route::get('departments/stats', [App\Http\Controllers\HR\DepartmentController::class, 'stats'])
+            ->name('departments.stats');
         Route::post('departments/export-pdf', [App\Http\Controllers\HR\DepartmentController::class, 'exportPdf'])
             ->name('departments.export-pdf');
         Route::get('departments/export-excel', [App\Http\Controllers\HR\DepartmentController::class, 'exportExcel'])
@@ -134,8 +136,14 @@ Route::middleware('auth')->group(function () {
         // Positions
         Route::get('positions/datatable', [App\Http\Controllers\HR\PositionController::class, 'datatable'])
             ->name('positions.datatable');
+        Route::get('positions/stats', [App\Http\Controllers\HR\PositionController::class, 'stats'])
+            ->name('positions.stats');
         Route::get('positions/preview-code', [App\Http\Controllers\HR\PositionController::class, 'previewCode'])
             ->name('positions.preview-code');
+        Route::post('positions/export-pdf', [App\Http\Controllers\HR\PositionController::class, 'exportPdf'])
+            ->name('positions.export-pdf');
+        Route::get('positions/export-excel', [App\Http\Controllers\HR\PositionController::class, 'exportExcel'])
+            ->name('positions.export-excel');
         Route::resource('positions', 'App\Http\Controllers\HR\PositionController')
             ->only(['index', 'store', 'update', 'destroy']);
             
@@ -146,6 +154,8 @@ Route::middleware('auth')->group(function () {
         // Employees
         Route::get('employees/datatable', [App\Http\Controllers\HR\EmployeeController::class, 'datatable'])
             ->name('employees.datatable');
+        Route::get('employees/stats', [App\Http\Controllers\HR\EmployeeController::class, 'stats'])
+            ->name('employees.stats');
         Route::get('employees/preview-code', [App\Http\Controllers\HR\EmployeeController::class, 'previewCode'])
             ->name('employees.preview-code');
         Route::get('employees/companies', [App\Http\Controllers\HR\EmployeeController::class, 'getCompanies'])

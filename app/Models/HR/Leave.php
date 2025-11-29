@@ -64,7 +64,7 @@ class Leave extends Model
     public function getEmployeeAvatarUrlAttribute(): string
     {
         return $this->employee?->profile_picture_url
-            ?? asset('build/assets/profile-1-0441b45e.jpg');
+            ?? asset('images/default-avatar.jpg');
     }
 
     public function getDurationLabelAttribute(): string

@@ -1,4 +1,4 @@
-<?php if (! $__env->hasRenderedOnce('29bb8e32-ca1c-4a52-a359-1d6080625634')): $__env->markAsRenderedOnce('29bb8e32-ca1c-4a52-a359-1d6080625634');
+<?php if (! $__env->hasRenderedOnce('efb8af5b-f9c4-421e-9326-a5ddd5f49b3d')): $__env->markAsRenderedOnce('efb8af5b-f9c4-421e-9326-a5ddd5f49b3d');
 $__env->startPush('styles'); ?>
     <style>
         /* Global Notification Styles */
@@ -540,7 +540,7 @@ $__env->startPush('styles'); ?>
     </div>
 </div>
 
-<?php if (! $__env->hasRenderedOnce('af77e0ff-d3b3-4436-82c9-a328a51465ef')): $__env->markAsRenderedOnce('af77e0ff-d3b3-4436-82c9-a328a51465ef');
+<?php if (! $__env->hasRenderedOnce('6195c055-0a89-4903-93d1-37fa4391906a')): $__env->markAsRenderedOnce('6195c055-0a89-4903-93d1-37fa4391906a');
 $__env->startPush('scripts'); ?>
 <script>
     // Global Notification System

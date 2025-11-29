@@ -30,7 +30,7 @@
                         <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
                             <x-base.lucide icon="pause-circle" class="w-4 h-4" />
                         </div>
-                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                        <div id="stats-inactive" class="text-6xl md:text-7xl font-semibold tracking-tight">
                             {{ $employeesInactive ?? '—' }}
                         </div>
                     </div>
@@ -45,7 +45,7 @@
                         <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
                             <x-base.lucide icon="check-circle-2" class="w-4 h-4" />
                         </div>
-                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                        <div id="stats-active" class="text-6xl md:text-7xl font-semibold tracking-tight">
                             {{ $employeesActive ?? '—' }}
                         </div>
                     </div>
@@ -60,7 +60,7 @@
                         <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
                             <x-base.lucide icon="users" class="w-4 h-4" />
                         </div>
-                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
+                        <div id="stats-total" class="text-6xl md:text-7xl font-semibold tracking-tight">
                             {{ $employeesTotal ?? '—' }}
                         </div>
                     </div>
@@ -76,96 +76,94 @@
         <div class="intro-y col-span-12">
             <x-base.preview-component class="intro-y box bg-white/80 border border-slate-200/70 shadow-[0_18px_45px_rgba(15,23,42,0.10)]">
                 <div class="p-5">
-                    <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
-                        <form id="employees-filter-form" class="w-full sm:mr-auto xl:flex">
-                            <div class="items-center sm:mr-4 sm:flex">
-                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
-                                    Field
-                                </label>
-                                <x-base.form-select id="employees-filter-field" class="mt-2 w-full sm:mt-0 sm:w-auto 2xl:w-full">
-                                    <option value="all">All Fields</option>
-                                    <option value="code">Code</option>
-                                    <option value="first_name">First Name</option>
-                                    <option value="last_name">Last Name</option>
-                                    <option value="email">Email</option>
-                                    <option value="position">Position</option>
-                                </x-base.form-select>
-                            </div>
-                            <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
-                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
-                                    Type
-                                </label>
-                                <x-base.form-select id="employees-filter-type" class="mt-2 w-full sm:mt-0 sm:w-auto">
-                                    <option value="contains">Contains</option>
-                                    <option value="equals">Equals</option>
-                                </x-base.form-select>
-                            </div>
-                            <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
-                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
-                                    Value
-                                </label>
-                                <x-base.form-input id="employees-filter-value" type="text" placeholder="Search..." class="mt-2 w-full sm:mt-0 sm:w-48 2xl:w-full" />
-                            </div>
-                            <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
-                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
-                                    Show
-                                </label>
-                                <x-base.form-select id="employees-filter-length" class="mt-2 w-full sm:mt-0 sm:w-auto">
-                                    <option value="10">10</option>
-                                    <option value="25">25</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                </x-base.form-select>
-                            </div>
-                            <div class="mt-2 flex flex-wrap gap-2 xl:mt-0">
-                                <x-base.tippy as="button" id="employees-filter-go" type="button" content="Run filters" class="btn-royal btn-royal--dark btn-royal--sm">
-                                    <x-base.lucide icon="Search" class="w-4 h-4" />
-                                    Go
-                                </x-base.tippy>
-                                <x-base.tippy as="button" id="employees-filter-reset" type="button" content="Reset filters" class="btn-royal btn-royal--outline btn-royal--sm">
-                                    <x-base.lucide icon="RotateCcw" class="w-4 h-4" />
-                                    Reset
-                                </x-base.tippy>
-                            </div>
-                        </form>
+                    {{-- Filters & Actions in One Row --}}
+                    <div class="flex flex-wrap items-center gap-2 mb-4">
+                        {{-- Search Input --}}
+                        <div class="relative min-w-[180px]">
+                            <x-base.lucide icon="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <x-base.form-input 
+                                id="employees-filter-value" 
+                                type="text" 
+                                placeholder="Search..." 
+                                class="pl-9 w-full text-sm py-1.5"
+                            />
+                        </div>
 
-                        <div class="mt-5 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
+                        {{-- Company Filter --}}
+                        <x-base.form-select id="company-filter" class="w-auto text-sm py-1.5">
+                            <option value="">All Companies</option>
+                            @foreach($companies ?? [] as $company)
+                                <option value="{{ $company->id }}">{{ $company->name }}</option>
+                            @endforeach
+                        </x-base.form-select>
+
+                        {{-- Department Filter --}}
+                        <x-base.form-select id="department-filter" class="w-auto text-sm py-1.5">
+                            <option value="">All Depts</option>
+                            @foreach($departments ?? [] as $department)
+                                <option value="{{ $department->id }}">{{ $department->name }}</option>
+                            @endforeach
+                        </x-base.form-select>
+
+                        {{-- Status Filter --}}
+                        <x-base.form-select id="status-filter" class="w-auto text-sm py-1.5">
+                            <option value="">Status</option>
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </x-base.form-select>
+
+                        {{-- Page Length --}}
+                        <x-base.form-select id="employees-filter-length" class="w-auto text-sm py-1.5">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </x-base.form-select>
+
+                        {{-- Reset Button --}}
+                        <x-base.tippy as="button" id="employees-filter-reset" type="button" content="Reset filters" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                            <x-base.lucide icon="x" class="w-4 h-4" />
+                        </x-base.tippy>
+
+                        {{-- Spacer --}}
+                        <div class="flex-1"></div>
+
+                        {{-- Action Buttons --}}
+                        <div class="flex items-center gap-1">
                             <x-base.tippy content="Print" placement="bottom">
-                                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark" title="Print">
-                                    <x-base.lucide icon="printer" class="w-5 h-5 icon-hover-rise" />
+                                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm px-2" title="Print">
+                                    <x-base.lucide icon="printer" class="w-4 h-4" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Export PDF" placement="bottom">
-                                <button id="employees-export-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark" title="Export PDF">
-                                    <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
+                                <button id="employees-export-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm px-2" title="Export PDF">
+                                    <x-base.lucide icon="file-text" class="w-4 h-4" />
                                 </button>
                             </x-base.tippy>
-                            <x-base.tippy content="Export to Excel" placement="bottom">
-                                <button id="employees-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark" title="Export to Excel">
-                                    <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
+                            <x-base.tippy content="Export Excel" placement="bottom">
+                                <button id="employees-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm px-2" title="Export Excel">
+                                    <x-base.lucide icon="file-spreadsheet" class="w-4 h-4" />
                                 </button>
                             </x-base.tippy>
-                            <x-base.tippy content="Import employees" placement="bottom">
-                                <button id="employees-import" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark" title="Import employees">
-                                    <x-base.lucide icon="upload-cloud" class="w-5 h-5 icon-hover-rise" />
+                            <x-base.tippy content="Import" placement="bottom">
+                                <button id="employees-import" type="button" class="btn-royal btn-royal--outline btn-royal--sm px-2" title="Import">
+                                    <x-base.lucide icon="upload-cloud" class="w-4 h-4" />
                                 </button>
                             </x-base.tippy>
                             <input type="file" id="employees-import-input" accept=".csv,text/csv" class="hidden" />
                             <x-base.tippy content="Refresh" placement="bottom">
-                                <button id="employees-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark" title="Refresh">
-                                    <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
+                                <button id="employees-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm px-2" title="Refresh">
+                                    <x-base.lucide icon="refresh-cw" class="w-4 h-4" />
                                 </button>
                             </x-base.tippy>
 
-                            {{-- Add Employee button at the right end of the toolbar --}}
-                            <x-base.tippy content="Add new employee" placement="bottom">
+                            {{-- Add Employee Button --}}
+                            <x-base.tippy content="Add employee" placement="bottom">
                                 <button
                                     type="button"
-                                    class="btn-royal btn-royal--gold btn-royal--sm sm:btn-royal--lg group"
+                                    class="btn-royal btn-royal--gold btn-royal--sm"
                                     data-tw-toggle="modal"
                                     data-tw-target="#create-employee-modal"
-                                    title="Add a new employee"
-                                    aria-label="Add a new employee"
                                 >
                                     <x-base.lucide icon="user-plus" class="w-4 h-4 mr-2 icon-hover-rise" />
                                     <span class="hidden sm:inline">Add</span>
@@ -197,109 +195,6 @@
         </div>
     </div>
 
-    <!-- Employees Filters Slide Over -->
-    <x-base.slideover id="employees-filters-slideover" size="md">
-        <x-base.slideover.panel>
-            <a
-                class="absolute top-0 left-0 right-auto mt-4 -ml-10 sm:-ml-12"
-                data-tw-dismiss="modal"
-                href="#"
-            >
-                <x-base.lucide class="h-8 w-8 text-slate-400" icon="X" />
-            </a>
-            <x-base.slideover.title class="border-b border-slate-200/60 p-5 dark:border-darkmode-400">
-                <h2 class="mr-auto text-base font-medium flex items-center gap-2">
-                    <x-base.lucide icon="Filter" class="h-5 w-5" />
-                    Employees Filters
-                </h2>
-            </x-base.slideover.title>
-
-            <x-base.slideover.description class="p-5">
-                <div class="mb-4 text-sm text-slate-600 dark:text-slate-400">
-                    Use these filters to narrow down the employees list. Click "Apply Filters" to update the table.
-                </div>
-
-                <div class="grid grid-cols-12 gap-4">
-                    <!-- Company Filter -->
-                    <div class="col-span-12">
-                        <label class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                            Filter by Company
-                        </label>
-                        <x-base.form-select id="company-filter" class="w-full">
-                            <option value="">All Companies</option>
-                            @foreach($companies ?? [] as $company)
-                                <option value="{{ $company->id }}">{{ $company->name }}</option>
-                            @endforeach
-                        </x-base.form-select>
-                    </div>
-
-                    <!-- Department Filter -->
-                    <div class="col-span-12">
-                        <label class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                            Filter by Department
-                        </label>
-                        <x-base.form-select id="department-filter" class="w-full">
-                            <option value="">All Departments</option>
-                            @foreach($departments ?? [] as $department)
-                                <option value="{{ $department->id }}">{{ $department->name }}</option>
-                            @endforeach
-                        </x-base.form-select>
-                    </div>
-
-                    <!-- Position Filter -->
-                    <div class="col-span-12">
-                        <label class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                            Filter by Position
-                        </label>
-                        <x-base.form-select id="position-filter" class="w-full">
-                            <option value="">All Positions</option>
-                            <!-- Will be populated via JavaScript -->
-                        </x-base.form-select>
-                    </div>
-                </div>
-
-                <!-- Filter Results Summary & Actions -->
-                <div class="mt-5 rounded-lg bg-slate-50 p-4 dark:bg-darkmode-600">
-                    <div class="flex flex-col gap-3">
-                        <div class="flex flex-wrap items-center gap-4">
-                            <div class="text-sm text-slate-600 dark:text-slate-400">
-                                <span class="font-medium">Total Employees:</span>
-                                <span id="total-employees-count" class="font-semibold text-slate-800">0</span>
-                            </div>
-                            <div class="text-sm text-slate-600 dark:text-slate-400">
-                                <span class="font-medium">Filtered:</span>
-                                <span id="filtered-employees-count" class="font-semibold text-blue-600">0</span>
-                            </div>
-                        </div>
-
-                        <div class="mt-2 flex justify-end gap-2">
-                            <x-base.tippy
-                                as="button"
-                                type="button"
-                                content="Close advanced filters"
-                                class="btn-royal btn-royal--outline btn-royal--sm w-28"
-                                data-tw-dismiss="modal"
-                            >
-                                <x-base.lucide icon="x" class="mr-2 h-4 w-4" />
-                                Close
-                            </x-base.tippy>
-                            <x-base.tippy
-                                as="button"
-                                id="advanced-filter-apply"
-                                type="button"
-                                content="Apply filters"
-                                class="btn-royal btn-royal--dark btn-royal--sm w-28"
-                            >
-                                <x-base.lucide icon="search" class="mr-2 h-4 w-4" />
-                                Apply
-                            </x-base.tippy>
-                        </div>
-                    </div>
-                </div>
-            </x-base.slideover.description>
-        </x-base.slideover.panel>
-    </x-base.slideover>
-
     @include('hr.employees.modals.create')
     @include('hr.employees.modals.edit')
     @stack('modals')
@@ -314,11 +209,12 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function () {
-            const filterField = document.getElementById('employees-filter-field');
-            const filterType = document.getElementById('employees-filter-type');
+            // Filter elements
             const filterValue = document.getElementById('employees-filter-value');
+            const companyFilter = document.getElementById('company-filter');
+            const departmentFilter = document.getElementById('department-filter');
+            const statusFilter = document.getElementById('status-filter');
             const lengthSelect = document.getElementById('employees-filter-length');
-            const filterGoBtn = document.getElementById('employees-filter-go');
             const filterResetBtn = document.getElementById('employees-filter-reset');
             const exportBtn = document.getElementById('employees-export');
             const exportPdfBtn = document.getElementById('employees-export-pdf');
@@ -327,20 +223,24 @@
             const importInput = document.getElementById('employees-import-input');
 
             const initialLength = lengthSelect ? parseInt(lengthSelect.value, 10) || 10 : 10;
+            let searchTimeout = null;
+
+            // Check if any filter is active
+            function hasFilters() {
+                return (filterValue && filterValue.value.trim() !== '') ||
+                       (companyFilter && companyFilter.value !== '') ||
+                       (departmentFilter && departmentFilter.value !== '') ||
+                       (statusFilter && statusFilter.value !== '');
+            }
 
             const table = (window.erpCrud && window.erpCrud.initDataTable) ? window.erpCrud.initDataTable({
                 tableSelector: '#employees-table',
                 ajaxUrl: '{{ route("hr.employees.datatable") }}',
                 ajaxData: function (d) {
-                    if (filterField) {
-                        d.filter_field = filterField.value || 'all';
-                    }
-                    if (filterType) {
-                        d.filter_type = filterType.value || 'contains';
-                    }
-                    if (filterValue) {
-                        d.filter_value = filterValue.value || '';
-                    }
+                    d.search_value = filterValue ? filterValue.value.trim() : '';
+                    d.company_id = companyFilter ? companyFilter.value : '';
+                    d.department_id = departmentFilter ? departmentFilter.value : '';
+                    d.status = statusFilter ? statusFilter.value : '';
                     d.page_length = lengthSelect ? parseInt(lengthSelect.value, 10) || initialLength : initialLength;
                 },
                 pageLength: initialLength,
@@ -400,10 +300,130 @@
                 return;
             }
 
+            // Stats elements
+            const statsTotal = document.getElementById('stats-total');
+            const statsActive = document.getElementById('stats-active');
+            const statsInactive = document.getElementById('stats-inactive');
+
+            // Update stats based on current filters
+            function updateStats() {
+                const params = new URLSearchParams();
+                if (filterValue && filterValue.value.trim()) params.append('search_value', filterValue.value.trim());
+                if (companyFilter && companyFilter.value) params.append('company_id', companyFilter.value);
+                if (departmentFilter && departmentFilter.value) params.append('department_id', departmentFilter.value);
+                // Don't include status filter for stats
+
+                fetch('{{ route("hr.employees.stats") }}?' + params.toString(), {
+                    credentials: 'same-origin',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (statsTotal) statsTotal.textContent = data.total;
+                    if (statsActive) statsActive.textContent = data.active;
+                    if (statsInactive) statsInactive.textContent = data.inactive;
+                })
+                .catch(() => {
+                    // Keep existing values on error
+                });
+            }
+
+            const reloadTable = function () {
+                table.ajax.reload(null, false);
+                updateStats();
+            };
+
+            // Search with debounce (auto-search as you type)
+            if (filterValue) {
+                filterValue.addEventListener('input', function () {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(reloadTable, 400);
+                });
+            }
+
+            // Instant filter on dropdown change
+            if (companyFilter) {
+                companyFilter.addEventListener('change', function() {
+                    // Load departments for selected company
+                    loadDepartmentsForCompany(this.value);
+                    reloadTable();
+                });
+            }
+
+            if (departmentFilter) {
+                departmentFilter.addEventListener('change', reloadTable);
+            }
+
+            if (statusFilter) {
+                statusFilter.addEventListener('change', reloadTable);
+            }
+
             if (lengthSelect) {
                 lengthSelect.addEventListener('change', function () {
                     const newLength = parseInt(this.value, 10) || initialLength;
                     table.page.len(newLength).draw();
+                });
+            }
+
+            // Reset all filters
+            if (filterResetBtn) {
+                filterResetBtn.addEventListener('click', function () {
+                    if (filterValue) filterValue.value = '';
+                    if (companyFilter) companyFilter.value = '';
+                    if (departmentFilter) {
+                        departmentFilter.value = '';
+                        // Reload all departments
+                        loadDepartmentsForCompany('');
+                    }
+                    if (statusFilter) statusFilter.value = '';
+                    if (lengthSelect) {
+                        lengthSelect.value = String(initialLength);
+                        table.page.len(initialLength);
+                    }
+                    reloadTable();
+                });
+            }
+
+            // Load departments based on company
+            function loadDepartmentsForCompany(companyId) {
+                if (!departmentFilter) return;
+
+                departmentFilter.innerHTML = '<option value="">Loading...</option>';
+
+                if (!companyId) {
+                    departmentFilter.innerHTML = '<option value="">All Departments</option>';
+                    const allDepartments = @json($departments ?? []);
+                    allDepartments.forEach(function(dept) {
+                        departmentFilter.innerHTML += '<option value="' + dept.id + '">' + (dept.name || '') + '</option>';
+                    });
+                    return;
+                }
+
+                fetch(`/hr/departments/api/company/${companyId}`, {
+                    credentials: 'same-origin',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    departmentFilter.innerHTML = '<option value="">All Departments</option>';
+                    if (data && Array.isArray(data)) {
+                        data.forEach(dept => {
+                            const option = document.createElement('option');
+                            option.value = dept.id;
+                            option.textContent = dept.name;
+                            departmentFilter.appendChild(option);
+                        });
+                    }
+                })
+                .catch(() => {
+                    departmentFilter.innerHTML = '<option value="">All Departments</option>';
                 });
             }
 
@@ -423,12 +443,10 @@
                     }
 
                     const params = {
-                        'filter_field': filterField ? filterField.value : '',
-                        'filter_type': filterType ? filterType.value : '',
-                        'filter_value': filterValue ? filterValue.value : '',
+                        'search_value': filterValue ? filterValue.value : '',
                         'company_id': companyFilter ? companyFilter.value : '',
                         'department_id': departmentFilter ? departmentFilter.value : '',
-                        'position_filter': positionFilter ? positionFilter.value : ''
+                        'status': statusFilter ? statusFilter.value : ''
                     };
 
                     Object.entries(params).forEach(function ([key, value]) {
@@ -493,168 +511,6 @@
                             importInput.value = '';
                         });
                 });
-            }
-
-            const reloadTable = function () {
-                table.ajax.reload(null, false);
-            };
-
-            if (filterGoBtn) {
-                filterGoBtn.addEventListener('click', reloadTable);
-            }
-
-            if (filterValue) {
-                filterValue.addEventListener('keyup', function (event) {
-                    if (event.key === 'Enter') {
-                        reloadTable();
-                    }
-                });
-            }
-
-            if (filterResetBtn) {
-                filterResetBtn.addEventListener('click', function () {
-                    if (filterField) {
-                        filterField.value = 'all';
-                    }
-                    if (filterType) {
-                        filterType.value = 'contains';
-                    }
-                    if (filterValue) {
-                        filterValue.value = '';
-                    }
-                    if (lengthSelect) {
-                        lengthSelect.value = String(initialLength);
-                        table.page.len(initialLength).draw();
-                    }
-                    reloadTable();
-                });
-            }
-
-            if (refreshBtn) {
-                refreshBtn.addEventListener('click', reloadTable);
-            }
-
-            // Advanced filters event listeners
-            const companyFilter = document.getElementById('company-filter');
-            const departmentFilter = document.getElementById('department-filter');
-            const positionFilter = document.getElementById('position-filter');
-            const advancedFilterApplyBtn = document.getElementById('advanced-filter-apply');
-
-            if (advancedFilterApplyBtn) {
-                advancedFilterApplyBtn.addEventListener('click', reloadTable);
-            }
-
-            // Auto-apply filters when changed
-            if (companyFilter) {
-                companyFilter.addEventListener('change', function() {
-                    // Reset department filter when company changes
-                    if (departmentFilter) {
-                        departmentFilter.value = '';
-                        // Load departments for selected company
-                        loadDepartmentsForCompany(this.value);
-                    }
-                    setTimeout(reloadTable, 300);
-                });
-            }
-
-            if (departmentFilter) {
-                departmentFilter.addEventListener('change', function() {
-                    loadPositionsForDepartment(this.value);
-                    setTimeout(reloadTable, 300);
-                });
-            }
-
-            if (positionFilter) {
-                positionFilter.addEventListener('change', function() {
-                    setTimeout(reloadTable, 300);
-                });
-            }
-
-            // Function to load departments based on company
-            function loadDepartmentsForCompany(companyId) {
-                if (!departmentFilter) return;
-
-                departmentFilter.innerHTML = '<option value="">Loading departments...</option>';
-
-                if (!companyId) {
-                    departmentFilter.innerHTML = '<option value="">All Departments</option>';
-                    // Add all departments back
-                    @foreach($departments ?? [] as $department)
-                        departmentFilter.innerHTML += '<option value="{{ $department->id }}">{{ $department->name }}</option>';
-                    @endforeach
-                    loadPositionsForDepartment(''); // Reset positions
-                    return;
-                }
-
-                fetch(`/hr/departments/api/company/${companyId}`, {
-                    credentials: 'same-origin',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    }
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        departmentFilter.innerHTML = '<option value="">All Departments</option>';
-                        if (data && Array.isArray(data)) {
-                            data.forEach(dept => {
-                                const option = document.createElement('option');
-                                option.value = dept.id;
-                                option.textContent = dept.name;
-                                departmentFilter.appendChild(option);
-                            });
-                        }
-                        loadPositionsForDepartment(''); // Reset positions when company changes
-                    })
-                    .catch(() => {
-                        departmentFilter.innerHTML = '<option value="">Error loading departments</option>';
-                    });
-            }
-
-            // Function to load positions based on department
-            function loadPositionsForDepartment(departmentId) {
-                if (!positionFilter) return;
-
-                positionFilter.innerHTML = '<option value="">Loading positions...</option>';
-
-                const url = departmentId 
-                    ? `/hr/employees/positions/department?department_id=${departmentId}`
-                    : '/hr/employees/positions/department';
-
-                fetch(url, {
-                    credentials: 'same-origin',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    }
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        positionFilter.innerHTML = '<option value="">All Positions</option>';
-                        if (data && Array.isArray(data)) {
-                            data.forEach(position => {
-                                const option = document.createElement('option');
-                                option.value = position;
-                                option.textContent = position;
-                                positionFilter.appendChild(option);
-                            });
-                        }
-                    })
-                    .catch(() => {
-                        positionFilter.innerHTML = '<option value="">Error loading positions</option>';
-                    });
             }
 
             // Employee code preview
@@ -792,9 +648,6 @@
                 }
                 table.ajax.reload(null, false);
             });
-
-            // Initialize positions on page load
-            loadPositionsForDepartment('');
 
             window.openEditModal = function(id, employeeId, firstName, lastName, email, phone, position, salary, hireDate, birthDate, gender, address, city, country, postalCode, departmentId, companyId, isActive) {
                 // Populate form fields

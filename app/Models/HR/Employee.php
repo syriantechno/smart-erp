@@ -216,7 +216,7 @@ class Employee extends Model
             return asset('storage/' . $this->profile_picture);
         }
 
-        return asset('build/assets/profile-1-0441b45e.jpg'); // Use existing profile image as fallback
+        return asset('images/default-avatar.jpg');
     }
 
     /**

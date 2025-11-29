@@ -261,7 +261,7 @@ class LeaveController extends Controller
     protected function renderEmployeeColumn(Leave $leave): string
     {
         $employee = $leave->employee;
-        $avatar = $employee?->profile_picture_url ?? asset('build/assets/profile-1-0441b45e.jpg');
+        $avatar = $employee?->profile_picture_url ?? asset('images/default-avatar.jpg');
         $name = $employee?->full_name ?? '—';
         $position = $employee?->position ?? '—';
         $department = $employee?->department?->name ?? '—';

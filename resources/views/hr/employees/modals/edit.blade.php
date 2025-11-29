@@ -294,10 +294,51 @@
 
 @push('scripts')
 <script>
-            document.getElementById('edit-housing-room-number'),
-            document.getElementById('edit-housing-unit-number')
-        ];
 document.addEventListener('DOMContentLoaded', function () {
+    // Image upload preview for edit modal
+    const editProfilePictureInput = document.getElementById('edit_profile_picture');
+    const editImagePreviewContainer = document.getElementById('edit-image-preview-container');
+    const editImagePreview = document.getElementById('edit-image-preview');
+    const editImagePlaceholder = document.getElementById('edit-image-placeholder');
+    const editRemoveImageBtn = document.getElementById('edit-remove-image');
+    const editRemoveProfilePictureInput = document.getElementById('edit-remove-profile-picture');
+
+    if (editProfilePictureInput) {
+        editProfilePictureInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    editImagePreview.src = e.target.result;
+                    editImagePreviewContainer.classList.remove('hidden');
+                    if (editImagePlaceholder) {
+                        editImagePlaceholder.classList.add('hidden');
+                    }
+                    if (editRemoveProfilePictureInput) {
+                        editRemoveProfilePictureInput.value = '0';
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    if (editRemoveImageBtn) {
+        editRemoveImageBtn.addEventListener('click', function() {
+            if (editProfilePictureInput) {
+                editProfilePictureInput.value = '';
+            }
+            editImagePreview.src = '';
+            editImagePreviewContainer.classList.add('hidden');
+            if (editImagePlaceholder) {
+                editImagePlaceholder.classList.remove('hidden');
+            }
+            if (editRemoveProfilePictureInput) {
+                editRemoveProfilePictureInput.value = '1';
+            }
+        });
+    }
+
     const housingToggle = document.getElementById('edit-is_company_housing');
     const housingDetails = document.getElementById('edit-housing-details');
     const housingInputs = [

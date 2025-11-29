@@ -38,14 +38,14 @@
     <!-- Delete Department -->
     <?php if (isset($component)) { $__componentOriginal032f83e94ea583b9c58157a8acdf0a87 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal032f83e94ea583b9c58157a8acdf0a87 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.erp.action-button','data' => ['icon' => 'Trash2','variant' => 'danger','title' => 'Delete Department','onclick' => 'deleteDepartment('.e($department->id).', \''.e(addslashes($department->name)).'\')']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.erp.action-button','data' => ['icon' => 'Trash2','variant' => 'danger','title' => 'Delete Department','onclick' => 'window.erpDeleteRecord && window.erpDeleteRecord('.e($department->id).', \''.e(addslashes($department->name)).'\')']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('erp.action-button'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['icon' => 'Trash2','variant' => 'danger','title' => 'Delete Department','onclick' => 'deleteDepartment('.e($department->id).', \''.e(addslashes($department->name)).'\')']); ?>
+<?php $component->withAttributes(['icon' => 'Trash2','variant' => 'danger','title' => 'Delete Department','onclick' => 'window.erpDeleteRecord && window.erpDeleteRecord('.e($department->id).', \''.e(addslashes($department->name)).'\')']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal032f83e94ea583b9c58157a8acdf0a87)): ?>

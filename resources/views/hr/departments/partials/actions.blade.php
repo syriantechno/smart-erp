@@ -19,6 +19,6 @@
         icon="Trash2"
         variant="danger"
         title="Delete Department"
-        onclick="deleteDepartment({{ $department->id }}, '{{ addslashes($department->name) }}')"
+        onclick="window.erpDeleteRecord && window.erpDeleteRecord({{ $department->id }}, '{{ addslashes($department->name) }}')"
     />
 </div>

@@ -31,6 +31,7 @@ class DepartmentController extends Controller
     public function index()
     {
         $departments = Department::with(['manager', 'parent', 'employees'])->get();
+        $companies = \App\Models\Setting\Company::active()->get();
 
         $departmentsTotal = $departments->count();
         $departmentsActive = $departments->where('is_active', true)->count();
@@ -38,6 +39,7 @@ class DepartmentController extends Controller
 
         return view('hr.departments.index', compact(
             'departments',
+            'companies',
             'departmentsTotal',
             'departmentsActive',
             'departmentsInactive'
@@ -183,6 +185,36 @@ class DepartmentController extends Controller
     }
     
     /**
+     * Get filtered stats for departments
+     */
+    public function stats(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $query = Department::query();
+
+        if ($request->filled('search_value')) {
+            $searchValue = $request->search_value;
+            $query->where(function ($q) use ($searchValue) {
+                $q->where('name', 'like', "%{$searchValue}%")
+                  ->orWhere('code', 'like', "%{$searchValue}%");
+            });
+        }
+
+        if ($request->filled('company_id') && $request->company_id !== '') {
+            $query->where('company_id', $request->company_id);
+        }
+
+        $total = (clone $query)->count();
+        $active = (clone $query)->where('is_active', true)->count();
+        $inactive = (clone $query)->where('is_active', false)->count();
+
+        return response()->json([
+            'total' => $total,
+            'active' => $active,
+            'inactive' => $inactive,
+        ]);
+    }
+
+    /**
      * Get departments for DataTable
      */
     public function datatable(Request $request)
@@ -198,6 +230,30 @@ class DepartmentController extends Controller
 
         $recordsTotal = (clone $baseQuery)->count();
 
+        // New simple filters
+        if ($request->filled('search_value')) {
+            $sv = $request->search_value;
+            $baseQuery->where(function ($query) use ($sv) {
+                $query->where('name', 'like', "%{$sv}%")
+                    ->orWhere('code', 'like', "%{$sv}%")
+                    ->orWhereHas('company', function ($q) use ($sv) {
+                        $q->where('name', 'like', "%{$sv}%");
+                    })
+                    ->orWhereHas('manager', function ($q) use ($sv) {
+                        $q->whereRaw("CONCAT(IFNULL(first_name, ''), ' ', IFNULL(last_name, '')) LIKE ?", ["%{$sv}%"]);
+                    });
+            });
+        }
+
+        if ($request->filled('company_id') && $request->company_id !== '') {
+            $baseQuery->where('company_id', $request->company_id);
+        }
+
+        if ($request->filled('status') && $request->status !== '') {
+            $baseQuery->where('is_active', $request->status);
+        }
+
+        // Legacy search
         if (!empty($searchValue)) {
             $baseQuery->where(function ($query) use ($searchValue) {
                 $query->where('name', 'like', "%{$searchValue}%")

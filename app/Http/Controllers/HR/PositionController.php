@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\HR\Department;
 use App\Models\HR\Position;
 use App\Services\DocumentCodeGenerator;
+use App\Services\PdfExporter;
+use App\Exports\PositionsExport;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,17 +20,21 @@ use App\Services\Notifications\NotificationDispatcher;
 
 class PositionController extends Controller
 {
-    public function __construct(private DocumentCodeGenerator $codeGenerator)
-    {
+    public function __construct(
+        private DocumentCodeGenerator $codeGenerator,
+        private PdfExporter $pdfExporter
+    ) {
     }
 
     public function index()
     {
+        $departments = \App\Models\HR\Department::active()->get();
         $positionsTotal = Position::count();
         $positionsActive = Position::where('is_active', true)->count();
         $positionsInactive = Position::where('is_active', false)->count();
 
         return view('hr.positions.index', compact(
+            'departments',
             'positionsTotal',
             'positionsActive',
             'positionsInactive'
@@ -95,6 +102,27 @@ class PositionController extends Controller
 
             return back()->with('error', 'Error creating position: ' . $e->getMessage());
         }
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $positions = Position::with('department')->get();
+
+        return $this->pdfExporter->stream(
+            'hr.positions.export_pdf',
+            [
+                'positions' => $positions,
+                'exportedAt' => now(),
+            ],
+            'positions.pdf'
+        );
+    }
+
+    public function exportExcel()
+    {
+        $positions = Position::with('department')->get();
+
+        return Excel::download(new PositionsExport($positions), 'positions.xlsx');
     }
 
     public function edit(Position $position)
@@ -218,6 +246,36 @@ class PositionController extends Controller
         }
     }
 
+    /**
+     * Get filtered stats for positions
+     */
+    public function stats(Request $request): JsonResponse
+    {
+        $query = Position::query();
+
+        if ($request->filled('search_value')) {
+            $searchValue = $request->search_value;
+            $query->where(function ($q) use ($searchValue) {
+                $q->where('title', 'like', "%{$searchValue}%")
+                  ->orWhere('code', 'like', "%{$searchValue}%");
+            });
+        }
+
+        if ($request->filled('department_id') && $request->department_id !== '') {
+            $query->where('department_id', $request->department_id);
+        }
+
+        $total = (clone $query)->count();
+        $active = (clone $query)->where('is_active', true)->count();
+        $inactive = (clone $query)->where('is_active', false)->count();
+
+        return response()->json([
+            'total' => $total,
+            'active' => $active,
+            'inactive' => $inactive,
+        ]);
+    }
+
     public function datatable(Request $request): JsonResponse
     {
         $draw = intval($request->input('draw'));
@@ -230,6 +288,27 @@ class PositionController extends Controller
 
         $recordsTotal = (clone $baseQuery)->count();
 
+        // New simple filters
+        if ($request->filled('search_value')) {
+            $sv = $request->search_value;
+            $baseQuery->where(function ($query) use ($sv) {
+                $query->where('title', 'like', "%{$sv}%")
+                    ->orWhere('code', 'like', "%{$sv}%")
+                    ->orWhereHas('department', function ($q) use ($sv) {
+                        $q->where('name', 'like', "%{$sv}%");
+                    });
+            });
+        }
+
+        if ($request->filled('department_id') && $request->department_id !== '') {
+            $baseQuery->where('department_id', $request->department_id);
+        }
+
+        if ($request->filled('status') && $request->status !== '') {
+            $baseQuery->where('is_active', $request->status);
+        }
+
+        // Legacy search
         if (!empty($searchValue)) {
             $baseQuery->where(function ($query) use ($searchValue) {
                 $query->where('title', 'like', "%{$searchValue}%")

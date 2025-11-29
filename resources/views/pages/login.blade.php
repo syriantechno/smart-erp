@@ -1,140 +1,272 @@
 @extends('../themes/base')
 
 @section('head')
-    <title>Login - Midone - Tailwind Admin Dashboard Template</title>
+    <title>Sign In - Smart ERP</title>
+    @push('styles')
+        <style>
+            .auth-shell {
+                min-height: 100vh;
+                background: linear-gradient(135deg, #fff5d7 0%, #ffe9a9 35%, #f9f2e8 65%, #f1f1f1 100%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 2rem 1.5rem;
+            }
+
+            .auth-card {
+                width: 100%;
+                max-width: 1200px;
+                border-radius: 32px;
+                background: #fff;
+                box-shadow: 0 25px 80px rgba(15, 23, 42, 0.12);
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+                overflow: hidden;
+            }
+
+            .auth-form-panel {
+                padding: clamp(2rem, 4vw, 3.5rem);
+                background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9));
+            }
+
+            .auth-form-title {
+                font-size: clamp(1.5rem, 2.5vw, 2rem);
+                font-weight: 700;
+                color: #0f172a;
+            }
+
+            .auth-form-subtitle {
+                color: #475569;
+                font-size: 0.95rem;
+                margin-top: 0.5rem;
+            }
+
+            .auth-input {
+                width: 100%;
+                padding: 0.9rem 1.1rem;
+                border-radius: 16px;
+                border: 1px solid #e2e8f0;
+                background: #f8fafc;
+                transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            }
+
+            .auth-input:focus {
+                border-color: #f4c15b;
+                box-shadow: 0 8px 30px rgba(251, 191, 36, 0.25);
+                background: #fff;
+            }
+
+            .auth-submit {
+                width: 100%;
+                border-radius: 24px;
+                padding: 0.95rem;
+                background: linear-gradient(90deg, #ffd977, #f6b756);
+                border: none;
+                color: #1f2937;
+                font-weight: 600;
+                font-size: 1rem;
+                box-shadow: 0 18px 30px rgba(247, 180, 84, 0.35);
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+            }
+
+            .auth-submit:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 25px 35px rgba(247, 180, 84, 0.45);
+            }
+
+            .auth-social-buttons {
+                display: flex;
+                gap: 0.75rem;
+                margin-top: 1rem;
+            }
+
+            .auth-social-button {
+                flex: 1;
+                border: 1px solid #e2e8f0;
+                border-radius: 18px;
+                padding: 0.85rem;
+                background: #fff;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+                font-weight: 500;
+                color: #0f172a;
+            }
+
+            .auth-hero-panel {
+                position: relative;
+                border-radius: 0;
+                background: linear-gradient(125deg, rgba(0,0,0,0.45), rgba(0,0,0,0.25)), url('{{ Vite::asset('resources/images/fakers/preview-2.jpg') }}');
+                background-size: cover;
+                background-position: center;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: clamp(2rem, 4vw, 3.5rem);
+                overflow: hidden;
+            }
+
+            .auth-hero-panel::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(135deg, rgba(255,245,215,0.1), rgba(255,233,169,0.35));
+            }
+
+            .auth-hero-panel::after {
+                content: '';
+                position: absolute;
+                width: 500px;
+                height: 500px;
+                background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%);
+                bottom: -10%;
+                right: -5%;
+            }
+
+            .auth-pill {
+                position: absolute;
+                background: #fff;
+                border-radius: 20px;
+                padding: 0.75rem 1.1rem;
+                box-shadow: 0 20px 50px rgba(15,23,42,0.25);
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                font-size: 0.85rem;
+                color: #0f172a;
+            }
+
+            .auth-pill--yellow {
+                background: #f9d35b;
+                color: #111827;
+            }
+
+            .auth-calendar {
+                position: absolute;
+                bottom: 2rem;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 85%;
+                background: rgba(17, 26, 38, 0.85);
+                border-radius: 22px;
+                padding: 1.5rem;
+                color: #f8fafc;
+                backdrop-filter: blur(12px);
+                box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            }
+
+            @media (max-width: 1024px) {
+                .auth-card {
+                    border-radius: 24px;
+                }
+
+                .auth-hero-panel {
+                    min-height: 420px;
+                }
+            }
+        </style>
+    @endpush
 @endsection
 
 @section('content')
-    <div @class([
-        'p-3 sm:px-8 relative h-screen lg:overflow-hidden bg-primary xl:bg-white dark:bg-darkmode-800 xl:dark:bg-darkmode-600',
-        'before:hidden before:xl:block before:content-[\'\'] before:w-[57%] before:-mt-[28%] before:-mb-[16%] before:-ml-[13%] before:absolute before:inset-y-0 before:left-0 before:transform before:rotate-[-4.5deg] before:bg-primary/20 before:rounded-[100%] before:dark:bg-darkmode-400',
-        'after:hidden after:xl:block after:content-[\'\'] after:w-[57%] after:-mt-[20%] after:-mb-[13%] after:-ml-[13%] after:absolute after:inset-y-0 after:left-0 after:transform after:rotate-[-4.5deg] after:bg-primary after:rounded-[100%] after:dark:bg-darkmode-700',
-    ])>
-        <div class="container relative z-10 sm:px-10">
-            <div class="block grid-cols-2 gap-4 xl:grid">
-                <!-- BEGIN: Login Info -->
-                <div class="hidden min-h-screen flex-col xl:flex">
-                    <a
-                        class="-intro-x flex items-center pt-5"
-                        href=""
-                    >
-                        <img
-                            class="w-6"
-                            src="{{ Vite::asset('resources/images/logo.svg') }}"
-                            alt="Midone - Tailwind Admin Dashboard Template"
-                        />
-                        <span class="ml-3 text-lg text-white"> Midone </span>
-                    </a>
-                    <div class="my-auto">
-                        <img
-                            class="-intro-x -mt-16 w-1/2"
-                            src="{{ Vite::asset('resources/images/illustration.svg') }}"
-                            alt="Midone - Tailwind Admin Dashboard Template"
-                        />
-                        <div class="-intro-x mt-10 text-4xl font-medium leading-tight text-white">
-                            A few more clicks to <br />
-                            sign in to your account.
-                        </div>
-                        <div class="-intro-x mt-5 text-lg text-white text-opacity-70 dark:text-slate-400">
-                            Manage all your e-commerce accounts in one place
-                        </div>
-                    </div>
+    <div class="auth-shell">
+        <div class="auth-card">
+            <div class="auth-form-panel">
+                <div class="mb-8">
+                    <img src="{{ Vite::asset('resources/images/logo.svg') }}" alt="Smart ERP" class="h-8">
                 </div>
-                <!-- END: Login Info -->
-                <!-- BEGIN: Login Form -->
-                <div class="my-10 flex h-screen py-5 xl:my-0 xl:h-auto xl:py-0">
-                    <div
-                        class="mx-auto my-auto w-full rounded-md bg-white px-5 py-8 shadow-md dark:bg-darkmode-600 sm:w-3/4 sm:px-8 lg:w-2/4 xl:ml-20 xl:w-auto xl:bg-transparent xl:p-0 xl:shadow-none">
-                        <h2 class="intro-x text-center text-2xl font-bold xl:text-left xl:text-3xl">
-                            Sign In
-                        </h2>
-                        <div class="intro-x mt-2 text-center text-slate-400 xl:hidden">
-                            A few more clicks to sign in to your account. Manage all your
-                            e-commerce accounts in one place
-                        </div>
-                        
-                        @if($errors->any())
-                            <div class="intro-x mt-4 p-3 bg-red-50 text-red-600 rounded-md">
-                                @foreach($errors->all() as $error)
-                                    <p>{{ $error }}</p>
-                                @endforeach
-                            </div>
-                        @endif
+                <div>
+                    <p class="text-sm uppercase tracking-[0.2em] text-slate-500">Welcome back</p>
+                    <h1 class="auth-form-title mt-2">Sign In</h1>
+                    <p class="auth-form-subtitle">Enter your credentials to access your account</p>
+                </div>
 
-                        <form method="POST" action="{{ route('login') }}" id="login-form">
-                            @csrf
-                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                            <div class="intro-x mt-8">
-                                <x-base.form-input
-                                    class="intro-x block min-w-full px-4 py-3 xl:min-w-[350px]"
-                                    type="email"
-                                    name="email"
-                                    value="{{ old('email') }}"
-                                    placeholder="Email"
-                                    required
-                                    autofocus
-                                />
-                                <x-base.form-input
-                                    class="intro-x mt-4 block min-w-full px-4 py-3 xl:min-w-[350px]"
-                                    type="password"
-                                    name="password"
-                                    placeholder="Password"
-                                    required
-                                />
-                            </div>
-                            <div class="intro-x mt-4 flex text-xs text-slate-600 dark:text-slate-500 sm:text-sm">
-                                <div class="mr-auto flex items-center">
-                                    <x-base.form-check.input
-                                        class="mr-2 border"
-                                        id="remember-me"
-                                        name="remember"
-                                        type="checkbox"
-                                        value="1"
-                                    />
-                                    <label
-                                        class="cursor-pointer select-none"
-                                        for="remember-me"
-                                    >
-                                        Remember me
-                                    </label>
-                                </div>
-                                <a href="">Forgot Password?</a>
-                            </div>
-                            <div class="intro-x mt-5 text-center xl:mt-8 xl:text-left">
-                                <x-base.button
-                                    class="w-full px-4 py-3 align-top xl:mr-3 xl:w-32"
-                                    variant="primary"
-                                    type="submit"
-                                >
-                                    Login
-                                </x-base.button>
-                                <x-base.button
-                                    class="mt-3 w-full px-4 py-3 align-top xl:mt-0 xl:w-32"
-                                    variant="outline-secondary"
-                                >
-                                    Register
-                                </x-base.button>
-                            </div>
-                        </form>
-                        <div class="intro-x mt-10 text-center text-slate-600 dark:text-slate-500 xl:mt-24 xl:text-left">
-                            By signin up, you agree to our
-                            <a
-                                class="text-primary dark:text-slate-200"
-                                href=""
-                            >
-                                Terms and Conditions
-                            </a>
-                            &
-                            <a
-                                class="text-primary dark:text-slate-200"
-                                href=""
-                            >
-                                Privacy Policy
-                            </a>
+                @if($errors->any())
+                    <div class="mt-8 rounded-2xl border border-red-100 bg-red-50/70 p-4 text-sm text-red-600">
+                        @foreach($errors->all() as $error)
+                            <p>{{ $error }}</p>
+                        @endforeach
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('login') }}" class="mt-8 space-y-4">
+                    @csrf
+                    <div>
+                        <label class="text-sm font-medium text-slate-600">Email</label>
+                        <input type="email" class="auth-input mt-2" name="email" value="{{ old('email') }}" placeholder="Enter your email" required autofocus>
+                    </div>
+
+                    <div>
+                        <label class="text-sm font-medium text-slate-600">Password</label>
+                        <div class="relative mt-2">
+                            <input type="password" class="auth-input pr-12" name="password" placeholder="••••••••" required>
+                            <span class="absolute inset-y-0 right-4 flex items-center text-slate-400 text-sm">👁</span>
                         </div>
                     </div>
+
+                    <div class="flex items-center justify-between text-sm text-slate-500">
+                        <label class="inline-flex items-center gap-2">
+                            <input type="checkbox" name="remember" class="h-4 w-4 rounded border-slate-300 text-amber-400 focus:ring-amber-300">
+                            Remember me
+                        </label>
+                        <a href="{{ route('password.request') }}" class="font-medium text-amber-500">Forgot password?</a>
+                    </div>
+
+                    <button type="submit" class="auth-submit">Login</button>
+
+                    <div class="text-center text-sm text-slate-400">or continue with</div>
+
+                    <div class="auth-social-buttons">
+                        <button type="button" class="auth-social-button">
+                            <img src="{{ Vite::asset('resources/images/icons/apple.svg') }}" alt="Apple" class="h-5">
+                            Apple
+                        </button>
+                        <button type="button" class="auth-social-button">
+                            <img src="{{ Vite::asset('resources/images/icons/google.svg') }}" alt="Google" class="h-5">
+                            Google
+                        </button>
+                    </div>
+                </form>
+
+                <div class="mt-10 flex flex-wrap items-center justify-between text-sm text-slate-400">
+                    <span>Don't have an account? <a href="{{ route('register') }}" class="text-slate-700 font-semibold">Sign up</a></span>
+                    <div class="flex gap-4">
+                        <a href="#" class="underline">Terms & Conditions</a>
+                        <a href="#" class="underline">Privacy Policy</a>
+                    </div>
                 </div>
-                <!-- END: Login Form -->
+            </div>
+
+            <div class="auth-hero-panel">
+                <div class="auth-pill auth-pill--yellow" style="top: 16%; left: 15%;">
+                    <span class="text-xs uppercase tracking-[0.2em]">Task Review With Team</span>
+                    <span class="text-sm font-semibold">02:30pm - 03:00pm</span>
+                </div>
+
+                <div class="auth-pill" style="top: 35%; right: 12%;">
+                    <div class="flex items-center -space-x-3">
+                        @foreach([14,11,6] as $avatar)
+                            <img src="{{ Vite::asset('resources/images/fakers/profile-' . $avatar . '.jpg') }}" class="h-8 w-8 rounded-full border-2 border-white" alt="team member">
+                        @endforeach
+                    </div>
+                    <span class="text-sm font-semibold">Daily Meeting</span>
+                </div>
+
+                <div class="auth-calendar">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm uppercase tracking-[0.3em] text-slate-400">March</p>
+                            <h3 class="text-2xl font-semibold">24 - 30</h3>
+                        </div>
+                        <span class="text-amber-300 text-sm">Weekly Schedule</span>
+                    </div>
+                    <div class="mt-6 grid grid-cols-7 gap-2 text-center text-sm text-slate-300">
+                        @foreach(['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] as $day)
+                            <div class="py-2 rounded-2xl {{ $day === 'Wed' ? 'bg-amber-400 text-gray-900 font-semibold' : 'bg-white/5' }}">{{ $day }}</div>
+                        @endforeach
+                    </div>
+                </div>
             </div>
         </div>
     </div>
