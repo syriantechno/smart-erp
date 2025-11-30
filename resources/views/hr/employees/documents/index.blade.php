@@ -7,15 +7,15 @@
 @section('subcontent')
     <div class="intro-y mt-8 flex items-center">
         <h2 class="mr-auto text-lg font-medium">{{ $employee->full_name }} - Documents</h2>
-        <div class="flex">
-            <x-base.button as="a" href="{{ route('hr.employees.show', $employee->id) }}" variant="outline-secondary" class="mr-3">
-                <x-base.lucide icon="ArrowLeft" class="w-4 h-4 mr-2" />
+        <div class="flex gap-3">
+            <a href="{{ route('hr.employees.show', $employee->id) }}" class="btn-royal btn-royal--outline">
+                <x-base.lucide icon="arrow-left" class="w-4 h-4 mr-2" />
                 Back to Profile
-            </x-base.button>
-            <x-base.button as="a" href="{{ route('hr.employees.documents.create', $employee->id) }}" variant="primary">
-                <x-base.lucide icon="Plus" class="w-4 h-4 mr-2" />
+            </a>
+            <a href="{{ route('hr.employees.documents.create', $employee->id) }}" class="btn-royal btn-royal--gold">
+                <x-base.lucide icon="plus" class="w-4 h-4 mr-2" />
                 Add Document
-            </x-base.button>
+            </a>
         </div>
     </div>
 
@@ -30,9 +30,9 @@
                         <x-base.lucide icon="FileText" class="w-5 h-5 mr-2 text-blue-500" />
                         Passport Documents
                     </h2>
-                    <x-base.button as="a" href="{{ route('hr.employees.documents.create', ['employee' => $employee->id, 'type' => 'passport']) }}" variant="outline-primary" size="sm">
-                        <x-base.lucide icon="Plus" class="w-4 h-4" />
-                    </x-base.button>
+                    <a href="{{ route('hr.employees.documents.create', ['employee' => $employee->id, 'type' => 'passport']) }}" class="btn-tonal btn-tonal--info btn-tonal--sm">
+                        <x-base.lucide icon="plus" class="w-4 h-4" />
+                    </a>
                 </div>
                 <div class="p-5">
                     @if(isset($documents['passport']) && $documents['passport']->count() > 0)
@@ -61,18 +61,18 @@
                                                 @endif
                                             </div>
                                         </div>
-                                        <div class="flex items-center space-x-2">
+                                        <div class="flex items-center gap-1">
                                             @if($document->file_path)
-                                                <x-base.button as="a" href="{{ route('hr.employees.documents.download', ['employee' => $employee->id, 'document' => $document->id]) }}" variant="outline-secondary" size="sm" title="Download">
-                                                    <x-base.lucide icon="Download" class="w-4 h-4" />
-                                                </x-base.button>
+                                                <a href="{{ route('hr.employees.documents.download', ['employee' => $employee->id, 'document' => $document->id]) }}" class="btn-tonal btn-tonal--info btn-tonal--icon" title="Download">
+                                                    <x-base.lucide icon="download" class="w-4 h-4" />
+                                                </a>
                                             @endif
-                                            <x-base.button as="a" href="{{ route('hr.employees.documents.edit', ['employee' => $employee->id, 'document' => $document->id]) }}" variant="outline-secondary" size="sm" title="Edit">
-                                                <x-base.lucide icon="Edit" class="w-4 h-4" />
-                                            </x-base.button>
-                                            <x-base.button onclick="confirmDelete({{ $document->id }}, '{{ addslashes($document->document_name) }}')" variant="outline-danger" size="sm" title="Delete">
-                                                <x-base.lucide icon="Trash" class="w-4 h-4" />
-                                            </x-base.button>
+                                            <a href="{{ route('hr.employees.documents.edit', ['employee' => $employee->id, 'document' => $document->id]) }}" class="btn-tonal btn-tonal--warning btn-tonal--icon" title="Edit">
+                                                <x-base.lucide icon="edit" class="w-4 h-4" />
+                                            </a>
+                                            <button onclick="confirmDelete({{ $document->id }}, '{{ addslashes($document->document_name) }}')" class="btn-tonal btn-tonal--danger btn-tonal--icon" title="Delete">
+                                                <x-base.lucide icon="trash-2" class="w-4 h-4" />
+                                            </button>
                                         </div>
                                     </div>
                                     @if($document->notes)
@@ -85,7 +85,7 @@
                         </div>
                     @else
                         <div class="flex flex-col items-center justify-center py-10 text-center">
-                            <x-base.lucide class="h-12 w-12 text-slate-400 mb-4" icon="FileText" />
+                            <x-base.lucide class="h-12 w-12 text-slate-400 mb-4" icon="file-text" />
                             <div class="text-slate-500 mb-2">No passport documents</div>
                             <a href="{{ route('hr.employees.documents.create', ['employee' => $employee->id, 'type' => 'passport']) }}"
                                class="text-primary hover:text-primary/80 text-sm">
@@ -105,9 +105,9 @@
                         <x-base.lucide icon="Plane" class="w-5 h-5 mr-2 text-green-500" />
                         Visa Documents
                     </h2>
-                    <x-base.button as="a" href="{{ route('hr.employees.documents.create', ['employee' => $employee->id, 'type' => 'visa']) }}" variant="outline-primary" size="sm">
-                        <x-base.lucide icon="Plus" class="w-4 h-4" />
-                    </x-base.button>
+                    <a href="{{ route('hr.employees.documents.create', ['employee' => $employee->id, 'type' => 'visa']) }}" class="btn-tonal btn-tonal--info btn-tonal--sm">
+                        <x-base.lucide icon="plus" class="w-4 h-4" />
+                    </a>
                 </div>
                 <div class="p-5">
                     @if(isset($documents['visa']) && $documents['visa']->count() > 0)
@@ -136,18 +136,18 @@
                                                 @endif
                                             </div>
                                         </div>
-                                        <div class="flex items-center space-x-2">
+                                        <div class="flex items-center gap-1">
                                             @if($document->file_path)
-                                                <x-base.button as="a" href="{{ route('hr.employees.documents.download', ['employee' => $employee->id, 'document' => $document->id]) }}" variant="outline-secondary" size="sm" title="Download">
-                                                    <x-base.lucide icon="Download" class="w-4 h-4" />
-                                                </x-base.button>
+                                                <a href="{{ route('hr.employees.documents.download', ['employee' => $employee->id, 'document' => $document->id]) }}" class="btn-tonal btn-tonal--info btn-tonal--icon" title="Download">
+                                                    <x-base.lucide icon="download" class="w-4 h-4" />
+                                                </a>
                                             @endif
-                                            <x-base.button as="a" href="{{ route('hr.employees.documents.edit', ['employee' => $employee->id, 'document' => $document->id]) }}" variant="outline-secondary" size="sm" title="Edit">
-                                                <x-base.lucide icon="Edit" class="w-4 h-4" />
-                                            </x-base.button>
-                                            <x-base.button onclick="confirmDelete({{ $document->id }}, '{{ addslashes($document->document_name) }}')" variant="outline-danger" size="sm" title="Delete">
-                                                <x-base.lucide icon="Trash" class="w-4 h-4" />
-                                            </x-base.button>
+                                            <a href="{{ route('hr.employees.documents.edit', ['employee' => $employee->id, 'document' => $document->id]) }}" class="btn-tonal btn-tonal--warning btn-tonal--icon" title="Edit">
+                                                <x-base.lucide icon="edit" class="w-4 h-4" />
+                                            </a>
+                                            <button onclick="confirmDelete({{ $document->id }}, '{{ addslashes($document->document_name) }}')" class="btn-tonal btn-tonal--danger btn-tonal--icon" title="Delete">
+                                                <x-base.lucide icon="trash-2" class="w-4 h-4" />
+                                            </button>
                                         </div>
                                     </div>
                                     @if($document->notes)
@@ -160,7 +160,7 @@
                         </div>
                     @else
                         <div class="flex flex-col items-center justify-center py-10 text-center">
-                            <x-base.lucide class="h-12 w-12 text-slate-400 mb-4" icon="Plane" />
+                            <x-base.lucide class="h-12 w-12 text-slate-400 mb-4" icon="plane" />
                             <div class="text-slate-500 mb-2">No visa documents</div>
                             <a href="{{ route('hr.employees.documents.create', ['employee' => $employee->id, 'type' => 'visa']) }}"
                                class="text-primary hover:text-primary/80 text-sm">
@@ -180,9 +180,9 @@
                         <x-base.lucide icon="Folder" class="w-5 h-5 mr-2 text-purple-500" />
                         Other Documents
                     </h2>
-                    <x-base.button as="a" href="{{ route('hr.employees.documents.create', ['employee' => $employee->id]) }}" variant="outline-primary" size="sm">
-                        <x-base.lucide icon="Plus" class="w-4 h-4" />
-                    </x-base.button>
+                    <a href="{{ route('hr.employees.documents.create', ['employee' => $employee->id]) }}" class="btn-tonal btn-tonal--info btn-tonal--sm">
+                        <x-base.lucide icon="plus" class="w-4 h-4" />
+                    </a>
                 </div>
                 <div class="p-5">
                     @php
@@ -203,18 +203,18 @@
                                             <div class="font-medium text-slate-800 dark:text-slate-300 text-sm">{{ $document->document_name }}</div>
                                             <div class="text-xs text-slate-500 mt-1">{{ $document->document_type_formatted }}</div>
                                         </div>
-                                        <div class="flex items-center space-x-1">
+                                        <div class="flex items-center gap-1">
                                             @if($document->file_path)
-                                                <x-base.button as="a" href="{{ route('hr.employees.documents.download', ['employee' => $employee->id, 'document' => $document->id]) }}" variant="outline-secondary" size="xs" title="Download">
-                                                    <x-base.lucide icon="Download" class="w-3 h-3" />
-                                                </x-base.button>
+                                                <a href="{{ route('hr.employees.documents.download', ['employee' => $employee->id, 'document' => $document->id]) }}" class="btn-tonal btn-tonal--info btn-tonal--icon btn-tonal--sm" title="Download">
+                                                    <x-base.lucide icon="download" class="w-3 h-3" />
+                                                </a>
                                             @endif
-                                            <x-base.button as="a" href="{{ route('hr.employees.documents.edit', ['employee' => $employee->id, 'document' => $document->id]) }}" variant="outline-secondary" size="xs" title="Edit">
-                                                <x-base.lucide icon="Edit" class="w-3 h-3" />
-                                            </x-base.button>
-                                            <x-base.button onclick="confirmDelete({{ $document->id }}, '{{ addslashes($document->document_name) }}')" variant="outline-danger" size="xs" title="Delete">
-                                                <x-base.lucide icon="Trash" class="w-3 h-3" />
-                                            </x-base.button>
+                                            <a href="{{ route('hr.employees.documents.edit', ['employee' => $employee->id, 'document' => $document->id]) }}" class="btn-tonal btn-tonal--warning btn-tonal--icon btn-tonal--sm" title="Edit">
+                                                <x-base.lucide icon="edit" class="w-3 h-3" />
+                                            </a>
+                                            <button onclick="confirmDelete({{ $document->id }}, '{{ addslashes($document->document_name) }}')" class="btn-tonal btn-tonal--danger btn-tonal--icon btn-tonal--sm" title="Delete">
+                                                <x-base.lucide icon="trash-2" class="w-3 h-3" />
+                                            </button>
                                         </div>
                                     </div>
                                     @if($document->document_number)
@@ -234,7 +234,7 @@
                         </div>
                     @else
                         <div class="flex flex-col items-center justify-center py-10 text-center">
-                            <x-base.lucide class="h-12 w-12 text-slate-400 mb-4" icon="Folder" />
+                            <x-base.lucide class="h-12 w-12 text-slate-400 mb-4" icon="folder" />
                             <div class="text-slate-500 mb-2">No other documents</div>
                             <a href="{{ route('hr.employees.documents.create', ['employee' => $employee->id]) }}"
                                class="text-primary hover:text-primary/80 text-sm">

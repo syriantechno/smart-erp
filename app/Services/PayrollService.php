@@ -5,11 +5,14 @@ namespace App\Services;
 use App\Models\HR\Employee;
 use App\Models\HR\Payroll;
 use App\Models\HR\Attendance;
+use App\Models\HR\Leave;
 use App\Models\HR\Penalty;
 use App\Models\HR\Advance;
 use App\Models\Setting\Setting;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class PayrollService
 {
@@ -88,8 +91,13 @@ class PayrollService
                 $results['failed']++;
                 $results['errors'][] = [
                     'employee' => $employee->full_name,
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
                 ];
+                Log::error("Payroll generation failed for {$employee->full_name}: " . $e->getMessage(), [
+                    'employee_id' => $employee->id,
+                    'trace' => $e->getTraceAsString()
+                ]);
             }
         }
 
@@ -131,6 +139,9 @@ class PayrollService
         // Calculate late deduction
         $lateDeduction = $this->calculateLateDeduction($attendanceData['late_minutes'], $hourlyRate);
 
+        // Get unpaid leave deduction
+        $unpaidLeaveData = $this->getUnpaidLeaveDeduction($employee->id, $dailyRate);
+
         // Get pending penalties (financial, approved, not yet deducted)
         $penaltiesData = $this->getPendingPenalties($employee->id);
         
@@ -138,7 +149,7 @@ class PayrollService
         $advancesData = $this->getPendingAdvanceInstallments($employee->id);
 
         // Calculate total deductions
-        $totalDeductions = $lateDeduction + $penaltiesData['total'] + $advancesData['total'];
+        $totalDeductions = $lateDeduction + $unpaidLeaveData['deduction'] + $penaltiesData['total'] + $advancesData['total'];
 
         // Gross salary = Earned salary + Overtime
         $grossSalary = $earnedSalary + $totalOvertimeAmount;
@@ -174,10 +185,17 @@ class PayrollService
             'late_minutes' => $attendanceData['late_minutes'],
             'late_deduction' => round($lateDeduction, 2),
             
+            // Unpaid leave
+            'unpaid_leave_days' => $unpaidLeaveData['days'],
+            'unpaid_leave_deduction' => round($unpaidLeaveData['deduction'], 2),
+            
             // Deduction details
             'deductions' => round($totalDeductions, 2),
             'deduction_details' => [
                 'late' => round($lateDeduction, 2),
+                'unpaid_leave' => round($unpaidLeaveData['deduction'], 2),
+                'unpaid_leave_days' => $unpaidLeaveData['days'],
+                'unpaid_leave_ids' => $unpaidLeaveData['ids'],
                 'penalties' => $penaltiesData['total'],
                 'penalty_ids' => $penaltiesData['ids'],
                 'advances' => $advancesData['total'],
@@ -194,22 +212,80 @@ class PayrollService
     }
 
     /**
+     * Get unpaid leave deduction for an employee
+     */
+    protected function getUnpaidLeaveDeduction(int $employeeId, float $dailyRate): array
+    {
+        $startDate = Carbon::create($this->year, $this->month, 1)->startOfMonth();
+        $endDate = $startDate->copy()->endOfMonth();
+
+        // Get approved unpaid leaves that overlap with this month
+        $leaves = Leave::where('employee_id', $employeeId)
+            ->where('status', 'approved')
+            ->where('is_paid', false)
+            ->where(function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('start_date', [$startDate, $endDate])
+                    ->orWhereBetween('end_date', [$startDate, $endDate])
+                    ->orWhere(function ($q) use ($startDate, $endDate) {
+                        $q->where('start_date', '<=', $startDate)
+                          ->where('end_date', '>=', $endDate);
+                    });
+            })
+            ->get();
+
+        $totalDays = 0;
+        $ids = [];
+
+        foreach ($leaves as $leave) {
+            // Calculate days within this month
+            $leaveStart = Carbon::parse($leave->start_date);
+            $leaveEnd = Carbon::parse($leave->end_date);
+            
+            // Adjust to month boundaries
+            $effectiveStart = $leaveStart->lt($startDate) ? $startDate : $leaveStart;
+            $effectiveEnd = $leaveEnd->gt($endDate) ? $endDate : $leaveEnd;
+            
+            // Count days (excluding weekends if needed)
+            $days = $effectiveStart->diffInDays($effectiveEnd) + 1;
+            
+            $totalDays += $days;
+            $ids[] = $leave->id;
+        }
+
+        return [
+            'days' => $totalDays,
+            'deduction' => round($totalDays * $dailyRate, 2),
+            'ids' => $ids,
+            'count' => count($ids),
+        ];
+    }
+
+    /**
      * Get pending financial penalties for an employee
      */
     protected function getPendingPenalties(int $employeeId): array
     {
-        $penalties = Penalty::where('employee_id', $employeeId)
-            ->where('type', 'financial')
-            ->where('status', 'approved')
-            ->where('deduct_from_salary', true)
-            ->where('deducted', false)
-            ->get();
+        try {
+            // Check if penalties table exists
+            if (!Schema::hasTable('penalties')) {
+                return ['total' => 0, 'ids' => [], 'count' => 0];
+            }
+            
+            $penalties = Penalty::where('employee_id', $employeeId)
+                ->where('type', 'financial')
+                ->where('status', 'approved')
+                ->where('deduct_from_salary', true)
+                ->where('deducted', false)
+                ->get();
 
-        return [
-            'total' => round($penalties->sum('amount'), 2),
-            'ids' => $penalties->pluck('id')->toArray(),
-            'count' => $penalties->count(),
-        ];
+            return [
+                'total' => round($penalties->sum('amount'), 2),
+                'ids' => $penalties->pluck('id')->toArray(),
+                'count' => $penalties->count(),
+            ];
+        } catch (\Exception $e) {
+            return ['total' => 0, 'ids' => [], 'count' => 0];
+        }
     }
 
     /**
@@ -217,25 +293,34 @@ class PayrollService
      */
     protected function getPendingAdvanceInstallments(int $employeeId): array
     {
-        $advances = Advance::where('employee_id', $employeeId)
-            ->where('status', 'disbursed')
-            ->where('remaining_amount', '>', 0)
-            ->where('start_deduction_date', '<=', Carbon::create($this->year, $this->month, 1)->endOfMonth())
-            ->get();
+        try {
+            // Check if advances table exists
+            if (!Schema::hasTable('advances')) {
+                return ['total' => 0, 'ids' => [], 'count' => 0];
+            }
+            
+            $advances = Advance::where('employee_id', $employeeId)
+                ->where('status', 'disbursed')
+                ->where('remaining_amount', '>', 0)
+                ->where('start_deduction_date', '<=', Carbon::create($this->year, $this->month, 1)->endOfMonth())
+                ->get();
 
-        $total = 0;
-        $ids = [];
+            $total = 0;
+            $ids = [];
 
-        foreach ($advances as $advance) {
-            $total += $advance->installment_amount;
-            $ids[] = $advance->id;
+            foreach ($advances as $advance) {
+                $total += $advance->installment_amount;
+                $ids[] = $advance->id;
+            }
+
+            return [
+                'total' => round($total, 2),
+                'ids' => $ids,
+                'count' => count($ids),
+            ];
+        } catch (\Exception $e) {
+            return ['total' => 0, 'ids' => [], 'count' => 0];
         }
-
-        return [
-            'total' => round($total, 2),
-            'ids' => $ids,
-            'count' => count($ids),
-        ];
     }
 
     /**

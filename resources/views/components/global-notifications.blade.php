@@ -2,10 +2,10 @@
     <style>
         /* Global Notification Styles */
         #global-toast-container {
-            position: fixed;
-            top: 24px;
-            right: 24px;
-            z-index: 99999;
+            position: fixed !important;
+            top: 24px !important;
+            right: 24px !important;
+            z-index: 2147483647 !important; /* Maximum z-index to ensure it's always on top */
             display: none;
             flex-direction: column;
             gap: 12px;
@@ -13,6 +13,7 @@
             max-width: 400px;
             width: auto;
             box-sizing: border-box;
+            isolation: isolate; /* Create new stacking context */
         }
 
         #global-toast-container:not(:empty) {
@@ -75,6 +76,7 @@
             display: flex;
             align-items: flex-start;
             gap: 12px;
+            pointer-events: auto;
         }
 
         .toast-icon {
@@ -293,8 +295,7 @@
     </style>
 @endPushOnce
 
-<!-- Toast Container -->
-<div id="global-toast-container"></div>
+<!-- Toast Container is now in base.blade.php at the end of body for proper z-index -->
 
 <!-- Session Notifications -->
 @if(session()->has('notification'))

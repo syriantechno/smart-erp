@@ -7,8 +7,8 @@
 @section('subcontent')
     <div class="intro-y mt-8 flex items-center">
         <h2 class="mr-auto text-lg font-medium">Add Document for {{ $employee->full_name }}</h2>
-        <a href="{{ route('hr.employees.documents.index', ['employee' => $employee->id]) }}" class="btn btn-outline-secondary">
-            <x-base.lucide icon="ArrowLeft" class="w-4 h-4 mr-2" />
+        <a href="{{ route('hr.employees.documents.index', ['employee' => $employee->id]) }}" class="btn-royal btn-royal--outline">
+            <x-base.lucide icon="arrow-left" class="w-4 h-4 mr-2" />
             Back to Documents
         </a>
     </div>
@@ -99,19 +99,15 @@
                             </div>
                         </div>
 
-                        <div class="custom-modal-footer mt-6">
-                            <x-base.button
-                                as="a"
-                                href="{{ route('hr.employees.documents.index', ['employee' => $employee->id]) }}"
-                                tone="warning"
-                            >
-                                <x-base.lucide icon="X" class="w-4 h-4 mr-2" />
+                        <div class="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-slate-200/60 dark:border-darkmode-400">
+                            <a href="{{ route('hr.employees.documents.index', ['employee' => $employee->id]) }}" class="btn-royal btn-royal--outline">
+                                <x-base.lucide icon="x" class="w-4 h-4 mr-2" />
                                 Cancel
-                            </x-base.button>
-                            <x-base.button type="submit" variant="primary">
-                                <x-base.lucide icon="Save" class="w-4 h-4 mr-2" />
+                            </a>
+                            <button type="submit" class="btn-royal btn-royal--gold">
+                                <x-base.lucide icon="save" class="w-4 h-4 mr-2" />
                                 Upload Document
-                            </x-base.button>
+                            </button>
                         </div>
                     </form>
                 </div>

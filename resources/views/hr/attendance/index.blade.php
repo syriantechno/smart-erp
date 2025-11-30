@@ -7,6 +7,23 @@
 @include('components.datatable.styles')
 @include('components.datatable.theme')
 
+@push('styles')
+<style>
+    /* Make filters more compact */
+    #filter-month, #filter-year, #filter-company, #filter-department {
+        min-width: auto;
+    }
+    
+    .icon-hover-rise {
+        transition: transform 200ms ease;
+    }
+    
+    .group:hover .icon-hover-rise {
+        transform: translateY(-2px);
+    }
+</style>
+@endpush
+
 @section('subcontent')
     @include('components.global-notifications')
 
@@ -86,72 +103,97 @@
         <div class="intro-y col-span-12">
             <x-base.preview-component class="intro-y box bg-white/80 border border-slate-200/70 shadow-[0_18px_45px_rgba(15,23,42,0.10)]">
                 <div class="p-5">
-                    {{-- Filters Row --}}
-                    <div class="flex flex-col sm:flex-row sm:items-end xl:items-start mb-5">
-                        <form id="attendance-filter-form" class="w-full sm:mr-auto xl:flex">
-                            <div class="items-center sm:mr-4 sm:flex">
-                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">Month</label>
-                                <x-base.form-select id="filter-month" class="mt-2 w-full sm:mt-0 sm:w-auto">
-                                    @for($m = 1; $m <= 12; $m++)
-                                        <option value="{{ $m }}" {{ $m == $month ? 'selected' : '' }}>
-                                            {{ \Carbon\Carbon::create()->month($m)->format('F') }}
-                                        </option>
-                                    @endfor
-                                </x-base.form-select>
-                            </div>
-                            <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
-                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">Year</label>
-                                <x-base.form-select id="filter-year" class="mt-2 w-full sm:mt-0 sm:w-auto">
-                                    @for($y = now()->year - 2; $y <= now()->year + 1; $y++)
-                                        <option value="{{ $y }}" {{ $y == $year ? 'selected' : '' }}>{{ $y }}</option>
-                                    @endfor
-                                </x-base.form-select>
-                            </div>
-                            <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
-                                <label class="mr-2 w-20 flex-none xl:w-auto xl:flex-initial">Department</label>
-                                <x-base.form-select id="filter-department" class="mt-2 w-full sm:mt-0 sm:w-auto">
-                                    <option value="">All Departments</option>
-                                    @foreach($departments ?? [] as $dept)
-                                        <option value="{{ $dept->id }}">{{ $dept->name }}</option>
-                                    @endforeach
-                                </x-base.form-select>
-                            </div>
-                            <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
-                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">Search</label>
-                                <x-base.form-input id="filter-search" type="text" placeholder="Employee name..." class="mt-2 w-full sm:mt-0 sm:w-48" />
-                            </div>
-                            <div class="mt-2 flex flex-wrap gap-2 xl:mt-0">
-                                <button type="button" id="btn-filter" class="btn-royal btn-royal--dark btn-royal--sm">
-                                    <x-base.lucide icon="search" class="w-4 h-4 mr-1" />
-                                    Filter
-                                </button>
-                                <button type="button" id="btn-reset" class="btn-royal btn-royal--outline btn-royal--sm">
-                                    <x-base.lucide icon="rotate-ccw" class="w-4 h-4 mr-1" />
-                                    Reset
-                                </button>
-                            </div>
-                        </form>
+                    {{-- Filters & Actions in One Row --}}
+                    <div class="flex flex-wrap items-center gap-2 mb-4">
+                        {{-- Search Input --}}
+                        <div class="relative min-w-[180px]">
+                            <x-base.lucide icon="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <x-base.form-input 
+                                id="filter-search" 
+                                type="text" 
+                                placeholder="Search employee..." 
+                                class="pl-9 w-full text-sm py-1.5"
+                            />
+                        </div>
 
-                        <div class="mt-5 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
-                            <x-base.tippy content="Export to Excel" placement="bottom">
-                                <button id="btn-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm group">
-                                    <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
+                        {{-- Month Filter --}}
+                        <x-base.form-select id="filter-month" class="w-auto text-sm py-1.5">
+                            @for($m = 1; $m <= 12; $m++)
+                                <option value="{{ $m }}" {{ $m == $month ? 'selected' : '' }}>
+                                    {{ \Carbon\Carbon::create()->month($m)->format('M') }}
+                                </option>
+                            @endfor
+                        </x-base.form-select>
+
+                        {{-- Year Filter --}}
+                        <x-base.form-select id="filter-year" class="w-auto text-sm py-1.5">
+                            @for($y = now()->year - 2; $y <= now()->year + 1; $y++)
+                                <option value="{{ $y }}" {{ $y == $year ? 'selected' : '' }}>{{ $y }}</option>
+                            @endfor
+                        </x-base.form-select>
+
+                        {{-- Company Filter --}}
+                        <x-base.form-select id="filter-company" class="w-auto text-sm py-1.5">
+                            <option value="">All Companies</option>
+                            @foreach($companies ?? [] as $company)
+                                <option value="{{ $company->id }}">{{ $company->name }}</option>
+                            @endforeach
+                        </x-base.form-select>
+
+                        {{-- Department Filter --}}
+                        <x-base.form-select id="filter-department" class="w-auto text-sm py-1.5">
+                            <option value="">All Depts</option>
+                            @foreach($departments ?? [] as $dept)
+                                <option value="{{ $dept->id }}">{{ $dept->name }}</option>
+                            @endforeach
+                        </x-base.form-select>
+
+                        {{-- Shift Filter --}}
+                        <x-base.form-select id="filter-shift" class="w-auto text-sm py-1.5">
+                            <option value="">All Shifts</option>
+                            @foreach($shifts ?? [] as $shift)
+                                <option value="{{ $shift->id }}">{{ $shift->name }}</option>
+                            @endforeach
+                        </x-base.form-select>
+
+                        {{-- Reset Button --}}
+                        <x-base.tippy as="button" id="btn-reset" type="button" content="Reset filters" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                            <x-base.lucide icon="x" class="w-4 h-4" />
+                        </x-base.tippy>
+
+                        {{-- Spacer --}}
+                        <div class="flex-1"></div>
+
+                        {{-- Action Buttons --}}
+                        <div class="flex items-center gap-1">
+                            <x-base.tippy content="Print" placement="bottom">
+                                <button id="btn-print" type="button" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                                    <x-base.lucide icon="printer" class="w-4 h-4" />
                                 </button>
                             </x-base.tippy>
-                            <x-base.tippy content="Print Report" placement="bottom">
-                                <button id="btn-print" type="button" class="btn-royal btn-royal--outline btn-royal--sm group">
-                                    <x-base.lucide icon="printer" class="w-5 h-5 icon-hover-rise" />
+                            <x-base.tippy content="Export Excel" placement="bottom">
+                                <button id="btn-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                                    <x-base.lucide icon="file-spreadsheet" class="w-4 h-4" />
+                                </button>
+                            </x-base.tippy>
+                            <x-base.tippy content="Refresh" placement="bottom">
+                                <button id="btn-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                                    <x-base.lucide icon="refresh-cw" class="w-4 h-4" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Bulk Entry" placement="bottom">
-                                <button id="btn-bulk" type="button" class="btn-royal btn-royal--outline btn-royal--sm group">
-                                    <x-base.lucide icon="users" class="w-5 h-5 icon-hover-rise" />
+                                <button id="btn-bulk" type="button" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                                    <x-base.lucide icon="users" class="w-4 h-4" />
                                 </button>
                             </x-base.tippy>
-                            <button id="btn-add" type="button" class="btn-royal btn-royal--gold">
-                                <x-base.lucide icon="plus" class="w-5 h-5 mr-2" />
-                                Add
-                            </button>
+
+                            {{-- Add Attendance Button --}}
+                            <x-base.tippy content="Add attendance" placement="bottom">
+                                <button id="btn-add" type="button" class="btn-royal btn-royal--gold btn-royal--sm">
+                                    <x-base.lucide icon="plus-circle" class="w-4 h-4 mr-2" />
+                                    <span class="hidden sm:inline">Add</span>
+                                </button>
+                            </x-base.tippy>
                         </div>
                     </div>
 
@@ -253,9 +295,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const tbody = document.querySelector('#attendance-table tbody');
         tbody.innerHTML = '<tr><td colspan="100" class="text-center py-8">Loading...</td></tr>';
 
-        fetch(urls.data + '?month=' + currentMonth + '&year=' + currentYear + 
-              '&department_id=' + ($('#filter-department').val() || '') +
-              '&search_term=' + ($('#filter-search').val() || ''), {
+        const params = new URLSearchParams({
+            month: currentMonth,
+            year: currentYear,
+            company_id: document.getElementById('filter-company')?.value || '',
+            department_id: document.getElementById('filter-department')?.value || '',
+            shift_id: document.getElementById('filter-shift')?.value || '',
+            search_term: document.getElementById('filter-search')?.value || ''
+        });
+
+        fetch(urls.data + '?' + params.toString(), {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -372,20 +421,40 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initial load
     loadAttendanceData();
 
-    // Filter handlers
-    document.getElementById('btn-filter').addEventListener('click', function() {
-        currentMonth = document.getElementById('filter-month').value;
-        currentYear = document.getElementById('filter-year').value;
-        loadAttendanceData();
+    // Auto-filter on change
+    ['filter-month', 'filter-year', 'filter-company', 'filter-department', 'filter-shift'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('change', function() {
+                currentMonth = document.getElementById('filter-month').value;
+                currentYear = document.getElementById('filter-year').value;
+                loadAttendanceData();
+            });
+        }
     });
 
+    // Search on Enter or after typing
+    let searchTimeout;
+    document.getElementById('filter-search')?.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => loadAttendanceData(), 500);
+    });
+
+    // Reset filters
     document.getElementById('btn-reset').addEventListener('click', function() {
         document.getElementById('filter-month').value = {{ now()->month }};
         document.getElementById('filter-year').value = {{ now()->year }};
+        document.getElementById('filter-company').value = '';
         document.getElementById('filter-department').value = '';
+        document.getElementById('filter-shift').value = '';
         document.getElementById('filter-search').value = '';
         currentMonth = {{ now()->month }};
         currentYear = {{ now()->year }};
+        loadAttendanceData();
+    });
+
+    // Refresh button
+    document.getElementById('btn-refresh')?.addEventListener('click', function() {
         loadAttendanceData();
     });
 

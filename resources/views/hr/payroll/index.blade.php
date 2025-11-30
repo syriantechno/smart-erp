@@ -296,9 +296,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 </td>
                 <td data-tw-merge class="px-5 py-3 border-b dark:border-darkmode-300">
                     <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center text-white text-xs font-bold">
-                            ${row.employee.name.charAt(0)}
-                        </div>
+                        ${row.employee.photo 
+                            ? `<img src="${row.employee.photo}" alt="${row.employee.name}" class="w-8 h-8 rounded-full object-cover">`
+                            : `<div class="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center text-white text-xs font-bold">${row.employee.name.charAt(0)}</div>`
+                        }
                         <div>
                             <div class="font-medium whitespace-nowrap">${row.employee.name}</div>
                             <div class="text-xs text-slate-500 mt-0.5">${row.employee.department}</div>

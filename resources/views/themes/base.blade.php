@@ -180,6 +180,8 @@
     @stack('scripts')
     <!-- END: Pages, layouts, components JS Assets-->
 
+<!-- Toast Container - Must be at the end of body for proper z-index -->
+<div id="global-toast-container"></div>
 
 </body>
 

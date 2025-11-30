@@ -26,7 +26,7 @@ class EmployeeEvaluation extends Model
 
     public function employee(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Employee::class);
+        return $this->belongsTo(\App\Models\HR\Employee::class);
     }
 
     public function evaluator(): BelongsTo

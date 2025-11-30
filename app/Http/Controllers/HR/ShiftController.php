@@ -47,52 +47,28 @@ class ShiftController extends Controller
         try {
             $baseQuery = $this->shiftRepository->getForDataTable();
 
-            // Custom filtering similar to other HR tables
-            $filterField = $request->get('filter_field', 'all');
-            $filterType = $request->get('filter_type', 'contains');
+            // Search filter
             $filterValue = $request->get('filter_value');
-
             if ($filterValue !== null && $filterValue !== '') {
-                $comparison = $filterType === 'equals' ? '=' : 'like';
-                $value = $filterType === 'equals' ? $filterValue : "%{$filterValue}%";
-
-                $baseQuery->where(function ($query) use ($filterField, $comparison, $value, $filterValue) {
-                    switch ($filterField) {
-                        case 'code':
-                            $query->where('code', $comparison, $value);
-                            break;
-
-                        case 'name':
-                            $query->where('name', $comparison, $value);
-                            break;
-
-                        case 'company':
-                            $query->whereHas('company', function ($companyQuery) use ($comparison, $value) {
-                                $companyQuery->where('name', $comparison, $value);
-                            });
-                            break;
-
-                        case 'status':
-                            $normalized = strtolower(trim($filterValue));
-                            if (in_array($normalized, ['active', '1', 'true', 'enabled'])) {
-                                $query->where('is_active', true);
-                            } elseif (in_array($normalized, ['inactive', '0', 'false', 'disabled'])) {
-                                $query->where('is_active', false);
-                            }
-                            break;
-
-                        case 'all':
-                        default:
-                            $query->where(function ($sub) use ($comparison, $value) {
-                                $sub->where('code', $comparison, $value)
-                                    ->orWhere('name', $comparison, $value)
-                                    ->orWhereHas('company', function ($companyQuery) use ($comparison, $value) {
-                                        $companyQuery->where('name', $comparison, $value);
-                                    });
-                            });
-                            break;
-                    }
+                $baseQuery->where(function ($query) use ($filterValue) {
+                    $query->where('code', 'like', "%{$filterValue}%")
+                          ->orWhere('name', 'like', "%{$filterValue}%")
+                          ->orWhereHas('company', function ($q) use ($filterValue) {
+                              $q->where('name', 'like', "%{$filterValue}%");
+                          });
                 });
+            }
+
+            // Company filter
+            $companyId = $request->get('company_id');
+            if ($companyId !== null && $companyId !== '') {
+                $baseQuery->where('company_id', $companyId);
+            }
+
+            // Status filter
+            $status = $request->get('status');
+            if ($status !== null && $status !== '') {
+                $baseQuery->where('is_active', $status == '1');
             }
 
             return \Yajra\DataTables\Facades\DataTables::of($baseQuery)
@@ -106,8 +82,8 @@ class ShiftController extends Controller
                 })
                 ->addColumn('status', function ($shift) {
                     return $shift->is_active ?
-                        '<span class="badge bg-success">Active</span>' :
-                        '<span class="badge bg-danger">Inactive</span>';
+                        '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>' :
+                        '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Inactive</span>';
                 })
                 ->addColumn('actions', function ($shift) {
                     try {
@@ -250,19 +226,19 @@ class ShiftController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
-            'start_time' => 'required|date_format:H:i',
-            'end_time' => 'required|date_format:H:i|after:start_time',
-            'working_hours' => 'required|numeric|min:0|max:24',
-            'color' => 'required|string|regex:/^#[a-fA-F0-9]{6}$/',
-            'is_active' => 'boolean',
+            'start_time' => 'required',
+            'end_time' => 'required',
+            'working_hours' => 'nullable|numeric|min:0|max:24',
+            'color' => 'required|string',
+            'is_active' => 'nullable',
             'applicable_to' => 'required|in:company,department,employee',
-            'company_id' => 'nullable|exists:companies,id',
-            'department_id' => 'nullable|exists:departments,id',
-            'employee_id' => 'nullable|exists:employees,id',
+            'company_id' => 'nullable',
+            'department_id' => 'nullable',
+            'employee_id' => 'nullable',
             'work_days' => 'nullable|array',
             'work_days.*' => 'in:monday,tuesday,wednesday,thursday,friday,saturday,sunday',
-            'break_start' => 'nullable|date_format:H:i',
-            'break_end' => 'nullable|date_format:H:i',
+            'break_start' => 'nullable',
+            'break_end' => 'nullable',
             'break_hours' => 'nullable|numeric|min:0|max:8',
         ]);
 
@@ -275,21 +251,29 @@ class ShiftController extends Controller
         }
 
         try {
+            // Handle is_active - can be boolean, string 'true'/'false', or 1/0
+            $isActive = $request->is_active;
+            if (is_string($isActive)) {
+                $isActive = in_array(strtolower($isActive), ['true', '1', 'yes']);
+            } else {
+                $isActive = (bool) $isActive;
+            }
+
             $shift->update([
                 'name' => $request->name,
                 'description' => $request->description,
                 'start_time' => $request->start_time,
                 'end_time' => $request->end_time,
-                'working_hours' => $request->working_hours,
+                'working_hours' => $request->working_hours ?: 8,
                 'color' => $request->color,
-                'is_active' => $request->boolean('is_active', true),
+                'is_active' => $isActive,
                 'applicable_to' => $request->applicable_to,
                 'company_id' => in_array($request->applicable_to, ['company', 'department', 'employee']) ? $request->company_id : null,
                 'department_id' => in_array($request->applicable_to, ['department', 'employee']) ? $request->department_id : null,
                 'employee_id' => $request->applicable_to === 'employee' ? $request->employee_id : null,
-                'work_days' => $request->work_days,
-                'break_start' => $request->break_start,
-                'break_end' => $request->break_end,
+                'work_days' => $request->work_days ?? [],
+                'break_start' => $request->break_start ?: null,
+                'break_end' => $request->break_end ?: null,
                 'break_hours' => $request->break_hours ?: 1.00,
             ]);
 
@@ -444,6 +428,147 @@ class ShiftController extends Controller
         return response()->json([
             'success' => true,
             'code' => Shift::generateUniqueCode()
+        ]);
+    }
+
+    /**
+     * Display shift reports page
+     */
+    public function reports()
+    {
+        $shifts = Shift::active()->orderBy('name')->get();
+        
+        return view('hr.shifts.reports', compact('shifts'));
+    }
+
+    /**
+     * Get shift report data
+     */
+    public function reportData(Request $request): JsonResponse
+    {
+        $year = $request->get('year', now()->year);
+        $month = $request->get('month', now()->month);
+        $shiftId = $request->get('shift_id');
+
+        // Get employees with shifts
+        $employeesQuery = Employee::where('is_active', true)
+            ->with(['department', 'defaultShift']);
+
+        if ($shiftId) {
+            $employeesQuery->where('default_shift_id', $shiftId);
+        }
+
+        $employees = $employeesQuery->get();
+        $employeeIds = $employees->pluck('id');
+
+        // Get attendance data
+        $attendanceQuery = \App\Models\HR\Attendance::with('shift')
+            ->whereYear('attendance_date', $year)
+            ->whereMonth('attendance_date', $month)
+            ->whereIn('employee_id', $employeeIds);
+
+        if ($shiftId) {
+            $attendanceQuery->where('shift_id', $shiftId);
+        }
+
+        $attendances = $attendanceQuery->get();
+
+        // Calculate stats
+        $totalEmployees = $employees->count();
+        $totalAttendances = $attendances->where('status', 'present')->count();
+        $totalWorkDays = \Carbon\Carbon::create($year, $month)->daysInMonth;
+        $expectedAttendances = $totalEmployees * $totalWorkDays * 0.7; // Assuming 70% are work days
+        $complianceRate = $expectedAttendances > 0 ? round(($totalAttendances / $expectedAttendances) * 100, 1) : 0;
+        $complianceRate = min(100, $complianceRate);
+
+        // Late arrivals (check_in after shift start_time)
+        $lateArrivals = 0;
+        foreach ($attendances as $att) {
+            if ($att->check_in && $att->shift) {
+                $checkIn = \Carbon\Carbon::parse($att->check_in);
+                $shiftStart = \Carbon\Carbon::parse($att->shift->start_time);
+                if ($checkIn->gt($shiftStart->addMinutes(15))) { // 15 min grace period
+                    $lateArrivals++;
+                }
+            }
+        }
+
+        // Total overtime
+        $totalOvertime = $attendances->sum('overtime_hours');
+
+        // Shift distribution
+        $distribution = Shift::active()
+            ->withCount(['attendances' => function ($q) use ($year, $month) {
+                $q->whereYear('attendance_date', $year)
+                  ->whereMonth('attendance_date', $month);
+            }])
+            ->get()
+            ->map(function ($shift) {
+                return [
+                    'name' => $shift->name,
+                    'count' => Employee::where('default_shift_id', $shift->id)->count(),
+                    'color' => $shift->color
+                ];
+            })
+            ->filter(fn($s) => $s['count'] > 0)
+            ->values();
+
+        // Top overtime employees
+        $topOvertime = $attendances
+            ->groupBy('employee_id')
+            ->map(function ($group) use ($employees) {
+                $employee = $employees->firstWhere('id', $group->first()->employee_id);
+                return [
+                    'name' => $employee?->full_name ?? 'Unknown',
+                    'department' => $employee?->department?->name ?? 'N/A',
+                    'overtime' => round($group->sum('overtime_hours'), 1)
+                ];
+            })
+            ->filter(fn($e) => $e['overtime'] > 0)
+            ->sortByDesc('overtime')
+            ->take(5)
+            ->values();
+
+        // Late by shift
+        $lateByShift = Shift::active()->get()->map(function ($shift) use ($attendances) {
+            $shiftAttendances = $attendances->where('shift_id', $shift->id);
+            $lateCount = 0;
+            foreach ($shiftAttendances as $att) {
+                if ($att->check_in) {
+                    $checkIn = \Carbon\Carbon::parse($att->check_in);
+                    $shiftStart = \Carbon\Carbon::parse($shift->start_time);
+                    if ($checkIn->gt($shiftStart->addMinutes(15))) {
+                        $lateCount++;
+                    }
+                }
+            }
+            return [
+                'name' => $shift->name,
+                'color' => $shift->color,
+                'count' => $lateCount
+            ];
+        })->filter(fn($s) => $s['count'] > 0)->values();
+
+        // Attendance summary
+        $attendanceSummary = [
+            'present' => $attendances->where('status', 'present')->count(),
+            'absent' => $attendances->where('status', 'absent')->count(),
+            'vacation' => $attendances->where('status', 'vacation')->count(),
+            'half_day' => $attendances->where('status', 'half_day')->count(),
+        ];
+
+        return response()->json([
+            'success' => true,
+            'stats' => [
+                'totalEmployees' => $totalEmployees,
+                'complianceRate' => $complianceRate,
+                'lateArrivals' => $lateArrivals,
+                'totalOvertime' => round($totalOvertime, 1)
+            ],
+            'distribution' => $distribution,
+            'topOvertime' => $topOvertime,
+            'lateByShift' => $lateByShift,
+            'attendanceSummary' => $attendanceSummary
         ]);
     }
 }

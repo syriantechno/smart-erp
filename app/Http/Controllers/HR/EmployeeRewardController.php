@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\HR\Employee;
 use App\Models\HR\EmployeeReward;
 use App\Services\Notifications\NotificationDispatcher;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -81,5 +82,29 @@ class EmployeeRewardController extends Controller
         return redirect()
             ->route('hr.employee-rewards.index')
             ->with('success', 'Employee reward saved successfully.');
+    }
+
+    public function show(EmployeeReward $reward): View
+    {
+        $reward->load(['employee.department', 'granter']);
+        
+        return view('hr.rewards.show', compact('reward'));
+    }
+
+    public function destroy(EmployeeReward $reward): RedirectResponse|JsonResponse
+    {
+        $employeeName = $reward->employee->full_name ?? 'Unknown';
+        
+        $reward->delete();
+
+        if (request()->expectsJson()) {
+            return response()->json([
+                'message' => "Reward for {$employeeName} deleted successfully.",
+            ]);
+        }
+
+        return redirect()
+            ->route('hr.employee-rewards.index')
+            ->with('success', "Reward for {$employeeName} deleted successfully.");
     }
 }

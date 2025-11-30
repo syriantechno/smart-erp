@@ -223,23 +223,21 @@
 
 @push('scripts')
 <script>
+// Prevent double submission
+let isSubmitting = false;
+
 // Define globally available function
 function submitShiftForm() {
+    if (isSubmitting) return;
     const form = document.getElementById('create-shift-form');
     if (form) {
         handleFormSubmit(form);
     }
 }
 
-// Form submit handler
-document.addEventListener('submit', function(e) {
-    if (e.target && e.target.id === 'create-shift-form') {
-        e.preventDefault();
-        handleFormSubmit(e.target);
-    }
-});
-
 function handleFormSubmit(form) {
+    if (isSubmitting) return;
+    isSubmitting = true;
     const formData = new FormData(form);
     const data = {};
 
@@ -350,10 +348,18 @@ function handleFormSubmit(form) {
             console.log('📨 بيانات الاستجابة:', data);
             if (data.success) {
                 showToast(data.message || 'Shift created successfully', 'success');
-                // Close modal
-                const modal = document.getElementById('create-shift-modal');
-                if (modal) {
-                    modal.__tw_modal.hide();
+                // Refresh notifications
+                if (window.refreshNotifications) window.refreshNotifications();
+                // Close modal safely
+                try {
+                    const modal = document.getElementById('create-shift-modal');
+                    if (modal && modal.__tw_modal) {
+                        modal.__tw_modal.hide();
+                    } else if (modal && typeof tailwind !== 'undefined') {
+                        tailwind.Modal.getInstance(modal)?.hide();
+                    }
+                } catch (e) {
+                    console.log('Modal close error (ignored):', e);
                 }
                 // Reload the table instead of the whole page
                 if (window.reloadTable) {
@@ -374,7 +380,13 @@ function handleFormSubmit(form) {
         })
         .catch(error => {
             console.error('💥 Network error:', error);
-            showToast('An error occurred while saving', 'error');
+            // Only show error if it's a real network error, not a modal close error
+            if (error.message && !error.message.includes('modal')) {
+                showToast('An error occurred while saving', 'error');
+            }
+        })
+        .finally(() => {
+            isSubmitting = false;
         });
 }
 

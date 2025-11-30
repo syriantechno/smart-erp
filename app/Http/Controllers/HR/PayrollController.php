@@ -11,6 +11,7 @@ use App\Services\Notifications\NotificationDispatcher;
 use App\Helpers\Reply;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 
@@ -146,6 +147,11 @@ class PayrollController extends Controller
             );
 
             $message = "Payroll generated: {$results['success']} success, {$results['failed']} failed, {$results['skipped']} skipped";
+            
+            // Log errors if any
+            if (!empty($results['errors'])) {
+                Log::error('Payroll generation errors:', $results['errors']);
+            }
             
             return Reply::success($message, ['results' => $results]);
         } catch (\Exception $e) {

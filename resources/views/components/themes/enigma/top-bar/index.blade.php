@@ -51,7 +51,7 @@
 
 <!-- BEGIN: Top Bar -->
 <div @class([
-    'h-[90px] md:h-[100px] z-[10] border-b border-white/[0.08] w-full px-5 sm:px-8 md:px-10 md:border-b-0 relative md:pt-6',
+    'h-[90px] md:h-[100px] z-[100] border-b border-white/[0.08] w-full px-5 sm:px-8 md:px-10 md:border-b-0 relative md:pt-6',
 ])>
     <div class="flex items-center">
 

@@ -1,7 +1,7 @@
 {{-- Notification Bell + Beautiful Dropdown --}}
 @props(['unreadCount' => 0])
 
-<div class="relative" id="notification-dropdown">
+<div class="relative z-[9999]" id="notification-dropdown">
     {{-- Notification Bell Button --}}
     <button
         id="notification-bell-btn"
@@ -23,7 +23,7 @@
     {{-- Beautiful Dropdown --}}
     <div
         id="notifications-dropdown"
-        class="absolute right-0 top-full z-50 mt-2 w-96 max-w-sm opacity-0 invisible transform translate-y-2 transition-all duration-200 ease-out"
+        class="absolute right-0 top-full z-[9999] mt-2 w-96 max-w-sm opacity-0 invisible transform translate-y-2 transition-all duration-200 ease-out"
         style="display: none;"
     >
         <div class="bg-white rounded-xl shadow-2xl border border-slate-200/60 overflow-hidden">
@@ -212,10 +212,53 @@ function startPolling() {
     if (pollingInterval) {
         clearInterval(pollingInterval);
     }
-    // Update unread count every 30 seconds
+    // Check for new notifications every 5 seconds for real-time feel
     pollingInterval = setInterval(() => {
-        loadUnreadCount();
-    }, 30000);
+        checkForNewNotifications();
+    }, 5000);
+}
+
+function checkForNewNotifications() {
+    fetch('{{ route("notifications.unread-count") }}', {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const newCount = data.count;
+            // If there are new notifications, reload the list
+            if (newCount > unreadCount) {
+                const diff = newCount - unreadCount;
+                unreadCount = newCount;
+                loadRecentNotifications();
+                // Show browser notification if supported
+                showBrowserNotification(diff);
+            } else if (newCount !== unreadCount) {
+                unreadCount = newCount;
+                updateBadge();
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error checking notifications:', error);
+    });
+}
+
+function showBrowserNotification(count) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('Smart ERP', {
+            body: `You have ${count} new notification(s)`,
+            icon: '/favicon.ico'
+        });
+    }
+}
+
+// Request notification permission on page load
+if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
 }
 
 function updateBadge() {
@@ -493,5 +536,45 @@ function formatTime(dateString) {
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(initNotifications, 100); // Small delay to ensure everything is loaded
+    
+    // Poll for new notifications every 10 seconds
+    setInterval(silentRefreshNotifications, 10000);
+    
+    // Make refresh function globally available
+    window.refreshNotifications = silentRefreshNotifications;
 });
+
+// Silent refresh function - updates without showing loading state
+function silentRefreshNotifications() {
+    fetch('{{ route("notifications.index") }}?per_page=10', {
+        headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.data) {
+            const newUnreadCount = data.data.data.filter(n => !n.is_read).length;
+            const badge = document.getElementById('notification-badge');
+            const countSpan = document.getElementById('notification-count');
+            
+            if (badge && countSpan) {
+                if (newUnreadCount > 0) {
+                    countSpan.textContent = newUnreadCount > 99 ? '99+' : newUnreadCount;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            }
+            
+            // Update the list if dropdown is open
+            const dropdown = document.getElementById('notifications-dropdown');
+            if (dropdown && !dropdown.classList.contains('invisible')) {
+                renderNotifications(data.data.data);
+            }
+        }
+    })
+    .catch(() => {}); // Silent fail
+}
 </script>

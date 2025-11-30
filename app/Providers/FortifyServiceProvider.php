@@ -33,6 +33,10 @@ class FortifyServiceProvider extends ServiceProvider
             return view('pages.login');
         });
 
+        Fortify::registerView(function () {
+            return view('pages.register');
+        });
+
         Fortify::createUsersUsing(CreateNewUser::class);
         Fortify::updateUserProfileInformationUsing(UpdateUserProfileInformation::class);
         Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);

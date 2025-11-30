@@ -27,6 +27,11 @@ class AttendanceController extends Controller
             ->orderBy('first_name')
             ->get();
 
+        // Get companies for filter
+        $companies = \App\Models\Company::where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
         // Get departments for filter
         $departments = \App\Models\HR\Department::where('is_active', true)
             ->orderBy('name')
@@ -43,7 +48,7 @@ class AttendanceController extends Controller
                 return $attendance->employee_id . '_' . $attendance->attendance_date->format('Y-m-d');
             });
 
-        return view('hr.attendance.index', compact('employees', 'attendances', 'year', 'month', 'departments', 'shifts'));
+        return view('hr.attendance.index', compact('employees', 'attendances', 'year', 'month', 'companies', 'departments', 'shifts'));
     }
 
     public function store(Request $request): JsonResponse
@@ -421,7 +426,9 @@ class AttendanceController extends Controller
     {
         $year = $request->get('year', now()->year);
         $month = $request->get('month', now()->month);
+        $companyId = $request->get('company_id');
         $departmentId = $request->get('department_id');
+        $shiftId = $request->get('shift_id');
         $searchTerm = $request->get('search_term');
 
         $daysInMonth = 31; // Always show 31 days
@@ -430,6 +437,10 @@ class AttendanceController extends Controller
         // Get employees with filters
         $employeesQuery = Employee::where('is_active', true)
             ->with(['department', 'company']);
+
+        if ($companyId) {
+            $employeesQuery->where('company_id', $companyId);
+        }
 
         if ($departmentId) {
             $employeesQuery->where('department_id', $departmentId);
@@ -443,14 +454,24 @@ class AttendanceController extends Controller
             });
         }
 
+        // Filter by default shift
+        if ($shiftId) {
+            $employeesQuery->where('default_shift_id', $shiftId);
+        }
+
         $employees = $employeesQuery->orderBy('first_name')->get();
 
         // Get attendance data for the month with shift relation
-        $attendances = Attendance::with('shift')
+        $attendanceQuery = Attendance::with('shift')
             ->forMonth($year, $month)
-            ->whereIn('employee_id', $employees->pluck('id'))
-            ->get()
-            ->groupBy('employee_id');
+            ->whereIn('employee_id', $employees->pluck('id'));
+
+        // Also filter attendance by shift if specified
+        if ($shiftId) {
+            $attendanceQuery->where('shift_id', $shiftId);
+        }
+
+        $attendances = $attendanceQuery->get()->groupBy('employee_id');
 
         // Build response data
         $data = [];

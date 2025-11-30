@@ -9,287 +9,298 @@
         <h2 class="mr-auto text-lg font-medium">{{ $employee->full_name }} Profile</h2>
     </div>
     <div class="mt-5 grid grid-cols-12 gap-6">
-        <!-- BEGIN: Profile Menu -->
+        <!-- BEGIN: Profile Card -->
         <div class="col-span-12 flex flex-col-reverse lg:col-span-4 lg:block 2xl:col-span-3">
-            <div class="intro-y box mt-5 lg:mt-0">
-                <div class="relative flex items-center p-5">
-                    <div class="image-fit h-12 w-12">
-                        <img
-                            class="rounded-full"
-                            src="{{ $employee->profile_picture_url }}"
-                            alt="{{ $employee->full_name }}"
-                        />
+            <div class="intro-y box mt-5 lg:mt-0 overflow-hidden">
+                <!-- Cover Image & Profile Picture -->
+                <div class="relative">
+                    <div class="h-32 bg-gradient-to-r from-amber-400 via-orange-400 to-yellow-300">
+                        <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2240%22%20fill%3D%22none%22%20stroke%3D%22rgba(255%2C255%2C255%2C0.2)%22%20stroke-width%3D%222%22%2F%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2230%22%20fill%3D%22none%22%20stroke%3D%22rgba(255%2C255%2C255%2C0.15)%22%20stroke-width%3D%222%22%2F%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2220%22%20fill%3D%22none%22%20stroke%3D%22rgba(255%2C255%2C255%2C0.1)%22%20stroke-width%3D%222%22%2F%3E%3C%2Fsvg%3E')] bg-cover opacity-50"></div>
                     </div>
-                    <div class="ml-4 mr-auto">
-                        <div class="text-base font-medium">
-                            {{ $employee->full_name }}
-                        </div>
-                        <div class="text-slate-500">{{ $employee->position ?? 'Employee' }}</div>
-                    </div>
-                    <x-base.menu>
-                        <x-base.menu.button
-                            class="block h-5 w-5"
-                            href="#"
-                            tag="a"
-                        >
-                            <x-base.lucide
-                                class="h-5 w-5 text-slate-500"
-                                icon="MoreHorizontal"
+                    <div class="absolute -bottom-12 left-1/2 -translate-x-1/2">
+                        <div class="h-24 w-24 rounded-full border-4 border-white dark:border-darkmode-600 overflow-hidden shadow-lg bg-white">
+                            <img
+                                class="h-full w-full object-cover"
+                                src="{{ $employee->profile_picture_url }}"
+                                alt="{{ $employee->full_name }}"
                             />
-                        </x-base.menu.button>
-                        <x-base.menu.items class="w-56">
-                            <x-base.menu.header>Actions</x-base.menu.header>
-                            <x-base.menu.divider />
-                            <x-base.menu.item>
-                                <a href="{{ route('hr.employees.edit', $employee) }}" class="flex items-center">
-                                    <x-base.lucide class="mr-2 h-4 w-4" icon="Edit" />
-                                    Edit Profile
-                                </a>
-                            </x-base.menu.item>
-                            <x-base.menu.item>
-                                <a href="mailto:{{ $employee->email }}" class="flex items-center">
-                                    <x-base.lucide class="mr-2 h-4 w-4" icon="Mail" />
-                                    Send Email
-                                </a>
-                            </x-base.menu.item>
-                            <x-base.menu.divider />
-                            <x-base.menu.footer>
-                                <x-base.button
-                                    class="px-2 py-1"
-                                    type="button"
-                                    variant="primary"
-                                >
-                                    <x-base.lucide class="mr-2 h-4 w-4" icon="Download" />
-                                    Export
-                                </x-base.button>
-                                <x-base.button
-                                    class="ml-auto px-2 py-1"
-                                    type="button"
-                                    variant="secondary"
-                                >
-                                    <x-base.lucide class="mr-2 h-4 w-4" icon="Share" />
-                                    Share
-                                </x-base.button>
-                            </x-base.menu.footer>
-                        </x-base.menu.items>
-                    </x-base.menu>
+                        </div>
+                    </div>
                 </div>
-                <div class="border-t border-slate-200/60 p-5 dark:border-darkmode-400">
-                    <a
-                        class="flex items-center font-medium text-primary"
-                        href="#personal-info"
-                    >
-                        <x-base.lucide
-                            class="mr-2 h-4 w-4"
-                            icon="User"
-                        /> Personal Information
-                    </a>
-                    <a
-                        class="mt-5 flex items-center"
-                        href="#employment-info"
-                    >
-                        <x-base.lucide
-                            class="mr-2 h-4 w-4"
-                            icon="Briefcase"
-                        /> Employment Details
-                    </a>
-                    <a
-                        class="mt-5 flex items-center"
-                        href="#contact-info"
-                    >
-                        <x-base.lucide
-                            class="mr-2 h-4 w-4"
-                            icon="Phone"
-                        /> Contact Information
-                    </a>
-                    <a
-                        class="mt-5 flex items-center"
-                        href="{{ route('hr.employees.documents.index', ['employee' => $employee->id]) }}"
-                    >
-                        <x-base.lucide
-                            class="mr-2 h-4 w-4"
-                            icon="FileText"
-                        /> Documents
-                    </a>
-                    <a
-                        class="mt-5 flex items-center"
-                        href="#assigned-tasks"
-                    >
-                        <x-base.lucide
-                            class="mr-2 h-4 w-4"
-                            icon="CheckSquare"
-                        /> Assigned Tasks
-                    </a>
-                </div>
-                <div class="border-t border-slate-200/60 p-5 dark:border-darkmode-400">
-                    <div class="text-sm">
-                        <div class="font-medium mb-2">Employee ID</div>
-                        <div class="text-slate-500">{{ $employee->employee_id }}</div>
-                    </div>
-                    <div class="text-sm mt-4">
-                        <div class="font-medium mb-2">Department</div>
-                        <div class="text-slate-500">{{ $employee->department->name ?? 'N/A' }}</div>
-                    </div>
-                    <div class="text-sm mt-4">
-                        <div class="font-medium mb-2">Hire Date</div>
-                        <div class="text-slate-500">{{ $employee->hire_date ? $employee->hire_date->format('M d, Y') : 'N/A' }}</div>
-                    </div>
-                    <div class="text-sm mt-4">
-                        <div class="font-medium mb-2">Status</div>
-                        <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold {{ $employee->is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
+
+                <!-- Name & Position -->
+                <div class="pt-14 pb-5 px-5 text-center">
+                    <h3 class="text-xl font-semibold text-slate-800 dark:text-white">{{ $employee->full_name }}</h3>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">{{ $employee->positionRelation->title ?? $employee->position ?? 'Employee' }}</p>
+                    <div class="flex items-center justify-center gap-2 mt-2">
+                        <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300">
+                            {{ $employee->code ?? $employee->employee_id }}
+                        </span>
+                        <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold {{ $employee->is_active ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' }}">
                             {{ $employee->is_active ? 'Active' : 'Inactive' }}
                         </span>
                     </div>
                 </div>
-                <div class="flex border-t border-slate-200/60 p-5 dark:border-darkmode-400">
-                    <x-base.button
-                        class="px-2 py-1"
-                        type="button"
-                        variant="primary"
-                    >
-                        <x-base.lucide class="mr-2 h-4 w-4" icon="MessageSquare" />
-                        Message
-                    </x-base.button>
-                    <x-base.button
-                        class="ml-auto px-2 py-1"
-                        type="button"
-                        variant="outline-secondary"
-                    >
-                        <x-base.lucide class="mr-2 h-4 w-4" icon="Calendar" />
-                        Schedule
-                    </x-base.button>
-                </div>
-            </div>
-            <div class="intro-y box mt-5 bg-primary p-5 text-white">
-                <div class="flex items-center">
-                    <div class="text-lg font-medium">Employee Stats</div>
-                    <div class="ml-auto rounded-md bg-white px-1 text-xs text-slate-700 dark:bg-primary dark:text-white">
-                        Info
+
+                <!-- Employment Information -->
+                <div class="border-t border-slate-200/60 dark:border-darkmode-400 px-5 py-5">
+                    <h4 class="text-base font-semibold text-slate-800 dark:text-white mb-4">Employment Info</h4>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center text-slate-600 dark:text-slate-400">
+                                <x-base.lucide icon="hash" class="w-4 h-4 mr-3 text-slate-400" />
+                                <span class="text-sm">Employee Code</span>
+                            </div>
+                            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">{{ $employee->code ?? $employee->employee_id ?? '-' }}</span>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center text-slate-600 dark:text-slate-400">
+                                <x-base.lucide icon="briefcase" class="w-4 h-4 mr-3 text-slate-400" />
+                                <span class="text-sm">Position</span>
+                            </div>
+                            <span class="text-sm font-medium text-slate-700 dark:text-slate-300 truncate max-w-[140px]" title="{{ $employee->positionRelation->title ?? $employee->position ?? '-' }}">{{ $employee->positionRelation->title ?? $employee->position ?? '-' }}</span>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center text-slate-600 dark:text-slate-400">
+                                <x-base.lucide icon="building-2" class="w-4 h-4 mr-3 text-slate-400" />
+                                <span class="text-sm">Department</span>
+                            </div>
+                            <span class="text-sm font-medium text-slate-700 dark:text-slate-300 truncate max-w-[140px]" title="{{ $employee->department->name ?? '-' }}">{{ $employee->department->name ?? '-' }}</span>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center text-slate-600 dark:text-slate-400">
+                                <x-base.lucide icon="building" class="w-4 h-4 mr-3 text-slate-400" />
+                                <span class="text-sm">Company</span>
+                            </div>
+                            <span class="text-sm font-medium text-slate-700 dark:text-slate-300 truncate max-w-[140px]" title="{{ $employee->company->name ?? '-' }}">{{ $employee->company->name ?? '-' }}</span>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center text-slate-600 dark:text-slate-400">
+                                <x-base.lucide icon="banknote" class="w-4 h-4 mr-3 text-slate-400" />
+                                <span class="text-sm">Salary</span>
+                            </div>
+                            <span class="text-sm font-medium text-emerald-600 dark:text-emerald-400">{{ $employee->salary ? number_format($employee->salary, 2) : '-' }}</span>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center text-slate-600 dark:text-slate-400">
+                                <x-base.lucide icon="calendar" class="w-4 h-4 mr-3 text-slate-400" />
+                                <span class="text-sm">Hire Date</span>
+                            </div>
+                            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">{{ $employee->hire_date ? $employee->hire_date->format('d M Y') : '-' }}</span>
+                        </div>
                     </div>
                 </div>
-                <div class="mt-4">
-                    <div class="flex justify-between items-center mb-2">
-                        <span>Years of Service</span>
-                        <span>{{ $employee->hire_date ? $employee->hire_date->diffInYears(now()) : 0 }} years</span>
+
+                <!-- Basic Information -->
+                <div class="border-t border-slate-200/60 dark:border-darkmode-400 px-5 py-5">
+                    <h4 class="text-base font-semibold text-slate-800 dark:text-white mb-4">Personal Info</h4>
+                    <div class="space-y-3">
+                        @if($employee->birth_date)
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center text-slate-600 dark:text-slate-400">
+                                <x-base.lucide icon="cake" class="w-4 h-4 mr-3 text-slate-400" />
+                                <span class="text-sm">Birthday</span>
+                            </div>
+                            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">{{ $employee->birth_date->format('d M Y') }}</span>
+                        </div>
+                        @endif
+
+                        @if($employee->gender)
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center text-slate-600 dark:text-slate-400">
+                                <x-base.lucide icon="user" class="w-4 h-4 mr-3 text-slate-400" />
+                                <span class="text-sm">Gender</span>
+                            </div>
+                            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">{{ ucfirst($employee->gender) }}</span>
+                        </div>
+                        @endif
+
+                        @if($employee->phone)
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center text-slate-600 dark:text-slate-400">
+                                <x-base.lucide icon="phone" class="w-4 h-4 mr-3 text-slate-400" />
+                                <span class="text-sm">Phone</span>
+                            </div>
+                            <a href="tel:{{ $employee->phone }}" class="text-sm font-medium text-primary hover:underline">{{ $employee->phone }}</a>
+                        </div>
+                        @endif
+
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center text-slate-600 dark:text-slate-400">
+                                <x-base.lucide icon="mail" class="w-4 h-4 mr-3 text-slate-400" />
+                                <span class="text-sm">E-Mail</span>
+                            </div>
+                            <a href="mailto:{{ $employee->email }}" class="text-sm font-medium text-primary hover:underline truncate max-w-[140px]" title="{{ $employee->email }}">{{ $employee->email }}</a>
+                        </div>
+
+                        @if($employee->nationality)
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center text-slate-600 dark:text-slate-400">
+                                <x-base.lucide icon="flag" class="w-4 h-4 mr-3 text-slate-400" />
+                                <span class="text-sm">Nationality</span>
+                            </div>
+                            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">{{ $employee->nationality }}</span>
+                        </div>
+                        @endif
+
+                        @if($employee->city || $employee->country)
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center text-slate-600 dark:text-slate-400">
+                                <x-base.lucide icon="map-pin" class="w-4 h-4 mr-3 text-slate-400" />
+                                <span class="text-sm">Location</span>
+                            </div>
+                            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">{{ implode(', ', array_filter([$employee->city, $employee->country])) }}</span>
+                        </div>
+                        @endif
+
+                        @if($employee->address)
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center text-slate-600 dark:text-slate-400">
+                                <x-base.lucide icon="home" class="w-4 h-4 mr-3 text-slate-400" />
+                                <span class="text-sm">Address</span>
+                            </div>
+                            <span class="text-sm font-medium text-slate-700 dark:text-slate-300 truncate max-w-[140px]" title="{{ $employee->address }}">{{ $employee->address }}</span>
+                        </div>
+                        @endif
                     </div>
-                    <div class="flex justify-between items-center mb-2">
-                        <span>Department</span>
-                        <span>{{ $employee->department->name ?? 'N/A' }}</span>
+                </div>
+
+                <!-- Documents Section -->
+                @php
+                    $documents = $employee->documents()->latest()->take(4)->get();
+                @endphp
+                @if($documents->count() > 0)
+                <div class="border-t border-slate-200/60 dark:border-darkmode-400 px-5 py-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-base font-semibold text-slate-800 dark:text-white">Documents</h4>
+                        <a href="{{ route('hr.employees.documents.index', ['employee' => $employee->id]) }}" class="text-xs text-primary hover:underline">View All</a>
                     </div>
-                    <div class="flex justify-between items-center mb-2">
-                        <span>Position</span>
-                        <span>{{ $employee->position ?? 'N/A' }}</span>
+                    <div class="grid grid-cols-2 gap-3">
+                        @foreach($documents as $doc)
+                        @php
+                            $extension = strtolower(pathinfo($doc->file_name ?? $doc->original_name ?? '', PATHINFO_EXTENSION));
+                            $iconBg = match($extension) {
+                                'pdf' => 'bg-red-100 dark:bg-red-900/30',
+                                'doc', 'docx' => 'bg-blue-100 dark:bg-blue-900/30',
+                                'xls', 'xlsx' => 'bg-green-100 dark:bg-green-900/30',
+                                'ppt', 'pptx' => 'bg-orange-100 dark:bg-orange-900/30',
+                                'jpg', 'jpeg', 'png', 'gif' => 'bg-purple-100 dark:bg-purple-900/30',
+                                default => 'bg-slate-100 dark:bg-slate-700'
+                            };
+                            $iconColor = match($extension) {
+                                'pdf' => 'text-red-600 dark:text-red-400',
+                                'doc', 'docx' => 'text-blue-600 dark:text-blue-400',
+                                'xls', 'xlsx' => 'text-green-600 dark:text-green-400',
+                                'ppt', 'pptx' => 'text-orange-600 dark:text-orange-400',
+                                'jpg', 'jpeg', 'png', 'gif' => 'text-purple-600 dark:text-purple-400',
+                                default => 'text-slate-600 dark:text-slate-400'
+                            };
+                            $fileSize = $doc->file_size ? round($doc->file_size / 1024, 1) . ' KB' : '';
+                        @endphp
+                        <a href="{{ $doc->file_url ?? '#' }}" target="_blank" class="flex items-center gap-3 p-3 rounded-xl {{ $iconBg }} hover:opacity-80 transition-opacity">
+                            <div class="flex-shrink-0">
+                                <x-base.lucide icon="file-text" class="w-6 h-6 {{ $iconColor }}" />
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-xs font-medium text-slate-700 dark:text-slate-300 truncate">{{ $doc->title ?? $doc->document_type ?? 'Document' }}</p>
+                                @if($fileSize)
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400">{{ $fileSize }}</p>
+                                @endif
+                            </div>
+                        </a>
+                        @endforeach
                     </div>
+                </div>
+                @endif
+
+                <!-- Statistics Section -->
+                <div class="border-t border-slate-200/60 dark:border-darkmode-400 px-5 py-5">
+                    <h4 class="text-base font-semibold text-slate-800 dark:text-white mb-4">Statistics</h4>
                     @php
                         $taskStats = [
                             'total' => $employee->assignedTasks()->count(),
                             'completed' => $employee->assignedTasks()->where('status', 'completed')->count(),
                         ];
+                        // Calculate years and months of service properly
+                        $yearsOfService = 0;
+                        $monthsOfService = 0;
+                        $daysOfService = 0;
+                        if ($employee->hire_date) {
+                            $hireDate = $employee->hire_date;
+                            $now = now();
+                            $yearsOfService = (int) $hireDate->diffInYears($now);
+                            $monthsOfService = (int) $hireDate->copy()->addYears($yearsOfService)->diffInMonths($now);
+                            $daysOfService = (int) $hireDate->diffInDays($now);
+                        }
+                        $leavesTaken = (int) ($employee->leaves()->where('status', 'approved')->sum('days_count') ?? 0);
                     @endphp
-                    <div class="flex justify-between items-center">
-                        <span>Tasks Completed</span>
-                        <span>{{ $taskStats['completed'] }}/{{ $taskStats['total'] }}</span>
+
+                    <div class="space-y-4">
+                        <!-- Years of Service -->
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm text-slate-600 dark:text-slate-400">Years of Service</span>
+                                <span class="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                                    @if($yearsOfService > 0)
+                                        {{ $yearsOfService }} yr{{ $yearsOfService > 1 ? 's' : '' }} {{ $monthsOfService }} mo
+                                    @elseif($monthsOfService > 0)
+                                        {{ $monthsOfService }} month{{ $monthsOfService > 1 ? 's' : '' }}
+                                    @else
+                                        {{ $daysOfService }} day{{ $daysOfService > 1 ? 's' : '' }}
+                                    @endif
+                                </span>
+                            </div>
+                            <div class="h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-darkmode-600">
+                                <div class="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500" style="width: {{ min(100, max(5, $yearsOfService * 10 + $monthsOfService)) }}%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Tasks Completed -->
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm text-slate-600 dark:text-slate-400">Tasks Completed</span>
+                                <span class="text-sm font-semibold text-slate-700 dark:text-slate-300">{{ $taskStats['completed'] }}/{{ $taskStats['total'] }}</span>
+                            </div>
+                            <div class="h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-darkmode-600">
+                                @php $taskPercent = $taskStats['total'] > 0 ? ($taskStats['completed'] / $taskStats['total']) * 100 : 0; @endphp
+                                <div class="h-full rounded-full bg-gradient-to-r from-emerald-400 to-green-500" style="width: {{ $taskPercent }}%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Leaves Taken -->
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm text-slate-600 dark:text-slate-400">Leaves Taken</span>
+                                <span class="text-sm font-semibold text-slate-700 dark:text-slate-300">{{ $leavesTaken }} day{{ $leavesTaken != 1 ? 's' : '' }}</span>
+                            </div>
+                            <div class="h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-darkmode-600">
+                                <div class="h-full rounded-full bg-gradient-to-r from-blue-400 to-indigo-500" style="width: {{ min(100, $leavesTaken * 3) }}%"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="mt-5 flex font-medium">
-                    <x-base.button
-                        class="border-white px-2 py-1 text-white dark:border-darkmode-400 dark:bg-darkmode-400 dark:text-slate-300"
-                        type="button"
-                    >
-                        View Details
-                    </x-base.button>
-                    <x-base.button
-                        class="ml-auto border-transparent px-2 py-1 text-white dark:border-transparent"
-                        type="button"
-                    >
-                        Back to List
-                    </x-base.button>
+
+                <!-- Quick Actions -->
+                <div class="border-t border-slate-200/60 dark:border-darkmode-400 p-4 flex gap-2">
+                    <a href="{{ route('hr.employees.edit', $employee) }}" class="flex-1 btn-tonal btn-tonal--warning text-center py-2 rounded-lg text-sm font-medium">
+                        <x-base.lucide icon="edit" class="w-4 h-4 inline mr-1" />
+                        Edit
+                    </a>
+                    <a href="mailto:{{ $employee->email }}" class="flex-1 btn-tonal btn-tonal--info text-center py-2 rounded-lg text-sm font-medium">
+                        <x-base.lucide icon="mail" class="w-4 h-4 inline mr-1" />
+                        Email
+                    </a>
                 </div>
             </div>
         </div>
-        <!-- END: Profile Menu -->
+        <!-- END: Profile Card -->
         <div class="col-span-12 lg:col-span-8 2xl:col-span-9">
             <div class="grid grid-cols-12 gap-6">
-                <!-- BEGIN: Personal Information -->
-                <div class="intro-y box col-span-12 2xl:col-span-6" id="personal-info">
-                    <div class="flex items-center border-b border-slate-200/60 px-5 py-5 dark:border-darkmode-400 sm:py-3">
-                        <h2 class="mr-auto text-base font-medium">Personal Information</h2>
-                    </div>
-                    <div class="p-5">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <div class="text-slate-500 text-sm">First Name</div>
-                                <div class="font-medium">{{ $employee->first_name }}</div>
-                            </div>
-                            <div>
-                                <div class="text-slate-500 text-sm">Last Name</div>
-                                <div class="font-medium">{{ $employee->last_name }}</div>
-                            </div>
-                            <div>
-                                <div class="text-slate-500 text-sm">Middle Name</div>
-                                <div class="font-medium">{{ $employee->middle_name ?? '-' }}</div>
-                            </div>
-                            <div>
-                                <div class="text-slate-500 text-sm">Gender</div>
-                                <div class="font-medium">
-                                    @if($employee->gender == 'male') Male
-                                    @elseif($employee->gender == 'female') Female
-                                    @elseif($employee->gender == 'other') Other
-                                    @else -
-                                    @endif
-                                </div>
-                            </div>
-                            @if($employee->birth_date)
-                            <div>
-                                <div class="text-slate-500 text-sm">Date of Birth</div>
-                                <div class="font-medium">{{ $employee->birth_date->format('M d, Y') }}</div>
-                            </div>
-                            <div>
-                                <div class="text-slate-500 text-sm">Age</div>
-                                <div class="font-medium">{{ $employee->age ?? '-' }} years</div>
-                            </div>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-                <!-- END: Personal Information -->
-
-                <!-- BEGIN: Employment Information -->
-                <div class="intro-y box col-span-12 2xl:col-span-6" id="employment-info">
-                    <div class="flex items-center border-b border-slate-200/60 px-5 py-5 dark:border-darkmode-400 sm:py-3">
-                        <h2 class="mr-auto text-base font-medium">Employment Information</h2>
-                    </div>
-                    <div class="p-5">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <div class="text-slate-500 text-sm">Employee ID</div>
-                                <div class="font-medium">{{ $employee->employee_id }}</div>
-                            </div>
-                            <div>
-                                <div class="text-slate-500 text-sm">Position</div>
-                                <div class="font-medium">{{ $employee->position ?? '-' }}</div>
-                            </div>
-                            <div>
-                                <div class="text-slate-500 text-sm">Department</div>
-                                <div class="font-medium">{{ $employee->department->name ?? '-' }}</div>
-                            </div>
-                            <div>
-                                <div class="text-slate-500 text-sm">Company</div>
-                                <div class="font-medium">{{ $employee->company->name ?? '-' }}</div>
-                            </div>
-                            <div>
-                                <div class="text-slate-500 text-sm">Hire Date</div>
-                                <div class="font-medium">{{ $employee->hire_date ? $employee->hire_date->format('M d, Y') : '-' }}</div>
-                            </div>
-                            <div>
-                                <div class="text-slate-500 text-sm">Salary</div>
-                                <div class="font-medium">{{ format_currency($employee->salary, 2) }}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- END: Employment Information -->
-
                 <!-- BEGIN: Performance & Rewards -->
                 <div class="intro-y box col-span-12 2xl:col-span-6" id="performance-rewards">
                     <div class="flex items-center border-b border-slate-200/60 px-5 py-5 dark:border-darkmode-400 sm:py-3">
@@ -455,52 +466,6 @@
                 </div>
                 <!-- END: Performance & Rewards -->
 
-                <!-- BEGIN: Contact Information -->
-                <div class="intro-y box col-span-12 2xl:col-span-6" id="contact-info">
-                    <div class="flex items-center border-b border-slate-200/60 px-5 py-5 dark:border-darkmode-400 sm:py-3">
-                        <h2 class="mr-auto text-base font-medium">Contact Information</h2>
-                    </div>
-                    <div class="p-5">
-                        <div class="space-y-4">
-                            <div class="flex items-center">
-                                <x-base.lucide class="h-4 w-4 text-slate-500 mr-3" icon="Mail" />
-                                <div>
-                                    <div class="text-slate-500 text-sm">Email</div>
-                                    <a href="mailto:{{ $employee->email }}" class="font-medium text-primary">{{ $employee->email }}</a>
-                                </div>
-                            </div>
-                            @if($employee->phone)
-                            <div class="flex items-center">
-                                <x-base.lucide class="h-4 w-4 text-slate-500 mr-3" icon="Phone" />
-                                <div>
-                                    <div class="text-slate-500 text-sm">Phone</div>
-                                    <a href="tel:{{ $employee->phone }}" class="font-medium text-primary">{{ $employee->phone }}</a>
-                                </div>
-                            </div>
-                            @endif
-                            @if($employee->address || $employee->city || $employee->country)
-                            <div class="flex items-start">
-                                <x-base.lucide class="h-4 w-4 text-slate-500 mr-3 mt-1" icon="MapPin" />
-                                <div>
-                                    <div class="text-slate-500 text-sm">Address</div>
-                                    <div class="font-medium">
-                                        @if($employee->address)
-                                            <div>{{ $employee->address }}</div>
-                                        @endif
-                                        <div>
-                                            @if($employee->city) {{ $employee->city }}, @endif
-                                            @if($employee->country) {{ $employee->country }} @endif
-                                            @if($employee->postal_code) {{ $employee->postal_code }} @endif
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-                <!-- END: Contact Information -->
-
                 <!-- BEGIN: Approval Signature -->
                 <div class="intro-y box col-span-12 2xl:col-span-6" id="approval-signature">
                     <div class="flex items-center border-b border-slate-200/60 px-5 py-5 dark:border-darkmode-400 sm:py-3">
@@ -654,73 +619,61 @@
                 </div>
                 <!-- END: Documents -->
 
-                <!-- BEGIN: Assigned Tasks -->
+                <!-- BEGIN: Assigned Tasks (New Design) -->
                 <div class="intro-y box col-span-12" id="assigned-tasks">
-                    <div class="flex items-center border-b border-slate-200/60 px-5 py-5 dark:border-darkmode-400 sm:py-3">
-                        <h2 class="mr-auto text-base font-medium">Assigned Tasks</h2>
-                        <x-base.button as="a" href="{{ route('tasks.index', ['employee_id' => $employee->id]) }}" variant="outline-secondary">
-                            <x-base.lucide class="mr-2 h-4 w-4" icon="ExternalLink" />
+                    <div class="flex items-center border-b border-slate-200/60 px-5 py-4 dark:border-darkmode-400">
+                        <h2 class="mr-auto text-base font-semibold text-slate-800 dark:text-white flex items-center">
+                            <x-base.lucide icon="clipboard-list" class="w-5 h-5 mr-2 text-amber-500" />
+                            Assigned Tasks
+                        </h2>
+                        <span class="text-xs text-slate-500 mr-3">{{ $employee->assignedTasks()->count() }} tasks</span>
+                        <a href="{{ route('tasks.index', ['employee_id' => $employee->id]) }}" class="btn-royal btn-royal--outline btn-royal--sm">
+                            <x-base.lucide class="mr-1 h-3 w-3" icon="external-link" />
                             View All
-                        </x-base.button>
+                        </a>
                     </div>
                     <div class="p-5">
                         @php
-                            $assignedTasks = $employee->assignedTasks()->with(['project'])->latest()->take(5)->get();
+                            $assignedTasks = $employee->assignedTasks()->with(['project', 'assignee'])->latest()->take(8)->get();
                         @endphp
 
                         @if($assignedTasks->count() > 0)
-                            <div class="space-y-3">
+                            <div class="space-y-4">
                                 @foreach($assignedTasks as $task)
-                                    <a href="{{ route('tasks.show', $task) }}" class="flex items-center justify-between p-4 border border-slate-200/60 rounded-lg dark:border-darkmode-400 hover:bg-slate-50 dark:hover:bg-darkmode-600 transition-colors cursor-pointer hover:border-primary/30 group">
-                                        <div class="flex items-center flex-1">
-                                            @if($task->color)
-                                                <div class="w-3 h-3 rounded-full mr-3 border border-white shadow-sm" style="background-color: {{ $task->color }}"></div>
+                                    @php
+                                        $progress = $task->progress_percentage ?? 0;
+                                        $progressColor = $progress >= 100 ? 'bg-slate-800' : ($progress >= 50 ? 'bg-amber-400' : 'bg-slate-300');
+                                    @endphp
+                                    <a href="{{ route('tasks.show', $task) }}" class="flex items-center gap-4 p-3 rounded-xl bg-slate-50/50 dark:bg-darkmode-600/50 hover:bg-slate-100/80 dark:hover:bg-darkmode-500/50 transition-colors cursor-pointer group">
+                                        <div class="flex-shrink-0">
+                                            @if($task->assignee && $task->assignee->profile_picture_url)
+                                                <img src="{{ $task->assignee->profile_picture_url }}" alt="{{ $task->assignee->full_name }}" class="h-12 w-12 rounded-full object-cover border-2 border-white shadow-sm" />
                                             @else
-                                                <x-base.lucide class="h-4 w-4 text-slate-400 mr-3" icon="CheckSquare" />
-                                            @endif
-                                            <div class="flex-1">
-                                                <div class="font-medium text-sm group-hover:text-primary transition-colors">{{ $task->title }}</div>
-                                                <div class="text-xs text-slate-500 mt-1">
-                                                    <span class="mr-3">{{ $task->code }}</span>
-                                                    @if($task->project)
-                                                        <span class="mr-3">{{ $task->project->name }}</span>
-                                                    @endif
-                                                    @if($task->due_date)
-                                                        <span>Due: {{ $task->due_date->format('M d, Y') }}</span>
-                                                    @endif
+                                                <div class="h-12 w-12 rounded-full bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 flex items-center justify-center border-2 border-white shadow-sm">
+                                                    <x-base.lucide icon="check-square" class="w-5 h-5 text-amber-600 dark:text-amber-400" />
                                                 </div>
-                                            </div>
+                                            @endif
                                         </div>
-                                        <div class="flex items-center space-x-2">
-                                            <!-- Click Indicator -->
-                                            <x-base.lucide class="h-4 w-4 text-slate-400 group-hover:text-primary transition-colors" icon="ExternalLink" />
-                                            
-                                            <!-- Priority Badge -->
-                                            @php
-                                                $priorityClass = match($task->priority) {
-                                                    'high' => 'bg-red-100 text-red-700',
-                                                    'medium' => 'bg-yellow-100 text-yellow-700',
-                                                    'low' => 'bg-green-100 text-green-700',
-                                                    default => 'bg-gray-100 text-gray-700'
-                                                };
-                                            @endphp
-                                            <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold {{ $priorityClass }}">
-                                                {{ ucfirst($task->priority) }}
-                                            </span>
-                                            
-                                            <!-- Status Badge -->
-                                            @php
-                                                $statusClass = match($task->status) {
-                                                    'completed' => 'bg-green-100 text-green-700',
-                                                    'in_progress' => 'bg-blue-100 text-blue-700',
-                                                    'pending' => 'bg-yellow-100 text-yellow-700',
-                                                    'cancelled' => 'bg-red-100 text-red-700',
-                                                    default => 'bg-gray-100 text-gray-700'
-                                                };
-                                            @endphp
-                                            <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold {{ $statusClass }}">
-                                                {{ ucfirst(str_replace('_', ' ', $task->status)) }}
-                                            </span>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-center justify-between mb-1">
+                                                <span class="font-semibold text-slate-800 dark:text-white group-hover:text-primary truncate transition-colors">
+                                                    {{ $task->title }}
+                                                </span>
+                                                @if($task->status === 'completed')
+                                                    <span class="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 flex-shrink-0 ml-2">Done</span>
+                                                @elseif($task->status === 'in_progress')
+                                                    <span class="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 flex-shrink-0 ml-2">In Progress</span>
+                                                @else
+                                                    <span class="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400 flex-shrink-0 ml-2">{{ ucfirst($task->status) }}</span>
+                                                @endif
+                                            </div>
+                                            <p class="text-sm text-slate-500 dark:text-slate-400 mb-2 truncate">{{ $task->project->name ?? 'No Project' }}</p>
+                                            <div class="flex items-center gap-3">
+                                                <div class="flex-1 h-2 rounded-full bg-slate-200 dark:bg-darkmode-400 overflow-hidden">
+                                                    <div class="h-full rounded-full {{ $progressColor }} transition-all duration-300" style="width: {{ $progress }}%"></div>
+                                                </div>
+                                                <span class="text-xs font-medium text-slate-600 dark:text-slate-400 w-10 text-right">{{ $progress }}%</span>
+                                            </div>
                                         </div>
                                     </a>
                                 @endforeach

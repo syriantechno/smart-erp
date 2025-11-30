@@ -134,12 +134,22 @@
 
                 {{-- Shift --}}
                 <div class="col-span-12 md:col-span-6">
-                    <x-base.form-label for="shift_id">Shift</x-base.form-label>
+                    <x-base.form-label for="shift_id">
+                        Shift
+                        <span id="shift-auto-badge" class="ml-2 text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full hidden">Auto</span>
+                    </x-base.form-label>
                     <x-base.form-select id="shift_id" name="shift_id" class="w-full">
-                        <option value="" data-hours="8">Auto Detect (8 hrs)</option>
+                        <option value="" data-hours="8">Select Shift (Default: 8 hrs)</option>
                         @foreach($shifts ?? [] as $shift)
-                            <option value="{{ $shift->id }}" data-hours="{{ $shift->working_hours ?? 8 }}">
-                                {{ $shift->name }} ({{ $shift->start_time }} - {{ $shift->end_time }}) - {{ $shift->working_hours ?? 8 }}h
+                            <option value="{{ $shift->id }}" 
+                                    data-hours="{{ $shift->working_hours ?? 8 }}"
+                                    data-start="{{ $shift->start_time }}"
+                                    data-end="{{ $shift->end_time }}"
+                                    data-company="{{ $shift->company_id }}"
+                                    data-department="{{ $shift->department_id }}"
+                                    data-employee="{{ $shift->employee_id }}"
+                                    data-applicable="{{ $shift->applicable_to }}">
+                                {{ $shift->name }} ({{ \Carbon\Carbon::parse($shift->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($shift->end_time)->format('H:i') }}) - {{ $shift->working_hours ?? 8 }}h
                             </option>
                         @endforeach
                     </x-base.form-select>
@@ -198,10 +208,24 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Employee data with shifts
+    const employeeShifts = {
+        @foreach($employees as $employee)
+        {{ $employee->id }}: {
+            defaultShiftId: {{ $employee->default_shift_id ?? 'null' }},
+            departmentId: {{ $employee->department_id ?? 'null' }},
+            companyId: {{ $employee->company_id ?? 'null' }}
+        },
+        @endforeach
+    };
+
     // Toggle between individual and department selection
     const entryTypeRadios = document.querySelectorAll('input[name="entry_type"]');
     const employeeWrapper = document.getElementById('employee-selection-wrapper');
     const departmentWrapper = document.getElementById('department-selection-wrapper');
+    const employeeSelect = document.getElementById('employee_id');
+    const shiftSelect = document.getElementById('shift_id');
+    const shiftAutoBadge = document.getElementById('shift-auto-badge');
 
     entryTypeRadios.forEach(radio => {
         radio.addEventListener('change', function() {
@@ -215,8 +239,80 @@ document.addEventListener('DOMContentLoaded', function() {
                 departmentWrapper.classList.remove('hidden');
                 document.getElementById('employee_id').required = false;
                 document.getElementById('department_id').required = true;
+                // Reset shift when switching to department
+                shiftSelect.value = '';
+                shiftAutoBadge.classList.add('hidden');
             }
         });
+    });
+
+    // Auto-select shift when employee is selected
+    employeeSelect.addEventListener('change', function() {
+        const employeeId = this.value;
+        if (!employeeId) {
+            shiftSelect.value = '';
+            shiftAutoBadge.classList.add('hidden');
+            return;
+        }
+
+        const empData = employeeShifts[employeeId];
+        if (!empData) return;
+
+        let selectedShift = null;
+
+        // Priority 1: Employee's default shift
+        if (empData.defaultShiftId) {
+            selectedShift = findShiftOption('employee', employeeId) || 
+                           findShiftById(empData.defaultShiftId);
+        }
+
+        // Priority 2: Department shift
+        if (!selectedShift && empData.departmentId) {
+            selectedShift = findShiftOption('department', empData.departmentId);
+        }
+
+        // Priority 3: Company shift
+        if (!selectedShift && empData.companyId) {
+            selectedShift = findShiftOption('company', empData.companyId);
+        }
+
+        if (selectedShift) {
+            shiftSelect.value = selectedShift.value;
+            shiftAutoBadge.classList.remove('hidden');
+            // Trigger change to recalculate hours
+            shiftSelect.dispatchEvent(new Event('change'));
+        } else {
+            shiftSelect.value = '';
+            shiftAutoBadge.classList.add('hidden');
+        }
+    });
+
+    function findShiftById(shiftId) {
+        return Array.from(shiftSelect.options).find(opt => opt.value == shiftId);
+    }
+
+    function findShiftOption(applicableTo, targetId) {
+        return Array.from(shiftSelect.options).find(opt => {
+            if (!opt.value) return false;
+            const applicable = opt.dataset.applicable;
+            if (applicable !== applicableTo) return false;
+            
+            switch (applicableTo) {
+                case 'employee': return opt.dataset.employee == targetId;
+                case 'department': return opt.dataset.department == targetId;
+                case 'company': return opt.dataset.company == targetId;
+            }
+            return false;
+        });
+    }
+
+    // When user manually changes shift, hide auto badge
+    shiftSelect.addEventListener('change', function() {
+        // Only hide if user manually changed (not from auto-select)
+        if (!this._autoSelect) {
+            shiftAutoBadge.classList.add('hidden');
+        }
+        this._autoSelect = false;
     });
 
     // Calculate working hours and auto-detect status
@@ -225,7 +321,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const workingHoursDisplay = document.getElementById('working-hours-display');
     const overtimeHoursDisplay = document.getElementById('overtime-hours-display');
     const statusSelect = document.getElementById('status');
-    const shiftSelect = document.getElementById('shift_id');
     
     // Get default shift working hours
     const defaultShiftHours = {{ $shifts->first()->working_hours ?? 8 }};

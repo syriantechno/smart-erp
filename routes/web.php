@@ -175,10 +175,20 @@ Route::middleware('auth')->group(function () {
             ->name('employee-evaluations.index');
         Route::post('employee-evaluations', [App\Http\Controllers\HR\EmployeeEvaluationController::class, 'store'])
             ->name('employee-evaluations.store');
+        Route::get('employee-evaluations/{evaluation}', [App\Http\Controllers\HR\EmployeeEvaluationController::class, 'show'])
+            ->name('employee-evaluations.show');
+        Route::delete('employee-evaluations/{evaluation}', [App\Http\Controllers\HR\EmployeeEvaluationController::class, 'destroy'])
+            ->name('employee-evaluations.destroy');
+        Route::get('employee-evaluations/{evaluation}/export-pdf', [App\Http\Controllers\HR\EmployeeEvaluationController::class, 'exportPdf'])
+            ->name('employee-evaluations.export-pdf');
         Route::get('employee-rewards', [App\Http\Controllers\HR\EmployeeRewardController::class, 'index'])
             ->name('employee-rewards.index');
         Route::post('employee-rewards', [App\Http\Controllers\HR\EmployeeRewardController::class, 'store'])
             ->name('employee-rewards.store');
+        Route::get('employee-rewards/{reward}', [App\Http\Controllers\HR\EmployeeRewardController::class, 'show'])
+            ->name('employee-rewards.show');
+        Route::delete('employee-rewards/{reward}', [App\Http\Controllers\HR\EmployeeRewardController::class, 'destroy'])
+            ->name('employee-rewards.destroy');
         
         // Employee Documents
         Route::prefix('employees/{employee}/documents')->name('employees.documents.')->group(function () {
@@ -255,6 +265,8 @@ Route::middleware('auth')->group(function () {
         // Shifts (under HR namespace)
         Route::get('shifts/datatable', [App\Http\Controllers\HR\ShiftController::class, 'datatable'])->name('shifts.datatable');
         Route::get('shifts/preview-code', [App\Http\Controllers\HR\ShiftController::class, 'previewCode'])->name('shifts.preview-code');
+        Route::get('shifts/reports', [App\Http\Controllers\HR\ShiftController::class, 'reports'])->name('shifts.reports');
+        Route::get('shifts/report-data', [App\Http\Controllers\HR\ShiftController::class, 'reportData'])->name('shifts.report-data');
         Route::post('shifts/{shift}/toggle-status', [App\Http\Controllers\HR\ShiftController::class, 'toggleStatus'])->name('shifts.toggle-status');
         Route::get('shifts/departments', [App\Http\Controllers\HR\ShiftController::class, 'getDepartments'])->name('shifts.departments');
         Route::get('shifts/employees', [App\Http\Controllers\HR\ShiftController::class, 'getEmployees'])->name('shifts.employees');

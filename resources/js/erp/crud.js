@@ -39,8 +39,12 @@ window.erpCrud = {
                         ajaxData(d);
                     }
                 },
+                dataSrc: function(json) {
+                    console.log('DataTable Response:', json);
+                    return json.data || [];
+                },
                 error: function(xhr, error, thrown) {
-                    console.error('DataTable AJAX Error:', error, thrown);
+                    console.error('DataTable AJAX Error:', error, thrown, xhr.responseText);
                 }
             },
             pageLength,
@@ -315,6 +319,10 @@ window.erpCrud = {
                         if (data && data.success) {
                             if (typeof window.showToast === 'function') {
                                 window.showToast(data.message || 'Deleted successfully', 'success');
+                            }
+                            // Refresh notifications
+                            if (typeof window.refreshNotifications === 'function') {
+                                window.refreshNotifications();
                             }
                             if (typeof options.onSuccess === 'function') {
                                 options.onSuccess(data);

@@ -8,6 +8,7 @@ use App\Models\HR\EmployeeEvaluation;
 use App\Models\HR\EmployeeEvaluationItem;
 use App\Models\HR\EvaluationCriterion;
 use App\Services\Notifications\NotificationDispatcher;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -19,8 +20,14 @@ class EmployeeEvaluationController extends Controller
         $evaluations = EmployeeEvaluation::with(['employee.department', 'evaluator', 'items.criterion'])
             ->orderByDesc('evaluated_at')
             ->orderByDesc('created_at')
-            ->limit(100)
-            ->get();
+            ->paginate(25);
+
+        // For stats (all evaluations)
+        $allEvaluations = EmployeeEvaluation::selectRaw('
+            COUNT(*) as total,
+            SUM(CASE WHEN overall_rating >= 5 THEN 1 ELSE 0 END) as good,
+            SUM(CASE WHEN overall_rating < 5 THEN 1 ELSE 0 END) as low
+        ')->first();
 
         $employees = Employee::active()
             ->with('department:id,name')
@@ -33,40 +40,52 @@ class EmployeeEvaluationController extends Controller
             ->orderBy('id')
             ->get();
 
-        return view('hr.evaluations.index', compact('evaluations', 'employees', 'criteria'));
+        return view('hr.evaluations.index', compact('evaluations', 'employees', 'criteria', 'allEvaluations'));
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): RedirectResponse|JsonResponse
     {
-        $validated = $request->validate([
-            'employee_id' => 'required|exists:employees,id',
-            'scores' => 'required|array',
-            'scores.*' => 'required|integer|min:1|max:10',
-            'comments' => 'nullable|string|max:2000',
-        ]);
+        // Check if we have active criteria
+        $activeCriteria = EvaluationCriterion::where('is_active', true)->get();
+        $hasCriteria = $activeCriteria->count() > 0;
 
-        $scores = $validated['scores'];
+        if ($hasCriteria) {
+            $validated = $request->validate([
+                'employee_id' => 'required|exists:employees,id',
+                'scores' => 'required|array',
+                'scores.*' => 'required|integer|min:1|max:10',
+                'comments' => 'nullable|string|max:2000',
+            ]);
 
-        // Filter only active criteria to avoid invalid IDs
-        $activeCriteriaIds = EvaluationCriterion::where('is_active', true)
-            ->pluck('id')
-            ->all();
+            $scores = $validated['scores'];
+            $activeCriteriaIds = $activeCriteria->pluck('id')->all();
 
-        $filteredScores = [];
-        foreach ($scores as $criterionId => $score) {
-            if (in_array((int) $criterionId, $activeCriteriaIds, true)) {
-                $filteredScores[(int) $criterionId] = (int) $score;
+            $filteredScores = [];
+            foreach ($scores as $criterionId => $score) {
+                if (in_array((int) $criterionId, $activeCriteriaIds, true)) {
+                    $filteredScores[(int) $criterionId] = (int) $score;
+                }
             }
-        }
 
-        if (count($filteredScores) === 0) {
-            return redirect()
-                ->back()
-                ->withInput()
-                ->withErrors(['scores' => 'At least one criterion score is required.']);
-        }
+            if (count($filteredScores) === 0) {
+                return redirect()
+                    ->back()
+                    ->withInput()
+                    ->withErrors(['scores' => 'At least one criterion score is required.']);
+            }
 
-        $overall = (int) round(array_sum($filteredScores) / count($filteredScores));
+            $overall = (int) round(array_sum($filteredScores) / count($filteredScores));
+        } else {
+            // No criteria - use direct overall_rating
+            $validated = $request->validate([
+                'employee_id' => 'required|exists:employees,id',
+                'overall_rating' => 'required|integer|min:1|max:10',
+                'comments' => 'nullable|string|max:2000',
+            ]);
+
+            $overall = (int) $validated['overall_rating'];
+            $filteredScores = [];
+        }
 
         $evaluation = new EmployeeEvaluation();
         $evaluation->employee_id = $validated['employee_id'];
@@ -76,6 +95,7 @@ class EmployeeEvaluationController extends Controller
         $evaluation->evaluated_at = now();
         $evaluation->save();
 
+        // Save criterion scores if any
         foreach ($filteredScores as $criterionId => $score) {
             EmployeeEvaluationItem::create([
                 'employee_evaluation_id' => $evaluation->id,
@@ -114,5 +134,43 @@ class EmployeeEvaluationController extends Controller
         return redirect()
             ->route('hr.employee-evaluations.index')
             ->with('success', 'Employee evaluation saved successfully.');
+    }
+
+    public function show(EmployeeEvaluation $evaluation): View
+    {
+        $evaluation->load(['employee.department', 'evaluator', 'items.criterion']);
+        
+        return view('hr.evaluations.show', compact('evaluation'));
+    }
+
+    public function destroy(EmployeeEvaluation $evaluation): RedirectResponse|JsonResponse
+    {
+        $employeeName = $evaluation->employee->full_name ?? 'Unknown';
+        
+        // Delete related items first
+        $evaluation->items()->delete();
+        $evaluation->delete();
+
+        if (request()->expectsJson()) {
+            return response()->json([
+                'message' => "Evaluation for {$employeeName} deleted successfully.",
+            ]);
+        }
+
+        return redirect()
+            ->route('hr.employee-evaluations.index')
+            ->with('success', "Evaluation for {$employeeName} deleted successfully.");
+    }
+
+    public function exportPdf(EmployeeEvaluation $evaluation)
+    {
+        $evaluation->load(['employee.department', 'employee.company', 'evaluator', 'items.criterion']);
+        
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('hr.evaluations.pdf', compact('evaluation'));
+        $pdf->setPaper('a4', 'portrait');
+        
+        $filename = 'evaluation_' . ($evaluation->employee->full_name ?? 'employee') . '_' . $evaluation->evaluated_at->format('Y-m-d') . '.pdf';
+        
+        return $pdf->download($filename);
     }
 }

@@ -79,7 +79,7 @@ unset($__defined_vars); ?>
 
 <!-- BEGIN: Top Bar -->
 <div class="<?php echo \Illuminate\Support\Arr::toCssClasses([
-    'h-[90px] md:h-[100px] z-[10] border-b border-white/[0.08] w-full px-5 sm:px-8 md:px-10 md:border-b-0 relative md:pt-6',
+    'h-[90px] md:h-[100px] z-[100] border-b border-white/[0.08] w-full px-5 sm:px-8 md:px-10 md:border-b-0 relative md:pt-6',
 ]); ?>">
     <div class="flex items-center">
 
@@ -751,7 +751,7 @@ unset($__defined_vars); ?>
 <!-- END: Top Bar -->
 
 
-<?php if (! $__env->hasRenderedOnce('159f2d4f-f38d-4ed1-a476-06a515edf62b')): $__env->markAsRenderedOnce('159f2d4f-f38d-4ed1-a476-06a515edf62b');
+<?php if (! $__env->hasRenderedOnce('85f75959-472f-4135-85f1-8cc638630f16')): $__env->markAsRenderedOnce('85f75959-472f-4135-85f1-8cc638630f16');
 $__env->startPush('scripts'); ?>
     <?php echo app('Illuminate\Foundation\Vite')('resources/js/components/themes/enigma/top-bar.js'); ?>
 <?php $__env->stopPush(); endif; ?>

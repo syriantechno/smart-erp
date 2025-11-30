@@ -1,12 +1,12 @@
-<?php if (! $__env->hasRenderedOnce('efb8af5b-f9c4-421e-9326-a5ddd5f49b3d')): $__env->markAsRenderedOnce('efb8af5b-f9c4-421e-9326-a5ddd5f49b3d');
+<?php if (! $__env->hasRenderedOnce('5ea57e8a-e476-412c-a4ac-126d7cdbafee')): $__env->markAsRenderedOnce('5ea57e8a-e476-412c-a4ac-126d7cdbafee');
 $__env->startPush('styles'); ?>
     <style>
         /* Global Notification Styles */
         #global-toast-container {
-            position: fixed;
-            top: 24px;
-            right: 24px;
-            z-index: 99999;
+            position: fixed !important;
+            top: 24px !important;
+            right: 24px !important;
+            z-index: 2147483647 !important; /* Maximum z-index to ensure it's always on top */
             display: none;
             flex-direction: column;
             gap: 12px;
@@ -14,6 +14,7 @@ $__env->startPush('styles'); ?>
             max-width: 400px;
             width: auto;
             box-sizing: border-box;
+            isolation: isolate; /* Create new stacking context */
         }
 
         #global-toast-container:not(:empty) {
@@ -76,6 +77,7 @@ $__env->startPush('styles'); ?>
             display: flex;
             align-items: flex-start;
             gap: 12px;
+            pointer-events: auto;
         }
 
         .toast-icon {
@@ -294,8 +296,7 @@ $__env->startPush('styles'); ?>
     </style>
 <?php $__env->stopPush(); endif; ?>
 
-<!-- Toast Container -->
-<div id="global-toast-container"></div>
+<!-- Toast Container is now in base.blade.php at the end of body for proper z-index -->
 
 <!-- Session Notifications -->
 <?php if(session()->has('notification')): ?>
@@ -540,7 +541,7 @@ $__env->startPush('styles'); ?>
     </div>
 </div>
 
-<?php if (! $__env->hasRenderedOnce('6195c055-0a89-4903-93d1-37fa4391906a')): $__env->markAsRenderedOnce('6195c055-0a89-4903-93d1-37fa4391906a');
+<?php if (! $__env->hasRenderedOnce('cafc7678-415c-4c4b-a644-e177f21910f6')): $__env->markAsRenderedOnce('cafc7678-415c-4c4b-a644-e177f21910f6');
 $__env->startPush('scripts'); ?>
 <script>
     // Global Notification System

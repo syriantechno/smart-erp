@@ -53,11 +53,33 @@
 
                 <div class="col-span-12 md:col-span-3">
                     <x-base.form-label for="create-leave-start-date">Start Date <span class="text-danger">*</span></x-base.form-label>
-                    <x-base.form-input id="create-leave-start-date" name="start_date" type="date" class="w-full" required />
+                    <div class="relative w-full">
+                        <div class="absolute flex h-full w-10 items-center justify-center rounded-l border bg-slate-100 text-slate-500 dark:border-darkmode-800 dark:bg-darkmode-700 dark:text-slate-400">
+                            <x-base.lucide icon="calendar" class="stroke-1.5 w-5 h-5"></x-base.lucide>
+                        </div>
+                        <x-base.litepicker
+                            id="create-leave-start-date"
+                            name="start_date"
+                            class="pl-12"
+                            data-single-mode="true"
+                            data-format="YYYY-MM-DD"
+                        />
+                    </div>
                 </div>
                 <div class="col-span-12 md:col-span-3">
                     <x-base.form-label for="create-leave-end-date">End Date <span class="text-danger">*</span></x-base.form-label>
-                    <x-base.form-input id="create-leave-end-date" name="end_date" type="date" class="w-full" required />
+                    <div class="relative w-full">
+                        <div class="absolute flex h-full w-10 items-center justify-center rounded-l border bg-slate-100 text-slate-500 dark:border-darkmode-800 dark:bg-darkmode-700 dark:text-slate-400">
+                            <x-base.lucide icon="calendar" class="stroke-1.5 w-5 h-5"></x-base.lucide>
+                        </div>
+                        <x-base.litepicker
+                            id="create-leave-end-date"
+                            name="end_date"
+                            class="pl-12"
+                            data-single-mode="true"
+                            data-format="YYYY-MM-DD"
+                        />
+                    </div>
                 </div>
                 <div class="col-span-12 md:col-span-3">
                     <x-base.form-label for="create-leave-days">Total Days</x-base.form-label>
@@ -84,7 +106,7 @@
                 </div>
                 <div class="col-span-12 md:col-span-3 flex items-end">
                     <label class="form-switch">
-                        <input id="create-leave-paid" name="is_paid" type="checkbox" class="form-check-input" checked>
+                        <input id="create-leave-paid" name="is_paid" type="checkbox" class="form-check-input" value="1" checked>
                         <span class="ml-2">Paid Leave</span>
                     </label>
                 </div>

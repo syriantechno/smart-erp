@@ -38,26 +38,52 @@ class LeaveController extends Controller
 
     public function datatable(Request $request): JsonResponse
     {
-        $query = Leave::query()
+        $draw = intval($request->input('draw'));
+        $length = intval($request->input('length', 10));
+        $start = intval($request->input('start', 0));
+
+        $baseQuery = Leave::query()
             ->with(['employee.department', 'employee.company'])
             ->orderByDesc('created_at');
 
-        $this->applyFilters($request, $query);
+        $recordsTotal = (clone $baseQuery)->count();
 
-        return DataTables::of($query)
-            ->addIndexColumn()
-            ->addColumn('request', fn (Leave $leave) => $this->renderRequestColumn($leave))
-            ->addColumn('employee', fn (Leave $leave) => $this->renderEmployeeColumn($leave))
-            ->addColumn('period', fn (Leave $leave) => $this->renderPeriodColumn($leave))
-            ->addColumn('reason', fn (Leave $leave) => $this->renderReasonColumn($leave))
-            ->addColumn('status', fn (Leave $leave) => $this->renderStatusBadge($leave->status))
-            ->addColumn('actions', fn (Leave $leave) => view('hr.leave.partials.actions', compact('leave'))->render())
-            ->rawColumns(['request', 'employee', 'period', 'reason', 'status', 'actions'])
-            ->toJson();
+        $this->applyFilters($request, $baseQuery);
+
+        $recordsFiltered = (clone $baseQuery)->count();
+
+        $leaves = $baseQuery
+            ->skip($start)
+            ->take($length)
+            ->get();
+
+        $data = $leaves->map(function (Leave $leave, $index) use ($start) {
+            return [
+                'DT_RowIndex' => $start + $index + 1,
+                'request' => $this->renderRequestColumn($leave),
+                'employee' => $this->renderEmployeeColumn($leave),
+                'period' => $this->renderPeriodColumn($leave),
+                'reason' => $this->renderReasonColumn($leave),
+                'status' => $this->renderStatusBadge($leave->status),
+                'actions' => view('hr.leave.partials.actions', compact('leave'))->render(),
+            ];
+        })->values();
+
+        return response()->json([
+            'draw' => $draw,
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $data,
+        ]);
     }
 
     public function store(Request $request): JsonResponse
     {
+        // Convert is_paid checkbox value to boolean
+        $request->merge([
+            'is_paid' => $request->has('is_paid') ? true : false
+        ]);
+        
         $validated = $this->validateLeave($request);
 
         $employee = Employee::findOrFail($validated['employee_id']);
@@ -98,8 +124,51 @@ class LeaveController extends Controller
 
     public function update(Request $request, Leave $leave): JsonResponse
     {
-        $validated = $this->validateLeave($request, $leave->id);
         $oldStatus = $leave->status;
+
+        // Quick status update (approve/reject)
+        if ($request->has('status') && count($request->all()) <= 2) {
+            $status = $request->input('status');
+            if (in_array($status, ['approved', 'rejected', 'pending'])) {
+                $leave->update(['status' => $status]);
+                
+                // Notify employee
+                if ($leave->employee && $leave->employee->user_id && $oldStatus !== $status) {
+                    $typeLabel = $this->leaveTypeOptions()[$leave->leave_type] ?? ucfirst($leave->leave_type);
+                    
+                    if ($status === 'approved') {
+                        NotificationDispatcher::toUser(
+                            $leave->employee->user_id,
+                            'leave.approved',
+                            'Leave Approved',
+                            "Your {$typeLabel} request has been approved.",
+                            route('hr.leave.index'),
+                            'check-circle',
+                            ['type' => 'success', 'actor_id' => auth()->id()]
+                        );
+                    } elseif ($status === 'rejected') {
+                        NotificationDispatcher::toUser(
+                            $leave->employee->user_id,
+                            'leave.rejected',
+                            'Leave Rejected',
+                            "Your {$typeLabel} request has been rejected.",
+                            route('hr.leave.index'),
+                            'x-circle',
+                            ['type' => 'error', 'actor_id' => auth()->id()]
+                        );
+                    }
+                }
+                
+                return Reply::success('Leave status updated successfully.');
+            }
+        }
+
+        // Convert is_paid checkbox value to boolean
+        $request->merge([
+            'is_paid' => $request->has('is_paid') ? true : false
+        ]);
+        
+        $validated = $this->validateLeave($request, $leave->id);
 
         $employee = Employee::findOrFail($validated['employee_id']);
         $validated['department_id'] = $validated['department_id'] ?? $employee->department_id;
@@ -186,23 +255,19 @@ class LeaveController extends Controller
 
     protected function applyFilters(Request $request, $query): void
     {
-        $filterField = $request->input('filter_field', 'all');
-        $filterType = $request->input('filter_type', 'contains');
-        $filterValue = trim((string) $request->input('filter_value'));
-
+        // Text search filter
+        $filterValue = trim((string) $request->input('filter_value', ''));
+        
         if ($filterValue !== '') {
-            $query->where(function ($q) use ($filterField, $filterType, $filterValue) {
-                $value = $filterType === 'equals' ? $filterValue : "%{$filterValue}%";
+            $filterField = $request->input('filter_field', 'all');
+            $filterType = $request->input('filter_type', 'contains');
+            $value = $filterType === 'equals' ? $filterValue : "%{$filterValue}%";
+            $likeComparison = $filterType === 'equals' ? '=' : 'like';
 
-                $likeComparison = $filterType === 'equals' ? '=' : 'like';
-
-                $apply = function ($builder, $column) use ($likeComparison, $value) {
-                    $builder->where($column, $likeComparison, $value);
-                };
-
+            $query->where(function ($q) use ($filterField, $likeComparison, $value, $filterType) {
                 switch ($filterField) {
                     case 'code':
-                        $apply($q, 'code');
+                        $q->where('code', $likeComparison, $value);
                         break;
                     case 'employee':
                         $q->whereHas('employee', function ($employeeQuery) use ($value, $filterType) {
@@ -216,32 +281,41 @@ class LeaveController extends Controller
                         });
                         break;
                     case 'type':
-                        $apply($q, 'leave_type');
+                        $q->where('leave_type', $likeComparison, $value);
                         break;
-                    default:
-                        $q->where('code', $likeComparison, $value)
-                            ->orWhere('leave_type', $likeComparison, $value)
-                            ->orWhereHas('employee', function ($employeeQuery) use ($value, $filterType) {
-                                $comparison = $filterType === 'equals' ? '=' : 'like';
-                                $employeeQuery->whereRaw("CONCAT(IFNULL(first_name,''),' ',IFNULL(middle_name,''),' ',IFNULL(last_name,'')) {$comparison} ?", [$value]);
-                            });
+                    default: // 'all'
+                        $q->where(function ($subQ) use ($likeComparison, $value, $filterType) {
+                            $subQ->where('code', $likeComparison, $value)
+                                ->orWhere('leave_type', $likeComparison, $value)
+                                ->orWhereHas('employee', function ($employeeQuery) use ($value, $filterType) {
+                                    $comparison = $filterType === 'equals' ? '=' : 'like';
+                                    $employeeQuery->whereRaw("CONCAT(IFNULL(first_name,''),' ',IFNULL(middle_name,''),' ',IFNULL(last_name,'')) {$comparison} ?", [$value]);
+                                });
+                        });
                 }
             });
         }
 
-        if ($type = $request->input('filter_leave_type')) {
-            $query->where('leave_type', $type);
+        // Leave type filter
+        $leaveType = $request->input('filter_leave_type');
+        if ($leaveType !== null && $leaveType !== '') {
+            $query->where('leave_type', $leaveType);
         }
 
-        if ($status = $request->input('filter_status')) {
+        // Status filter
+        $status = $request->input('filter_status');
+        if ($status !== null && $status !== '') {
             $query->where('status', $status);
         }
 
-        if ($from = $request->input('filter_from')) {
+        // Date range filters - validate date format
+        $from = $request->input('filter_from');
+        if ($from !== null && $from !== '' && preg_match('/^\d{4}-\d{2}-\d{2}$/', $from)) {
             $query->whereDate('start_date', '>=', $from);
         }
 
-        if ($to = $request->input('filter_to')) {
+        $to = $request->input('filter_to');
+        if ($to !== null && $to !== '' && preg_match('/^\d{4}-\d{2}-\d{2}$/', $to)) {
             $query->whereDate('end_date', '<=', $to);
         }
     }
@@ -309,15 +383,28 @@ class LeaveController extends Controller
     protected function renderStatusBadge(string $status): string
     {
         $label = $this->leaveStatusOptions()[$status] ?? ucfirst($status);
-        $classMap = [
-            'pending' => 'leave-status-badge leave-status-badge--pending',
-            'approved' => 'leave-status-badge leave-status-badge--approved',
-            'rejected' => 'leave-status-badge leave-status-badge--rejected',
-        ];
+        
+        // Use unified badge styling like Positions
+        $colorClasses = match($status) {
+            'approved' => 'text-lime-600',
+            'pending' => 'text-amber-600',
+            'rejected' => 'text-rose-500',
+            default => 'text-slate-500',
+        };
 
-        $classes = $classMap[$status] ?? 'leave-status-badge';
+        $iconSvg = match($status) {
+            'approved' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
+            'pending' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+            'rejected' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>',
+            default => '',
+        };
 
-        return "<span class=\"{$classes}\">{$label}</span>";
+        return <<<HTML
+            <span class="inline-flex items-center text-base font-semibold {$colorClasses}">
+                {$iconSvg}
+                {$label}
+            </span>
+        HTML;
     }
 
     protected function calculateDays(string $start, string $end): int

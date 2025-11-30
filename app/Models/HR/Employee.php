@@ -44,6 +44,7 @@ class Employee extends Model
         'country',
         'postal_code',
         'department_id',
+        'default_shift_id',
         'company_id',
         'user_id',
         'has_system_access',
@@ -80,6 +81,52 @@ class Employee extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Setting\Company::class, 'company_id');
+    }
+
+    /**
+     * Get the default shift for the employee.
+     */
+    public function defaultShift(): BelongsTo
+    {
+        return $this->belongsTo(Shift::class, 'default_shift_id');
+    }
+
+    /**
+     * Get the applicable shift for this employee.
+     * Priority: Employee's default shift > Department shift > Company shift
+     */
+    public function getApplicableShift(): ?Shift
+    {
+        // 1. Employee's own default shift
+        if ($this->default_shift_id) {
+            return $this->defaultShift;
+        }
+
+        // 2. Department-level shift
+        $departmentShift = Shift::where('applicable_to', 'department')
+            ->where('department_id', $this->department_id)
+            ->where('is_active', true)
+            ->first();
+        
+        if ($departmentShift) {
+            return $departmentShift;
+        }
+
+        // 3. Company-level shift
+        $companyShift = Shift::where('applicable_to', 'company')
+            ->where('company_id', $this->company_id)
+            ->where('is_active', true)
+            ->first();
+
+        return $companyShift;
+    }
+
+    /**
+     * Get the leaves for the employee.
+     */
+    public function leaves(): HasMany
+    {
+        return $this->hasMany(Leave::class);
     }
 
     /**

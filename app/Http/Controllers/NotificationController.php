@@ -16,17 +16,39 @@ class NotificationController extends Controller
     /**
      * Get all notifications for the authenticated user.
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request)
     {
-        $notifications = Notification::where('user_id', Auth::id())
+        $query = Notification::where('user_id', Auth::id())
             ->with('creator')
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
+            ->orderBy('created_at', 'desc');
 
-        return response()->json([
-            'success' => true,
-            'data' => $notifications,
-        ]);
+        // Apply filter
+        if ($request->filter === 'unread') {
+            $query->where('is_read', false);
+        } elseif ($request->filter === 'read') {
+            $query->where('is_read', true);
+        }
+
+        $notifications = $query->paginate(15);
+
+        // Get stats
+        $stats = [
+            'total' => Notification::where('user_id', Auth::id())->count(),
+            'unread' => Notification::where('user_id', Auth::id())->where('is_read', false)->count(),
+            'read' => Notification::where('user_id', Auth::id())->where('is_read', true)->count(),
+        ];
+
+        // Return JSON for AJAX requests
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'data' => $notifications,
+                'stats' => $stats,
+            ]);
+        }
+
+        // Return view for normal requests
+        return view('notifications.index');
     }
 
     /**

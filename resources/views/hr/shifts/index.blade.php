@@ -89,89 +89,89 @@
                         </x-base.alert>
                     @endif
 
-                    <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
-                        <form id="shifts-filter-form" class="w-full sm:mr-auto xl:flex">
-                            <div class="items-center sm:mr-4 sm:flex">
-                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
-                                    Field
-                                </label>
-                                <x-base.form-select id="shifts-filter-field" class="mt-2 w-full sm:mt-0 sm:w-auto 2xl:w-full">
-                                    <option value="all">All Fields</option>
-                                    <option value="code">Code</option>
-                                    <option value="name">Name</option>
-                                    <option value="company">Company</option>
-                                    <option value="status">Status</option>
-                                </x-base.form-select>
-                            </div>
-                            <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
-                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
-                                    Type
-                                </label>
-                                <x-base.form-select id="shifts-filter-type" class="mt-2 w-full sm:mt-0 sm:w-auto">
-                                    <option value="contains">Contains</option>
-                                    <option value="equals">Equals</option>
-                                </x-base.form-select>
-                            </div>
-                            <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
-                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
-                                    Value
-                                </label>
-                                <x-base.form-input id="shifts-filter-value" type="text" placeholder="Search..." class="mt-2 w-full sm:mt-0 sm:w-48 2xl:w-full" />
-                            </div>
-                            <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
-                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
-                                    Display
-                                </label>
-                                <x-base.form-select id="shifts-filter-length" class="mt-2 w-full sm:mt-0 sm:w-auto">
-                                    <option value="10">10</option>
-                                    <option value="25">25</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                </x-base.form-select>
-                            </div>
-                            <div class="mt-4 flex flex-wrap gap-2 sm:items-center xl:mt-0">
-                                <button id="shifts-filter-go" type="button" class="btn-royal btn-royal--dark btn-royal--sm w-full sm:w-24 group">
-                                    <x-base.lucide icon="search" class="w-4 h-4 icon-hover-rise" />
-                                    Go
-                                </button>
-                                <button id="shifts-filter-reset" type="button" class="btn-royal btn-royal--outline btn-royal--sm w-full sm:w-24 group">
-                                    <x-base.lucide icon="rotate-ccw" class="w-4 h-4 icon-hover-rise" />
-                                    Reset
-                                </button>
-                            </div>
-                        </form>
+                    {{-- Filters & Actions in One Row --}}
+                    <div class="flex flex-wrap items-center gap-2 mb-4">
+                        {{-- Search Input --}}
+                        <div class="relative min-w-[180px]">
+                            <x-base.lucide icon="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <x-base.form-input 
+                                id="shifts-filter-value" 
+                                type="text" 
+                                placeholder="Search..." 
+                                class="pl-9 w-full text-sm py-1.5"
+                            />
+                        </div>
 
-                        <div class="mt-5 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
+                        {{-- Company Filter --}}
+                        <x-base.form-select id="company-filter" class="w-auto text-sm py-1.5">
+                            <option value="">All Companies</option>
+                            @foreach($companies ?? [] as $company)
+                                <option value="{{ $company->id }}">{{ $company->name }}</option>
+                            @endforeach
+                        </x-base.form-select>
+
+                        {{-- Status Filter --}}
+                        <x-base.form-select id="status-filter" class="w-auto text-sm py-1.5">
+                            <option value="">Status</option>
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </x-base.form-select>
+
+                        {{-- Page Length --}}
+                        <x-base.form-select id="shifts-filter-length" class="w-auto text-sm py-1.5">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </x-base.form-select>
+
+                        {{-- Reset Button --}}
+                        <x-base.tippy as="button" id="shifts-filter-reset" type="button" content="Reset filters" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                            <x-base.lucide icon="x" class="w-4 h-4" />
+                        </x-base.tippy>
+
+                        {{-- Spacer --}}
+                        <div class="flex-1"></div>
+
+                        {{-- Action Buttons --}}
+                        <div class="flex items-center gap-1">
                             <x-base.tippy content="Print" placement="bottom">
-                                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
-                                    <x-base.lucide icon="printer" class="w-5 h-5 icon-hover-rise" />
+                                <button id="shifts-print" type="button" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                                    <x-base.lucide icon="printer" class="w-4 h-4" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Export PDF" placement="bottom">
-                                <button id="shifts-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
-                                    <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
+                                <button id="shifts-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                                    <x-base.lucide icon="file-text" class="w-4 h-4" />
                                 </button>
                             </x-base.tippy>
-                            <x-base.tippy content="Export" placement="bottom">
-                                <button id="shifts-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
-                                    <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
+                            <x-base.tippy content="Export Excel" placement="bottom">
+                                <button id="shifts-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                                    <x-base.lucide icon="file-spreadsheet" class="w-4 h-4" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Refresh" placement="bottom">
-                                <button id="shifts-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
-                                    <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
+                                <button id="shifts-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                                    <x-base.lucide icon="refresh-cw" class="w-4 h-4" />
                                 </button>
                             </x-base.tippy>
 
-                            {{-- Add Shift button at the right end of the toolbar --}}
-                            <x-base.tippy content="Add new shift" placement="bottom">
+                            {{-- Reports Button --}}
+                            <x-base.tippy content="View Reports" placement="bottom">
+                                <a href="{{ route('hr.shifts.reports') }}" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                                    <x-base.lucide icon="bar-chart-3" class="w-4 h-4" />
+                                </a>
+                            </x-base.tippy>
+
+                            {{-- Add Shift Button --}}
+                            <x-base.tippy content="Add shift" placement="bottom">
                                 <button
                                     type="button"
-                                    class="btn-royal btn-royal--gold btn-royal--sm sm:btn-royal--lg group"
+                                    class="btn-royal btn-royal--gold btn-royal--sm"
                                     data-tw-toggle="modal"
                                     data-tw-target="#create-shift-modal"
                                 >
-                                    <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
+                                    <x-base.lucide icon="plus-circle" class="w-4 h-4 mr-2" />
                                     <span class="hidden sm:inline">Add</span>
                                 </button>
                             </x-base.tippy>
@@ -201,6 +201,7 @@
     </div>
 
     @include('hr.shifts.modals.create')
+    @include('hr.shifts.modals.edit')
     @stack('shift-modals')
 @endsection
 
@@ -208,11 +209,10 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const filterField = document.getElementById('shifts-filter-field');
-        const filterType = document.getElementById('shifts-filter-type');
         const filterValue = document.getElementById('shifts-filter-value');
+        const companyFilter = document.getElementById('company-filter');
+        const statusFilter = document.getElementById('status-filter');
         const lengthSelect = document.getElementById('shifts-filter-length');
-        const filterGoBtn = document.getElementById('shifts-filter-go');
         const filterResetBtn = document.getElementById('shifts-filter-reset');
         const exportBtn = document.getElementById('shifts-export');
         const refreshBtn = document.getElementById('shifts-refresh');
@@ -224,15 +224,9 @@
             tableSelector: '#shifts-table',
             ajaxUrl: '{{ route("hr.shifts.datatable") }}',
             ajaxData: function (d) {
-                if (filterField) {
-                    d.filter_field = filterField.value || 'all';
-                }
-                if (filterType) {
-                    d.filter_type = filterType.value || 'contains';
-                }
-                if (filterValue) {
-                    d.filter_value = filterValue.value || '';
-                }
+                d.filter_value = filterValue?.value || '';
+                d.company_id = companyFilter?.value || '';
+                d.status = statusFilter?.value || '';
             },
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center font-medium', orderable: false },
@@ -283,29 +277,37 @@
             table.ajax.reload(null, false);
         };
 
-        if (filterGoBtn) {
-            filterGoBtn.addEventListener('click', reloadTable);
-        }
+        // Auto-filter on change
+        [companyFilter, statusFilter].forEach(el => {
+            if (el) el.addEventListener('change', reloadTable);
+        });
 
+        // Search on typing with debounce
+        let searchTimeout;
         if (filterValue) {
-            filterValue.addEventListener('keyup', function (event) {
-                if (event.key === 'Enter') {
-                    reloadTable();
-                }
+            filterValue.addEventListener('input', function () {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(reloadTable, 500);
             });
         }
 
+        // Reset filters
         if (filterResetBtn) {
             filterResetBtn.addEventListener('click', function () {
-                if (filterField) filterField.value = 'all';
-                if (filterType) filterType.value = 'contains';
                 if (filterValue) filterValue.value = '';
+                if (companyFilter) companyFilter.value = '';
+                if (statusFilter) statusFilter.value = '';
                 if (lengthSelect) {
                     lengthSelect.value = String(initialLength);
                     table.page.len(initialLength).draw();
                 }
                 reloadTable();
             });
+        }
+
+        // Refresh button
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', reloadTable);
         }
 
         if (pdfBtn) {
@@ -353,6 +355,9 @@
             });
         }
 
+        // Make reloadTable globally available
+        window.reloadTable = reloadTable;
+
         window.erpCrud.handleDelete({
             urlBuilder: function(id) {
                 return `{{ route('hr.shifts.destroy', '') }}/${id}`;
@@ -363,43 +368,241 @@
         });
     });
 
+    // Delete shift
     window.deleteShift = function(id, name) {
         window.erpDeleteRecord(id, name);
     };
 
-    // Simple view handler for now - can be extended to open a modal later
-    window.viewShift = function (id) {
-        showToast('View shift #' + id + ' (view details modal not implemented yet)', 'info');
+    // View shift details
+    window.viewShift = function(id) {
+        const modal = document.getElementById('view-shift-modal');
+        const content = document.getElementById('view-shift-content');
+        
+        // Show loading
+        content.innerHTML = `
+            <div class="text-center py-8">
+                <i data-lucide="loader-2" class="w-8 h-8 mx-auto animate-spin text-slate-400"></i>
+                <p class="mt-2 text-slate-500">Loading...</p>
+            </div>
+        `;
+        
+        // Open modal
+        const modalInstance = tailwind.Modal.getOrCreateInstance(modal);
+        modalInstance.show();
+        
+        // Fetch shift data
+        fetch(`{{ url('hr/shifts') }}/${id}`, {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const shift = data.data;
+                content.innerHTML = `
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-4 p-4 bg-slate-50 rounded-lg">
+                            <div class="w-12 h-12 rounded-full" style="background-color: ${shift.color}"></div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-slate-800">${shift.name}</h3>
+                                <p class="text-sm text-slate-500">${shift.code}</p>
+                            </div>
+                            <span class="ml-auto px-3 py-1 rounded-full text-sm font-medium ${shift.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
+                                ${shift.is_active ? 'Active' : 'Inactive'}
+                            </span>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-3 bg-blue-50 rounded-lg">
+                                <p class="text-xs text-blue-600 uppercase tracking-wide">Start Time</p>
+                                <p class="text-lg font-semibold text-blue-800">${shift.start_time || '-'}</p>
+                            </div>
+                            <div class="p-3 bg-blue-50 rounded-lg">
+                                <p class="text-xs text-blue-600 uppercase tracking-wide">End Time</p>
+                                <p class="text-lg font-semibold text-blue-800">${shift.end_time || '-'}</p>
+                            </div>
+                            <div class="p-3 bg-purple-50 rounded-lg">
+                                <p class="text-xs text-purple-600 uppercase tracking-wide">Working Hours</p>
+                                <p class="text-lg font-semibold text-purple-800">${shift.working_hours || 8} hrs</p>
+                            </div>
+                            <div class="p-3 bg-amber-50 rounded-lg">
+                                <p class="text-xs text-amber-600 uppercase tracking-wide">Break Hours</p>
+                                <p class="text-lg font-semibold text-amber-800">${shift.break_hours || 1} hrs</p>
+                            </div>
+                        </div>
+                        
+                        ${shift.description ? `
+                        <div class="p-3 bg-slate-50 rounded-lg">
+                            <p class="text-xs text-slate-500 uppercase tracking-wide mb-1">Description</p>
+                            <p class="text-slate-700">${shift.description}</p>
+                        </div>
+                        ` : ''}
+                        
+                        <div class="p-3 bg-slate-50 rounded-lg">
+                            <p class="text-xs text-slate-500 uppercase tracking-wide mb-1">Applies To</p>
+                            <p class="text-slate-700">${shift.applicable_to === 'company' ? 'Entire Company' : shift.applicable_to === 'department' ? 'Department: ' + (shift.department?.name || '-') : 'Employee: ' + (shift.employee?.full_name || '-')}</p>
+                        </div>
+                    </div>
+                `;
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            } else {
+                content.innerHTML = '<p class="text-center text-red-500 py-8">Failed to load shift details</p>';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            content.innerHTML = '<p class="text-center text-red-500 py-8">Error loading shift details</p>';
+        });
     };
 
-    // Simple edit handler for now - can be extended to open an edit modal
-    window.editShift = function (id) {
-        showToast('Edit shift #' + id + ' (edit modal not implemented yet)', 'info');
+    // Open edit modal
+    window.openEditShiftModal = function(id) {
+        const modal = document.getElementById('edit-shift-modal');
+        
+        // Fetch shift data
+        fetch(`{{ url('hr/shifts') }}/${id}`, {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const shift = data.data;
+                
+                // Populate form
+                document.getElementById('edit-shift-id').value = shift.id;
+                document.getElementById('edit-shift-code').value = shift.code;
+                document.getElementById('edit-shift-name').value = shift.name;
+                document.getElementById('edit-shift-description').value = shift.description || '';
+                document.getElementById('edit-start-time').value = shift.start_time;
+                document.getElementById('edit-end-time').value = shift.end_time;
+                document.getElementById('edit-working-hours').value = shift.working_hours;
+                document.getElementById('edit-shift-color').value = shift.color;
+                document.getElementById('edit-is-active').checked = shift.is_active;
+                document.getElementById('edit-break-start').value = shift.break_start || '';
+                document.getElementById('edit-break-end').value = shift.break_end || '';
+                document.getElementById('edit-break-hours').value = shift.break_hours || 1;
+                document.getElementById('edit-applicable-to').value = shift.applicable_to;
+                document.getElementById('edit-company-id').value = shift.company_id || '';
+                
+                // Work days
+                document.querySelectorAll('.edit-work-day').forEach(cb => {
+                    cb.checked = shift.work_days && shift.work_days.includes(cb.value);
+                });
+                
+                // Show/hide applicable fields
+                const applicableTo = shift.applicable_to;
+                document.getElementById('edit-department-selection').style.display = 
+                    ['department', 'employee'].includes(applicableTo) ? 'block' : 'none';
+                document.getElementById('edit-employee-selection').style.display = 
+                    applicableTo === 'employee' ? 'block' : 'none';
+                
+                // Open modal
+                const modalInstance = tailwind.Modal.getOrCreateInstance(modal);
+                modalInstance.show();
+            } else {
+                showToast('Failed to load shift data', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Error loading shift data', 'error');
+        });
     };
 
-    window.toggleShiftStatus = function (id) {
-        const baseUrl = '{{ rtrim(route('hr.shifts.toggle-status', ['shift' => '__ID__']), '__ID__') }}';
-        fetch(baseUrl + id, {
+    // Submit edit form - prevent double submission
+    let isEditSubmitting = false;
+    window.submitEditShiftForm = function() {
+        if (isEditSubmitting) return;
+        isEditSubmitting = true;
+
+        const form = document.getElementById('edit-shift-form');
+        const id = document.getElementById('edit-shift-id').value;
+        const formData = new FormData(form);
+        
+        const data = {};
+        const workDays = [];
+        
+        for (let [key, value] of formData.entries()) {
+            if (key === 'work_days[]') {
+                workDays.push(value);
+            } else {
+                data[key] = value;
+            }
+        }
+        data.work_days = workDays;
+        data.is_active = document.getElementById('edit-is-active').checked;
+        
+        // Calculate working hours
+        const startTime = data.start_time;
+        const endTime = data.end_time;
+        if (startTime && endTime) {
+            const [sh, sm] = startTime.split(':').map(Number);
+            const [eh, em] = endTime.split(':').map(Number);
+            const startMinutes = sh * 60 + sm;
+            let endMinutes = eh * 60 + em;
+            if (endMinutes <= startMinutes) endMinutes += 24 * 60;
+            data.working_hours = Math.round((endMinutes - startMinutes) / 60 * 2) / 2;
+        }
+        
+        fetch(`{{ url('hr/shifts') }}/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast(data.message || 'Shift updated successfully', 'success');
+                if (window.refreshNotifications) window.refreshNotifications();
+                try {
+                    tailwind.Modal.getInstance(document.getElementById('edit-shift-modal'))?.hide();
+                } catch(e) {}
+                reloadTable();
+            } else {
+                showToast(data.message || 'Failed to update shift', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Error updating shift', 'error');
+        })
+        .finally(() => {
+            isEditSubmitting = false;
+        });
+    };
+
+    // Toggle shift status
+    window.toggleShiftStatus = function(id) {
+        fetch(`{{ url('hr/shifts') }}/${id}/toggle-status`, {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
                 'X-Requested-With': 'XMLHttpRequest',
                 'Accept': 'application/json',
-            },
-            credentials: 'same-origin',
+            }
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.reload();
-                    showToast(data.message, 'success');
-                } else {
-                    showToast(data.message || 'Failed to update shift status', 'error');
-                }
-            })
-            .catch(() => {
-                showToast('An error occurred while updating', 'error');
-            });
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast(data.message, 'success');
+                if (window.refreshNotifications) window.refreshNotifications();
+                reloadTable();
+            } else {
+                showToast(data.message || 'Failed to update shift status', 'error');
+            }
+        })
+        .catch(() => {
+            showToast('An error occurred while updating', 'error');
+        });
     };
     </script>
 @endpush

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\HR;
 
 use App\Http\Controllers\Controller;
-use App\Models\Employee;
-use App\Models\EmployeeDocument;
+use App\Models\HR\Employee;
+use App\Models\HR\EmployeeDocument;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -39,11 +39,15 @@ class EmployeeDocumentController extends Controller
             'document_type' => 'required|in:passport,visa,id_card,license,certificate,other',
             'document_name' => 'required|string|max:255',
             'document_number' => 'nullable|string|max:255',
-            'issue_date' => 'nullable|date',
-            'expiry_date' => 'nullable|date|after:issue_date',
+            'issue_date' => 'nullable|string',
+            'expiry_date' => 'nullable|string',
             'notes' => 'nullable|string|max:1000',
             'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120', // 5MB max
         ]);
+
+        // Parse dates from Litepicker format
+        $issueDate = !empty($validated['issue_date']) ? \Carbon\Carbon::parse($validated['issue_date'])->format('Y-m-d') : null;
+        $expiryDate = !empty($validated['expiry_date']) ? \Carbon\Carbon::parse($validated['expiry_date'])->format('Y-m-d') : null;
 
         try {
             DB::beginTransaction();
@@ -53,8 +57,8 @@ class EmployeeDocumentController extends Controller
             $document->document_type = $validated['document_type'];
             $document->document_name = $validated['document_name'];
             $document->document_number = $validated['document_number'] ?? null;
-            $document->issue_date = $validated['issue_date'] ?? null;
-            $document->expiry_date = $validated['expiry_date'] ?? null;
+            $document->issue_date = $issueDate;
+            $document->expiry_date = $expiryDate;
             $document->notes = $validated['notes'] ?? null;
 
             // Handle file upload

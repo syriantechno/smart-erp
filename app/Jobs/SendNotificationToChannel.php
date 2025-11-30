@@ -70,7 +70,21 @@ class SendNotificationToChannel implements ShouldQueue
         $type = $this->data['type'] ?? 'info';
         $createdBy = $this->data['actor_id'] ?? null;
 
-        foreach ($this->recipientIds as $userId) {
+        // Ensure unique recipient IDs
+        $uniqueRecipients = array_values(array_unique($this->recipientIds));
+
+        foreach ($uniqueRecipients as $userId) {
+            // Check if notification already exists (prevent duplicates)
+            $exists = Notification::where('user_id', $userId)
+                ->where('title', $this->title)
+                ->where('message', $this->message)
+                ->where('created_at', '>=', now()->subSeconds(5))
+                ->exists();
+
+            if ($exists) {
+                continue;
+            }
+
             Notification::create([
                 'type' => $type,
                 'title' => $this->title,
