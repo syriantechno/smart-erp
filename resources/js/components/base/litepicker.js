@@ -6,9 +6,9 @@
         const currentYear = dayjs().year();
         let options = {
             autoApply: false,
-            singleMode: false,
-            numberOfColumns: 2,
-            numberOfMonths: 2,
+            singleMode: true,
+            numberOfColumns: 1,
+            numberOfMonths: 1,
             showWeekNumbers: true,
             format: "D MMM, YYYY",
             dropdowns: {
@@ -19,10 +19,10 @@
             },
         };
 
-        if ($(this).data("single-mode")) {
-            options.singleMode = true;
-            options.numberOfColumns = 1;
-            options.numberOfMonths = 1;
+        if ($(this).data("range")) {
+            options.singleMode = false;
+            options.numberOfColumns = 2;
+            options.numberOfMonths = 2;
         }
 
         if ($(this).data("format")) {

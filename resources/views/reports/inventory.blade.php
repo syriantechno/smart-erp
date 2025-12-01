@@ -77,7 +77,7 @@
                 </div>
                 <div>
                     <div class="text-slate-500 text-sm">قيمة المخزون</div>
-                    <div class="text-2xl font-bold text-emerald-600">{{ number_format($inventoryValue, 2) }}</div>
+                    <div class="text-2xl font-bold text-emerald-600">{{ function_exists('format_currency') ? format_currency($inventoryValue) : number_format($inventoryValue, 2) }}</div>
                 </div>
             </div>
         </div>
@@ -108,7 +108,7 @@
                     <div class="text-sm text-slate-500 mt-1">إجمالي الأوامر</div>
                 </div>
                 <div class="p-4 bg-emerald-50 rounded-lg text-center">
-                    <div class="text-3xl font-bold text-emerald-600">{{ number_format($purchaseOrdersStats['total_value'], 2) }}</div>
+                    <div class="text-3xl font-bold text-emerald-600">{{ function_exists('format_currency') ? format_currency($purchaseOrdersStats['total_value']) : number_format($purchaseOrdersStats['total_value'], 2) }}</div>
                     <div class="text-sm text-slate-500 mt-1">القيمة الإجمالية</div>
                 </div>
                 <div class="p-4 bg-amber-50 rounded-lg text-center">
@@ -196,7 +196,7 @@
                         <td class="px-4 py-3 font-medium">{{ $material->name }}</td>
                         <td class="px-4 py-3">{{ $material->category->name ?? 'N/A' }}</td>
                         <td class="px-4 py-3 text-center font-semibold">{{ number_format($material->quantity) }}</td>
-                        <td class="px-4 py-3 text-emerald-600 font-semibold">{{ number_format($material->quantity * $material->unit_price, 2) }}</td>
+                        <td class="px-4 py-3 text-emerald-600 font-semibold">{{ function_exists('format_currency') ? format_currency($material->quantity * $material->unit_price) : number_format($material->quantity * $material->unit_price, 2) }}</td>
                     </tr>
                     @endforeach
                 </tbody>

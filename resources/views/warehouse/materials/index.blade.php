@@ -270,7 +270,7 @@
                     { data: 'name', name: 'name' },
                     { data: 'category_name', name: 'category_name' },
                     { data: 'unit_name', name: 'unit_name' },
-                    { data: 'price', name: 'price', render: function(data) { return '{{ config("app.currency", "$") }}' + parseFloat(data).toFixed(2); } },
+                    { data: 'price', name: 'price', render: function(data) { return '{{ setting('currency.symbol', '$') }}' + parseFloat(data).toFixed(2); } },
                     { 
                         data: 'is_active', 
                         name: 'is_active',

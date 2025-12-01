@@ -369,6 +369,112 @@ class ReportController extends Controller
     }
 
     /**
+     * Customers Reports
+     */
+    public function customers(Request $request)
+    {
+        $startDate = $request->get('start_date', Carbon::now()->startOfMonth()->format('Y-m-d'));
+        $endDate = $request->get('end_date', Carbon::now()->endOfMonth()->format('Y-m-d'));
+
+        // Basic customer stats
+        $totalCustomers = Customer::count();
+        $activeCustomers = Customer::where('status', 'active')->count();
+        $inactiveCustomers = Customer::where('status', 'inactive')->count();
+        $suspendedCustomers = Customer::where('status', 'suspended')->count();
+
+        // New customers in selected period
+        $newCustomers = Customer::whereBetween('created_at', [$startDate, $endDate])
+            ->orderBy('created_at', 'desc')
+            ->take(25)
+            ->get();
+
+        // Customers revenue in selected period
+        $revenueBaseQuery = Invoice::select(
+                'customer_id',
+                DB::raw('COUNT(*) as invoices_count'),
+                DB::raw('SUM(total) as total_revenue')
+            )
+            ->whereBetween('invoice_date', [$startDate, $endDate])
+            ->groupBy('customer_id')
+            ->with('customer');
+
+        $topCustomers = (clone $revenueBaseQuery)
+            ->orderByDesc('total_revenue')
+            ->take(10)
+            ->get();
+
+        $revenueByCustomer = (clone $revenueBaseQuery)
+            ->orderByDesc('total_revenue')
+            ->get();
+
+        $totalRevenue = $revenueByCustomer->sum('total_revenue');
+
+        // Status distribution
+        $statusStats = Customer::select('status', DB::raw('COUNT(*) as count'))
+            ->groupBy('status')
+            ->get();
+
+        // Type distribution
+        $typeStats = Customer::select('customer_type', DB::raw('COUNT(*) as count'))
+            ->groupBy('customer_type')
+            ->get();
+
+        return view('reports.customers', compact(
+            'startDate', 'endDate',
+            'totalCustomers', 'activeCustomers', 'inactiveCustomers', 'suspendedCustomers',
+            'newCustomers', 'topCustomers', 'revenueByCustomer', 'totalRevenue',
+            'statusStats', 'typeStats'
+        ));
+    }
+
+    /**
+     * Vendors Reports
+     */
+    public function vendors(Request $request)
+    {
+        $startDate = $request->get('start_date', Carbon::now()->startOfMonth()->format('Y-m-d'));
+        $endDate = $request->get('end_date', Carbon::now()->endOfMonth()->format('Y-m-d'));
+
+        // Basic vendor stats
+        $totalVendors = Vendor::count();
+        $activeVendors = Vendor::where('is_active', true)->count();
+        $inactiveVendors = $totalVendors - $activeVendors;
+
+        // New vendors in selected period
+        $newVendors = Vendor::whereBetween('created_at', [$startDate, $endDate])
+            ->orderBy('created_at', 'desc')
+            ->take(25)
+            ->get();
+
+        // Purchases from vendors in selected period (Purchase Orders)
+        $purchasesBaseQuery = PurchaseOrder::select(
+                'vendor_id',
+                DB::raw('COUNT(*) as orders_count'),
+                DB::raw('SUM(total_amount) as total_purchased')
+            )
+            ->whereBetween('order_date', [$startDate, $endDate])
+            ->groupBy('vendor_id')
+            ->with('vendor');
+
+        $topVendors = (clone $purchasesBaseQuery)
+            ->orderByDesc('total_purchased')
+            ->take(10)
+            ->get();
+
+        $purchasesByVendor = (clone $purchasesBaseQuery)
+            ->orderByDesc('total_purchased')
+            ->get();
+
+        $totalPurchases = $purchasesByVendor->sum('total_purchased');
+
+        return view('reports.vendors', compact(
+            'startDate', 'endDate',
+            'totalVendors', 'activeVendors', 'inactiveVendors',
+            'newVendors', 'topVendors', 'purchasesByVendor', 'totalPurchases'
+        ));
+    }
+
+    /**
      * Project Reports
      */
     public function projects(Request $request)

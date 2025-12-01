@@ -1083,6 +1083,3 @@
         }
     }
     </script>
-
-    @include('accounting.invoices.partials.create-modal')
-    @include('accounting.invoices.partials.edit-modal')

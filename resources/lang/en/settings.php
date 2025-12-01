@@ -52,4 +52,15 @@ return [
     'document_expiry' => 'Document Expiry',
     'expiry_reminder_days' => 'Reminder Days Before Expiry',
     'expiry_reminder_days_desc' => 'Number of days before document expiry to send a reminder',
+
+    // Tax Settings
+    'tax_created_success' => 'Tax created successfully',
+    'tax_updated_success' => 'Tax updated successfully',
+    'tax_deleted_success' => 'Tax deleted successfully',
+    'tax_create_failed' => 'Failed to create tax',
+    'tax_update_failed' => 'Failed to update tax',
+    'tax_delete_failed' => 'Failed to delete tax',
+    'tax_save_error' => 'An error occurred while saving the tax',
+    'tax_update_error' => 'An error occurred while updating the tax',
+    'tax_delete_error' => 'An error occurred while deleting the tax',
 ];

@@ -51,7 +51,7 @@
                 </div>
                 <div>
                     <div class="text-slate-500 text-sm">إجمالي المبيعات</div>
-                    <div class="text-2xl font-bold text-emerald-600">{{ number_format($totalSales, 2) }}</div>
+                    <div class="text-2xl font-bold text-emerald-600">{{ function_exists('format_currency') ? format_currency($totalSales) : number_format($totalSales, 2) }}</div>
                 </div>
             </div>
         </div>
@@ -138,7 +138,7 @@
                         <td class="px-4 py-3 text-slate-500">{{ $index + 1 }}</td>
                         <td class="px-4 py-3 font-medium">{{ $customer->customer->name ?? 'N/A' }}</td>
                         <td class="px-4 py-3 text-center">{{ $customer->orders_count }}</td>
-                        <td class="px-4 py-3 text-emerald-600 font-semibold">{{ number_format($customer->total_sales, 2) }}</td>
+                        <td class="px-4 py-3 text-emerald-600 font-semibold">{{ function_exists('format_currency') ? format_currency($customer->total_sales) : number_format($customer->total_sales, 2) }}</td>
                         <td class="px-4 py-3 text-center">
                             <div class="flex items-center gap-2">
                                 <div class="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
@@ -176,7 +176,7 @@
                         <td class="px-4 py-3 font-medium">{{ $sale->invoice_number ?? 'INV-' . $sale->id }}</td>
                         <td class="px-4 py-3">{{ $sale->customer->name ?? 'N/A' }}</td>
                         <td class="px-4 py-3 text-center">{{ $sale->invoice_date?->format('Y-m-d') }}</td>
-                        <td class="px-4 py-3 text-emerald-600 font-semibold">{{ number_format($sale->total, 2) }}</td>
+                        <td class="px-4 py-3 text-emerald-600 font-semibold">{{ function_exists('format_currency') ? format_currency($sale->total) : number_format($sale->total, 2) }}</td>
                         <td class="px-4 py-3 text-center">
                             @if($sale->status === 'paid')
                             <span class="px-2 py-1 bg-emerald-100 text-emerald-600 rounded text-xs font-semibold">مدفوعة</span>

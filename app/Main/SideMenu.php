@@ -225,6 +225,11 @@ class SideMenu
                         'route_name' => 'supplier.vendors.index',
                         'title' => __('menu.vendors'),
                     ],
+                    'supplier-vendors-reports' => [
+                        'icon' => 'bar-chart-3',
+                        'route_name' => 'reports.vendors',
+                        'title' => __('menu.vendor_reports'),
+                    ],
                 ],
             ],
             'customers' => [
@@ -235,6 +240,11 @@ class SideMenu
                         'icon' => 'user-plus',
                         'route_name' => 'customers.index',
                         'title' => __('menu.all_customers'),
+                    ],
+                    'customers-reports' => [
+                        'icon' => 'bar-chart-3',
+                        'route_name' => 'reports.customers',
+                        'title' => __('menu.customer_reports'),
                     ],
                 ],
             ],

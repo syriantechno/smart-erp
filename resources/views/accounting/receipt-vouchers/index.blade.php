@@ -73,7 +73,7 @@
                         <x-base.lucide icon="wallet" class="w-4 h-4 text-emerald-600" />
                     </div>
                     <div class="text-4xl md:text-5xl font-semibold tracking-tight text-emerald-600" id="stat-amount">
-                        {{ number_format($vouchers->sum('total_amount'), 2) }}
+                        {{ function_exists('format_currency') ? format_currency($vouchers->sum('total_amount')) : number_format($vouchers->sum('total_amount'), 2) }}
                     </div>
                 </div>
                 <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">المبلغ</div>
@@ -201,7 +201,7 @@
                                     {{ $v->account?->name ?? '-' }}
                                 </td>
                                 <td data-tw-merge class="px-5 py-3 border-b dark:border-darkmode-300 text-right font-semibold text-emerald-600">
-                                    {{ number_format($v->total_amount, 2) }}
+                                    {{ function_exists('format_currency') ? format_currency($v->total_amount) : number_format($v->total_amount, 2) }}
                                 </td>
                                 <td data-tw-merge class="px-5 py-3 border-b dark:border-darkmode-300 text-center">
                                     @if($v->status === 'posted')

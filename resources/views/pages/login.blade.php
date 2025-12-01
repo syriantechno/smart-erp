@@ -11,12 +11,11 @@
             }
 
             .auth-form-side {
-                background: linear-gradient(180deg, #fffdf7 0%, #fef9e7 50%, #fdf6e3 100%);
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
-                align-items: flex-end;
-                padding: 3rem 6rem 3rem 4rem;
+                align-items: center;
+                padding: 3rem 4rem;
             }
 
             .auth-form-wrapper {
@@ -70,13 +69,13 @@
 
             .auth-input {
                 width: 100%;
-                padding: 0.875rem 1rem;
-                border-radius: 50px;
-                border: none;
-                background: rgba(255, 255, 255, 0.8);
+                padding: 0.875rem 1rem !important;
+                border-radius: 12px !important;
+                border: 1px solid #e2e8f0 !important;
+                background: #fff !important;
                 font-size: 0.95rem;
                 color: #0f172a;
-                transition: box-shadow 0.2s ease;
+                transition: box-shadow 0.2s ease, border-color 0.2s ease;
             }
 
             .auth-input::placeholder {
@@ -186,17 +185,17 @@
             /* Hero Side */
             .auth-hero-side {
                 position: relative;
-                background: url('{{ Vite::asset('resources/images/fakers/preview-2.jpg') }}');
+                background: url('{{ Vite::asset('resources/images/fakers/login.jpg') }}');
                 background-size: cover;
                 background-position: center;
                 overflow: hidden;
+                margin: 1.5rem;
+                border-radius: 2rem;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             }
 
             .auth-hero-side::before {
-                content: '';
-                position: absolute;
-                inset: 0;
-                background: linear-gradient(135deg, rgba(0,0,0,0.3), rgba(0,0,0,0.1));
+                display: none;
             }
 
             .auth-close-btn {

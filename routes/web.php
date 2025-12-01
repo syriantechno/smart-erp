@@ -585,6 +585,30 @@ Route::middleware('auth')->group(function () {
         Route::get('journal-entries/stats', [App\Http\Controllers\Accounting\AccountingController::class, 'journalEntriesStats'])
             ->name('journal-entries.stats');
 
+        // Invoices
+        Route::get('invoices', [App\Http\Controllers\Accounting\InvoiceController::class, 'index'])
+            ->name('invoices.index');
+        Route::get('invoices/preview-code', [App\Http\Controllers\Accounting\InvoiceController::class, 'previewCode'])
+            ->name('invoices.preview-code');
+        Route::post('invoices', [App\Http\Controllers\Accounting\InvoiceController::class, 'store'])
+            ->name('invoices.store');
+        Route::get('invoices/datatable', [App\Http\Controllers\Accounting\InvoiceController::class, 'datatable'])
+            ->name('invoices.datatable');
+        Route::get('invoices/stats', [App\Http\Controllers\Accounting\InvoiceController::class, 'stats'])
+            ->name('invoices.stats');
+        Route::get('invoices/export', [App\Http\Controllers\Accounting\InvoiceController::class, 'export'])
+            ->name('invoices.export');
+        Route::get('invoices/export-pdf', [App\Http\Controllers\Accounting\InvoiceController::class, 'exportPdf'])
+            ->name('invoices.export-pdf');
+        Route::get('invoices/{invoice}', [App\Http\Controllers\Accounting\InvoiceController::class, 'show'])
+            ->name('invoices.show');
+        Route::put('invoices/{invoice}', [App\Http\Controllers\Accounting\InvoiceController::class, 'update'])
+            ->name('invoices.update');
+
+        // Invoices Delete
+        Route::delete('invoices/{invoice}', [App\Http\Controllers\Accounting\InvoiceController::class, 'destroy'])
+            ->name('invoices.destroy');
+
         // Cash Boxes
         Route::get('cash-boxes', [App\Http\Controllers\Accounting\CashBoxController::class, 'index'])
             ->name('cash-boxes.index');
@@ -597,17 +621,13 @@ Route::middleware('auth')->group(function () {
         Route::post('bank-accounts', [App\Http\Controllers\Accounting\BankAccountController::class, 'store'])
             ->name('bank-accounts.store');
 
-        // Invoices
-        Route::get('invoices', [App\Http\Controllers\Accounting\InvoiceController::class, 'index'])
-            ->name('invoices.index');
-        Route::post('invoices', [App\Http\Controllers\Accounting\InvoiceController::class, 'store'])
-            ->name('invoices.store');
-
         // Payment Vouchers
         Route::get('payment-vouchers', [App\Http\Controllers\Accounting\PaymentVoucherController::class, 'index'])
             ->name('payment-vouchers.index');
         Route::post('payment-vouchers', [App\Http\Controllers\Accounting\PaymentVoucherController::class, 'store'])
             ->name('payment-vouchers.store');
+        Route::get('payment-vouchers/datatable', [App\Http\Controllers\Accounting\PaymentVoucherController::class, 'datatable'])
+            ->name('payment-vouchers.datatable');
         Route::delete('payment-vouchers/{paymentVoucher}', [App\Http\Controllers\Accounting\PaymentVoucherController::class, 'destroy'])
             ->name('payment-vouchers.destroy');
 
@@ -631,6 +651,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/hr', [App\Http\Controllers\Report\ReportController::class, 'hr'])->name('hr');
         Route::get('/inventory', [App\Http\Controllers\Report\ReportController::class, 'inventory'])->name('inventory');
         Route::get('/sales', [App\Http\Controllers\Report\ReportController::class, 'sales'])->name('sales');
+        Route::get('/customers', [App\Http\Controllers\Report\ReportController::class, 'customers'])->name('customers');
+        Route::get('/vendors', [App\Http\Controllers\Report\ReportController::class, 'vendors'])->name('vendors');
         Route::get('/projects', [App\Http\Controllers\Report\ReportController::class, 'projects'])->name('projects');
         Route::get('/custom', [App\Http\Controllers\Report\ReportController::class, 'custom'])->name('custom');
         Route::post('/custom/generate', [App\Http\Controllers\Report\ReportController::class, 'generateCustom'])->name('custom.generate');
@@ -682,6 +704,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [App\Http\Controllers\CustomerController::class, 'index'])->name('index');
         Route::get('/datatable', [App\Http\Controllers\CustomerController::class, 'datatable'])->name('datatable');
         Route::get('/preview-code', [App\Http\Controllers\CustomerController::class, 'previewCode'])->name('preview-code');
+        Route::post('/export-pdf', [App\Http\Controllers\CustomerController::class, 'exportPdf'])->name('export-pdf');
+        Route::get('/export-excel', [App\Http\Controllers\CustomerController::class, 'exportExcel'])->name('export-excel');
+        Route::get('/{customer}/statement', [App\Http\Controllers\CustomerController::class, 'statement'])->name('statement');
+        Route::post('/{customer}/statement/export-pdf', [App\Http\Controllers\CustomerController::class, 'statementPdf'])->name('statement.pdf');
         Route::post('/', [App\Http\Controllers\CustomerController::class, 'store'])->name('store');
         Route::get('/{customer}', [App\Http\Controllers\CustomerController::class, 'show'])->name('show');
         Route::put('/{customer}', [App\Http\Controllers\CustomerController::class, 'update'])->name('update');

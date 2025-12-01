@@ -55,7 +55,7 @@
         'logo_url' => $company->logo ? \Illuminate\Support\Facades\Storage::url($company->logo) : null,
     ])->values();
 
-    $currencySymbol = config('app.currency_symbol', config('app.currency', '$'));
+    $currencySymbol = setting('currency.symbol', '$');
 
     $defaultCompany = $company ?? $companies->first();
     $defaultCompanyName = $defaultCompany->name ?? 'Smart ERP';

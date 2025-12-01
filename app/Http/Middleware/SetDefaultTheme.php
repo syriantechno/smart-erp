@@ -21,6 +21,11 @@ class SetDefaultTheme
             Session::put('activeTheme', 'smart-erp');
         }
         
+        // Always set the layout to 'side-menu' for all requests
+        if (!Session::has('activeLayout')) {
+            Session::put('activeLayout', 'side-menu');
+        }
+        
         return $next($request);
     }
 }

@@ -205,7 +205,7 @@
 
                         <div class="mt-5 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
                             <x-base.tippy content="Print" placement="bottom">
-                                <button type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
+                                <button type="button" id="vendors-print" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
                                     <x-base.lucide icon="printer" class="w-5 h-5 icon-hover-rise" />
                                 </button>
                             </x-base.tippy>
@@ -424,6 +424,16 @@
                     </div>
 
                     <div class="col-span-12 md:col-span-6">
+                        <x-base.form-label for="create-vendor-category">Vendor Category</x-base.form-label>
+                        <x-base.form-select id="create-vendor-category" name="category" class="w-full">
+                            <option value="">Select category</option>
+                            <option value="local">Local</option>
+                            <option value="international">International</option>
+                            <option value="strategic">Strategic</option>
+                        </x-base.form-select>
+                    </div>
+
+                    <div class="col-span-12 md:col-span-6">
                         <x-base.form-label for="create-vendor-payment-terms">Payment Terms</x-base.form-label>
                         <x-base.form-input
                             id="create-vendor-payment-terms"
@@ -513,8 +523,9 @@
                         success: function(response) {
                             if (response.success) {
                                 const modalEl = document.getElementById('create-vendor-modal');
-                                if (modalEl && modalEl.__tippy?.hide) {
-                                    modalEl.__tippy.hide();
+                                if (modalEl && window.tailwind && window.tailwind.Modal) {
+                                    const modalInstance = window.tailwind.Modal.getOrCreateInstance(modalEl);
+                                    modalInstance.hide();
                                 }
 
                                 form.reset();
@@ -708,11 +719,28 @@
 
             $('#vendors-refresh').on('click', function() {
                 vendorsTable.ajax.reload();
+
+                if (typeof window.showSuccess === 'function') {
+                    window.showSuccess('Vendors list refreshed');
+                } else if (typeof window.showToast === 'function') {
+                    window.showToast('Vendors list refreshed', 'info');
+                }
             });
 
             $('#vendors-filter-length').on('change', function() {
                 vendorsTable.page.len($(this).val()).draw();
             });
+
+            $('#vendors-print').on('click', function() {
+                window.print();
+            });
+
+            if (window.erpCrud) {
+                window.erpCrud.handleDelete({
+                    urlBuilder: (id) => `/supplier/vendors/${id}`,
+                    onSuccess: () => vendorsTable.ajax.reload(null, false),
+                });
+            }
         }
 
         function viewVendor(id) {

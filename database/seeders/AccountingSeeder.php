@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Accounting\Accounting;
+use App\Models\Accounting\Tax;
 
 class AccountingSeeder extends Seeder
 {
@@ -36,6 +37,11 @@ class AccountingSeeder extends Seeder
             ['code' => '2110', 'name' => 'Accounts Payable', 'type' => 'liability', 'category' => 'current_liability', 'level' => 3, 'parent_code' => '2100'],
             ['code' => '2120', 'name' => 'Accrued Expenses', 'type' => 'liability', 'category' => 'current_liability', 'level' => 3, 'parent_code' => '2100'],
             ['code' => '2130', 'name' => 'Short-term Loans', 'type' => 'liability', 'category' => 'current_liability', 'level' => 3, 'parent_code' => '2100'],
+            ['code' => '2140', 'name' => 'Tax Payable', 'type' => 'liability', 'category' => 'current_liability', 'level' => 3, 'parent_code' => '2100'],
+            ['code' => '2141', 'name' => 'Sales Tax Payable', 'type' => 'liability', 'category' => 'current_liability', 'level' => 4, 'parent_code' => '2140'],
+            ['code' => '2142', 'name' => 'VAT Payable', 'type' => 'liability', 'category' => 'current_liability', 'level' => 4, 'parent_code' => '2140'],
+            ['code' => '2143', 'name' => 'Income Tax Payable', 'type' => 'liability', 'category' => 'current_liability', 'level' => 4, 'parent_code' => '2140'],
+            ['code' => '2144', 'name' => 'Withholding Tax Payable', 'type' => 'liability', 'category' => 'current_liability', 'level' => 4, 'parent_code' => '2140'],
 
             ['code' => '2200', 'name' => 'Long-term Liabilities', 'type' => 'liability', 'category' => 'long_term_liability', 'level' => 2, 'parent_code' => '2000'],
             ['code' => '2210', 'name' => 'Long-term Loans', 'type' => 'liability', 'category' => 'long_term_liability', 'level' => 3, 'parent_code' => '2200'],
@@ -50,12 +56,23 @@ class AccountingSeeder extends Seeder
             ['code' => '4000', 'name' => 'Income', 'type' => 'income', 'category' => 'operating_income', 'level' => 1, 'parent_code' => null],
             ['code' => '4100', 'name' => 'Operating Income', 'type' => 'income', 'category' => 'operating_income', 'level' => 2, 'parent_code' => '4000'],
             ['code' => '4110', 'name' => 'Sales Revenue', 'type' => 'income', 'category' => 'operating_income', 'level' => 3, 'parent_code' => '4100'],
+            ['code' => '4111', 'name' => 'Product Sales', 'type' => 'income', 'category' => 'operating_income', 'level' => 4, 'parent_code' => '4110'],
+            ['code' => '4112', 'name' => 'Merchandise Sales', 'type' => 'income', 'category' => 'operating_income', 'level' => 4, 'parent_code' => '4110'],
+            ['code' => '4113', 'name' => 'Sales Returns and Allowances', 'type' => 'income', 'category' => 'operating_income', 'level' => 4, 'parent_code' => '4110'],
+            ['code' => '4114', 'name' => 'Sales Discounts', 'type' => 'income', 'category' => 'operating_income', 'level' => 4, 'parent_code' => '4110'],
             ['code' => '4120', 'name' => 'Service Revenue', 'type' => 'income', 'category' => 'operating_income', 'level' => 3, 'parent_code' => '4100'],
             ['code' => '4200', 'name' => 'Other Income', 'type' => 'income', 'category' => 'other_income', 'level' => 2, 'parent_code' => '4000'],
 
             // Expenses
             ['code' => '5000', 'name' => 'Expenses', 'type' => 'expense', 'category' => 'operating_expense', 'level' => 1, 'parent_code' => null],
             ['code' => '5100', 'name' => 'Cost of Goods Sold', 'type' => 'expense', 'category' => 'cost_of_goods_sold', 'level' => 2, 'parent_code' => '5000'],
+            ['code' => '5110', 'name' => 'Purchases', 'type' => 'expense', 'category' => 'cost_of_goods_sold', 'level' => 3, 'parent_code' => '5100'],
+            ['code' => '5111', 'name' => 'Raw Materials Purchases', 'type' => 'expense', 'category' => 'cost_of_goods_sold', 'level' => 4, 'parent_code' => '5110'],
+            ['code' => '5112', 'name' => 'Merchandise Purchases', 'type' => 'expense', 'category' => 'cost_of_goods_sold', 'level' => 4, 'parent_code' => '5110'],
+            ['code' => '5113', 'name' => 'Purchase Returns and Allowances', 'type' => 'expense', 'category' => 'cost_of_goods_sold', 'level' => 4, 'parent_code' => '5110'],
+            ['code' => '5114', 'name' => 'Purchase Discounts', 'type' => 'expense', 'category' => 'cost_of_goods_sold', 'level' => 4, 'parent_code' => '5110'],
+            ['code' => '5120', 'name' => 'Direct Labor', 'type' => 'expense', 'category' => 'cost_of_goods_sold', 'level' => 3, 'parent_code' => '5100'],
+            ['code' => '5130', 'name' => 'Manufacturing Overhead', 'type' => 'expense', 'category' => 'cost_of_goods_sold', 'level' => 3, 'parent_code' => '5100'],
             ['code' => '5200', 'name' => 'Operating Expenses', 'type' => 'expense', 'category' => 'operating_expense', 'level' => 2, 'parent_code' => '5000'],
             ['code' => '5210', 'name' => 'Salaries and Wages', 'type' => 'expense', 'category' => 'operating_expense', 'level' => 3, 'parent_code' => '5200'],
             ['code' => '5220', 'name' => 'Rent Expense', 'type' => 'expense', 'category' => 'operating_expense', 'level' => 3, 'parent_code' => '5200'],
@@ -80,5 +97,24 @@ class AccountingSeeder extends Seeder
             $account = Accounting::create($data);
             $created[$data['code']] = $account;
         }
+
+        $vatAccount = Accounting::where('code', '2142')->first();
+
+        Tax::firstOrCreate(
+            [
+                'company_id' => null,
+                'code' => 'VAT5',
+            ],
+            [
+                'name' => 'Standard VAT 5%',
+                'rate' => 5.000,
+                'type' => 'value_added',
+                'sales_account_id' => $vatAccount ? $vatAccount->id : null,
+                'purchase_account_id' => $vatAccount ? $vatAccount->id : null,
+                'is_default' => true,
+                'is_active' => true,
+                'description' => 'Default 5% value-added tax',
+            ]
+        );
     }
 }

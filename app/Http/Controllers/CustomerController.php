@@ -2,26 +2,32 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\CustomersExport;
 use App\Models\Customer;
 use App\Models\User;
+use App\Models\Accounting\JournalEntryLine;
 use App\Services\Accounting\LinkedAccountManager;
 use App\Services\DocumentCodeGenerator;
 use App\Services\Notifications\NotificationDispatcher;
+use App\Services\PdfExporter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class CustomerController extends Controller
 {
     protected $codeGenerator;
     protected $linkedAccountManager;
+    protected PdfExporter $pdfExporter;
 
-    public function __construct(DocumentCodeGenerator $codeGenerator, LinkedAccountManager $linkedAccountManager)
+    public function __construct(DocumentCodeGenerator $codeGenerator, LinkedAccountManager $linkedAccountManager, PdfExporter $pdfExporter)
     {
         $this->codeGenerator = $codeGenerator;
         $this->linkedAccountManager = $linkedAccountManager;
+        $this->pdfExporter = $pdfExporter;
     }
 
     public function index(): \Illuminate\View\View
@@ -181,5 +187,188 @@ class CustomerController extends Controller
     {
         $customer->delete();
         return response()->json(['success' => true, 'message' => 'Customer deleted successfully']);
+    }
+
+    public function statement(Request $request, Customer $customer)
+    {
+        $customer->load('account');
+
+        $data = $this->buildCustomerStatementData($customer, $request);
+
+        return view('customers.statement', $data);
+    }
+
+    public function statementPdf(Request $request, Customer $customer)
+    {
+        $customer->load('account');
+
+        $data = $this->buildCustomerStatementData($customer, $request);
+
+        return $this->pdfExporter->stream(
+            'customers.statement_pdf',
+            $data,
+            'customer-statement-' . ($customer->code ?? $customer->id) . '.pdf'
+        );
+    }
+
+    protected function buildCustomerStatementData(Customer $customer, Request $request): array
+    {
+        $customer->loadMissing('account');
+        $account = $customer->account;
+
+        $dateFrom = $request->input('date_from');
+        $dateTo = $request->input('date_to');
+
+        if (!$account) {
+            return [
+                'customer' => $customer,
+                'account' => null,
+                'dateFrom' => $dateFrom,
+                'dateTo' => $dateTo,
+                'openingBalance' => 0,
+                'totalDebit' => 0,
+                'totalCredit' => 0,
+                'closingBalance' => 0,
+                'closingBalanceAbs' => 0,
+                'closingBalanceType' => null,
+                'transactions' => collect(),
+            ];
+        }
+
+        $baseQuery = JournalEntryLine::with('journalEntry')
+            ->where('account_id', $account->id)
+            ->whereHas('journalEntry', function ($q) {
+                $q->where('status', 'posted');
+            });
+
+        $openingBalance = 0;
+        if ($dateFrom) {
+            $openingBalance = (clone $baseQuery)
+                ->whereHas('journalEntry', function ($q) use ($dateFrom) {
+                    $q->where('entry_date', '<', $dateFrom);
+                })
+                ->selectRaw('COALESCE(SUM(debit - credit), 0) as balance')
+                ->value('balance');
+        }
+
+        $transactionsQuery = clone $baseQuery;
+
+        if ($dateFrom) {
+            $transactionsQuery->whereHas('journalEntry', function ($q) use ($dateFrom) {
+                $q->where('entry_date', '>=', $dateFrom);
+            });
+        }
+
+        if ($dateTo) {
+            $transactionsQuery->whereHas('journalEntry', function ($q) use ($dateTo) {
+                $q->where('entry_date', '<=', $dateTo);
+            });
+        }
+
+        $lines = $transactionsQuery
+            ->get()
+            ->sortBy(function (JournalEntryLine $line) {
+                $date = optional(optional($line->journalEntry)->entry_date)->format('Y-m-d') ?? '0000-00-00';
+                return $date . '-' . str_pad((string) $line->id, 6, '0', STR_PAD_LEFT);
+            })
+            ->values();
+
+        $totalDebit = $lines->sum('debit');
+        $totalCredit = $lines->sum('credit');
+
+        $runningBalance = $openingBalance;
+        $transactions = $lines->map(function (JournalEntryLine $line) use (&$runningBalance) {
+            $runningBalance += ((float) $line->debit - (float) $line->credit);
+
+            return [
+                'date' => optional(optional($line->journalEntry)->entry_date)->format('Y-m-d'),
+                'reference' => optional($line->journalEntry)->reference_number,
+                'description' => optional($line->journalEntry)->description ?: $line->memo,
+                'debit' => (float) $line->debit,
+                'credit' => (float) $line->credit,
+                'balance' => $runningBalance,
+            ];
+        });
+
+        $closingBalance = $runningBalance;
+        $closingBalanceAbs = abs($closingBalance);
+        $closingBalanceType = $closingBalance > 0 ? 'debit' : ($closingBalance < 0 ? 'credit' : null);
+
+        return [
+            'customer' => $customer,
+            'account' => $account,
+            'dateFrom' => $dateFrom,
+            'dateTo' => $dateTo,
+            'openingBalance' => $openingBalance,
+            'totalDebit' => $totalDebit,
+            'totalCredit' => $totalCredit,
+            'closingBalance' => $closingBalance,
+            'closingBalanceAbs' => $closingBalanceAbs,
+            'closingBalanceType' => $closingBalanceType,
+            'transactions' => $transactions,
+        ];
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $customers = Customer::query()
+            ->with('account');
+
+        // نفس منطق الفلاتر المستخدم في datatable()
+        $field = $request->input('field', 'all');
+        $type = $request->input('type', 'contains');
+        $value = $request->input('value');
+
+        if ($field !== 'all' && !empty($value)) {
+            $operator = $type === 'equals' ? '=' : 'like';
+            $searchValue = $type === 'equals' ? $value : "%{$value}%";
+
+            $customers->where($field, $operator, $searchValue);
+        }
+
+        if ($request->filled('status')) {
+            $customers->where('status', $request->input('status'));
+        }
+
+        $customers = $customers
+            ->orderBy('name')
+            ->get();
+
+        return $this->pdfExporter->stream(
+            'customers.export_pdf',
+            [
+                'customers' => $customers,
+                'exportedAt' => now(),
+            ],
+            'customers.pdf'
+        );
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $customersQuery = Customer::query()
+            ->with('account');
+
+        // نفس منطق الفلاتر المستخدم في datatable()
+        $field = $request->input('field', 'all');
+        $type = $request->input('type', 'contains');
+        $value = $request->input('value');
+
+        if ($field !== 'all' && !empty($value)) {
+            $operator = $type === 'equals' ? '=' : 'like';
+            $searchValue = $type === 'equals' ? $value : "%{$value}%";
+
+            $customersQuery->where($field, $operator, $searchValue);
+        }
+
+        if ($request->filled('status')) {
+            $customersQuery->where('status', $request->input('status'));
+        }
+
+        $customers = $customersQuery
+            ->orderBy('name')
+            ->get();
+
+        return Excel::download(new CustomersExport($customers), 'customers.xlsx');
     }
 }

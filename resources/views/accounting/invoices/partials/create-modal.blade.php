@@ -191,6 +191,15 @@
                             class="text-sm"
                         />
                     </div>
+                    <div class="col-span-12 sm:col-span-6 lg:col-span-3">
+                        <x-base.form-label for="invoice-approval-template">{{ __('invoices.fields.approval_template') ?? 'Approval Template' }}</x-base.form-label>
+                        <x-base.form-select id="invoice-approval-template" name="approval_template_id" class="text-sm">
+                            <option value="">{{ __('invoices.fields.no_approval') ?? 'No Approval Required' }}</option>
+                            @foreach($approvalTemplates ?? [] as $template)
+                                <option value="{{ $template->id }}">{{ $template->name }}</option>
+                            @endforeach
+                        </x-base.form-select>
+                    </div>
                     <div class="col-span-12 sm:col-span-6 lg:col-span-12">
                         <x-base.form-label for="invoice-notes">{{ __('invoices.fields.notes') }}</x-base.form-label>
                         <x-base.form-textarea
@@ -359,9 +368,16 @@
                 const modalEl = document.getElementById('create-invoice-modal');
                 const companySelect = document.getElementById('invoice-company');
                 const taxRateInput = document.getElementById('invoice-tax-rate');
+                const templateSelect = document.getElementById('invoice-approval-template');
                 const companyLogoEl = document.getElementById('invoice-company-logo');
                 const companyNameEl = document.getElementById('invoice-company-name');
                 const companyAddressEl = document.getElementById('invoice-company-address');
+
+                // Validate critical elements exist
+                if (!modalEl || !form || !submitBtn) {
+                    console.error('Invoice modal: Critical elements not found in DOM');
+                    return;
+                }
 
                 const showError = (message) => {
                     if (typeof window.showError === 'function') {

@@ -37,13 +37,6 @@ if (!function_exists('uncamelize')) {
     }
 }
 
-if (!function_exists('format_currency')) {
-    function format_currency($value, $currency = 'USD')
-    {
-        return number_format((float) $value, 2) . ' ' . $currency;
-    }
-}
-
 if (!function_exists('generate_document_code')) {
     function generate_document_code(string $documentType): string
     {

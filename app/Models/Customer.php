@@ -21,6 +21,7 @@ class Customer extends Model
         'address',
         'tax_id',
         'customer_type',
+        'category',
         'credit_limit',
         'payment_terms',
         'status',

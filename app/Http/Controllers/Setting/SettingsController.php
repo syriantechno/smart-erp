@@ -69,12 +69,12 @@ class SettingsController extends Controller
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => 'تم إضافة الضريبة بنجاح',
+                'message' => __('settings.tax_created_success'),
                 'tax' => $tax
             ]);
         }
 
-        return redirect()->route('settings.index')->with('success', 'Tax created successfully.');
+        return redirect()->route('settings.index')->with('success', __('settings.tax_created_success'));
     }
 
     /**
@@ -110,12 +110,12 @@ class SettingsController extends Controller
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => 'تم تحديث الضريبة بنجاح',
+                'message' => __('settings.tax_updated_success'),
                 'tax' => $tax->fresh()
             ]);
         }
 
-        return redirect()->route('settings.index')->with('success', 'تم تحديث الضريبة بنجاح');
+        return redirect()->route('settings.index')->with('success', __('settings.tax_updated_success'));
     }
 
     /**
@@ -128,12 +128,12 @@ class SettingsController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'تم حذف الضريبة بنجاح'
+                'message' => __('settings.tax_deleted_success')
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'فشل في حذف الضريبة: ' . $e->getMessage()
+                'message' => __('settings.tax_delete_failed') . ': ' . $e->getMessage()
             ], 500);
         }
     }

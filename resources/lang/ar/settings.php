@@ -52,4 +52,15 @@ return [
     'document_expiry' => 'انتهاء صلاحية المستندات',
     'expiry_reminder_days' => 'أيام التذكير قبل الانتهاء',
     'expiry_reminder_days_desc' => 'عدد الأيام قبل انتهاء صلاحية المستند لإرسال تذكير',
+
+    // Tax Settings
+    'tax_created_success' => 'تم إضافة الضريبة بنجاح',
+    'tax_updated_success' => 'تم تحديث الضريبة بنجاح',
+    'tax_deleted_success' => 'تم حذف الضريبة بنجاح',
+    'tax_create_failed' => 'فشل في إضافة الضريبة',
+    'tax_update_failed' => 'فشل في تحديث الضريبة',
+    'tax_delete_failed' => 'فشل في حذف الضريبة',
+    'tax_save_error' => 'حدث خطأ أثناء حفظ الضريبة',
+    'tax_update_error' => 'حدث خطأ أثناء تحديث الضريبة',
+    'tax_delete_error' => 'حدث خطأ أثناء حذف الضريبة',
 ];

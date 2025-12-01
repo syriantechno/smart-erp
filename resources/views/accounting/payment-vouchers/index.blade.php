@@ -1,7 +1,7 @@
 @extends('../themes/' . $activeTheme . '/' . $activeLayout)
 
 @section('subhead')
-    <title>سندات الصرف - {{ config('app.name') }}</title>
+    <title>{{ __('payment_vouchers.page_title') }} - {{ config('app.name') }}</title>
 @endsection
 
 @include('components.datatable.styles')
@@ -26,7 +26,7 @@
     <div class="flex items-baseline justify-between gap-6">
         <h2 class="flex items-center gap-2 text-2xl md:text-3xl font-semibold text-royalDark tracking-wide">
             <x-base.lucide icon="credit-card" class="w-7 h-7" />
-            <span>سندات الصرف</span>
+            <span>{{ __('payment_vouchers.page_title') }}</span>
         </h2>
 
         <div class="flex flex-row items-end gap-8 md:gap-12 justify-end">
@@ -40,7 +40,7 @@
                         {{ $vouchers->where('status', 'draft')->count() }}
                     </div>
                 </div>
-                <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">مسودة</div>
+                <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">{{ __('payment_vouchers.stats.draft') }}</div>
             </div>
             {{-- Approved --}}
             <div class="flex flex-col items-center gap-1">
@@ -52,7 +52,7 @@
                         {{ $vouchers->where('status', 'approved')->count() }}
                     </div>
                 </div>
-                <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">معتمد</div>
+                <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">{{ __('payment_vouchers.stats.approved') }}</div>
             </div>
             {{-- Total --}}
             <div class="flex flex-col items-center gap-1">
@@ -64,7 +64,7 @@
                         {{ $vouchers->count() }}
                     </div>
                 </div>
-                <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">الإجمالي</div>
+                <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">{{ __('payment_vouchers.stats.total') }}</div>
             </div>
             {{-- Amount --}}
             <div class="flex flex-col items-center gap-1">
@@ -73,10 +73,10 @@
                         <x-base.lucide icon="wallet" class="w-4 h-4 text-rose-600" />
                     </div>
                     <div class="text-4xl md:text-5xl font-semibold tracking-tight text-rose-600" id="stat-amount">
-                        {{ number_format($vouchers->sum('total_amount'), 2) }}
+                        {{ function_exists('format_currency') ? format_currency($vouchers->sum('total_amount')) : number_format($vouchers->sum('total_amount'), 2) }}
                     </div>
                 </div>
-                <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">المبلغ</div>
+                <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">{{ __('payment_vouchers.stats.amount') }}</div>
             </div>
         </div>
     </div>
@@ -86,75 +86,84 @@
     <div class="intro-y col-span-12">
         <x-base.preview-component class="intro-y box bg-white/80 border border-slate-200/70 shadow-[0_18px_45px_rgba(15,23,42,0.10)]">
             <div class="p-5">
-                {{-- Filters & Actions Toolbar --}}
-                <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
-                    <form id="vouchers-filter-form" class="w-full sm:mr-auto xl:flex">
-                        <div class="items-center sm:mr-4 sm:flex">
-                            <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial text-slate-500">الحقل</label>
-                            <x-base.form-select id="filter-field" class="mt-2 w-full sm:mt-0 sm:w-auto 2xl:w-full">
-                                <option value="all">الكل</option>
-                                <option value="number">رقم السند</option>
-                                <option value="company">الشركة</option>
-                                <option value="account">الحساب</option>
-                            </x-base.form-select>
+                {{-- Filters & Actions Toolbar (match Positions layout) --}}
+                <div class="flex flex-wrap items-center gap-2 mb-4 md:flex-nowrap">
+                    <form id="vouchers-filter-form" class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                        {{-- Search / Value Input --}}
+                        <div class="relative min-w-[180px]">
+                            <x-base.lucide icon="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <x-base.form-input
+                                id="filter-value"
+                                type="text"
+                                placeholder="بحث..."
+                                class="pl-9 w-full text-sm py-1.5"
+                            />
                         </div>
-                        <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
-                            <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial text-slate-500">النوع</label>
-                            <x-base.form-select id="filter-type" class="mt-2 w-full sm:mt-0 sm:w-auto">
-                                <option value="contains">يحتوي</option>
-                                <option value="equals">يساوي</option>
-                            </x-base.form-select>
-                        </div>
-                        <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
-                            <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial text-slate-500">القيمة</label>
-                            <x-base.form-input id="filter-value" type="text" placeholder="بحث..." class="mt-2 w-full sm:mt-0 sm:w-48 2xl:w-full" />
-                        </div>
-                        <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
-                            <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial text-slate-500">الحالة</label>
-                            <x-base.form-select id="filter-status" class="mt-2 w-full sm:mt-0 sm:w-auto">
-                                <option value="">الكل</option>
-                                <option value="draft">مسودة</option>
-                                <option value="posted">مرحّل</option>
-                                <option value="approved">معتمد</option>
-                            </x-base.form-select>
-                        </div>
-                        <div class="mt-4 flex flex-wrap gap-2 sm:items-center xl:mt-0">
+
+                        {{-- Field Filter --}}
+                        <x-base.form-select id="filter-field" class="w-auto text-sm py-1.5">
+                            <option value="all">{{ __('payment_vouchers.filters.all') }}</option>
+                            <option value="number">{{ __('payment_vouchers.filters.number') }}</option>
+                            <option value="company">{{ __('payment_vouchers.filters.company') }}</option>
+                            <option value="account">{{ __('payment_vouchers.filters.account') }}</option>
+                        </x-base.form-select>
+
+                        {{-- Type Filter --}}
+                        <x-base.form-select id="filter-type" class="w-auto text-sm py-1.5">
+                            <option value="contains">{{ __('payment_vouchers.filters.contains') }}</option>
+                            <option value="equals">{{ __('payment_vouchers.filters.equals') }}</option>
+                        </x-base.form-select>
+
+                        {{-- Status Filter --}}
+                        <x-base.form-select id="filter-status" class="w-auto text-sm py-1.5">
+                            <option value="">{{ __('payment_vouchers.filters.status_all') }}</option>
+                            <option value="draft">{{ __('payment_vouchers.statuses.draft') }}</option>
+                            <option value="posted">{{ __('payment_vouchers.statuses.posted') }}</option>
+                            <option value="approved">{{ __('payment_vouchers.statuses.approved') }}</option>
+                        </x-base.form-select>
+
+                        {{-- Filter Buttons --}}
+                        <div class="flex flex-wrap items-center gap-2">
                             <x-base.tippy content="تطبيق الفلتر" placement="top">
-                                <button id="filter-go" type="button" class="btn-royal btn-royal--dark btn-royal--sm w-full sm:w-24 group">
+                                <button id="filter-go" type="button" class="btn-royal btn-royal--dark btn-royal--sm px-2 group">
                                     <x-base.lucide icon="search" class="w-4 h-4 icon-hover-rise" />
-                                    بحث
+                                    {{ __('payment_vouchers.buttons.filter') }}
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="إعادة تعيين" placement="top">
-                                <button id="filter-reset" type="button" class="btn-royal btn-royal--outline btn-royal--sm w-full sm:w-24 group">
+                                <button id="filter-reset" type="button" class="btn-royal btn-royal--outline btn-royal--sm px-2 group">
                                     <x-base.lucide icon="rotate-ccw" class="w-4 h-4 icon-hover-rise" />
-                                    إعادة
+                                    {{ __('payment_vouchers.buttons.reset') }}
                                 </button>
                             </x-base.tippy>
                         </div>
                     </form>
 
-                    <div class="mt-5 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
-                        <x-base.tippy content="طباعة" placement="bottom">
-                            <button type="button" class="btn-royal btn-royal--outline btn-royal--sm group text-royalDark">
+                    {{-- Spacer like Positions page --}}
+                    <div class="flex-1 hidden md:block"></div>
+
+                    {{-- Action Buttons (match Positions sizing) --}}
+                    <div class="flex flex-wrap items-center gap-1 md:gap-1.5">
+                        <x-base.tippy content="{{ __('payment_vouchers.buttons.print') }}" placement="bottom">
+                            <button type="button" class="btn-royal btn-royal--outline btn-royal--sm px-2 group">
                                 <x-base.lucide icon="printer" class="w-5 h-5 icon-hover-rise" />
                             </button>
                         </x-base.tippy>
-                        <x-base.tippy content="تصدير Excel" placement="bottom">
-                            <button id="export-excel" type="button" class="btn-royal btn-royal--outline btn-royal--sm group text-royalDark">
+                        <x-base.tippy content="{{ __('payment_vouchers.buttons.export_excel') }}" placement="bottom">
+                            <button id="export-excel" type="button" class="btn-royal btn-royal--outline btn-royal--sm px-2 group">
                                 <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
                             </button>
                         </x-base.tippy>
-                        <x-base.tippy content="تحديث" placement="bottom">
-                            <button id="refresh-table" type="button" class="btn-royal btn-royal--outline btn-royal--sm group text-royalDark" onclick="location.reload()">
+                        <x-base.tippy content="{{ __('payment_vouchers.buttons.refresh') }}" placement="bottom">
+                            <button id="refresh-table" type="button" class="btn-royal btn-royal--outline btn-royal--sm px-2 group">
                                 <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
                             </button>
                         </x-base.tippy>
                         {{-- Add Button --}}
-                        <x-base.tippy content="إضافة سند صرف جديد" placement="bottom">
-                            <button type="button" class="btn-royal btn-royal--gold btn-royal--sm sm:btn-royal--lg group" data-tw-toggle="modal" data-tw-target="#create-payment-voucher-modal">
+                        <x-base.tippy content="{{ __('payment_vouchers.buttons.create') }}" placement="bottom">
+                            <button type="button" class="btn-royal btn-royal--gold btn-royal--sm px-2 group" data-tw-toggle="modal" data-tw-target="#create-payment-voucher-modal">
                                 <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
-                                <span class="hidden sm:inline">إضافة</span>
+                                <span class="hidden sm:inline">{{ __('payment_vouchers.buttons.add') }}</span>
                             </button>
                         </x-base.tippy>
                     </div>
@@ -164,86 +173,17 @@
                     <table id="payment-vouchers-table" data-tw-merge data-erp-table class="w-full min-w-full table-auto text-left text-sm">
                         <thead>
                             <tr>
-                                <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">رقم السند</th>
-                                <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">التاريخ</th>
-                                <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">الشركة</th>
-                                <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">الطريقة</th>
-                                <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">الحساب</th>
-                                <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-right">المبلغ</th>
-                                <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">الحالة</th>
-                                <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">الإجراءات</th>
+                                <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">{{ __('payment_vouchers.table.number') }}</th>
+                                <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">{{ __('payment_vouchers.table.date') }}</th>
+                                <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">{{ __('payment_vouchers.table.company') }}</th>
+                                <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">{{ __('payment_vouchers.table.method') }}</th>
+                                <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">{{ __('payment_vouchers.table.account') }}</th>
+                                <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-right">{{ __('payment_vouchers.table.amount') }}</th>
+                                <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">{{ __('payment_vouchers.table.status') }}</th>
+                                <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">{{ __('payment_vouchers.table.actions') }}</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @forelse($vouchers as $v)
-                            <tr class="intro-x">
-                                <td data-tw-merge class="px-5 py-3 border-b dark:border-darkmode-300 font-medium">
-                                    PV-{{ str_pad($v->id, 5, '0', STR_PAD_LEFT) }}
-                                </td>
-                                <td data-tw-merge class="px-5 py-3 border-b dark:border-darkmode-300">
-                                    {{ $v->voucher_date?->format('Y-m-d') }}
-                                </td>
-                                <td data-tw-merge class="px-5 py-3 border-b dark:border-darkmode-300">
-                                    {{ $v->company->name ?? '-' }}
-                                </td>
-                                <td data-tw-merge class="px-5 py-3 border-b dark:border-darkmode-300">
-                                    <span class="inline-flex items-center gap-1 text-sm">
-                                        @if($v->method === 'cash')
-                                            <x-base.lucide icon="wallet" class="w-4 h-4 text-emerald-600" />
-                                            <span>نقدي</span>
-                                        @else
-                                            <x-base.lucide icon="building-2" class="w-4 h-4 text-blue-600" />
-                                            <span>بنكي</span>
-                                        @endif
-                                    </span>
-                                </td>
-                                <td data-tw-merge class="px-5 py-3 border-b dark:border-darkmode-300">
-                                    {{ $v->account?->name ?? '-' }}
-                                </td>
-                                <td data-tw-merge class="px-5 py-3 border-b dark:border-darkmode-300 text-right font-semibold text-rose-600">
-                                    {{ number_format($v->total_amount, 2) }}
-                                </td>
-                                <td data-tw-merge class="px-5 py-3 border-b dark:border-darkmode-300 text-center">
-                                    @if($v->status === 'posted')
-                                        <span class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-100 text-emerald-600 rounded text-xs font-semibold">
-                                            <x-base.lucide icon="check-circle" class="w-3 h-3" /> مرحّل
-                                        </span>
-                                    @elseif($v->status === 'draft')
-                                        <span class="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-600 rounded text-xs font-semibold">
-                                            <x-base.lucide icon="clock" class="w-3 h-3" /> مسودة
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center gap-1 px-2 py-1 bg-slate-100 text-slate-600 rounded text-xs font-semibold">
-                                            {{ $v->status }}
-                                        </span>
-                                    @endif
-                                </td>
-                                <td data-tw-merge class="px-5 py-3 border-b dark:border-darkmode-300 text-center">
-                                    <div class="flex justify-center gap-1">
-                                        <button class="p-1.5 rounded hover:bg-blue-50 text-blue-600 hover:text-blue-800 transition-colors" title="عرض">
-                                            <x-base.lucide icon="eye" class="w-4 h-4" />
-                                        </button>
-                                        <button class="p-1.5 rounded hover:bg-emerald-50 text-emerald-600 hover:text-emerald-800 transition-colors" title="طباعة">
-                                            <x-base.lucide icon="printer" class="w-4 h-4" />
-                                        </button>
-                                        <button class="btn-delete p-1.5 rounded hover:bg-red-50 text-slate-500 hover:text-red-600 transition-colors" 
-                                                data-id="{{ $v->id }}" 
-                                                data-name="PV-{{ str_pad($v->id, 5, '0', STR_PAD_LEFT) }}" 
-                                                title="حذف">
-                                            <x-base.lucide icon="trash-2" class="w-4 h-4" />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="8" class="px-5 py-8 text-center text-slate-400">
-                                    <x-base.lucide icon="inbox" class="w-12 h-12 mx-auto mb-2 opacity-50" />
-                                    لا توجد سندات صرف
-                                </td>
-                            </tr>
-                            @endforelse
-                        </tbody>
+                        <tbody></tbody>
                     </table>
                 </div>
             </div>
@@ -370,6 +310,8 @@
 </x-modal.form>
 @endsection
 
+@include('components.datatable.scripts')
+
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -381,7 +323,91 @@ document.addEventListener('DOMContentLoaded', function () {
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
     const form = document.getElementById('payment-voucher-form');
     const saveBtn = document.getElementById('save-voucher-btn');
-    const tableBody = document.querySelector('#payment-vouchers-table tbody');
+    const filterField = document.getElementById('filter-field');
+    const filterType = document.getElementById('filter-type');
+    const filterValue = document.getElementById('filter-value');
+    const filterStatus = document.getElementById('filter-status');
+    const filterGoBtn = document.getElementById('filter-go');
+    const filterResetBtn = document.getElementById('filter-reset');
+    const refreshBtn = document.getElementById('refresh-table');
+    let searchTimeout = null;
+    const table = window.erpCrud && window.erpCrud.initDataTable ? window.erpCrud.initDataTable({
+        tableSelector: '#payment-vouchers-table',
+        ajaxUrl: '{{ route("accounting.payment-vouchers.datatable") }}',
+        ajaxData: function (d) {
+            d.filter_field = filterField ? filterField.value : 'all';
+            d.filter_type = filterType ? filterType.value : 'contains';
+            d.filter_value = filterValue ? filterValue.value : '';
+            d.filter_status = filterStatus ? filterStatus.value : '';
+        },
+        pageLength: 25,
+        columns: [
+            { data: 'number', name: 'number', className: 'px-5 py-3 border-b dark:border-darkmode-300 font-medium' },
+            { data: 'voucher_date', name: 'voucher_date', className: 'px-5 py-3 border-b dark:border-darkmode-300' },
+            { data: 'company_name', name: 'company_name', className: 'px-5 py-3 border-b dark:border-darkmode-300' },
+            { data: 'method_label', name: 'method', className: 'px-5 py-3 border-b dark:border-darkmode-300' },
+            { data: 'account_name', name: 'account_name', className: 'px-5 py-3 border-b dark:border-darkmode-300' },
+            { data: 'amount_formatted', name: 'total_amount', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-right font-semibold text-rose-600' },
+            { data: 'status_badge', name: 'status', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center' },
+            { data: 'actions', name: 'actions', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center', orderable: false, searchable: false }
+        ],
+        drawCallback: function () {
+            if (typeof window.Lucide !== 'undefined') {
+                window.Lucide.createIcons();
+            } else if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+                lucide.createIcons();
+            }
+
+            if (typeof bindDeleteHandlers === 'function') {
+                bindDeleteHandlers();
+            }
+        }
+    }) : null;
+
+    if (table) {
+        window.paymentVouchersTable = table;
+
+        if (filterGoBtn) {
+            filterGoBtn.addEventListener('click', function () {
+                window.paymentVouchersTable.ajax.reload(null, false);
+            });
+        }
+
+        if (filterResetBtn) {
+            filterResetBtn.addEventListener('click', function () {
+                if (filterField) filterField.value = 'all';
+                if (filterType) filterType.value = 'contains';
+                if (filterValue) filterValue.value = '';
+                if (filterStatus) filterStatus.value = '';
+
+                window.paymentVouchersTable.ajax.reload(null, false);
+            });
+        }
+
+        // Debounced search similar to employees page
+        if (filterValue) {
+            filterValue.addEventListener('input', function () {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(function () {
+                    window.paymentVouchersTable.ajax.reload(null, false);
+                }, 400);
+            });
+        }
+
+        // Auto reload on status change
+        if (filterStatus) {
+            filterStatus.addEventListener('change', function () {
+                window.paymentVouchersTable.ajax.reload(null, false);
+            });
+        }
+
+        // Refresh button uses DataTable reload
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', function () {
+                window.paymentVouchersTable.ajax.reload(null, false);
+            });
+        }
+    }
 
     // Method visibility toggle
     function updateMethodVisibility() {
@@ -442,69 +468,27 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
+                    const v = data.voucher;
                     // Show success message
                     if (typeof window.showSuccess === 'function') {
                         window.showSuccess(data.message);
                     }
                     
-                    // Add new row to table
-                    const v = data.voucher;
-                    const newRow = `
-                        <tr class="intro-x">
-                            <td data-tw-merge class="px-5 py-3 border-b dark:border-darkmode-300 font-medium">${v.number}</td>
-                            <td data-tw-merge class="px-5 py-3 border-b dark:border-darkmode-300">${v.voucher_date}</td>
-                            <td data-tw-merge class="px-5 py-3 border-b dark:border-darkmode-300">${v.company_name}</td>
-                            <td data-tw-merge class="px-5 py-3 border-b dark:border-darkmode-300">
-                                <span class="inline-flex items-center gap-1 text-sm">
-                                    ${v.method === 'cash' ? '<i data-lucide="wallet" class="w-4 h-4 text-emerald-600"></i><span>نقدي</span>' : '<i data-lucide="building-2" class="w-4 h-4 text-blue-600"></i><span>بنكي</span>'}
-                                </span>
-                            </td>
-                            <td data-tw-merge class="px-5 py-3 border-b dark:border-darkmode-300">${v.account_name}</td>
-                            <td data-tw-merge class="px-5 py-3 border-b dark:border-darkmode-300 text-right font-semibold text-rose-600">${v.total_amount}</td>
-                            <td data-tw-merge class="px-5 py-3 border-b dark:border-darkmode-300 text-center">
-                                <span class="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-600 rounded text-xs font-semibold">
-                                    <i data-lucide="clock" class="w-3 h-3"></i> مسودة
-                                </span>
-                            </td>
-                            <td data-tw-merge class="px-5 py-3 border-b dark:border-darkmode-300 text-center">
-                                <div class="flex justify-center gap-1">
-                                    <button class="p-1.5 rounded hover:bg-blue-50 text-blue-600 hover:text-blue-800 transition-colors" title="عرض">
-                                        <i data-lucide="eye" class="w-4 h-4"></i>
-                                    </button>
-                                    <button class="p-1.5 rounded hover:bg-emerald-50 text-emerald-600 hover:text-emerald-800 transition-colors" title="طباعة">
-                                        <i data-lucide="printer" class="w-4 h-4"></i>
-                                    </button>
-                                    <button class="btn-delete p-1.5 rounded hover:bg-red-50 text-slate-500 hover:text-red-600 transition-colors" data-id="${v.id}" data-name="${v.number}" title="حذف">
-                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                    
-                    // Remove empty row if exists
-                    const emptyRow = tableBody.querySelector('td[colspan]');
-                    if (emptyRow) {
-                        emptyRow.closest('tr').remove();
+                    // Reload table data instead of manual row injection
+                    if (window.paymentVouchersTable) {
+                        window.paymentVouchersTable.ajax.reload(null, false);
                     }
-                    
-                    tableBody.insertAdjacentHTML('afterbegin', newRow);
-                    
-                    // Reinitialize Lucide icons
-                    if (typeof lucide !== 'undefined') {
-                        lucide.createIcons();
-                    }
-                    
+
                     // Update stats
                     const totalEl = document.getElementById('stat-total');
                     const amountEl = document.getElementById('stat-amount');
                     if (totalEl) {
                         totalEl.textContent = parseInt(totalEl.textContent) + 1;
                     }
-                    if (amountEl) {
+                    if (amountEl && v && v.total_amount) {
                         const currentAmount = parseFloat(amountEl.textContent.replace(/,/g, '')) || 0;
-                        const newAmount = parseFloat(v.total_amount.replace(/,/g, '')) || 0;
-                        amountEl.textContent = (currentAmount + newAmount).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                        const newAmount = parseFloat(String(v.total_amount).replace(/,/g, '')) || 0;
+                        amountEl.textContent = (currentAmount + newAmount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                     }
                     
                     // Reset form and close modal
@@ -539,7 +523,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Delete handlers
+    // Delete handlers (for legacy buttons) - kept for backward compatibility
     function bindDeleteHandlers() {
         document.querySelectorAll('.btn-delete').forEach(btn => {
             btn.removeEventListener('click', handleDelete);
@@ -552,6 +536,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const name = this.dataset.name;
         const row = this.closest('tr');
 
+        runDeleteRequest(id, name, row);
+    }
+
+    function runDeleteRequest(id, name, row) {
         if (typeof window.confirmDelete === 'function') {
             window.confirmDelete(name, () => {
                 fetch(`/accounting/payment-vouchers/${id}`, {
@@ -567,8 +555,17 @@ document.addEventListener('DOMContentLoaded', function () {
                         if (typeof window.showSuccess === 'function') {
                             window.showSuccess(data.message || 'تم حذف السند بنجاح');
                         }
-                        row.remove();
-                        
+
+                        // Remove row if provided (legacy mode)
+                        if (row && row.remove) {
+                            row.remove();
+                        }
+
+                        // Reload DataTable if available
+                        if (window.paymentVouchersTable) {
+                            window.paymentVouchersTable.ajax.reload(null, false);
+                        }
+
                         // Update stats
                         const totalEl = document.getElementById('stat-total');
                         if (totalEl) {
@@ -588,6 +585,25 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
     }
+
+    // Expose helpers similar to Positions page style
+    window.viewPaymentVoucher = function (id) {
+        // Placeholder: later can open a detailed view modal
+        if (typeof window.showInfo === 'function') {
+            window.showInfo('عرض تفاصيل السند قادم قريباً');
+        }
+    };
+
+    window.printPaymentVoucher = function (id) {
+        // Placeholder: hook into real print route when available
+        if (typeof window.showInfo === 'function') {
+            window.showInfo('طباعة سند الصرف قيد التنفيذ');
+        }
+    };
+
+    window.deletePaymentVoucher = function (id, number) {
+        runDeleteRequest(id, number, null);
+    };
 
     bindDeleteHandlers();
 });

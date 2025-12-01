@@ -23,7 +23,7 @@
         <div class="box p-5 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white">
             <div class="flex items-center justify-between">
                 <div>
-                    <div class="text-3xl font-bold">{{ number_format($stats['total_revenue'], 2) }}</div>
+                    <div class="text-3xl font-bold">{{ function_exists('format_currency') ? format_currency($stats['total_revenue']) : number_format($stats['total_revenue'], 2) }}</div>
                     <div class="text-emerald-100 mt-1">إجمالي الإيرادات</div>
                 </div>
                 <x-base.lucide icon="trending-up" class="w-12 h-12 opacity-50" />
@@ -34,7 +34,7 @@
         <div class="box p-5 bg-gradient-to-br from-rose-500 to-rose-600 text-white">
             <div class="flex items-center justify-between">
                 <div>
-                    <div class="text-3xl font-bold">{{ number_format($stats['total_expenses'], 2) }}</div>
+                    <div class="text-3xl font-bold">{{ function_exists('format_currency') ? format_currency($stats['total_expenses']) : number_format($stats['total_expenses'], 2) }}</div>
                     <div class="text-rose-100 mt-1">إجمالي المصروفات</div>
                 </div>
                 <x-base.lucide icon="trending-down" class="w-12 h-12 opacity-50" />
@@ -209,7 +209,7 @@
                     </div>
                     <div class="text-right">
                         <div class="font-semibold {{ $invoice->status === 'paid' ? 'text-emerald-600' : 'text-amber-600' }}">
-                            {{ number_format($invoice->total, 2) }}
+                            {{ function_exists('format_currency') ? format_currency($invoice->total) : number_format($invoice->total, 2) }}
                         </div>
                         <div class="text-xs text-slate-400">{{ $invoice->invoice_date?->format('M d') }}</div>
                     </div>
@@ -236,7 +236,7 @@
                         <div class="text-sm text-slate-500">{{ Str::limit($payment->description, 20) }}</div>
                     </div>
                     <div class="text-right">
-                        <div class="font-semibold text-rose-600">-{{ number_format($payment->total_amount, 2) }}</div>
+                        <div class="font-semibold text-rose-600">-{{ function_exists('format_currency') ? format_currency($payment->total_amount) : number_format($payment->total_amount, 2) }}</div>
                         <div class="text-xs text-slate-400">{{ $payment->voucher_date?->format('M d') }}</div>
                     </div>
                 </div>
@@ -262,7 +262,7 @@
                         <div class="text-sm text-slate-500">{{ Str::limit($receipt->description, 20) }}</div>
                     </div>
                     <div class="text-right">
-                        <div class="font-semibold text-emerald-600">+{{ number_format($receipt->total_amount, 2) }}</div>
+                        <div class="font-semibold text-emerald-600">+{{ function_exists('format_currency') ? format_currency($receipt->total_amount) : number_format($receipt->total_amount, 2) }}</div>
                         <div class="text-xs text-slate-400">{{ $receipt->voucher_date?->format('M d') }}</div>
                     </div>
                 </div>

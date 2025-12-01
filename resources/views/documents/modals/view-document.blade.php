@@ -32,7 +32,7 @@
                     <span id="view-doc-created">-</span>
                 </div>
                 <div class="flex items-center text-slate-600 dark:text-slate-300">
-                    <x-base.lucide icon="CalendarClock" class="w-4 h-4 mr-2" />
+                    <x-base.lucide icon="calendar-clock" class="w-4 h-4 mr-2" />
                     <span id="view-doc-expiry">-</span>
                 </div>
                 <div class="flex items-center text-slate-600 dark:text-slate-300">

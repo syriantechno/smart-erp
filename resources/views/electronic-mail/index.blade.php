@@ -78,96 +78,106 @@
             </div>
         </div>
     </div>
+    
+    <div class="mt-6 grid grid-cols-12 gap-6">
         <div class="col-span-12 lg:col-span-3 2xl:col-span-2">
             <h2 class="intro-y mr-auto mt-2 text-lg font-medium">Electronic Mail</h2>
             <div class="intro-y mt-6">
-                <div
-                    class="rounded-2xl border border-white/10 text-white shadow-[0_20px_45px_rgba(10,24,55,0.35)]"
-                    style="background: linear-gradient(135deg, var(--primary-color, #0f1f3d) 0%, var(--secondary-color, #1d3d8f) 45%, var(--accent-color, #0998d6) 100%);"
-                >
-                    <div class="p-6 space-y-5">
-                        <div>
-                            <p class="text-xs uppercase tracking-[0.35em] text-white/70">Mail Control Center</p>
-                            <h3 class="mt-2 text-xl font-semibold">Keep inbox momentum</h3>
-                            <p class="mt-2 text-sm text-white/80">
-                                {{ $inboxCount }} unread · {{ $sentCount }} sent · {{ $draftCount }} drafts
-                            </p>
+                <div class="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
+                    <div class="p-6 border-b border-slate-200">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
+                                <x-base.lucide icon="Mail" class="w-5 h-5 text-slate-600" />
+                            </div>
+                            <div>
+                                <p class="text-xs uppercase tracking-wider text-slate-500 font-medium">Mail Control Center</p>
+                                <h3 class="text-lg font-semibold text-slate-800">Keep inbox momentum</h3>
+                            </div>
                         </div>
+                        <p class="text-sm text-slate-600 mb-4">
+                            {{ $inboxCount }} unread · {{ $sentCount }} sent · {{ $draftCount }} drafts
+                        </p>
                         <button
                             type="button"
-                            class="flex w-full items-center rounded-xl bg-white/15 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-400/30 transition hover:bg-white/20"
+                            class="flex w-full items-center justify-center rounded-lg bg-slate-800 hover:bg-slate-900 px-4 py-3 text-sm font-semibold text-white shadow-sm transition duration-200"
                             onclick="openComposeModal(); return false;"
                         >
-                            <x-base.lucide icon="PenSquare" class="mr-3 h-4 w-4" />
+                            <x-base.lucide icon="PenSquare" class="mr-2 h-4 w-4" />
                             Compose
-                            <span class="ml-auto rounded-full bg-white/20 px-2 py-0.5 text-[11px] tracking-wide">New</span>
                         </button>
-                        <div class="border-t border-white/10 pt-4 space-y-2 text-white">
-                            <a
-                                href="javascript:void(0)"
-                                class="js-mail-folder-link flex items-center rounded-xl px-3 py-2 text-sm font-semibold transition hover:bg-white/15 {{ $currentFolder === 'inbox' ? 'bg-white/15' : 'bg-white/5' }}"
-                                data-folder="inbox"
-                                onclick="return changeMailFolder(event, 'inbox')"
-                            >
-                                <x-base.lucide icon="Mail" class="mr-3 h-4 w-4" /> Inbox
-                                @if($inboxCount > 0)
-                                    <span class="ml-auto rounded-full bg-white/20 px-2 py-0.5 text-[11px]">{{ $inboxCount }}</span>
-                                @endif
-                            </a>
-                            <a
-                                href="javascript:void(0)"
-                                class="js-mail-folder-link flex items-center rounded-xl px-3 py-2 text-sm font-semibold transition hover:bg-white/15 {{ $currentFolder === 'starred' ? 'bg-white/15' : 'bg-white/5' }}"
-                                data-folder="starred"
-                                onclick="return changeMailFolder(event, 'starred')"
-                            >
-                                <x-base.lucide icon="Star" class="mr-3 h-4 w-4" /> Starred
-                                @if($starredCount > 0)
-                                    <span class="ml-auto rounded-full bg-white/20 px-2 py-0.5 text-[11px]">{{ $starredCount }}</span>
-                                @endif
-                            </a>
-                            <a
-                                href="javascript:void(0)"
-                                class="js-mail-folder-link flex items-center rounded-xl px-3 py-2 text-sm font-semibold transition hover:bg-white/15 {{ $currentFolder === 'sent' ? 'bg-white/15' : 'bg-white/5' }}"
-                                data-folder="sent"
-                                onclick="return changeMailFolder(event, 'sent')"
-                            >
-                                <x-base.lucide icon="Send" class="mr-3 h-4 w-4" /> Sent
-                                @if($sentCount > 0)
-                                    <span class="ml-auto rounded-full bg-white/20 px-2 py-0.5 text-[11px]">{{ $sentCount }}</span>
-                                @endif
-                            </a>
-                            <a
-                                href="javascript:void(0)"
-                                class="js-mail-folder-link flex items-center rounded-xl px-3 py-2 text-sm font-semibold transition hover:bg-white/15 {{ $currentFolder === 'draft' ? 'bg-white/15' : 'bg-white/5' }}"
-                                data-folder="draft"
-                                onclick="return changeMailFolder(event, 'draft')"
-                            >
-                                <x-base.lucide icon="FileText" class="mr-3 h-4 w-4" /> Draft
-                                @if($draftCount > 0)
-                                    <span class="ml-auto rounded-full bg-white/20 px-2 py-0.5 text-[11px]">{{ $draftCount }}</span>
-                                @endif
-                            </a>
-                        </div>
-                        <div class="border-t border-white/10 pt-4 space-y-2 text-sm font-semibold text-white/80">
-                            <div class="flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2">
-                                <span class="h-2 w-2 rounded-full bg-pending"></span>
-                                Work
-                                <span class="ml-auto text-[11px] text-white/60">Focus</span>
-                            </div>
-                            <div class="flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2">
-                                <span class="h-2 w-2 rounded-full bg-success"></span>
-                                Personal
-                                <span class="ml-auto text-[11px] text-white/60">0 unread</span>
-                            </div>
-                            <div class="flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2">
+                    </div>
+                    <div class="p-6 space-y-1">
+                        <a
+                            href="javascript:void(0)"
+                            class="js-mail-folder-link flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition duration-200 hover:bg-slate-50 {{ $currentFolder === 'inbox' ? 'bg-slate-100 text-slate-900' : 'text-slate-700' }}"
+                            data-folder="inbox"
+                            onclick="return changeMailFolder(event, 'inbox')"
+                        >
+                            <x-base.lucide icon="Mail" class="mr-3 h-4 w-4 text-slate-500" />
+                            Inbox
+                            @if($inboxCount > 0)
+                                <span class="ml-auto bg-slate-600 text-white rounded-full px-2 py-0.5 text-xs">{{ $inboxCount }}</span>
+                            @endif
+                        </a>
+                        <a
+                            href="javascript:void(0)"
+                            class="js-mail-folder-link flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition duration-200 hover:bg-slate-50 {{ $currentFolder === 'starred' ? 'bg-slate-100 text-slate-900' : 'text-slate-700' }}"
+                            data-folder="starred"
+                            onclick="return changeMailFolder(event, 'starred')"
+                        >
+                            <x-base.lucide icon="Star" class="mr-3 h-4 w-4 text-slate-500" />
+                            Starred
+                            @if($starredCount > 0)
+                                <span class="ml-auto bg-slate-600 text-white rounded-full px-2 py-0.5 text-xs">{{ $starredCount }}</span>
+                            @endif
+                        </a>
+                        <a
+                            href="javascript:void(0)"
+                            class="js-mail-folder-link flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition duration-200 hover:bg-slate-50 {{ $currentFolder === 'sent' ? 'bg-slate-100 text-slate-900' : 'text-slate-700' }}"
+                            data-folder="sent"
+                            onclick="return changeMailFolder(event, 'sent')"
+                        >
+                            <x-base.lucide icon="Send" class="mr-3 h-4 w-4 text-slate-500" />
+                            Sent
+                            @if($sentCount > 0)
+                                <span class="ml-auto bg-slate-600 text-white rounded-full px-2 py-0.5 text-xs">{{ $sentCount }}</span>
+                            @endif
+                        </a>
+                        <a
+                            href="javascript:void(0)"
+                            class="js-mail-folder-link flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition duration-200 hover:bg-slate-50 {{ $currentFolder === 'draft' ? 'bg-slate-100 text-slate-900' : 'text-slate-700' }}"
+                            data-folder="draft"
+                            onclick="return changeMailFolder(event, 'draft')"
+                        >
+                            <x-base.lucide icon="FileText" class="mr-3 h-4 w-4 text-slate-500" />
+                            Draft
+                            @if($draftCount > 0)
+                                <span class="ml-auto bg-slate-600 text-white rounded-full px-2 py-0.5 text-xs">{{ $draftCount }}</span>
+                            @endif
+                        </a>
+                    </div>
+                    <div class="border-t border-slate-200 p-6">
+                        <p class="text-xs uppercase tracking-wider text-slate-500 font-medium mb-3">Labels</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2">
                                 <span class="h-2 w-2 rounded-full bg-warning"></span>
-                                Important
-                                <span class="ml-auto text-[11px] text-white/60">Stay alert</span>
+                                <span class="text-sm font-medium text-slate-700">Work</span>
+                                <span class="ml-auto text-xs text-slate-500">Focus</span>
                             </div>
-                            <div class="flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2">
+                            <div class="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2">
+                                <span class="h-2 w-2 rounded-full bg-success"></span>
+                                <span class="text-sm font-medium text-slate-700">Personal</span>
+                                <span class="ml-auto text-xs text-slate-500">0 unread</span>
+                            </div>
+                            <div class="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2">
+                                <span class="h-2 w-2 rounded-full bg-info"></span>
+                                <span class="text-sm font-medium text-slate-700">Important</span>
+                                <span class="ml-auto text-xs text-slate-500">Stay alert</span>
+                            </div>
+                            <div class="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2">
                                 <span class="h-2 w-2 rounded-full bg-danger"></span>
-                                Urgent
-                                <span class="ml-auto text-[11px] text-white/60">Action asap</span>
+                                <span class="text-sm font-medium text-slate-700">Urgent</span>
+                                <span class="ml-auto text-xs text-slate-500">Action asap</span>
                             </div>
                         </div>
                     </div>

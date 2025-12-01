@@ -11,9 +11,11 @@ use App\Models\Accounting\Tax;
 use App\Models\Company;
 use App\Models\User;
 use App\Services\Notifications\NotificationDispatcher;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Yajra\DataTables\Facades\DataTables;
 
 class PaymentVoucherController extends Controller
 {
@@ -124,6 +126,97 @@ class PaymentVoucherController extends Controller
         return redirect()
             ->route('accounting.payment-vouchers.index')
             ->with('success', 'تم إنشاء سند الصرف بنجاح');
+    }
+
+    public function datatable(Request $request): JsonResponse
+    {
+        $query = PaymentVoucher::query()
+            ->select([
+                'payment_vouchers.id',
+                'payment_vouchers.company_id',
+                'payment_vouchers.account_id',
+                'payment_vouchers.tax_id',
+                'payment_vouchers.voucher_date',
+                'payment_vouchers.method',
+                'payment_vouchers.total_amount',
+                'payment_vouchers.status',
+            ])
+            ->with([
+                'company:id,name',
+                'account:id,name',
+            ]);
+
+        // Simple search across number, company and account
+        if ($request->filled('filter_value') && $request->filter_value !== '') {
+            $value = $request->filter_value;
+            $field = $request->input('filter_field', 'all');
+
+            $query->where(function ($q) use ($value, $field) {
+                if ($field === 'number') {
+                    $q->where('payment_vouchers.id', 'LIKE', "%{$value}%");
+                } elseif ($field === 'company') {
+                    $q->whereHas('company', function ($sub) use ($value) {
+                        $sub->where('name', 'LIKE', "%{$value}%");
+                    });
+                } elseif ($field === 'account') {
+                    $q->whereHas('account', function ($sub) use ($value) {
+                        $sub->where('name', 'LIKE', "%{$value}%");
+                    });
+                } else {
+                    $q->where('payment_vouchers.id', 'LIKE', "%{$value}%")
+                        ->orWhereHas('company', function ($sub) use ($value) {
+                            $sub->where('name', 'LIKE', "%{$value}%");
+                        })
+                        ->orWhereHas('account', function ($sub) use ($value) {
+                            $sub->where('name', 'LIKE', "%{$value}%");
+                        });
+                }
+            });
+        }
+
+        if ($request->filled('filter_status') && $request->filter_status !== '') {
+            $query->where('status', $request->filter_status);
+        }
+
+        return DataTables::of($query)
+            ->addIndexColumn()
+            ->addColumn('number', function ($voucher) {
+                return 'PV-' . str_pad($voucher->id, 5, '0', STR_PAD_LEFT);
+            })
+            ->addColumn('company_name', function ($voucher) {
+                return $voucher->company->name ?? '-';
+            })
+            ->addColumn('method_label', function ($voucher) {
+                if ($voucher->method === 'cash') {
+                    return '<span class="inline-flex items-center gap-1 text-sm"><i data-lucide="wallet" class="w-4 h-4 text-emerald-600"></i><span>نقدي</span></span>';
+                }
+
+                return '<span class="inline-flex items-center gap-1 text-sm"><i data-lucide="building-2" class="w-4 h-4 text-blue-600"></i><span>بنكي</span></span>';
+            })
+            ->addColumn('account_name', function ($voucher) {
+                return $voucher->account->name ?? '-';
+            })
+            ->addColumn('amount_formatted', function ($voucher) {
+                return number_format($voucher->total_amount, 2);
+            })
+            ->addColumn('status_badge', function ($voucher) {
+                if ($voucher->status === 'posted') {
+                    return '<span class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-100 text-emerald-600 rounded text-xs font-semibold"><i data-lucide="check-circle" class="w-3 h-3"></i> مرحّل</span>';
+                }
+
+                if ($voucher->status === 'draft') {
+                    return '<span class="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-600 rounded text-xs font-semibold"><i data-lucide="clock" class="w-3 h-3"></i> مسودة</span>';
+                }
+
+                return '<span class="inline-flex items-center gap-1 px-2 py-1 bg-slate-100 text-slate-600 rounded text-xs font-semibold">' . e($voucher->status) . '</span>';
+            })
+            ->addColumn('actions', function ($voucher) {
+                return view('accounting.payment-vouchers.partials.actions', [
+                    'voucher' => $voucher,
+                ])->render();
+            })
+            ->rawColumns(['method_label', 'status_badge', 'actions'])
+            ->toJson();
     }
 
     public function destroy(Request $request, PaymentVoucher $paymentVoucher)

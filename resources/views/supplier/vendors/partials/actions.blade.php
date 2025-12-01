@@ -1,17 +1,22 @@
-<div class="flex items-center justify-center gap-2">
-    <x-base.tippy content="View vendor" placement="top">
-        <button type="button" class="btn-royal btn-royal--info btn-royal--icon group" onclick="viewVendor({{ $vendor->id }})">
-            <x-base.lucide icon="eye" class="w-4 h-4 icon-hover-rise" />
-        </button>
-    </x-base.tippy>
-    <x-base.tippy content="Edit vendor" placement="top">
-        <button type="button" class="btn-royal btn-royal--warning btn-royal--icon group" onclick="editVendor({{ $vendor->id }})">
-            <x-base.lucide icon="edit" class="w-4 h-4 icon-hover-rise" />
-        </button>
-    </x-base.tippy>
-    <x-base.tippy content="Delete vendor" placement="top">
-        <button type="button" class="btn-royal btn-royal--danger btn-royal--icon group" onclick="deleteVendor({{ $vendor->id }})">
-            <x-base.lucide icon="trash-2" class="w-4 h-4 icon-hover-rise" />
-        </button>
-    </x-base.tippy>
+<div class="flex items-center justify-center gap-1 min-w-[80px]">
+    <x-erp.action-button
+        icon="Eye"
+        variant="secondary"
+        title="View Vendor"
+        onclick="window.viewVendor && window.viewVendor({{ $vendor->id }})"
+    />
+
+    <x-erp.action-button
+        icon="Edit"
+        variant="primary"
+        title="Edit Vendor"
+        onclick="window.editVendor && window.editVendor({{ $vendor->id }})"
+    />
+
+    <x-erp.action-button
+        icon="Trash2"
+        variant="danger"
+        title="Delete Vendor"
+        onclick="window.erpDeleteRecord && window.erpDeleteRecord({{ $vendor->id }}, '{{ addslashes($vendor->name) }}')"
+    />
 </div>

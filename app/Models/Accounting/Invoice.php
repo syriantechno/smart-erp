@@ -12,9 +12,11 @@ class Invoice extends Model
 {
     protected $fillable = [
         'customer_id',
+        'company_id',
         'number',
         'type',
         'tax_id',
+        'approval_template_id',
         'invoice_date',
         'due_date',
         'reference',
@@ -51,6 +53,11 @@ class Invoice extends Model
     public function lines(): HasMany
     {
         return $this->hasMany(InvoiceLine::class);
+    }
+
+    public function approvalTemplate(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Approval\ApprovalTemplate::class, 'approval_template_id');
     }
 
     public function getTypeLabelAttribute(): string

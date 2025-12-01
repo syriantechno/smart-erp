@@ -93,19 +93,50 @@
                         </div>
                     </div>
 
+                    @php
+                        $currencySettingsCode = old('currency_code', $settings['currency.code'] ?? 'USD');
+                        $currencySettingsSymbol = old('currency_symbol', $settings['currency.symbol'] ?? '$');
+                        $availableCurrencies = [
+                            ['code' => 'USD', 'name' => 'US Dollar', 'symbol' => '$'],
+                            ['code' => 'EUR', 'name' => 'Euro', 'symbol' => '€'],
+                            ['code' => 'GBP', 'name' => 'British Pound', 'symbol' => '£'],
+                            ['code' => 'SAR', 'name' => 'Saudi Riyal', 'symbol' => '﷼'],
+                            ['code' => 'AED', 'name' => 'UAE Dirham', 'symbol' => 'د.إ'],
+                            ['code' => 'QAR', 'name' => 'Qatari Riyal', 'symbol' => 'ر.ق'],
+                            ['code' => 'KWD', 'name' => 'Kuwaiti Dinar', 'symbol' => 'د.ك'],
+                            ['code' => 'OMR', 'name' => 'Omani Rial', 'symbol' => 'ر.ع.'],
+                            ['code' => 'BHD', 'name' => 'Bahraini Dinar', 'symbol' => '.د.ب'],
+                            ['code' => 'EGP', 'name' => 'Egyptian Pound', 'symbol' => '£'],
+                            ['code' => 'TRY', 'name' => 'Turkish Lira', 'symbol' => '₺'],
+                            ['code' => 'JPY', 'name' => 'Japanese Yen', 'symbol' => '¥'],
+                            ['code' => 'CNY', 'name' => 'Chinese Yuan', 'symbol' => '¥'],
+                            ['code' => 'INR', 'name' => 'Indian Rupee', 'symbol' => '₹'],
+                            ['code' => 'PKR', 'name' => 'Pakistani Rupee', 'symbol' => '₨'],
+                            ['code' => 'BDT', 'name' => 'Bangladeshi Taka', 'symbol' => '৳'],
+                            ['code' => 'IDR', 'name' => 'Indonesian Rupiah', 'symbol' => 'Rp'],
+                            ['code' => 'MYR', 'name' => 'Malaysian Ringgit', 'symbol' => 'RM'],
+                            ['code' => 'AUD', 'name' => 'Australian Dollar', 'symbol' => '$'],
+                            ['code' => 'CAD', 'name' => 'Canadian Dollar', 'symbol' => '$'],
+                            ['code' => 'CHF', 'name' => 'Swiss Franc', 'symbol' => 'CHF'],
+                        ];
+                    @endphp
+
                     <!-- Currency Code -->
                     <div class="col-span-12 sm:col-span-6 lg:col-span-4">
                         <x-base.form-label for="currency_code">
                             Currency Code
                         </x-base.form-label>
-                        <x-base.form-input
+                        <x-base.form-select
                             id="currency_code"
                             name="currency_code"
-                            type="text"
                             class="w-full"
-                            placeholder="e.g. USD, SAR"
-                            value="{{ old('currency_code', $settings['currency.code'] ?? 'USD') }}"
-                        />
+                        >
+                            @foreach($availableCurrencies as $currency)
+                                <option value="{{ $currency['code'] }}" {{ $currencySettingsCode === $currency['code'] ? 'selected' : '' }}>
+                                    {{ $currency['code'] }} - {{ $currency['name'] }}
+                                </option>
+                            @endforeach
+                        </x-base.form-select>
                         <div class="text-sm text-slate-500 mt-1">
                             ISO currency code used for reports (e.g. USD, SAR).
                         </div>
@@ -115,15 +146,18 @@
                     <div class="col-span-12 sm:col-span-6 lg:col-span-4">
                         <x-base.form-label for="currency_symbol">
                             Currency Symbol
-                        </x-base-form-label>
-                        <x-base.form-input
+                        </x-base.form-label>
+                        <x-base.form-select
                             id="currency_symbol"
                             name="currency_symbol"
-                            type="text"
                             class="w-full"
-                            placeholder="$, SAR, د.إ"
-                            value="{{ old('currency_symbol', $settings['currency.symbol'] ?? '$') }}"
-                        />
+                        >
+                            @foreach($availableCurrencies as $currency)
+                                <option value="{{ $currency['symbol'] }}" {{ $currencySettingsSymbol === $currency['symbol'] ? 'selected' : '' }}>
+                                    {{ $currency['symbol'] }} - {{ $currency['code'] }} ({{ $currency['name'] }})
+                                </option>
+                            @endforeach
+                        </x-base.form-select>
                         <div class="text-sm text-slate-500 mt-1">
                             Symbol shown with amounts (e.g. $, SAR, د.إ).
                         </div>

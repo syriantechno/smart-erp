@@ -11,6 +11,7 @@ import './pages/departments';
 import './pages/positions';
 import './pages/payroll';
 import './pages/leave';
+import './pages/customers';
 
 // Configure axios for CSRF protection
 import axios from 'axios';
@@ -44,5 +45,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (typeof window.initializePayrollModal === 'function') {
         window.initializePayrollModal();
+    }
+    if (typeof window.initializeCustomersPage === 'function') {
+        window.initializeCustomersPage();
     }
 });

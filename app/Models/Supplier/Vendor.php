@@ -25,6 +25,7 @@ class Vendor extends Model
         'payment_terms',
         'account_id',
         'notes',
+        'category',
         'is_active',
     ];
 

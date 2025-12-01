@@ -324,7 +324,7 @@
                                     value="{{ old('salary', $employee->salary) }}"
                                     required
                                 />
-                                <span class="text-sm text-slate-500">{{ setting('currency.symbol', config('app.currency', 'USD')) }}</span>
+                                <span class="text-sm text-slate-500">{{ setting('currency.symbol', '$') }}</span>
                             </div>
                             @error('salary')
                                 <div class="mt-2 text-danger">{{ $message }}</div>

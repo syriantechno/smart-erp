@@ -78,20 +78,22 @@ class DocumentCodeGenerator
         // Get the table name based on document type
         $tableName = $this->getTableName($documentType);
         
+        $codeColumn = $this->getCodeColumn($documentType);
+
         if (!$tableName) {
             throw new RuntimeException("Unknown table for document type: {$documentType}");
         }
 
         // Get the highest code number from the database
         $lastRecord = DB::table($tableName)
-            ->where('code', 'like', $setting->prefix . '%')
+            ->where($codeColumn, 'like', $setting->prefix . '%')
             ->orderBy('id', 'desc')
             ->first();
 
-        if ($lastRecord && $lastRecord->code) {
+        if ($lastRecord && $lastRecord->{$codeColumn}) {
             // Extract number from code (e.g., "EMP-0005" -> 5)
             $pattern = '/^' . preg_quote($setting->prefix, '/') . '-(?:\d{4}-)?(\d+)$/';
-            if (preg_match($pattern, $lastRecord->code, $matches)) {
+            if (preg_match($pattern, $lastRecord->{$codeColumn}, $matches)) {
                 $lastNumber = (int) $matches[1];
                 $setting->update(['current_number' => $lastNumber]);
             }
@@ -113,6 +115,7 @@ class DocumentCodeGenerator
             'warehouses' => 'warehouses',
             'categories' => 'categories',
             'purchase_requests' => 'purchase_requests',
+            'invoices' => 'invoices',
             'customers' => 'customers',
             // Add more mappings as needed
         ];
@@ -120,22 +123,33 @@ class DocumentCodeGenerator
         return $tableMap[$documentType] ?? null;
     }
 
+    protected function getCodeColumn(string $documentType): string
+    {
+        $columnMap = [
+            'invoices' => 'number',
+        ];
+
+        return $columnMap[$documentType] ?? 'code';
+    }
+
     protected function ensureBaseline(PrefixSetting $setting): void
     {
         $tableName = $this->getTableName($setting->document_type);
+
+        $codeColumn = $this->getCodeColumn($setting->document_type);
 
         if (! $tableName) {
             return;
         }
 
         $lastRecord = DB::table($tableName)
-            ->where('code', 'like', $setting->prefix . '%')
+            ->where($codeColumn, 'like', $setting->prefix . '%')
             ->orderBy('id', 'desc')
             ->first();
 
-        if ($lastRecord && isset($lastRecord->code)) {
+        if ($lastRecord && isset($lastRecord->{$codeColumn})) {
             $pattern = '/^' . preg_quote($setting->prefix, '/') . '-(?:\d{4}-)?(\d+)$/';
-            if (preg_match($pattern, $lastRecord->code, $matches)) {
+            if (preg_match($pattern, $lastRecord->{$codeColumn}, $matches)) {
                 $lastNumber = (int) $matches[1];
 
                 if ($setting->current_number < $lastNumber) {
