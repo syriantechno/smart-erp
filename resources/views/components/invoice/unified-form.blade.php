@@ -10,7 +10,7 @@
 ])
 
 <x-modal.form :id="$id" :title="$title" size="full">
-    <form :id="$id . '-form'">
+    <form id="{{ $id }}-form">
         @csrf
         
         <!-- Invoice Header -->
@@ -349,15 +349,19 @@ function refreshInvoiceCode(type) {
 
 // Initialize when modal opens
 document.addEventListener('DOMContentLoaded', function() {
-    // Add initial row when modal opens
+    // Add initial row when modal that uses this component opens
     const modalTriggers = document.querySelectorAll('[data-tw-toggle="modal"]');
     modalTriggers.forEach(trigger => {
         trigger.addEventListener('click', function() {
             const targetId = this.getAttribute('data-tw-target');
-            if (targetId && targetId.includes('invoice')) {
+            if (targetId) {
                 setTimeout(() => {
                     const modalId = targetId.replace('#', '');
-                    addMaterialRow(modalId);
+                    const template = document.getElementById(modalId + '-material-row-template');
+                    const tbody = document.getElementById(modalId + '-materials-tbody');
+                    if (template && tbody && tbody.children.length === 0) {
+                        addMaterialRow(modalId);
+                    }
                 }, 100);
             }
         });

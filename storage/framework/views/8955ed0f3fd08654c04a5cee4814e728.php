@@ -1,79 +1,5 @@
-<?php
-    $company = $company ?? null;
-    $companies = $companies ?? collect();
-    $warehouses = $warehouses ?? collect();
-    $categories = $categories ?? collect();
-    $materials = $materials ?? collect();
-    $materialCategories = $materialCategories ?? collect();
-    $approvalTemplates = $approvalTemplates ?? collect();
-
-    $warehousesPayload = $warehouses->map(fn ($warehouse) => [
-        'id' => $warehouse->id,
-        'code' => $warehouse->code,
-        'name' => $warehouse->name,
-        'location' => $warehouse->location,
-    ])->values();
-
-    $materialsPayload = $materials->map(fn ($material) => [
-        'id' => $material['id'] ?? null,
-        'code' => $material['code'] ?? null,
-        'name' => $material['name'] ?? null,
-        'category_id' => $material['category_id'] ?? null,
-        'category_name' => $material['category_name'] ?? null,
-        'unit' => $material['unit'] ?? null,
-        'unit_symbol' => $material['unit_symbol'] ?? null,
-        'price' => $material['price'] ?? 0,
-    ])->values();
-
-    $materialCategoriesPayload = $materialCategories->map(fn ($category) => [
-        'id' => $category['id'] ?? null,
-        'name' => $category['name'] ?? null,
-    ])->values();
-
-    $catalogsPayload = $categories->map(fn ($category) => [
-        'id' => $category->id,
-        'name' => $category->name,
-        'children' => $category->children->map(fn ($child) => [
-            'id' => $child->id,
-            'name' => $child->name,
-        ])->values(),
-    ])->values();
-
-    $approvalTemplatesPayload = $approvalTemplates->map(fn ($template) => [
-        'id' => $template->id,
-        'name' => $template->name,
-        'description' => $template->description,
-        'levels' => $template->levels,
-    ])->values();
-
-    $companiesPayload = $companies->map(fn ($company) => [
-        'id' => $company->id,
-        'name' => $company->name,
-        'address' => $company->address,
-        'logo_url' => $company->logo ? \Illuminate\Support\Facades\Storage::url($company->logo) : null,
-    ])->values();
-
-    $currencySymbol = setting('currency.symbol', '$');
-
-    $defaultCompany = $company ?? $companies->first();
-    $defaultCompanyName = $defaultCompany->name ?? 'Smart ERP';
-    $defaultCompanyAddress = $defaultCompany->address ?? 'Select the warehouse items needed for fulfillment.';
-    $defaultCompanyLogo = $defaultCompany?->logo ? \Illuminate\Support\Facades\Storage::url($defaultCompany->logo) : null;
-    $defaultCompanyId = $defaultCompany->id ?? null;
-
-    $defaultCompanyMeta = [
-        'id' => $defaultCompanyId,
-        'name' => $defaultCompanyName,
-        'address' => $defaultCompanyAddress,
-        'logo_url' => $defaultCompanyLogo
-            ?? 'https://ui-avatars.com/api/?name=' . urlencode($defaultCompanyName)
-            . '&background=1D4ED8&color=fff',
-    ];
-?>
-
 <?php $__env->startSection('subhead'); ?>
-    <title>Material Requests - <?php echo e(config('app.name')); ?></title>
-    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
+    <title>Warehouses Management - <?php echo e(config('app.name')); ?></title>
 <?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('components.datatable.styles', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
@@ -81,10 +7,40 @@
 
 <?php $__env->startPush('styles'); ?>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.min.css">
-<?php $__env->stopPush(); ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 
-<?php $__env->startSection('subcontent'); ?>
-    <?php echo $__env->make('components.global-notifications', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+    <style>
+        /* Match general compact table style used in HR modules */
+        #warehouses-table {
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        #warehouses-table tbody tr {
+            height: 2.25rem;
+        }
+
+        #warehouses-table th {
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.5rem 1.25rem;
+        }
+
+        #warehouses-table td {
+            padding: 0.375rem 1.25rem;
+        }
+
+        #warehouses-table .inline-flex {
+            padding: 0.125rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        #warehouses-table .px-5.py-1\.5 {
+            padding: 0.375rem 1.25rem;
+        }
+    </style>
+<?php $__env->stopPush(); ?>
 
 <?php $__env->startSection('subcontent'); ?>
     <?php echo $__env->make('components.global-notifications', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
@@ -95,14 +51,14 @@
             <h2 class="flex items-center gap-2 text-2xl md:text-3xl font-semibold text-royalDark tracking-wide">
                 <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'clipboard-list','class' => 'w-7 h-7']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'warehouse','class' => 'w-7 h-7']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.lucide'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['icon' => 'clipboard-list','class' => 'w-7 h-7']); ?>
+<?php $component->withAttributes(['icon' => 'warehouse','class' => 'w-7 h-7']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
@@ -113,7 +69,7 @@
 <?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
-                <span>Material Requests</span>
+                <span>Warehouses Management</span>
             </h2>
 
             <div class="flex flex-row items-end gap-8 md:gap-12 justify-end">
@@ -123,14 +79,14 @@
                         <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
                             <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'x-circle','class' => 'w-4 h-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'pause-circle','class' => 'w-4 h-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.lucide'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['icon' => 'x-circle','class' => 'w-4 h-4']); ?>
+<?php $component->withAttributes(['icon' => 'pause-circle','class' => 'w-4 h-4']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
@@ -143,12 +99,12 @@
 <?php endif; ?>
                         </div>
                         <div class="text-6xl md:text-7xl font-semibold tracking-tight">
-                            <?php echo e($statusStats['rejected'] ?? '—'); ?>
+                            <?php echo e($inactiveWarehouses ?? '—'); ?>
 
                         </div>
                     </div>
                     <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
-                        Rejected
+                        Inactive
                     </div>
                 </div>
 
@@ -178,12 +134,12 @@
 <?php endif; ?>
                         </div>
                         <div class="text-6xl md:text-7xl font-semibold tracking-tight">
-                            <?php echo e($statusStats['approved'] ?? '—'); ?>
+                            <?php echo e($activeWarehouses ?? '—'); ?>
 
                         </div>
                     </div>
                     <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
-                        Approved
+                        Active
                     </div>
                 </div>
 
@@ -193,14 +149,14 @@
                         <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
                             <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'clock','class' => 'w-4 h-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'warehouse','class' => 'w-4 h-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.lucide'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['icon' => 'clock','class' => 'w-4 h-4']); ?>
+<?php $component->withAttributes(['icon' => 'warehouse','class' => 'w-4 h-4']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
@@ -213,82 +169,12 @@
 <?php endif; ?>
                         </div>
                         <div class="text-6xl md:text-7xl font-semibold tracking-tight">
-                            <?php echo e($statusStats['in_progress'] ?? '—'); ?>
+                            <?php echo e($totalWarehouses ?? '—'); ?>
 
                         </div>
                     </div>
                     <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
-                        In Progress
-                    </div>
-                </div>
-
-                
-                <div class="flex flex-col items-center gap-1">
-                    <div class="flex items-baseline gap-2">
-                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
-                            <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'pause-circle','class' => 'w-4 h-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.lucide'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['icon' => 'pause-circle','class' => 'w-4 h-4']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
-<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
-<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
-<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
-<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
-<?php endif; ?>
-                        </div>
-                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
-                            <?php echo e($statusStats['pending'] ?? '—'); ?>
-
-                        </div>
-                    </div>
-                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
-                        Pending
-                    </div>
-                </div>
-
-                
-                <div class="flex flex-col items-center gap-1">
-                    <div class="flex items-baseline gap-2">
-                        <div class="inline-flex items-center justify-center rounded-full bg-white/40 px-1.5 py-1">
-                            <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'clipboard-list','class' => 'w-4 h-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('base.lucide'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes(['icon' => 'clipboard-list','class' => 'w-4 h-4']); ?>
-<?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
-<?php $attributes = $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
-<?php unset($__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800)): ?>
-<?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
-<?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
-<?php endif; ?>
-                        </div>
-                        <div class="text-6xl md:text-7xl font-semibold tracking-tight">
-                            <?php echo e($statusStats['total'] ?? '—'); ?>
-
-                        </div>
-                    </div>
-                    <div class="self-start pl-2 text-xs uppercase tracking-[0.25em] text-slate-600">
-                        Total
+                        Warehouses
                     </div>
                 </div>
             </div>
@@ -309,27 +195,24 @@
 <?php $component->withAttributes(['class' => 'intro-y box bg-white/80 border border-slate-200/70 shadow-[0_18px_45px_rgba(15,23,42,0.10)]']); ?>
                 <div class="p-5">
                     <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
-                        <form id="material-requests-filter-form" class="w-full sm:mr-auto xl:flex">
+                        <form id="warehouses-filter-form" class="w-full sm:mr-auto xl:flex">
                             <div class="items-center sm:mr-4 sm:flex">
                                 <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
                                     Status
                                 </label>
                                 <?php if (isset($component)) { $__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-select.index','data' => ['id' => 'status-filter','class' => 'mt-2 w-full sm:mt-0 sm:w-auto']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-select.index','data' => ['id' => 'warehouses-status-filter','class' => 'mt-2 w-full sm:mt-0 sm:w-auto']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.form-select'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['id' => 'status-filter','class' => 'mt-2 w-full sm:mt-0 sm:w-auto']); ?>
+<?php $component->withAttributes(['id' => 'warehouses-status-filter','class' => 'mt-2 w-full sm:mt-0 sm:w-auto']); ?>
                                     <option value="">All Status</option>
-                                    <option value="pending">Pending</option>
-                                    <option value="in_progress">In progress</option>
-                                    <option value="approved">Approved</option>
-                                    <option value="rejected">Rejected</option>
-                                    <option value="completed">Completed</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
                                  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a)): ?>
@@ -347,14 +230,14 @@
                                 </label>
                                 <?php if (isset($component)) { $__componentOriginal40054831fd8fc1521987609af4b37cc0 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal40054831fd8fc1521987609af4b37cc0 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-input.index','data' => ['id' => 'search-filter','type' => 'text','placeholder' => 'Search...','class' => 'mt-2 w-full sm:mt-0 sm:w-48 2xl:w-full']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-input.index','data' => ['id' => 'warehouses-search-filter','type' => 'text','placeholder' => 'Search...','class' => 'mt-2 w-full sm:mt-0 sm:w-48 2xl:w-full']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.form-input'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['id' => 'search-filter','type' => 'text','placeholder' => 'Search...','class' => 'mt-2 w-full sm:mt-0 sm:w-48 2xl:w-full']); ?>
+<?php $component->withAttributes(['id' => 'warehouses-search-filter','type' => 'text','placeholder' => 'Search...','class' => 'mt-2 w-full sm:mt-0 sm:w-48 2xl:w-full']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal40054831fd8fc1521987609af4b37cc0)): ?>
@@ -367,7 +250,7 @@
 <?php endif; ?>
                             </div>
                             <div class="mt-4 flex flex-wrap gap-2 sm:items-center xl:mt-0">
-                                <button id="material-requests-filter-go" type="button" class="btn-royal btn-royal--dark btn-royal--sm w-full sm:w-24 group">
+                                <button id="warehouses-filter-go" type="button" class="btn-royal btn-royal--dark btn-royal--sm w-full sm:w-24 group">
                                     <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'search','class' => 'w-4 h-4 icon-hover-rise']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -390,7 +273,7 @@
 <?php endif; ?>
                                     Go
                                 </button>
-                                <button id="material-requests-filter-reset" type="button" class="btn-royal btn-royal--outline btn-royal--sm w-full sm:w-24 group">
+                                <button id="warehouses-filter-reset" type="button" class="btn-royal btn-royal--outline btn-royal--sm w-full sm:w-24 group">
                                     <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'rotate-ccw','class' => 'w-4 h-4 icon-hover-rise']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -427,7 +310,7 @@
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['content' => 'Export PDF','placement' => 'bottom']); ?>
-                                <button id="material-requests-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
+                                <button id="warehouses-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
                                     <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'file-text','class' => 'w-5 h-5 icon-hover-rise']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -469,7 +352,7 @@
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['content' => 'Export','placement' => 'bottom']); ?>
-                                <button id="material-requests-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
+                                <button id="warehouses-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
                                     <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'file-spreadsheet','class' => 'w-5 h-5 icon-hover-rise']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -511,7 +394,7 @@
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['content' => 'Refresh','placement' => 'bottom']); ?>
-                                <button id="material-requests-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
+                                <button id="warehouses-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
                                     <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'refresh-cw','class' => 'w-5 h-5 icon-hover-rise']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -547,20 +430,19 @@
                             
                             <?php if (isset($component)) { $__componentOriginaleaefd826d177068d67dd4af24306c055 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginaleaefd826d177068d67dd4af24306c055 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.tippy.index','data' => ['content' => 'Create new material request','placement' => 'bottom']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.tippy.index','data' => ['content' => 'Add new warehouse','placement' => 'bottom']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.tippy'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['content' => 'Create new material request','placement' => 'bottom']); ?>
+<?php $component->withAttributes(['content' => 'Add new warehouse','placement' => 'bottom']); ?>
                                 <button
                                     type="button"
-                                    id="create-material-request-button"
                                     class="btn-royal btn-royal--gold btn-royal--sm sm:btn-royal--lg group"
                                     data-tw-toggle="modal"
-                                    data-tw-target="#material-request-modal"
+                                    data-tw-target="#create-warehouse-modal"
                                 >
                                     <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
@@ -582,7 +464,7 @@
 <?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
-                                    <span class="hidden sm:inline">New Request</span>
+                                    <span class="hidden sm:inline">Add</span>
                                 </button>
                              <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
@@ -596,9 +478,10 @@
 <?php endif; ?>
                         </div>
                     </div>
+
                     <div class="overflow-x-auto sm:overflow-visible" data-erp-table-wrapper>
                         <table
-                            id="material-requests-table"
+                            id="warehouses-table"
                             data-tw-merge
                             data-erp-table
                             class="datatable-default w-full min-w-full table-auto text-left text-sm"
@@ -606,12 +489,8 @@
                             <thead class="bg-gradient-to-r from-royalDark to-gray-800 text-white">
                                 <tr>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Code</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Title</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Requested By</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Company</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Request Date</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Total Amount</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Approvals</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Name</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Location</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Status</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Actions</th>
                                 </tr>
@@ -632,213 +511,213 @@
 <?php endif; ?>
         </div>
     </div>
+
+    <?php echo $__env->make('warehouse.modals.create', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+    <?php echo $__env->make('warehouse.modals.edit', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+    <?php echo $__env->yieldPushContent('modals'); ?>
 <?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('components.datatable.scripts', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
-
-<?php echo $__env->make('warehouse.material-requests.modals.create-request', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
 <?php $__env->startPush('scripts'); ?>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
 
     <script>
-        window.materialRequestPayload = {
-            routes: {
-                store: '<?php echo e(route('warehouse.material-requests.store')); ?>',
-                previewCode: '<?php echo e(route('warehouse.material-requests.preview-code')); ?>',
-                materials: '<?php echo e(route('warehouse.material-requests.materials')); ?>',
-                categoryChildren: '<?php echo e(route('warehouse.categories.children')); ?>'
-            },
-            meta: {
-                csrf: '<?php echo e(csrf_token()); ?>'
-            },
-            data: {
-                companies: <?php echo json_encode($companiesPayload, 15, 512) ?>,
-                defaultCompany: <?php echo json_encode($defaultCompanyMeta, 15, 512) ?>,
-                warehouses: <?php echo json_encode($warehousesPayload, 15, 512) ?>,
-                materials: <?php echo json_encode($materialsPayload, 15, 512) ?>,
-                categories: <?php echo json_encode($materialCategoriesPayload, 15, 512) ?>,
-                catalogs: <?php echo json_encode($catalogsPayload, 15, 512) ?>,
-                approvalTemplates: <?php echo json_encode($approvalTemplatesPayload, 15, 512) ?>,
-                currencySymbol: <?php echo json_encode($currencySymbol, 15, 512) ?>
-            }
-        };
-
-        window.dispatchEvent(new Event('material-request:payload-ready'));
-
-        let materialRequestsTable;
+        let warehousesTable;
 
         document.addEventListener('DOMContentLoaded', function () {
             const jq = window.jQuery || window.$;
-            if (!jq) {
-                console.error('jQuery not available on material requests page.');
+
+            if (!jq || typeof jq.fn === 'undefined' || typeof jq.fn.DataTable === 'undefined') {
+                console.error('DataTables is not loaded; warehouses table will not be initialised.');
                 return;
             }
 
-            jq(function () {
-                initializeMaterialRequestsTable();
-                setupMaterialRequestsFilters();
-            });
+            initializeWarehousesDataTable();
+            setupWarehousesEventListeners();
         });
 
-        function initializeMaterialRequestsTable() {
-            materialRequestsTable = window.erpCrud.initDataTable({
-                tableSelector: '#material-requests-table',
-                ajaxUrl: '<?php echo e(route("warehouse.material-requests.datatable")); ?>',
-                ajaxData: function(d) {
-                    d.status = $('#status-filter').val();
-                    d.search_value = $('#search-filter').val();
+        function initializeWarehousesDataTable() {
+            warehousesTable = window.erpCrud.initDataTable({
+                tableSelector: '#warehouses-table',
+                ajaxUrl: '<?php echo e(route("warehouse.warehouses.datatable")); ?>',
+                ajaxData: function (d) {
+                    const statusEl = document.getElementById('warehouses-status-filter');
+                    const searchEl = document.getElementById('warehouses-search-filter');
+
+                    d.status = statusEl ? statusEl.value : '';
+                    d.filter_value = searchEl ? searchEl.value : '';
+                    d.filter_field = 'all';
+                    d.filter_type = 'contains';
                 },
                 columns: [
                     { data: 'code', name: 'code' },
-                    { data: 'title', name: 'title' },
-                    { data: 'requested_by_name', name: 'requested_by_name' },
-                    { data: 'company_name', name: 'company_name' },
-                    { data: 'request_date', name: 'request_date' },
-                    {
-                        data: 'total_amount',
-                        name: 'total_amount',
-                        render: function (value) {
-                            if (window.erpCrud && typeof window.erpCrud.formatCurrency === 'function') {
-                                return window.erpCrud.formatCurrency(value);
-                            }
-                            return value ?? 0;
-                        }
-                    },
-                    { data: 'approval_progress', name: 'approval_progress', orderable: false, searchable: false },
-                    {
-                        data: 'status_badge',
-                        name: 'status',
-                        className: 'text-center',
-                        orderable: false,
-                        searchable: false,
-                        render: function (value) {
-                            return value || '';
-                        }
-                    },
+                    { data: 'name', name: 'name' },
+                    { data: 'location', name: 'location' },
+                    { data: 'status_badge', name: 'status_badge', orderable: false, searchable: false },
                     { data: 'actions', name: 'actions', orderable: false, searchable: false }
                 ],
                 pageLength: 25
             });
-            window.materialRequestsTable = materialRequestsTable;
-        }
 
-        function setupMaterialRequestsFilters() {
-            $('#search-filter').on('keypress', function(e) {
-                if (e.which === 13) {
-                    applyFilters();
-                }
-            });
+            window.warehousesTable = warehousesTable;
 
-            $('#status-filter').on('change', function() {
-                applyFilters();
-            });
-
-            // PDF export
-            $('#material-requests-pdf').on('click', function() {
-                showToast('PDF export functionality not implemented yet', 'info');
-            });
-
-            // Export functionality
-            $('#material-requests-export').on('click', function() {
-                if (window.erpCrud && typeof window.erpCrud.exportDataTable === 'function') {
-                    window.erpCrud.exportDataTable(materialRequestsTable, 'material-requests');
-                } else {
-                    showToast('Export functionality not available', 'error');
-                }
-            });
-
-            // Refresh functionality
-            $('#material-requests-refresh').on('click', function() {
-                if (materialRequestsTable) {
-                    materialRequestsTable.ajax.reload();
-                    showToast('Data refreshed', 'success');
-                }
-            });
-
-            // Quick search input in compact bar
-            $('#quick-search').on('keypress', function(e) {
-                if (e.which === 13) {
-                    const value = $(this).val();
-                    $('#search-filter').val(value);
-                    applyFilters();
-                }
-            });
-        }
-
-        function applyFilters() {
-            if (materialRequestsTable) {
-                materialRequestsTable.ajax.reload();
-            }
-        }
-
-        function clearFilters() {
-            $('#status-filter').val('');
-            $('#search-filter').val('');
-            $('#quick-search').val('');
-            applyFilters();
-        }
-
-        window.filterByStatus = function (status) {
-            const statusSelect = $('#status-filter');
-            if (!statusSelect.length) {
+            if (!warehousesTable) {
                 return;
             }
 
-            statusSelect.val(status || '');
-            $('#search-filter').val('');
-            applyFilters();
-        };
+            warehousesTable.on('draw', function () {
+                if (typeof window.lucide !== 'undefined' && window.lucide.createIcons) {
+                    window.lucide.createIcons();
+                }
+            });
+        }
 
-        window.toggleAdvancedFilters = function () {
-            const panel = document.getElementById('advanced-filters-panel');
-            if (!panel) return;
-            panel.classList.toggle('hidden');
-        };
-
-        function deleteMaterialRequest(id, code) {
-            if (!window.confirmDelete || !window.showError || !window.showToast) {
-                console.error('Global notification helpers are not available.');
+        function setupWarehousesEventListeners() {
+            const jq = window.jQuery || window.$;
+            if (!jq) {
                 return;
             }
 
-            window.confirmDelete(code, function () {
-                const jq = window.jQuery || window.$;
-                if (!jq) {
-                    console.error('jQuery is not available for deleteMaterialRequest.');
-                    return;
-                }
+            const pdfBtn = jq('#warehouses-pdf');
+            const exportBtn = jq('#warehouses-export');
+            const refreshBtn = jq('#warehouses-refresh');
 
-                jq.ajax({
-                    url: '<?php echo e(route('warehouse.material-requests.destroy', ':id')); ?>'.replace(':id', id),
-                    type: 'POST',
-                    data: {
-                        _method: 'DELETE',
-                        _token: '<?php echo e(csrf_token()); ?>'
-                    }
-                })
-                .done(function (response) {
-                    const message = response.message || 'Material request deleted successfully.';
-                    window.showToast(message, 'delete');
-                    if (window.materialRequestsTable) {
-                        window.materialRequestsTable.ajax.reload(null, false);
-                    }
-                })
-                .fail(function (xhr) {
-                    const message = xhr.responseJSON?.message || 'Failed to delete material request.';
-                    window.showError(message);
+            jq('#warehouses-search-filter').on('keypress', function (e) {
+                if (e.which === 13) {
+                    applyWarehousesFilters();
+                }
+            });
+
+            jq('#warehouses-status-filter').on('change', function () {
+                applyWarehousesFilters();
+            });
+
+            if (pdfBtn.length) {
+                pdfBtn.on('click', function () {
+                    showToast('PDF export functionality not implemented yet', 'info');
                 });
-            });
+            }
+
+            if (exportBtn.length) {
+                exportBtn.on('click', function () {
+                    if (window.erpCrud && typeof window.erpCrud.exportDataTable === 'function') {
+                        window.erpCrud.exportDataTable(warehousesTable, 'warehouses');
+                    } else {
+                        showToast('Export functionality not available', 'error');
+                    }
+                });
+            }
+
+            if (refreshBtn.length) {
+                refreshBtn.on('click', function () {
+                    if (warehousesTable) {
+                        warehousesTable.ajax.reload();
+                        showToast('Data refreshed', 'success');
+                    }
+                });
+            }
         }
 
-        function openMaterialRequestEditModal(id) {
-            // Placeholder for Ajax-powered edit modal; implementation will
-            // reuse the create modal structure and populate it with data.
-            // For now, simply navigate to the show page with edit flag
-            // to avoid breaking the UI until the full edit modal is wired.
-            window.location.href = '<?php echo e(route('warehouse.material-requests.show', ':id')); ?>'.replace(':id', id) + '?edit=1';
+        function applyWarehousesFilters() {
+            if (warehousesTable) {
+                warehousesTable.ajax.reload();
+            }
+            updateWarehousesActiveFiltersIndicator();
         }
+
+        function clearWarehousesFilters() {
+            const jq = window.jQuery || window.$;
+            if (!jq) {
+                return;
+            }
+
+            jq('#warehouses-status-filter').val('');
+            jq('#warehouses-search-filter').val('');
+            if (warehousesTable) {
+                warehousesTable.ajax.reload();
+            }
+            updateWarehousesActiveFiltersIndicator();
+            showToast('Filters reset', 'success');
+        }
+
+        function updateWarehousesActiveFiltersIndicator() {
+            const jq = window.jQuery || window.$;
+            if (!jq) {
+                return;
+            }
+
+            const hasActiveFilters = jq('#warehouses-status-filter').val() || jq('#warehouses-search-filter').val();
+            jq('#warehouses-active-filters-indicator').toggleClass('hidden', !hasActiveFilters);
+        }
+
+        window.editWarehouse = function(id) {
+            const jq = window.jQuery || window.$;
+            if (!jq) {
+                return;
+            }
+
+            jq.get('<?php echo e(route("warehouse.warehouses.show", ":id")); ?>'.replace(':id', id))
+                .done(function(response) {
+                    if (response.success) {
+                        if (typeof window.populateEditWarehouseModal === 'function') {
+                            window.populateEditWarehouseModal(response.warehouse);
+                        }
+                        jq('#edit-warehouse-modal').modal('show');
+                    }
+                });
+        };
+
+        window.deleteWarehouse = function(id, name) {
+            const jq = window.jQuery || window.$;
+            if (!jq) {
+                return;
+            }
+
+            if (typeof window.confirmDelete === 'function') {
+                window.confirmDelete(name, function() {
+                    jq.ajax({
+                        url: '<?php echo e(route("warehouse.warehouses.destroy", ":id")); ?>'.replace(':id', id),
+                        type: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector("meta[name='csrf-token']").getAttribute('content')
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                if (warehousesTable) {
+                                    warehousesTable.ajax.reload();
+                                }
+                                if (typeof window.showSuccess === 'function') {
+                                    window.showSuccess(response.message || 'Warehouse deleted successfully');
+                                }
+                            } else if (typeof window.showError === 'function') {
+                                window.showError(response.message || 'Failed to delete warehouse.');
+                            }
+                        },
+                        error: function() {
+                            if (typeof window.showError === 'function') {
+                                window.showError('Failed to delete warehouse.');
+                            }
+                        }
+                    });
+                });
+            } else {
+                // Fallback - just run delete
+                jq.ajax({
+                    url: '<?php echo e(route("warehouse.warehouses.destroy", ":id")); ?>'.replace(':id', id),
+                    type: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector("meta[name='csrf-token']").getAttribute('content')
+                    },
+                    success: function(response) {
+                        if (response.success && warehousesTable) {
+                            warehousesTable.ajax.reload();
+                        }
+                    }
+                });
+            }
+        };
     </script>
 <?php $__env->stopPush(); ?>
 
-<?php echo $__env->make('../themes/' . $activeTheme . '/' . $activeLayout, array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\laravel\smart-erp\resources\views/warehouse/material-requests/index.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('../themes/' . $activeTheme . '/' . $activeLayout, array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\laravel\smart-erp\resources\views/warehouse/index.blade.php ENDPATH**/ ?>

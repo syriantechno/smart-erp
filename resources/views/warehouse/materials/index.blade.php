@@ -91,66 +91,70 @@
         <div class="intro-y col-span-12">
             <x-base.preview-component class="intro-y box bg-white/80 border border-slate-200/70 shadow-[0_18px_45px_rgba(15,23,42,0.10)]">
                 <div class="p-5">
-                    <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
-                        <form id="materials-filter-form" class="w-full sm:mr-auto xl:flex">
-                            <div class="items-center sm:mr-4 sm:flex">
-                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
-                                    Category
-                                </label>
-                                <x-base.form-select id="category-filter" class="mt-2 w-full sm:mt-0 sm:w-auto">
-                                    <option value="">All Categories</option>
-                                    @foreach($categories ?? [] as $category)
-                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                    @endforeach
-                                </x-base.form-select>
-                            </div>
-                            <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
-                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
-                                    Status
-                                </label>
-                                <x-base.form-select id="status-filter" class="mt-2 w-full sm:mt-0 sm:w-auto">
-                                    <option value="">All Status</option>
-                                    <option value="active">Active</option>
-                                    <option value="inactive">Inactive</option>
-                                </x-base.form-select>
-                            </div>
-                            <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
-                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
-                                    Search
-                                </label>
-                                <x-base.form-input
-                                    id="search-filter"
-                                    type="text"
-                                    placeholder="Search..."
-                                    class="mt-2 w-full sm:mt-0 sm:w-48 2xl:w-full"
-                                />
-                            </div>
-                            <div class="mt-4 flex flex-wrap gap-2 sm:items-center xl:mt-0">
-                                <button id="materials-filter-go" type="button" class="btn-royal btn-royal--dark btn-royal--sm w-full sm:w-24 group">
-                                    <x-base.lucide icon="search" class="w-4 h-4 icon-hover-rise" />
-                                    Go
-                                </button>
-                                <button id="materials-filter-reset" type="button" class="btn-royal btn-royal--outline btn-royal--sm w-full sm:w-24 group">
-                                    <x-base.lucide icon="rotate-ccw" class="w-4 h-4 icon-hover-rise" />
-                                    Reset
-                                </button>
-                            </div>
-                        </form>
+                    {{-- Unified filter & actions bar (same pattern as Departments / Categories) --}}
+                    <div class="flex flex-wrap items-center gap-2 mb-4">
+                        {{-- Search Input --}}
+                        <div class="relative min-w-[180px]">
+                            <x-base.lucide icon="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <x-base.form-input
+                                id="search-filter"
+                                type="text"
+                                placeholder="Search..."
+                                class="pl-9 w-full text-sm py-1.5"
+                            />
+                        </div>
 
-                        <div class="mt-5 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
-                            <x-base.tippy content="Export PDF" placement="bottom">
-                                <button id="materials-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
-                                    <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
+                        {{-- Category Filter --}}
+                        <x-base.form-select id="category-filter" class="w-auto text-sm py-1.5">
+                            <option value="">All Categories</option>
+                            @foreach($categories ?? [] as $category)
+                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            @endforeach
+                        </x-base.form-select>
+
+                        {{-- Status Filter --}}
+                        <x-base.form-select id="status-filter" class="w-auto text-sm py-1.5">
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </x-base.form-select>
+
+                        {{-- Page Length --}}
+                        <x-base.form-select id="materials-filter-length" class="w-auto text-sm py-1.5">
+                            <option value="10">10</option>
+                            <option value="25" selected>25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </x-base.form-select>
+
+                        {{-- Reset Button --}}
+                        <x-base.tippy as="button" id="materials-filter-reset" type="button" content="Reset filters" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                            <x-base.lucide icon="x" class="w-4 h-4" />
+                        </x-base.tippy>
+
+                        {{-- Spacer --}}
+                        <div class="flex-1"></div>
+
+                        {{-- Action Buttons --}}
+                        <div class="flex items-center gap-1">
+                            <x-base.tippy content="Print" placement="bottom">
+                                <button id="materials-print" type="button" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                                    <x-base.lucide icon="printer" class="w-4 h-4" />
                                 </button>
                             </x-base.tippy>
-                            <x-base.tippy content="Export" placement="bottom">
-                                <button id="materials-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
-                                    <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
+                            <x-base.tippy content="Export PDF" placement="bottom">
+                                <button id="materials-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                                    <x-base.lucide icon="file-text" class="w-4 h-4" />
+                                </button>
+                            </x-base.tippy>
+                            <x-base.tippy content="Export Excel" placement="bottom">
+                                <button id="materials-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                                    <x-base.lucide icon="file-spreadsheet" class="w-4 h-4" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Refresh" placement="bottom">
-                                <button id="materials-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
-                                    <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
+                                <button id="materials-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                                    <x-base.lucide icon="refresh-cw" class="w-4 h-4" />
                                 </button>
                             </x-base.tippy>
 
@@ -159,11 +163,11 @@
                                 <button
                                     type="button"
                                     id="open-create-material-modal"
-                                    class="btn-royal btn-royal--gold btn-royal--sm sm:btn-royal--lg group"
+                                    class="btn-royal btn-royal--gold btn-royal--sm group"
                                     data-tw-toggle="modal"
                                     data-tw-target="#create-material-modal"
                                 >
-                                    <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
+                                    <x-base.lucide icon="plus-circle" class="w-4 h-4 mr-2" />
                                     <span class="hidden sm:inline">Add</span>
                                 </button>
                             </x-base.tippy>
@@ -177,15 +181,15 @@
                             data-erp-table
                             class="datatable-default w-full min-w-full table-auto text-left text-sm"
                         >
-                            <thead class="bg-gradient-to-r from-royalDark to-gray-800 text-white">
+                            <thead>
                                 <tr>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Code</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Name</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Category</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Unit</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Price</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Status</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Actions</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Code</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Name</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Category</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Unit</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Price</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Status</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -216,10 +220,10 @@
         let materialsTable;
         const unitStoreUrl = '{{ route("warehouse.measurement-units.store") }}';
         
-        // Make categories and units data available globally for modals
+        // Make categories, units, and warehouses data available globally for modals
         window.materialsCategories = @json($categories ?? []);
         window.materialsUnits = @json($units ?? []);
-    </script>
+        window.materialsWarehouses = @json($warehouses ?? []);
 
         document.addEventListener('DOMContentLoaded', function () {
             const jq = window.jQuery || window.$;
@@ -312,6 +316,11 @@
                 applyFilters();
             });
 
+            // Reset filters button
+            $('#materials-filter-reset').on('click', function () {
+                clearFilters();
+            });
+
             // PDF export
             const pdfBtn = $('#materials-pdf');
             if (pdfBtn.length) {
@@ -340,6 +349,14 @@
                         materialsTable.ajax.reload();
                         showToast('Data refreshed', 'success');
                     }
+                });
+            }
+
+            // Print functionality
+            const printBtn = $('#materials-print');
+            if (printBtn.length) {
+                printBtn.on('click', function () {
+                    window.print();
                 });
             }
         }

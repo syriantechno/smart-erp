@@ -94,11 +94,15 @@ class PaymentVoucherController extends Controller
         // Notify accounting team
         $accountingTeam = User::whereHas('roles', fn($q) => $q->whereIn('name', ['admin', 'accountant']))->pluck('id')->toArray();
         if (!empty($accountingTeam)) {
+            $formattedTotal = function_exists('format_currency')
+                ? format_currency($voucher->total_amount)
+                : number_format($voucher->total_amount, 2);
+
             NotificationDispatcher::toUsers(
                 $accountingTeam,
                 'payment.created',
                 'سند صرف جديد',
-                "تم إنشاء سند صرف بمبلغ " . number_format($voucher->total_amount, 2),
+                "تم إنشاء سند صرف بمبلغ {$formattedTotal}",
                 route('accounting.payment-vouchers.index'),
                 'credit-card',
                 ['type' => 'info', 'actor_id' => auth()->id()]
@@ -117,7 +121,9 @@ class PaymentVoucherController extends Controller
                     'company_name' => $voucher->company->name ?? '-',
                     'method' => $voucher->method,
                     'account_name' => $voucher->account->name ?? '-',
-                    'total_amount' => number_format($voucher->total_amount, 2),
+                    'total_amount' => function_exists('format_currency')
+                        ? format_currency($voucher->total_amount)
+                        : number_format($voucher->total_amount, 2),
                     'status' => $voucher->status,
                 ]
             ]);

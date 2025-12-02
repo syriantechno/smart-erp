@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Warehouse\Material;
 use App\Models\Warehouse\Category;
 use App\Models\Warehouse\MeasurementUnit;
+use App\Models\Warehouse\Warehouse;
+use App\Models\Warehouse\Inventory;
 use App\Models\User;
 use App\Services\DocumentCodeGenerator;
 use App\Services\Notifications\NotificationDispatcher;
@@ -27,6 +29,7 @@ class MaterialController extends Controller
     {
         $categories = Category::active()->select('id', 'name', 'parent_id')->get();
         $units = MeasurementUnit::active()->select('id', 'name', 'symbol')->get();
+        $warehouses = Warehouse::active()->select('id', 'name', 'code', 'location')->get();
         $parentCategories = $categories->whereNull('parent_id');
 
         // Get statistics for the royal theme header
@@ -38,6 +41,7 @@ class MaterialController extends Controller
         return view('warehouse.materials.index', [
             'categories' => $categories,
             'units' => $units,
+            'warehouses' => $warehouses,
             'parentCategories' => $parentCategories,
             'totalMaterials' => $totalMaterials,
             'activeMaterials' => $activeMaterials,
@@ -187,6 +191,7 @@ class MaterialController extends Controller
             'category_id' => 'required|exists:categories,id',
             'unit_id' => 'required|exists:measurement_units,id',
             'opening_quantity' => 'nullable|numeric|min:0',
+            'opening_warehouse_id' => 'nullable|exists:warehouses,id',
             'price' => 'required|numeric|min:0',
             'is_active' => 'boolean',
             'image' => 'nullable|image|max:5120',
@@ -222,6 +227,23 @@ class MaterialController extends Controller
             }
 
             $material = Material::create($materialData);
+
+            // Map opening quantity to inventory for the selected warehouse (if provided)
+            $openingQty = (float) ($materialData['opening_quantity'] ?? 0);
+            $openingWarehouseId = $request->input('opening_warehouse_id');
+
+            if ($openingQty > 0 && $openingWarehouseId) {
+                Inventory::updateOrCreate(
+                    [
+                        'material_id' => $material->id,
+                        'warehouse_id' => $openingWarehouseId,
+                    ],
+                    [
+                        'quantity' => $openingQty,
+                        'unit_price' => (float) $material->price,
+                    ]
+                );
+            }
 
             DB::commit();
 
@@ -272,6 +294,7 @@ class MaterialController extends Controller
             'category_id' => 'required|exists:categories,id',
             'unit_id' => 'required|exists:measurement_units,id',
             'opening_quantity' => 'nullable|numeric|min:0',
+            'opening_warehouse_id' => 'nullable|exists:warehouses,id',
             'price' => 'required|numeric|min:0',
             'is_active' => 'boolean',
             'image' => 'nullable|image|max:5120',
@@ -317,6 +340,23 @@ class MaterialController extends Controller
             }
 
             $material->update($materialData);
+
+            // Optionally sync opening quantity to inventory for a selected warehouse
+            $openingQty = (float) ($materialData['opening_quantity'] ?? 0);
+            $openingWarehouseId = $request->input('opening_warehouse_id');
+
+            if ($openingWarehouseId && $openingQty >= 0) {
+                Inventory::updateOrCreate(
+                    [
+                        'material_id' => $material->id,
+                        'warehouse_id' => $openingWarehouseId,
+                    ],
+                    [
+                        'quantity' => $openingQty,
+                        'unit_price' => (float) $material->price,
+                    ]
+                );
+            }
 
             DB::commit();
 

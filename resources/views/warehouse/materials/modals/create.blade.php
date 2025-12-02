@@ -9,8 +9,8 @@
                 Material Information
             </h4>
             <div class="grid grid-cols-12 gap-4 gap-y-4">
-                <!-- First Row: Code, Name, Category, Unit, Status -->
-                <div class="col-span-12 md:col-span-2 xl:col-span-15/100">
+                <!-- Row 1: Code, Name -->
+                <div class="col-span-12 md:col-span-6">
                     <x-base.form-label for="create-code">Code</x-base.form-label>
                     <x-base.form-input
                         id="create-code"
@@ -23,7 +23,7 @@
                     />
                 </div>
 
-                <div class="col-span-12 md:col-span-3 xl:col-span-25/100">
+                <div class="col-span-12 md:col-span-6">
                     <x-base.form-label for="create-name">Name</x-base.form-label>
                     <x-base.form-input
                         id="create-name"
@@ -35,7 +35,8 @@
                     />
                 </div>
 
-                <div class="col-span-12 md:col-span-2 xl:col-span-15/100">
+                <!-- Row 2: Category, Unit -->
+                <div class="col-span-12 md:col-span-6">
                     <x-base.form-label for="create-category">Category</x-base.form-label>
                     <x-base.form-select id="create-category" name="category_id" class="w-full" required>
                         <option value="">Select Category</option>
@@ -43,7 +44,7 @@
                     </x-base.form-select>
                 </div>
 
-                <div class="col-span-12 md:col-span-2 xl:col-span-20/100">
+                <div class="col-span-12 md:col-span-6">
                     <x-base.form-label for="create-unit">Unit</x-base.form-label>
                     <div class="flex gap-2">
                         <x-base.form-select id="create-unit" name="unit_id" class="w-full" required>
@@ -118,44 +119,8 @@
                     </div>
                 </div>
 
-                <div class="col-span-12 md:col-span-2 xl:col-span-10/100">
-                    <x-base.form-label for="create-status">Status</x-base.form-label>
-                    <x-base.form-select id="create-status" name="is_active" class="w-full" required>
-                        <option value="1">Active</option>
-                        <option value="0">Inactive</option>
-                    </x-base.form-select>
-                </div>
-
-                <!-- Second Row: SKU, Barcode, Price, Opening Balance -->
-                <div class="col-span-12 md:col-span-3 xl:col-span-25/100">
-                    <x-base.form-label for="create-sku" class="flex items-center gap-2">
-                        SKU
-                        <span class="text-xs font-normal text-slate-400">(Optional)</span>
-                    </x-base.form-label>
-                    <x-base.form-input
-                        id="create-sku"
-                        name="sku"
-                        type="text"
-                        class="w-full"
-                        placeholder="Internal stock code"
-                    />
-                </div>
-
-                <div class="col-span-12 md:col-span-3 xl:col-span-25/100">
-                    <x-base.form-label for="create-barcode" class="flex items-center gap-2">
-                        Barcode
-                        <span class="text-xs font-normal text-slate-400">(Optional)</span>
-                    </x-base.form-label>
-                    <x-base.form-input
-                        id="create-barcode"
-                        name="barcode"
-                        type="text"
-                        class="w-full"
-                        placeholder="EAN / UPC"
-                    />
-                </div>
-
-                <div class="col-span-12 md:col-span-2 xl:col-span-15/100">
+                <!-- Row 3: Price, Opening Balance -->
+                <div class="col-span-12 md:col-span-6">
                     <x-base.form-label for="create-price">Price</x-base.form-label>
                     <x-base.form-input
                         id="create-price"
@@ -169,18 +134,70 @@
                     />
                 </div>
 
-                <div class="col-span-12 md:col-span-3 xl:col-span-20/100">
+                <div class="col-span-12 md:col-span-6">
                     <x-base.form-label for="create-opening-quantity">Opening Balance</x-base.form-label>
+                    <div class="grid grid-cols-12 gap-2">
+                        <div class="col-span-12 sm:col-span-7">
+                            <x-base.form-select id="create-opening-warehouse" name="opening_warehouse_id" class="w-full">
+                                <option value="">Select Warehouse</option>
+                                @foreach(($warehouses ?? []) as $warehouse)
+                                    <option value="{{ $warehouse->id }}">
+                                        {{ $warehouse->name }}@if($warehouse->location) — {{ $warehouse->location }} @endif
+                                    </option>
+                                @endforeach
+                            </x-base.form-select>
+                        </div>
+                        <div class="col-span-12 sm:col-span-5">
+                            <x-base.form-input
+                                id="create-opening-quantity"
+                                name="opening_quantity"
+                                type="number"
+                                step="0.0001"
+                                min="0"
+                                class="w-full"
+                                value="0"
+                                placeholder="0.0000"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 4: SKU, Barcode -->
+                <div class="col-span-12 md:col-span-6">
+                    <x-base.form-label for="create-sku" class="flex items-center gap-2">
+                        SKU
+                        <span class="text-xs font-normal text-slate-400">(Optional)</span>
+                    </x-base.form-label>
                     <x-base.form-input
-                        id="create-opening-quantity"
-                        name="opening_quantity"
-                        type="number"
-                        step="0.0001"
-                        min="0"
+                        id="create-sku"
+                        name="sku"
+                        type="text"
                         class="w-full"
-                        value="0"
-                        placeholder="0.0000"
+                        placeholder="Internal stock code"
                     />
+                </div>
+
+                <div class="col-span-12 md:col-span-6">
+                    <x-base.form-label for="create-barcode" class="flex items-center gap-2">
+                        Barcode
+                        <span class="text-xs font-normal text-slate-400">(Optional)</span>
+                    </x-base.form-label>
+                    <x-base.form-input
+                        id="create-barcode"
+                        name="barcode"
+                        type="text"
+                        class="w-full"
+                        placeholder="EAN / UPC"
+                    />
+                </div>
+
+                <!-- Row 5: Status full width on its own line -->
+                <div class="col-span-12 md:col-span-4 lg:col-span-3">
+                    <x-base.form-label for="create-status">Status</x-base.form-label>
+                    <x-base.form-select id="create-status" name="is_active" class="w-full" required>
+                        <option value="1">Active</option>
+                        <option value="0">Inactive</option>
+                    </x-base.form-select>
                 </div>
 
                 <div class="col-span-12">
@@ -244,10 +261,10 @@
                 type="submit"
                 form="create-material-form"
                 id="create-material-btn"
-                class="btn-royal btn-royal--success group"
+                class="btn-royal btn-royal--gold group"
             >
                 <x-base.lucide icon="save" class="w-5 h-5 icon-hover-rise" />
-                Save
+                Save Material
             </button>
         </div>
     @endslot

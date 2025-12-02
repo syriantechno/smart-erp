@@ -90,58 +90,73 @@
         <div class="intro-y col-span-12">
             <x-base.preview-component class="intro-y box bg-white/80 border border-slate-200/70 shadow-[0_18px_45px_rgba(15,23,42,0.10)]">
                 <div class="p-5">
-                    <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
-                        <form id="sale-orders-filter-form" class="w-full sm:mr-auto xl:flex">
-                            <div class="items-center sm:mr-4 sm:flex">
-                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
-                                    Status
-                                </label>
-                                <x-base.form-select id="sale-orders-status-filter" class="mt-2 w-full sm:mt-0 sm:w-auto">
-                                    <option value="">All Status</option>
-                                    <option value="pending">Pending</option>
-                                    <option value="confirmed">Confirmed</option>
-                                    <option value="shipped">Shipped</option>
-                                    <option value="completed">Completed</option>
-                                    <option value="cancelled">Cancelled</option>
-                                </x-base.form-select>
-                            </div>
-                            <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
-                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
-                                    Search
-                                </label>
-                                <x-base.form-input
-                                    id="sale-orders-search-filter"
-                                    type="text"
-                                    placeholder="Search..."
-                                    class="mt-2 w-full sm:mt-0 sm:w-48 2xl:w-full"
-                                />
-                            </div>
-                            <div class="mt-4 flex flex-wrap gap-2 sm:items-center xl:mt-0">
-                                <button id="sale-orders-filter-go" type="button" class="btn-royal btn-royal--dark btn-royal--sm w-full sm:w-24 group">
-                                    <x-base.lucide icon="search" class="w-4 h-4 icon-hover-rise" />
-                                    Go
-                                </button>
-                                <button id="sale-orders-filter-reset" type="button" class="btn-royal btn-royal--outline btn-royal--sm w-full sm:w-24 group">
-                                    <x-base.lucide icon="rotate-ccw" class="w-4 h-4 icon-hover-rise" />
-                                    Reset
-                                </button>
-                            </div>
-                        </form>
+                    {{-- Unified filter & actions bar (same pattern as Purchase Orders / Delivery Orders) --}}
+                    <div class="flex flex-wrap items-center gap-2 mb-4">
+                        {{-- Search Input --}}
+                        <div class="relative min-w-[180px]">
+                            <x-base.lucide icon="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <x-base.form-input
+                                id="sale-orders-search-filter"
+                                type="text"
+                                placeholder="Search..."
+                                class="pl-9 w-full text-sm py-1.5"
+                            />
+                        </div>
 
-                        <div class="mt-5 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
-                            <x-base.tippy content="Export PDF" placement="bottom">
-                                <button id="sale-orders-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
-                                    <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
+                        {{-- Status Filter --}}
+                        <x-base.form-select id="sale-orders-status-filter" class="w-auto text-sm py-1.5">
+                            <option value="">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="confirmed">Confirmed</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </x-base.form-select>
+
+                        {{-- Warehouse Filter --}}
+                        <x-base.form-select id="sale-orders-warehouse-filter" class="w-auto text-sm py-1.5">
+                            <option value="">All Warehouses</option>
+                            @foreach ($warehouses as $warehouse)
+                                <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                            @endforeach
+                        </x-base.form-select>
+
+                        {{-- Page Length --}}
+                        <x-base.form-select id="sale-orders-filter-length" class="w-auto text-sm py-1.5">
+                            <option value="10">10</option>
+                            <option value="25" selected>25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </x-base.form-select>
+
+                        {{-- Reset Button --}}
+                        <x-base.tippy as="button" id="sale-orders-filter-reset" type="button" content="Reset filters" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                            <x-base.lucide icon="x" class="w-4 h-4" />
+                        </x-base.tippy>
+
+                        {{-- Spacer --}}
+                        <div class="flex-1"></div>
+
+                        {{-- Action Buttons --}}
+                        <div class="flex items-center gap-1">
+                            <x-base.tippy content="Print" placement="bottom">
+                                <button id="sale-orders-print" type="button" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                                    <x-base.lucide icon="printer" class="w-4 h-4" />
                                 </button>
                             </x-base.tippy>
-                            <x-base.tippy content="Export" placement="bottom">
-                                <button id="sale-orders-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
-                                    <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
+                            <x-base.tippy content="Export PDF" placement="bottom">
+                                <button id="sale-orders-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                                    <x-base.lucide icon="file-text" class="w-4 h-4" />
+                                </button>
+                            </x-base.tippy>
+                            <x-base.tippy content="Export Excel" placement="bottom">
+                                <button id="sale-orders-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                                    <x-base.lucide icon="file-spreadsheet" class="w-4 h-4" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Refresh" placement="bottom">
-                                <button id="sale-orders-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
-                                    <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
+                                <button id="sale-orders-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                                    <x-base.lucide icon="refresh-cw" class="w-4 h-4" />
                                 </button>
                             </x-base.tippy>
 
@@ -150,56 +165,14 @@
                                 <button
                                     type="button"
                                     id="open-create-so-modal"
-                                    class="btn-royal btn-royal--gold btn-royal--sm sm:btn-royal--lg group"
+                                    class="btn-royal btn-royal--gold btn-royal--sm"
                                     data-tw-toggle="modal"
+                                    data-tw-target="#sale-order-modal"
                                 >
-                                    <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
+                                    <x-base.lucide icon="plus-circle" class="w-4 h-4 mr-1" />
                                     <span class="hidden sm:inline">Add</span>
                                 </button>
                             </x-base.tippy>
-                        <!-- Warehouse Filter -->
-                        <div class="col-span-12 md:col-span-4">
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Warehouse
-                            </label>
-                            <x-base.form-select id="so-warehouse-filter" class="w-full">
-                                <option value="">All Warehouses</option>
-                                @foreach ($warehouses as $warehouse)
-                                    <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
-                                @endforeach
-                            </x-base.form-select>
-                        </div>
-
-                        <!-- Search Filter -->
-                        <div class="col-span-12 md:col-span-4">
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Search
-                            </label>
-                            <x-base.form-input
-                                id="so-search-filter"
-                                type="text"
-                                placeholder="Search sale orders..."
-                                class="w-full"
-                            />
-                        </div>
-
-                        <div class="col-span-12 flex justify-end gap-2 mt-2 flex-wrap">
-                            <button
-                                type="button"
-                                class="btn-royal btn-royal--outline btn-royal--sm group"
-                                onclick="clearSoFilters()"
-                            >
-                                <x-base.lucide icon="rotate-ccw" class="w-4 h-4 icon-hover-rise" />
-                                Clear
-                            </button>
-                            <button
-                                type="button"
-                                class="btn-royal btn-royal--dark btn-royal--sm group"
-                                onclick="applySoFilters()"
-                            >
-                                <x-base.lucide icon="search" class="w-4 h-4 icon-hover-rise" />
-                                Apply
-                            </button>
                         </div>
                     </div>
 
@@ -210,15 +183,14 @@
                             data-erp-table
                             class="datatable-default w-full min-w-full table-auto text-left text-sm"
                         >
-                            <thead class="bg-gradient-to-r from-royalDark to-gray-800 text-white">
+                            <thead>
                                 <tr>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">#</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Code</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Title</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Customer</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Warehouse</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Created By</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Order Date</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Total Amount</th>
+                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-right">Total Amount</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Status</th>
                                     <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Actions</th>
                                 </tr>
@@ -230,6 +202,8 @@
             </x-base.preview-component>
         </div>
     </div>
+
+    @include('warehouse.sale-orders.modals.create')
 @endsection
 
 @include('components.datatable.scripts')
@@ -259,9 +233,9 @@
                 ajaxUrl: '{{ route("warehouse.sale-orders.datatable") }}',
                 ajaxData: function(d) {
                     const jq = window.jQuery || window.$;
-                    d.status = jq ? jq('#so-status-filter').val() : '';
-                    d.warehouse_id = jq ? jq('#so-warehouse-filter').val() : '';
-                    d.search_value = jq ? jq('#so-search-filter').val() : '';
+                    d.status = jq ? jq('#sale-orders-status-filter').val() : '';
+                    d.warehouse_id = jq ? jq('#sale-orders-warehouse-filter').val() : '';
+                    d.search_value = jq ? jq('#sale-orders-search-filter').val() : '';
                 },
                 columns: [
                     { data: 'code', name: 'code' },
@@ -269,19 +243,8 @@
                     { data: 'warehouse_name', name: 'warehouse_name' },
                     { data: 'created_by_name', name: 'created_by_name' },
                     { data: 'order_date', name: 'order_date' },
-                    { data: 'total_amount', name: 'total_amount' },
-                    { 
-                        data: 'is_active', 
-                        name: 'is_active',
-                        className: 'text-center',
-                        title: 'Status',
-                        render: function (value) {
-                            if (window.erpCrud && typeof window.erpCrud.renderStatusBadge === 'function') {
-                                return window.erpCrud.renderStatusBadge(value);
-                            }
-                            return value ? 'Active' : 'Inactive';
-                        }
-                    },
+                    { data: 'total_amount', name: 'total_amount', className: 'text-right' },
+                    { data: 'status_badge', name: 'status', className: 'text-center' },
                     { data: 'actions', name: 'actions', orderable: false, searchable: false }
                 ],
                 pageLength: 25
@@ -300,21 +263,28 @@
                 }
             });
 
-            jq('#sale-orders-status-filter').on('change', function () {
-                applySaleOrdersFilters();
+            jq('#sale-orders-status-filter, #sale-orders-warehouse-filter, #sale-orders-filter-length').on('change', function () {
+                const lengthEl = document.getElementById('sale-orders-filter-length');
+                if (saleOrdersTable && lengthEl) {
+                    saleOrdersTable.page.len(parseInt(lengthEl.value || '25', 10)).draw();
+                } else {
+                    applySaleOrdersFilters();
+                }
             });
 
-            // PDF export
+            // PDF export (placeholder)
             jq('#sale-orders-pdf').on('click', function () {
-                showToast('PDF export functionality not implemented yet', 'info');
+                if (typeof window.showToast === 'function') {
+                    window.showToast('PDF export functionality not implemented yet', 'info');
+                }
             });
 
-            // Export functionality
+            // Export functionality (fallback to client-side export helper if available)
             jq('#sale-orders-export').on('click', function () {
                 if (window.erpCrud && typeof window.erpCrud.exportDataTable === 'function') {
                     window.erpCrud.exportDataTable(saleOrdersTable, 'sale-orders');
-                } else {
-                    showToast('Export functionality not available', 'error');
+                } else if (typeof window.showToast === 'function') {
+                    window.showToast('Export functionality not available', 'error');
                 }
             });
 
@@ -322,8 +292,30 @@
             jq('#sale-orders-refresh').on('click', function () {
                 if (saleOrdersTable) {
                     saleOrdersTable.ajax.reload();
-                    showToast('Data refreshed', 'success');
+                    if (typeof window.showToast === 'function') {
+                        window.showToast('Data refreshed', 'success');
+                    }
                 }
+            });
+
+            // Print
+            jq('#sale-orders-print').on('click', function () {
+                window.print();
+            });
+
+            // Reset filters
+            jq('#sale-orders-filter-reset').on('click', function () {
+                jq('#sale-orders-search-filter').val('');
+                jq('#sale-orders-status-filter').val('');
+                jq('#sale-orders-warehouse-filter').val('');
+                const lengthEl = document.getElementById('sale-orders-filter-length');
+                if (lengthEl) {
+                    lengthEl.value = '25';
+                }
+                if (saleOrdersTable) {
+                    saleOrdersTable.page.len(25).draw();
+                }
+                applySaleOrdersFilters();
             });
         }
 

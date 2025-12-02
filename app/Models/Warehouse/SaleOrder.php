@@ -2,6 +2,11 @@
 
 namespace App\Models\Warehouse;
 
+use App\Models\Approval\ApprovalRequest;
+use App\Models\Approval\ApprovalTemplate;
+use App\Models\Setting\Company;
+use App\Models\Work\Project;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -18,10 +23,15 @@ class SaleOrder extends Model
         'status',
         'order_date',
         'expected_delivery_date',
+        'company_id',
+        'project_id',
+        'priority',
         'customer_id',
         'warehouse_id',
         'created_by',
         'total_amount',
+        'approval_template_id',
+        'approval_request_id',
         'is_active'
     ];
 
@@ -47,9 +57,29 @@ class SaleOrder extends Model
         return $this->belongsTo(Warehouse::class);
     }
 
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
+    }
+
+    public function project(): BelongsTo
+    {
+        return $this->belongsTo(Project::class);
+    }
+
     public function items(): HasMany
     {
         return $this->hasMany(SaleOrderItem::class);
+    }
+
+    public function approvalTemplate(): BelongsTo
+    {
+        return $this->belongsTo(ApprovalTemplate::class);
+    }
+
+    public function approvalRequest(): BelongsTo
+    {
+        return $this->belongsTo(ApprovalRequest::class);
     }
 
     public function deliveryOrders(): HasMany

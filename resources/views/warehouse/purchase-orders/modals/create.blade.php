@@ -1,176 +1,285 @@
 @php
-    $codeGenerator = app(\App\Services\DocumentCodeGenerator::class);
-    $generatedCode = $codeGenerator->generate('purchase_orders');
+    $heroCompanyName = $defaultCompanyName ?? 'Smart ERP';
+    $heroCompanyAddress = $defaultCompanyAddress ?? 'Select the warehouse items needed for fulfillment.';
+    $heroCompanyLogo = $defaultCompanyLogo
+        ?? 'https://ui-avatars.com/api/?name=' . urlencode($heroCompanyName)
+        . '&background=1D4ED8&color=fff';
 @endphp
 
-<x-modal.form id="create-po-modal" title="Add New Purchase Order" size="5xl">
-    <form id="create-po-form" action="{{ route('warehouse.purchase-orders.store') }}" method="POST">
+<x-modal.form id="create-po-modal" size="xxl" title="New Purchase Order">
+    <form id="purchase-order-form" action="{{ route('warehouse.purchase-orders.store') }}" method="POST" class="space-y-6">
         @csrf
 
-        <!-- Purchase Order Information Section -->
-        <div class="mb-6">
-            <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                <x-base.lucide icon="file-text" class="h-5 w-5"></x-base.lucide>
-                Purchase Order Information
-            </h4>
-            
-            <div class="flex flex-wrap gap-4 gap-y-4">
-                <div class="w-full md:w-1/3 lg:w-1/6">
-                    <x-base.form-label for="create-po-code">Code</x-base.form-label>
-                    <div class="flex gap-2">
-                        <x-base.form-input
-                            id="create-po-code"
-                            name="code"
-                            type="text"
-                            class="flex-1"
-                            value="{{ old('code', $generatedCode) }}"
-                            readonly
-                        />
-                        <button
-                            type="button"
-                            class="btn-royal btn-royal--dark btn-royal--sm "
-                            onclick="refreshPurchaseOrderCode()"
-                            title="Refresh Code"
+        <input type="hidden" name="total_amount" id="purchase-order-total" value="0">
+        <input type="hidden" name="items" id="purchase-order-items" value="[]">
+        <input type="hidden" name="status" value="pending">
+
+        <div class="flex flex-col gap-3 rounded-2xl border border-slate-200/70 bg-slate-50/60 p-4 dark:border-darkmode-400 dark:bg-darkmode-600/30">
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="h-14 w-14 overflow-hidden rounded-2xl border border-white/60 bg-white shadow-sm flex items-center justify-center">
+                    <img
+                        id="purchase-order-company-logo"
+                        src="{{ $heroCompanyLogo }}"
+                        alt="{{ $heroCompanyName }} Logo"
+                        class="h-full w-full object-cover"
+                    >
+                </div>
+                <div class="flex-1 min-w-[200px]">
+                    <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">Purchase Order</p>
+                    <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100" id="purchase-order-company-name">
+                        {{ $heroCompanyName }}
+                    </h3>
+                    <p class="text-sm text-slate-500" id="purchase-order-company-address">
+                        {{ $heroCompanyAddress }}
+                    </p>
+                </div>
+                <div class="text-right text-sm text-slate-500">
+                    <p>Currency</p>
+                    <p class="text-base font-semibold text-slate-700">{{ $currencySymbol ?? config('app.currency_symbol', '$') }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <div class="rounded-2xl border border-slate-200/70 bg-white shadow-sm dark:border-darkmode-400 dark:bg-darkmode-600">
+                <div class="border-b border-slate-200/60 px-5 py-3 dark:border-darkmode-400">
+                    <h4 class="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-100">
+                        <x-base.lucide icon="Info" class="h-4 w-4" />
+                        Order Details
+                    </h4>
+                </div>
+                <div class="grid grid-cols-12 gap-2 px-5 py-4 text-sm">
+                    <div class="col-span-12 sm:col-span-6 lg:col-span-3">
+                        <x-base.form-label for="purchase-order-code">Order Code</x-base.form-label>
+                        <div class="flex gap-2">
+                            <x-base.form-input
+                                id="purchase-order-code"
+                                name="code"
+                                type="text"
+                                class="w-full text-sm"
+                                readonly
+                                placeholder="AUTO"
+                            />
+                            <x-base.button type="button" variant="outline-secondary" class="shrink-0" id="purchase-order-regenerate">
+                                <x-base.lucide icon="RefreshCcw" class="h-4 w-4" />
+                            </x-base.button>
+                        </div>
+                    </div>
+                    <div class="col-span-12 sm:col-span-6 lg:col-span-3">
+                        <x-base.form-label for="purchase-order-company">Company</x-base.form-label>
+                        <x-base.form-select
+                            id="purchase-order-company"
+                            name="company_id"
+                            required
+                            class="text-sm"
                         >
-                            <x-base.lucide icon="refresh-cw" class="w-4 h-4" />
-                        </button>
+                            <option value="">Select company</option>
+                            @foreach ($companies as $companyOption)
+                                <option value="{{ $companyOption->id }}" @selected(($defaultCompanyId ?? null) === $companyOption->id)>
+                                    {{ $companyOption->name }}
+                                </option>
+                            @endforeach
+                        </x-base.form-select>
+                    </div>
+                    <div class="col-span-12 sm:col-span-6 lg:col-span-3">
+                        <x-base.form-label for="purchase-order-title">Title</x-base.form-label>
+                        <x-base.form-input
+                            id="purchase-order-title"
+                            name="title"
+                            type="text"
+                            required
+                            class="text-sm"
+                            placeholder="Ex: Monthly Clinic Supplies PO"
+                        />
+                    </div>
+                    <div class="col-span-12 sm:col-span-6 lg:col-span-3">
+                        <x-base.form-label for="purchase-order-date">Order Date</x-base.form-label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 flex w-10 items-center justify-center rounded-l border bg-slate-100 text-slate-500 dark:border-darkmode-800 dark:bg-darkmode-700 dark:text-slate-400">
+                                <x-base.lucide icon="Calendar" class="h-4 w-4" />
+                            </div>
+                            <x-base.litepicker
+                                id="purchase-order-date"
+                                name="order_date"
+                                class="w-full pl-12 text-sm"
+                                data-single-mode="true"
+                                data-format="YYYY-MM-DD"
+                                value="{{ now()->format('Y-m-d') }}"
+                                required
+                            />
+                        </div>
+                    </div>
+                    <div class="col-span-12 sm:col-span-6 lg:col-span-3">
+                        <x-base.form-label for="purchase-order-expected-date">Expected Delivery</x-base.form-label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 flex w-10 items-center justify-center rounded-l border bg-slate-100 text-slate-500 dark:border-darkmode-800 dark:bg-darkmode-700 dark:text-slate-400">
+                                <x-base.lucide icon="Calendar" class="h-4 w-4" />
+                            </div>
+                            <x-base.litepicker
+                                id="purchase-order-expected-date"
+                                name="expected_delivery_date"
+                                class="w-full pl-12 text-sm"
+                                data-single-mode="true"
+                                data-format="YYYY-MM-DD"
+                            />
+                        </div>
+                    </div>
+                    <div class="col-span-12 sm:col-span-6 lg:col-span-3">
+                        <x-base.form-label for="purchase-order-priority">Priority</x-base.form-label>
+                        <x-base.form-select id="purchase-order-priority" name="priority" class="text-sm">
+                            <option value="normal">Normal</option>
+                            <option value="high">High</option>
+                            <option value="urgent">Urgent</option>
+                        </x-base.form-select>
+                    </div>
+                    <div class="col-span-12 sm:col-span-6 lg:col-span-3">
+                        <x-base.form-label for="purchase-order-project">Project</x-base.form-label>
+                        <x-base.form-select
+                            id="purchase-order-project"
+                            name="project_id"
+                            class="text-sm"
+                        >
+                            <option value="">Select project</option>
+                            @foreach(($projects ?? collect()) as $project)
+                                <option value="{{ $project->id }}">
+                                    {{ $project->code ? $project->code . ' — ' : '' }}{{ $project->name }}
+                                </option>
+                            @endforeach
+                        </x-base.form-select>
+                    </div>
+                    <div class="col-span-12 sm:col-span-6 lg:col-span-3">
+                        <x-base.form-label for="purchase-order-approval-template">Approval Template</x-base.form-label>
+                        <x-base.form-select id="purchase-order-approval-template" name="approval_template_id" required class="text-sm">
+                            <option value="">Select approval template</option>
+                            @foreach ($approvalTemplates as $template)
+                                <option value="{{ $template->id }}">{{ $template->name }}</option>
+                            @endforeach
+                        </x-base.form-select>
+                    </div>
+                    <div class="col-span-12 sm:col-span-6 lg:col-span-12">
+                        <x-base.form-label for="purchase-order-description">Notes</x-base.form-label>
+                        <x-base.form-textarea
+                            id="purchase-order-description"
+                            name="description"
+                            rows="3"
+                            class="text-sm"
+                            placeholder="Context, instructions, or delivery details..."
+                        ></x-base.form-textarea>
                     </div>
                 </div>
+            </div>
 
-                <div class="w-full md:w-1/3 lg:w-2/6">
-                    <x-base.form-label for="create-po-title">Title <span class="text-danger">*</span></x-base.form-label>
-                    <x-base.form-input
-                        id="create-po-title"
-                        name="title"
-                        type="text"
-                        placeholder="Enter purchase order title"
-                        class="w-full"
-                        required
-                    />
+            <div class="rounded-2xl border border-slate-200/70 bg-white shadow-sm dark:border-darkmode-400 dark:bg-darkmode-600">
+                <div class="border-b border-slate-200/60 px-5 py-3 dark:border-darkmode-400">
+                    <div class="flex flex-col gap-3">
+                        <div class="flex flex-wrap items-start justify-between gap-2 text-sm">
+                            <h4 class="text-sm font-semibold text-slate-700 dark:text-slate-100">Select Materials</h4>
+                        </div>
+                        <div class="grid grid-cols-12 gap-2 text-sm">
+                            <div class="col-span-12 md:col-span-3">
+                                <x-base.form-label for="purchase-order-warehouse">Warehouse</x-base.form-label>
+                                <x-base.form-select id="purchase-order-warehouse" name="warehouse_id" required class="text-sm">
+                                    <option value="">Select warehouse</option>
+                                    @foreach ($warehouses as $warehouse)
+                                        <option value="{{ $warehouse->id }}">{{ $warehouse->name }} — {{ $warehouse->location }}</option>
+                                    @endforeach
+                                </x-base.form-select>
+                            </div>
+                            <div class="col-span-12 md:col-span-3" data-catalog-control="catalog">
+                                <x-base.form-label for="purchase-order-catalog">Catalog</x-base.form-label>
+                                <x-base.form-select id="purchase-order-catalog" class="text-sm">
+                                    <option value="">Select catalog</option>
+                                    @foreach ($categories as $catalog)
+                                        @php
+                                            $childOptions = $catalog->children->map(fn ($child) => [
+                                                'id' => $child->id,
+                                                'name' => $child->name,
+                                            ])->values();
+                                        @endphp
+                                        <option
+                                            value="{{ $catalog->id }}"
+                                            data-children='@json($childOptions)'
+                                        >
+                                            {{ $catalog->name }}
+                                        </option>
+                                    @endforeach
+                                </x-base.form-select>
+                            </div>
+                            <div class="col-span-12 md:col-span-3" data-catalog-control="sub">
+                                <x-base.form-label for="purchase-order-sub-catalog">Sub Catalog</x-base.form-label>
+                                <x-base.form-select id="purchase-order-sub-catalog" disabled class="text-sm">
+                                    <option value="">Select sub catalog</option>
+                                </x-base.form-select>
+                            </div>
+                            <div class="col-span-12 md:col-span-3" data-catalog-control="material">
+                                <x-base.form-label for="purchase-order-material-select">Materials</x-base.form-label>
+                                <x-base.tom-select id="purchase-order-material-select" data-placeholder="Search materials" class="text-sm" disabled>
+                                    <option value="">Select material</option>
+                                </x-base.tom-select>
+                                <div class="mt-2">
+                                    <x-base.form-input id="purchase-order-material-filter" type="text" placeholder="Type to search..." class="w-full text-sm" disabled />
+                                </div>
+                                <div id="purchase-order-material-template" class="hidden">
+                                    <div class="flex items-center gap-3">
+                                        <div class="h-10 w-10 overflow-hidden rounded-lg bg-slate-100">
+                                            <img src="" alt="Material" class="h-full w-full object-cover" loading="lazy" />
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-semibold text-slate-700"></p>
+                                            <p class="text-xs text-slate-500"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
-                <div class="w-full md:w-1/3 lg:w-1/6">
-                    <x-base.form-label for="create-po-date">Order Date <span class="text-danger">*</span></x-base.form-label>
-                    <x-base.form-input
-                        id="create-po-date"
-                        name="order_date"
-                        type="date"
-                        value="{{ date('Y-m-d') }}"
-                        class="w-full"
-                        required
-                    />
-                </div>
-
-                <div class="w-full md:w-1/3 lg:w-1/6">
-                    <x-base.form-label for="create-po-status">Status</x-base.form-label>
-                    <x-base.form-select id="create-po-status" name="status" class="w-full">
-                        <option value="pending">Pending</option>
-                        <option value="approved">Approved</option>
-                        <option value="shipped">Shipped</option>
-                        <option value="delivered">Delivered</option>
-                        <option value="cancelled">Cancelled</option>
-                    </x-base.form-select>
-                </div>
-
-                <div class="w-full md:w-1/3 lg:w-1/6">
-                    <x-base.form-label for="create-po-delivery-date">Expected Delivery</x-base.form-label>
-                    <x-base.form-input
-                        id="create-po-delivery-date"
-                        name="expected_delivery_date"
-                        type="date"
-                        class="w-full"
-                    />
-                </div>
-
-                <div class="w-full md:w-1/3 lg:w-1/6">
-                    <x-base.form-label for="create-po-amount">Total Amount <span class="text-danger">*</span></x-base.form-label>
-                    <x-base.form-input
-                        id="create-po-amount"
-                        name="total_amount"
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        placeholder="0.00"
-                        class="w-full"
-                        required
-                    />
+                <div class="px-5 pb-4 text-sm">
+                    <div id="purchase-order-material-loader" class="mt-4 flex items-center gap-2 text-xs text-slate-500 hidden">
+                        <x-base.lucide icon="Loader" class="h-4 w-4 animate-spin" />
+                        Fetching materials...
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Supplier Information Section -->
-        <div class="mb-6">
-            <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                <x-base.lucide icon="building" class="h-5 w-5"></x-base.lucide>
-                Supplier Information
-            </h4>
-            
-            <div class="flex flex-wrap gap-4 gap-y-4">
-                <div class="w-full md:w-1/2">
-                    <x-base.form-label for="create-po-supplier">Supplier</x-base.form-label>
-                    <x-base.form-select id="create-po-supplier" name="supplier_id" class="w-full">
-                        <option value="">Select Supplier</option>
-                        @foreach($suppliers ?? [] as $supplier)
-                            <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
-                        @endforeach
-                    </x-base.form-select>
-                </div>
-
-                <div class="w-full md:w-1/2">
-                    <label class="flex items-center mt-6">
-                        <x-base.form-check.input 
-                            type="checkbox" 
-                            name="is_active" 
-                            value="1"
-                            checked
-                        />
-                        <span class="ml-2">Active</span>
-                    </label>
-                </div>
+        <div class="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm dark:border-darkmode-400 dark:bg-darkmode-600">
+            <div class="flex items-center justify-between border-b border-slate-200/60 pb-4 dark:border-darkmode-400">
+                <h4 class="text-sm font-semibold text-slate-700 dark:text-slate-100">Selected Items</h4>
+                <span class="text-xs text-slate-500" id="purchase-order-item-count">0 items</span>
             </div>
-        </div>
-
-        <!-- Description Section -->
-        <div class="mb-6">
-            <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                <x-base.lucide icon="file-text" class="h-5 w-5"></x-base.lucide>
-                Additional Information
-            </h4>
-            
-            <div class="w-full">
-                <x-base.form-label for="create-po-description">Description</x-base.form-label>
-                <x-base.form-textarea
-                    id="create-po-description"
-                    name="description"
-                    rows="3"
-                    placeholder="Enter purchase order description"
-                    class="w-full"
-                ></x-base.form-textarea>
+            <div class="overflow-x-auto">
+                <table class="mt-4 w-full text-left text-sm">
+                    <thead>
+                        <tr class="text-xs uppercase tracking-wide text-slate-500">
+                            <th class="px-4 py-2">Material</th>
+                            <th class="px-4 py-2">Unit</th>
+                            <th class="px-4 py-2">Qty</th>
+                            <th class="px-4 py-2">Unit Price</th>
+                            <th class="px-4 py-2 text-right">Total</th>
+                            <th class="px-4 py-2 text-center">Remove</th>
+                        </tr>
+                    </thead>
+                    <tbody id="purchase-order-selected" class="divide-y divide-slate-100"></tbody>
+                </table>
             </div>
-        </div>
-
-        <!-- Materials Section (Optional for future enhancement) -->
-        <div class="mb-6">
-            <h4 class="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                <x-base.lucide icon="package" class="h-5 w-5"></x-base.lucide>
-                Materials
-                <span class="text-sm text-slate-500 font-normal">(Optional - can be added after creation)</span>
-            </h4>
-            
-            <div class="bg-slate-50 dark:bg-darkmode-800 rounded-lg p-4 text-center">
-                <x-base.lucide icon="info" class="h-8 w-8 mx-auto text-slate-400 mb-2"></x-base.lucide>
-                <p class="text-slate-600 dark:text-slate-400">
-                    Materials can be added after creating the purchase order using the unified invoice system.
-                </p>
+            <div class="mt-4 flex flex-wrap items-center justify-between gap-4">
+                <div></div>
+                <div class="text-right">
+                    <p class="text-xs uppercase text-slate-500">Grand Total</p>
+                    <p class="text-2xl font-semibold text-slate-800">
+                        <span id="purchase-order-grand-total">{{ $currencySymbol ?? '$' }}0.00</span>
+                    </p>
+                </div>
             </div>
         </div>
     </form>
 
-    @slot('footer')
+    <x-slot name="footer">
         <div class="flex w-full flex-wrap justify-end gap-2">
             <button
                 type="button"
-                class="btn-royal btn-royal--outline btn-royal--sm group"
+                class="btn-royal btn-royal--outline group"
                 data-tw-dismiss="modal"
             >
                 <x-base.lucide icon="x-circle" class="w-5 h-5 icon-hover-rise" />
@@ -178,147 +287,584 @@
             </button>
             <button
                 type="submit"
-                form="create-po-form"
-                id="create-po-btn"
-                class="btn-royal btn-royal--gold btn-royal--sm group"
+                form="purchase-order-form"
+                id="purchase-order-submit"
+                class="btn-royal btn-royal--gold group"
             >
                 <x-base.lucide icon="save" class="w-5 h-5 icon-hover-rise" />
-                Save
+                Submit Order
             </button>
         </div>
-    @endslot
+    </x-slot>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            console.log('🔧 Initializing Purchase Order modal...');
-            
-            const jq = window.jQuery || window.$;
-            if (!jq) {
-                console.error('jQuery not available for create purchase order modal.');
-                return;
-            }
+        // Guard against double-initialization when external purchase-orders-modal.js also defines the same logic
+        if (!window.__PO_INLINE_INIT) {
+            window.__PO_INLINE_INIT = true;
 
-            const $ = jq;
-            
-            // Wait for modal to be ready
-            setTimeout(() => {
-                const form = document.getElementById('create-po-form');
-                const submitBtn = $('#create-po-btn');
-
-                if (!form) {
-                    console.warn('Purchase order form not found');
+        (() => {
+            const bootstrap = () => {
+                if (window.__purchaseOrderModalInitialized) {
                     return;
                 }
-                
-                console.log('✅ Purchase order form found');
-                
-                // Add CSRF token setup
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+
+                const payload = window.purchaseOrderPayload;
+                if (!payload) {
+                    console.warn('purchaseOrderPayload missing');
+                    return;
+                }
+
+                window.__purchaseOrderModalInitialized = true;
+
+                const companies = payload.data.companies || [];
+                const defaultCompany = payload.data.defaultCompany || {};
+                const companyMap = new Map(companies.map((company) => [String(company.id), company]));
+
+                const state = {
+                    materials: [],
+                    materialLookup: new Map(),
+                    selected: new Map(),
+                    currency: payload.data.currencySymbol || '{{ $currencySymbol ?? '$' }}',
+                    companyMap,
+                    defaultCompany,
+                    selectedCompanyId: defaultCompany.id ?? null,
+                    catalogs: payload.data.catalogs || [],
+                    catalogChildrenMap: new Map((payload.data.catalogs || []).map((catalog) => [String(catalog.id), catalog.children || []])),
+                    selectedWarehouseId: null,
+                    selectedCatalogId: null,
+                    selectedSubCatalogId: null,
+                    isLoading: false,
+                };
+
+                const codeInput = document.getElementById('purchase-order-code');
+                const titleInput = document.getElementById('purchase-order-title');
+                const regenerateBtn = document.getElementById('purchase-order-regenerate');
+                const warehouseSelect = document.getElementById('purchase-order-warehouse');
+                const catalogSelect = document.getElementById('purchase-order-catalog');
+                const subCatalogSelect = document.getElementById('purchase-order-sub-catalog');
+                const materialSelect = document.getElementById('purchase-order-material-select');
+                const materialTemplate = document.getElementById('purchase-order-material-template');
+                const materialFilterInput = document.getElementById('purchase-order-material-filter');
+                const fallbackMaterialImage = payload.meta?.materialPlaceholder || 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" fill="#e2e8f0"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#94a3b8" font-family="Arial" font-size="10">No Image</text></svg>');
+                const loaderEl = document.getElementById('purchase-order-material-loader');
+                const selectedTable = document.getElementById('purchase-order-selected');
+                const totalField = document.getElementById('purchase-order-total');
+                const itemsField = document.getElementById('purchase-order-items');
+                const grandTotalLabel = document.getElementById('purchase-order-grand-total');
+                const itemCountLabel = document.getElementById('purchase-order-item-count');
+                const form = document.getElementById('purchase-order-form');
+                const submitBtn = document.getElementById('purchase-order-submit');
+                const companySelect = document.getElementById('purchase-order-company');
+                const companyLogoEl = document.getElementById('purchase-order-company-logo');
+                const companyNameEl = document.getElementById('purchase-order-company-name');
+                const companyAddressEl = document.getElementById('purchase-order-company-address');
+
+                const showError = (message) => {
+                    window.showError?.(message) ?? console.error(message);
+                };
+
+                const fallbackLogo = (name) => `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'Smart ERP')}&background=1D4ED8&color=fff`;
+
+                const getCompanyData = (id) => {
+                    if (!id) {
+                        return null;
                     }
-                });
+                    return state.companyMap.get(String(id)) || null;
+                };
 
-            form.addEventListener('submit', function (e) {
-                e.preventDefault();
+                const updateCompanyHero = (companyData) => {
+                    const target = companyData || state.defaultCompany || {};
+                    const companyName = target.name || state.defaultCompany?.name || 'Smart ERP';
+                    if (companyNameEl) {
+                        companyNameEl.textContent = companyName;
+                    }
+                    if (companyAddressEl) {
+                        companyAddressEl.textContent = target.address || state.defaultCompany?.address || 'Select the warehouse items needed for fulfillment.';
+                    }
+                    if (companyLogoEl) {
+                        companyLogoEl.src = target.logo_url || fallbackLogo(companyName);
+                    }
+                };
 
-                const formData = new FormData(form);
-                const originalText = submitBtn.html();
+                const syncCompanySelection = () => {
+                    if (!companySelect) {
+                        updateCompanyHero();
+                        return;
+                    }
 
-                submitBtn.prop('disabled', true).html('<i class="w-4 h-4 mr-2 animate-spin" data-lucide="loader"></i> Saving...');
+                    const selectedId = companySelect.value || state.defaultCompany?.id || null;
+                    state.selectedCompanyId = selectedId ? String(selectedId) : null;
+                    updateCompanyHero(getCompanyData(state.selectedCompanyId));
+                };
 
-                $.ajax({
-                    url: '{{ route("warehouse.purchase-orders.store") }}',
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            console.log('✅ Purchase order created successfully');
-                            
-                            // Close modal safely
-                            try {
-                                const modalElement = document.getElementById('create-po-modal');
-                                if (modalElement) {
-                                    modalElement.style.display = 'none';
-                                    modalElement.classList.remove('show');
-                                    document.body.classList.remove('modal-open');
-                                    
-                                    // Remove backdrop
-                                    const backdrop = document.querySelector('.modal-backdrop');
-                                    if (backdrop) {
-                                        backdrop.remove();
+                const fetchCode = () => {
+                    if (!payload.routes.previewCode || !codeInput) return;
+                    fetch(payload.routes.previewCode)
+                        .then((res) => res.json())
+                        .then((data) => {
+                            if (data && data.code) {
+                                codeInput.value = data.code;
+                            }
+                        })
+                        .catch(() => {});
+                };
+
+                const canQueryMaterials = () => {
+                    return state.selectedWarehouseId && state.selectedCatalogId;
+                };
+
+                const resetMaterialResults = () => {
+                    state.materials = [];
+                    state.materialLookup.clear();
+                    if (materialSelect?.tomselect) {
+                        materialSelect.tomselect.clearOptions();
+                        materialSelect.tomselect.clear();
+                        materialSelect.tomselect.disable();
+                    } else if (materialSelect) {
+                        materialSelect.innerHTML = '<option value="">Select material</option>';
+                        materialSelect.disabled = true;
+                    }
+                    if (materialFilterInput) {
+                        materialFilterInput.value = '';
+                        materialFilterInput.disabled = true;
+                    }
+                };
+
+                const toggleLoader = (show) => {
+                    state.isLoading = !!show;
+                    loaderEl?.classList.toggle('hidden', !show);
+                };
+
+                // Reuse global instance if external script created it to avoid "already been declared" errors
+                let materialSelectInstance = window.__poMaterialSelectInstance || null;
+
+                const renderMaterialOptions = () => {
+                    if (!materialSelect) return;
+
+                    const previousValue = materialSelectInstance?.getValue?.() || '';
+
+                    if (!materialSelectInstance) {
+                        if (materialSelect.tomselect) {
+                            materialSelect.tomselect.destroy();
+                        }
+
+                        materialSelectInstance = new TomSelect(materialSelect, {
+                            valueField: 'id',
+                            labelField: 'name',
+                            searchField: ['name', 'code'],
+                            maxOptions: 1000,
+                            plugins: {
+                                clear_button: { title: 'Clear selection' },
+                            },
+                            render: {
+                                option: (data) => {
+                                    const template = materialTemplate?.firstElementChild?.cloneNode(true);
+                                    if (!template) {
+                                        return `<div>
+                                            <div class="flex flex-col">
+                                                <span class="font-semibold">${data.name}</span>
+                                                <span class="text-xs text-slate-500">${data.code}</span>
+                                            </div>
+                                        </div>`;
                                     }
+
+                                    const img = template.querySelector('img');
+                                    if (img) {
+                                        img.src = data.image_url || fallbackMaterialImage;
+                                    }
+                                    const titleEl = template.querySelector('p.text-sm');
+                                    if (titleEl) {
+                                        titleEl.textContent = data.name;
+                                    }
+                                    const subtitle = template.querySelector('p.text-xs');
+                                    if (subtitle) {
+                                        subtitle.textContent = `${data.code || 'No code'} · ${state.currency}${Number(data.price || 0).toFixed(2)}`;
+                                    }
+
+                                    return template.outerHTML;
+                                },
+                                item: (data) => {
+                                    return `<div class="flex flex-col">
+                                        <span class="font-semibold text-sm">${data.name}</span>
+                                        <span class="text-xs text-slate-500">${data.code}</span>
+                                    </div>`;
+                                },
+                            },
+                        });
+
+                        const selectInstance = materialSelectInstance;
+                        materialSelect.addEventListener('change', () => {
+                            const selectedId = materialSelect.value;
+                            if (!selectedId) return;
+                            addMaterial(selectedId);
+                            selectInstance?.clear?.();
+                        });
+
+                        if (materialFilterInput) {
+                            materialFilterInput.addEventListener('input', (event) => {
+                                const keyword = (event.target.value || '').trim();
+                                selectInstance?.setTextboxValue(keyword);
+                                selectInstance?.refreshOptions(keyword.length > 0);
+                            });
+                        }
+                    }
+
+                    const mapped = state.materials.map((material) => ({
+                        id: String(material.id),
+                        name: material.name,
+                        code: material.code,
+                        price: material.price,
+                        image_url: material.image_url,
+                    }));
+
+                    if (materialSelectInstance) {
+                        materialSelectInstance.clearOptions();
+                        materialSelectInstance.addOptions(mapped);
+                        materialSelectInstance.refreshOptions(false);
+                        if (previousValue) {
+                            materialSelectInstance.setValue(previousValue, true);
+                        }
+
+                        const hasMaterials = !!state.materials.length;
+                        if (hasMaterials) {
+                            materialSelectInstance.enable();
+                            materialFilterInput && (materialFilterInput.disabled = false);
+                        } else {
+                            materialSelectInstance.disable();
+                            if (materialFilterInput) {
+                                materialFilterInput.value = '';
+                                materialFilterInput.disabled = true;
+                            }
+                        }
+                    }
+                };
+
+                const fetchMaterials = (append = false, page = 1) => {
+                    if (!payload.routes.materials || !canQueryMaterials()) {
+                        resetMaterialResults();
+                        return;
+                    }
+
+                    toggleLoader(true);
+                    const params = new URLSearchParams({
+                        warehouse_id: state.selectedWarehouseId,
+                        catalog_id: state.selectedCatalogId,
+                        page: page.toString(),
+                    });
+
+                    if (state.selectedSubCatalogId) {
+                        params.append('sub_catalog_id', state.selectedSubCatalogId);
+                    }
+
+                    fetch(`${payload.routes.materials}?${params.toString()}`)
+                        .then((res) => res.json())
+                        .then((response) => {
+                            if (!response.success) {
+                                throw new Error(response.message || 'Failed to fetch materials');
+                            }
+
+                            const items = response.data?.items || [];
+                            if (append) {
+                                state.materials = state.materials.concat(items);
+                            } else {
+                                state.materials = items;
+                            }
+
+                            items.forEach((item) => {
+                                state.materialLookup.set(String(item.id), item);
+                            });
+
+                            renderMaterialOptions();
+                        })
+                        .catch((error) => {
+                            console.error(error);
+                            showError('Unable to load materials.');
+                        })
+                        .finally(() => {
+                            toggleLoader(false);
+                        });
+                };
+
+                const renderSelected = () => {
+                    selectedTable.innerHTML = '';
+                    state.selected.forEach((item) => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td class="px-4 py-3">
+                                <p class="font-semibold">${item.name}</p>
+                                <p class="text-xs text-slate-500">${item.code}</p>
+                            </td>
+                            <td class="px-4 py-3">${item.unit || item.unit_symbol || '-'}</td>
+                            <td class="px-4 py-3">
+                                <input type="tel" inputmode="numeric" pattern="[0-9]*" min="1" step="1" value="${item.quantity}" data-qty="${item.material_id}" class="w-20 rounded-lg border border-slate-200 px-2 py-1 text-sm" />
+                            </td>
+                            <td class="px-4 py-3">${state.currency}${Number(item.unit_price).toFixed(2)}</td>
+                            <td class="px-4 py-3 text-right" data-row-total="${item.material_id}">${state.currency}${Number(item.unit_price * item.quantity).toFixed(2)}</td>
+                            <td class="px-4 py-3 text-center">
+                                <button
+                                    type="button"
+                                    data-remove="${item.material_id}"
+                                    class="inline-flex items-center justify-center rounded-md p-2 text-slate-500 transition hover:text-red-600 focus:outline-none focus:ring-1 focus:ring-red-500/40"
+                                >
+                                    <i data-lucide="Trash2" class="h-4 w-4"></i>
+                                </button>
+                            </td>`;
+                        selectedTable.appendChild(row);
+                    });
+                    updateSelectedSummary();
+                    window.lucide?.createIcons?.();
+                };
+
+                const updateSelectedSummary = () => {
+                    let total = 0;
+                    state.selected.forEach((item) => {
+                        total += item.unit_price * item.quantity;
+                    });
+
+                    totalField.value = total.toFixed(2);
+                    grandTotalLabel.textContent = `${state.currency}${Number(total).toFixed(2)}`;
+                    itemsField.value = JSON.stringify(Array.from(state.selected.values()));
+                    itemCountLabel.textContent = `${state.selected.size} item${state.selected.size === 1 ? '' : 's'}`;
+                };
+
+                const addMaterial = (selectedId) => {
+                    const material = state.materialLookup.get(String(selectedId));
+                    if (!material) return;
+
+                    const key = String(material.id);
+                    const existing = state.selected.get(key);
+
+                    if (existing) {
+                        existing.quantity += 1;
+                        state.selected.set(key, existing);
+                    } else {
+                        state.selected.set(key, {
+                            material_id: material.id,
+                            code: material.code,
+                            name: material.name,
+                            unit: material.unit_name,
+                            unit_symbol: material.unit_symbol,
+                            quantity: 1,
+                            unit_price: material.price,
+                        });
+                    }
+
+                    renderSelected();
+                };
+
+                if (warehouseSelect) {
+                    warehouseSelect.addEventListener('change', () => {
+                        state.selectedWarehouseId = warehouseSelect.value || null;
+                        resetMaterialResults();
+                        if (canQueryMaterials()) {
+                            fetchMaterials();
+                        }
+                    });
+                }
+
+                if (catalogSelect) {
+                    catalogSelect.addEventListener('change', () => {
+                        const catalogId = catalogSelect.value || null;
+                        state.selectedCatalogId = catalogId;
+
+                        const children = state.catalogChildrenMap.get(String(catalogId)) || [];
+                        subCatalogSelect.innerHTML = '<option value="">Select sub catalog</option>';
+                        if (children.length) {
+                            children.forEach((child) => {
+                                const option = document.createElement('option');
+                                option.value = child.id;
+                                option.textContent = child.name;
+                                subCatalogSelect.appendChild(option);
+                            });
+                            subCatalogSelect.disabled = false;
+                        } else {
+                            subCatalogSelect.disabled = true;
+                        }
+
+                        resetMaterialResults();
+                        if (canQueryMaterials()) {
+                            fetchMaterials();
+                        }
+                    });
+                }
+
+                if (subCatalogSelect) {
+                    subCatalogSelect.addEventListener('change', () => {
+                        state.selectedSubCatalogId = subCatalogSelect.value || null;
+                        resetMaterialResults();
+                        if (canQueryMaterials()) {
+                            fetchMaterials();
+                        }
+                    });
+                }
+
+                if (materialSelect) {
+                    materialSelect.addEventListener('change', () => {
+                        const selectedId = materialSelect.value;
+                        if (!selectedId) return;
+                        addMaterial(selectedId);
+                        if (materialSelect.tomselect) {
+                            materialSelect.tomselect.clear(true);
+                        }
+                    });
+                }
+
+                if (selectedTable) {
+                    selectedTable.addEventListener('input', (event) => {
+                        const target = event.target;
+                        if (target && target.hasAttribute('data-qty')) {
+                            const key = target.getAttribute('data-qty');
+                            const value = parseFloat(target.value || '0');
+                            const existing = state.selected.get(String(key));
+                            if (!existing) {
+                                return;
+                            }
+                            existing.quantity = value > 0 ? value : 1;
+                            state.selected.set(String(key), existing);
+                            renderSelected();
+                        }
+                    });
+
+                    selectedTable.addEventListener('click', (event) => {
+                        const target = event.target.closest('[data-remove]');
+                        if (!target) return;
+                        const key = target.getAttribute('data-remove');
+                        state.selected.delete(String(key));
+                        renderSelected();
+                    });
+                }
+
+                if (regenerateBtn) {
+                    regenerateBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        fetchCode();
+                    });
+                }
+
+                syncCompanySelection();
+
+                if (companySelect) {
+                    companySelect.addEventListener('change', syncCompanySelection);
+                }
+
+                // initial code generation
+                fetchCode();
+
+                // regenerate on button click
+                if (regenerateBtn) {
+                    regenerateBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        fetchCode();
+                    });
+                }
+
+                if (form && submitBtn) {
+                    form.addEventListener('submit', function (e) {
+                        e.preventDefault();
+
+                        const jq = window.jQuery || window.$;
+                        if (!jq) {
+                            showError('jQuery not available on purchase order page.');
+                            return;
+                        }
+
+                        const $ = jq;
+                        $.ajaxSetup({
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            }
+                        });
+
+                        const formData = new FormData(form);
+                        const originalHtml = submitBtn.innerHTML;
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<i class="w-4 h-4 mr-2 animate-spin" data-lucide="loader"></i> Saving...';
+
+                        $.ajax({
+                            url: payload.routes.store,
+                            type: 'POST',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                if (response.success) {
+                                    window.showSuccess?.(response.message || 'Purchase order created successfully') ?? console.log(response.message || 'Purchase order created successfully');
+
+                                    const modalElement = document.getElementById('create-po-modal');
+                                    if (modalElement && window.tailwind?.Modal?.getOrCreateInstance) {
+                                        const instance = window.tailwind.Modal.getOrCreateInstance(modalElement);
+                                        instance.hide();
+                                    }
+
+                                    form.reset();
+                                    state.selected.clear();
+                                    renderSelected();
+
+                                    if (window.purchaseOrdersTable) {
+                                        window.purchaseOrdersTable.ajax.reload();
+                                    }
+                                } else {
+                                    const errorMsg = response.message || 'Failed to create purchase order.';
+                                    showError(errorMsg);
                                 }
-                            } catch (error) {
-                                console.warn('Error closing modal:', error);
+                            },
+                            error: function(xhr) {
+                                let message = 'An error occurred while saving the purchase order.';
+                                if (xhr.responseJSON && xhr.responseJSON.message) {
+                                    message = xhr.responseJSON.message;
+                                }
+                                showError(message);
+                            },
+                            complete: function() {
+                                submitBtn.disabled = false;
+                                submitBtn.innerHTML = originalHtml;
+                                if (typeof window.lucide !== 'undefined') {
+                                    window.lucide.createIcons();
+                                }
                             }
-                            
-                            // Reset form
-                            form.reset();
-                            
-                            // Refresh table
-                            if (window.purchaseOrdersTable) {
-                                window.purchaseOrdersTable.ajax.reload();
-                            }
-                            
-                            // Show success message using global notifications
-                            if (typeof window.showSuccess === 'function') {
-                                window.showSuccess(response.message || 'Purchase order created successfully');
-                            } else if (typeof window.showToast === 'function') {
-                                window.showToast(response.message || 'Purchase order created successfully', 'success');
-                            } else {
-                                console.log('Success:', response.message || 'Purchase order created successfully');
-                            }
-                        } else {
-                            const errorMsg = response.message || 'Failed to create purchase order.';
-                            if (typeof window.showError === 'function') {
-                                window.showError(errorMsg);
-                            } else if (typeof window.showToast === 'function') {
-                                window.showToast(errorMsg, 'error');
-                            } else {
-                                console.error('Error:', errorMsg);
-                            }
-                        }
-                    },
-                    error: function(xhr) {
-                        let message = 'An error occurred while saving the purchase order.';
-                        if (xhr.responseJSON && xhr.responseJSON.message) {
-                            message = xhr.responseJSON.message;
-                        }
+                        });
+                    });
+                }
+            };
 
-                        if (typeof window.showError === 'function') {
-                            window.showError(message);
-                        } else if (typeof window.showToast === 'function') {
-                            window.showToast(message, 'error');
-                        } else {
-                            console.error('Error:', message);
-                        }
-                    },
-                    complete: function() {
-                        submitBtn.prop('disabled', false).html(originalText);
-                        
-                        // Re-initialize Lucide icons
-                        if (typeof lucide !== 'undefined') {
-                            lucide.createIcons();
-                        }
-                    }
-                });
-            }, 500); // Wait 500ms for modal to be ready
-        });
+            const init = () => {
+                if (window.purchaseOrderPayload) {
+                    bootstrap();
+                } else {
+                    window.addEventListener('purchase-order:payload-ready', bootstrap, { once: true });
+                }
 
-        function refreshPurchaseOrderCode() {
-            const $ = window.jQuery || window.$;
-            $.get('{{ route("warehouse.purchase-orders.preview-code") }}')
-                .done(function (response) {
-                    if (response && response.code) {
-                        document.getElementById('create-po-code').value = response.code;
-                    }
-                });
+                // When the main "Add" button is clicked, make sure code gets refreshed
+                const openBtn = document.getElementById('open-create-po-modal');
+                if (openBtn) {
+                    openBtn.addEventListener('click', () => {
+                        if (window.purchaseOrderPayload && !window.__purchaseOrderModalInitialized) {
+                            bootstrap();
+                        }
+                        const codeInputEl = document.getElementById('purchase-order-code');
+                        if (codeInputEl && (!codeInputEl.value || codeInputEl.value === '')) {
+                            // trigger a fresh code when opening if empty
+                            if (window.purchaseOrderPayload && window.purchaseOrderPayload.routes?.previewCode) {
+                                fetch(window.purchaseOrderPayload.routes.previewCode)
+                                    .then(res => res.json())
+                                    .then(data => {
+                                        if (data && data.code) {
+                                            codeInputEl.value = data.code;
+                                        }
+                                    })
+                                    .catch(() => {});
+                            }
+                        }
+                    });
+                }
+            };
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
         }
     </script>
 </x-modal.form>

@@ -2,7 +2,84 @@
 
 @section('subhead')
     <title>Delivery Orders - {{ config('app.name') }}</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 @endsection
+
+@include('components.datatable.styles')
+@include('components.datatable.theme')
+
+@php
+    $company = $company ?? null;
+    $companies = $companies ?? collect();
+    $warehouses = $warehouses ?? collect();
+    $categories = $categories ?? collect();
+    $materials = $materials ?? collect();
+    $materialCategories = $materialCategories ?? collect();
+    $approvalTemplates = $approvalTemplates ?? collect();
+
+    $warehousesPayload = $warehouses->map(fn ($warehouse) => [
+        'id' => $warehouse->id,
+        'code' => $warehouse->code,
+        'name' => $warehouse->name,
+        'location' => $warehouse->location,
+    ])->values();
+
+    $materialsPayload = $materials->map(fn ($material) => [
+        'id' => $material['id'] ?? null,
+        'code' => $material['code'] ?? null,
+        'name' => $material['name'] ?? null,
+        'category_id' => $material['category_id'] ?? null,
+        'category_name' => $material['category_name'] ?? null,
+        'unit' => $material['unit'] ?? null,
+        'unit_symbol' => $material['unit_symbol'] ?? null,
+        'price' => $material['price'] ?? 0,
+    ])->values();
+
+    $materialCategoriesPayload = $materialCategories->map(fn ($category) => [
+        'id' => $category['id'] ?? null,
+        'name' => $category['name'] ?? null,
+    ])->values();
+
+    $catalogsPayload = $categories->map(fn ($category) => [
+        'id' => $category->id,
+        'name' => $category->name,
+        'children' => $category->children->map(fn ($child) => [
+            'id' => $child->id,
+            'name' => $child->name,
+        ])->values(),
+    ])->values();
+
+    $approvalTemplatesPayload = $approvalTemplates->map(fn ($template) => [
+        'id' => $template->id,
+        'name' => $template->name,
+        'description' => $template->description,
+        'levels' => $template->levels,
+    ])->values();
+
+    $companiesPayload = $companies->map(fn ($companyItem) => [
+        'id' => $companyItem->id,
+        'name' => $companyItem->name,
+        'address' => $companyItem->address,
+        'logo_url' => $companyItem->logo ? \Illuminate\Support\Facades\Storage::url($companyItem->logo) : null,
+    ])->values();
+
+    $currencySymbol = setting('currency.symbol', '$');
+
+    $defaultCompany = $company ?? $companies->first();
+    $defaultCompanyName = $defaultCompany->name ?? 'Smart ERP';
+    $defaultCompanyAddress = $defaultCompany->address ?? 'Prepare and ship the requested items.';
+    $defaultCompanyLogo = $defaultCompany?->logo ? \Illuminate\Support\Facades\Storage::url($defaultCompany->logo) : null;
+    $defaultCompanyId = $defaultCompany->id ?? null;
+
+    $defaultCompanyMeta = [
+        'id' => $defaultCompanyId,
+        'name' => $defaultCompanyName,
+        'address' => $defaultCompanyAddress,
+        'logo_url' => $defaultCompanyLogo
+            ?? 'https://ui-avatars.com/api/?name=' . urlencode($defaultCompanyName)
+            . '&background=1D4ED8&color=fff',
+    ];
+@endphp
 
 @section('subcontent')
     @include('components.global-notifications')
@@ -83,70 +160,85 @@
         <div class="intro-y col-span-12">
             <x-base.preview-component class="intro-y box bg-white/80 border border-slate-200/70 shadow-[0_18px_45px_rgba(15,23,42,0.10)]">
                 <div class="p-5">
-                    <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
-                        <form id="delivery-orders-filter-form" class="w-full sm:mr-auto xl:flex">
-                            <div class="items-center sm:mr-4 sm:flex">
-                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
-                                    Status
-                                </label>
-                                <x-base.form-select id="delivery-orders-status-filter" class="mt-2 w-full sm:mt-0 sm:w-auto">
-                                    <option value="">All Status</option>
-                                    <option value="pending">Pending</option>
-                                    <option value="shipped">Shipped</option>
-                                    <option value="delivered">Delivered</option>
-                                    <option value="cancelled">Cancelled</option>
-                                </x-base.form-select>
-                            </div>
-                            <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
-                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
-                                    Search
-                                </label>
-                                <x-base.form-input
-                                    id="delivery-orders-search-filter"
-                                    type="text"
-                                    placeholder="Search..."
-                                    class="mt-2 w-full sm:mt-0 sm:w-48 2xl:w-full"
-                                />
-                            </div>
-                            <div class="mt-4 flex flex-wrap gap-2 sm:items-center xl:mt-0">
-                                <button id="delivery-orders-filter-go" type="button" class="btn-royal btn-royal--dark btn-royal--sm w-full sm:w-24 group">
-                                    <x-base.lucide icon="search" class="w-4 h-4 icon-hover-rise" />
-                                    Go
-                                </button>
-                                <button id="delivery-orders-filter-reset" type="button" class="btn-royal btn-royal--outline btn-royal--sm w-full sm:w-24 group">
-                                    <x-base.lucide icon="rotate-ccw" class="w-4 h-4 icon-hover-rise" />
-                                    Reset
-                                </button>
-                            </div>
-                        </form>
+                    {{-- Filters & Actions in One Row (copied from Departments) --}}
+                    <div class="flex flex-wrap items-center gap-2 mb-4">
+                        {{-- Search Input --}}
+                        <div class="relative min-w-[180px]">
+                            <x-base.lucide icon="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <x-base.form-input
+                                id="delivery-orders-search-filter"
+                                type="text"
+                                placeholder="Search..."
+                                class="pl-9 w-full text-sm py-1.5"
+                            />
+                        </div>
 
-                        <div class="mt-5 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
-                            <x-base.tippy content="Export PDF" placement="bottom">
-                                <button id="delivery-orders-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
-                                    <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
+                        {{-- Company Filter --}}
+                        <x-base.form-select id="delivery-orders-company-filter" class="w-auto text-sm py-1.5">
+                            <option value="">All Companies</option>
+                            @foreach($companies ?? [] as $companyOption)
+                                <option value="{{ $companyOption->id }}">{{ $companyOption->name }}</option>
+                            @endforeach
+                        </x-base.form-select>
+
+                        {{-- Status Filter --}}
+                        <x-base.form-select id="delivery-orders-status-filter" class="w-auto text-sm py-1.5">
+                            <option value="">Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="cancelled">Cancelled</option>
+                        </x-base.form-select>
+
+                        {{-- Page Length --}}
+                        <x-base.form-select id="delivery-orders-filter-length" class="w-auto text-sm py-1.5">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </x-base.form-select>
+
+                        {{-- Reset Button --}}
+                        <x-base.tippy as="button" id="delivery-orders-filter-reset" type="button" content="Reset filters" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                            <x-base.lucide icon="x" class="w-4 h-4" />
+                        </x-base.tippy>
+
+                        {{-- Spacer --}}
+                        <div class="flex-1"></div>
+
+                        {{-- Action Buttons --}}
+                        <div class="flex items-center gap-1">
+                            <x-base.tippy content="Print" placement="bottom">
+                                <button type="button" id="delivery-orders-print" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                                    <x-base.lucide icon="printer" class="w-4 h-4" />
                                 </button>
                             </x-base.tippy>
-                            <x-base.tippy content="Export" placement="bottom">
-                                <button id="delivery-orders-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
-                                    <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
+                            <x-base.tippy content="Export PDF" placement="bottom">
+                                <button type="button" id="delivery-orders-pdf" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                                    <x-base.lucide icon="file-text" class="w-4 h-4" />
+                                </button>
+                            </x-base.tippy>
+                            <x-base.tippy content="Export Excel" placement="bottom">
+                                <button id="delivery-orders-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                                    <x-base.lucide icon="file-spreadsheet" class="w-4 h-4" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Refresh" placement="bottom">
-                                <button id="delivery-orders-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
-                                    <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
+                                <button id="delivery-orders-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                                    <x-base.lucide icon="refresh-cw" class="w-4 h-4" />
                                 </button>
                             </x-base.tippy>
 
-                            {{-- Add Delivery Order button at the right end of the toolbar --}}
-                            <x-base.tippy content="Add new delivery order" placement="bottom">
+                            {{-- Add Delivery Order Button --}}
+                            <x-base.tippy content="Add delivery order" placement="bottom">
                                 <button
                                     type="button"
                                     id="open-create-do-modal"
-                                    class="btn-royal btn-royal--gold btn-royal--sm sm:btn-royal--lg group"
+                                    class="btn-royal btn-royal--gold btn-royal--sm"
                                     data-tw-toggle="modal"
                                     data-tw-target="#create-do-modal"
                                 >
-                                    <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
+                                    <x-base.lucide icon="plus-circle" class="w-4 h-4 mr-2" />
                                     <span class="hidden sm:inline">Add</span>
                                 </button>
                             </x-base.tippy>
@@ -160,17 +252,17 @@
                             data-erp-table
                             class="datatable-default w-full min-w-full table-auto text-left text-sm"
                         >
-                            <thead class="bg-gradient-to-r from-royalDark to-gray-800 text-white">
+                            <thead>
                                 <tr>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">#</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Code</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Title</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Customer</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Warehouse</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Delivery Date</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Total Amount</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Status</th>
-                                    <th class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Actions</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">#</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Code</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Title</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Customer</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Warehouse</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Delivery Date</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap">Total Amount</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Status</th>
+                                    <th data-tw-merge class="font-medium px-5 py-3 border-b-2 dark:border-darkmode-300 whitespace-nowrap text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -181,19 +273,36 @@
         </div>
     </div>
 
-    <!-- Unified Invoice Modal for Delivery Orders -->
-    <x-invoice.unified-form 
-        id="create-do-modal" 
-        title="Create Delivery Order" 
-        type="delivery_order"
-        :customers="$customers ?? []"
-        :warehouses="$warehouses ?? []"
-        :materials="$materials ?? []"
-    />
+    <!-- Delivery Order Create Modal (mirrors Material Request / Purchase Order modal) -->
+    @include('warehouse.delivery-orders.modals.create')
 
     @include('components.datatable.scripts')
 
     <script>
+        window.deliveryOrderPayload = {
+            routes: {
+                store: '{{ route('warehouse.delivery-orders.store') }}',
+                previewCode: '{{ route('warehouse.delivery-orders.preview-code') }}',
+                materials: '{{ route('warehouse.material-requests.materials') }}',
+                categoryChildren: '{{ route('warehouse.categories.children') }}'
+            },
+            meta: {
+                csrf: '{{ csrf_token() }}'
+            },
+            data: {
+                companies: @json($companiesPayload),
+                defaultCompany: @json($defaultCompanyMeta),
+                warehouses: @json($warehousesPayload),
+                materials: @json($materialsPayload),
+                categories: @json($materialCategoriesPayload),
+                catalogs: @json($catalogsPayload),
+                approvalTemplates: @json($approvalTemplatesPayload),
+                currencySymbol: @json($currencySymbol)
+            }
+        };
+
+        window.dispatchEvent(new Event('delivery-order:payload-ready'));
+
         let deliveryOrdersTable;
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -232,8 +341,7 @@
                     { data: 'total_amount', name: 'total_amount' },
                     { data: 'status', name: 'status', className: 'text-center' },
                     { data: 'actions', name: 'actions', orderable: false, searchable: false }
-                ],
-                pageLength: 25
+                ]
             });
 
             window.deliveryOrdersTable = deliveryOrdersTable;

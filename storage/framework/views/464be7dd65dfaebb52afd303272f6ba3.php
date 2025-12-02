@@ -1,6 +1,6 @@
 <?php
     $heroCompanyName = $defaultCompanyName ?? 'Smart ERP';
-    $heroCompanyAddress = $defaultCompanyAddress ?? 'Select the warehouse items needed for fulfillment.';
+    $heroCompanyAddress = $defaultCompanyAddress ?? 'Prepare and ship the requested items.';
     $heroCompanyLogo = $defaultCompanyLogo
         ?? 'https://ui-avatars.com/api/?name=' . urlencode($heroCompanyName)
         . '&background=1D4ED8&color=fff';
@@ -8,38 +8,38 @@
 
 <?php if (isset($component)) { $__componentOriginal8ffb2951ef6cc6f4f3162130bd0a3e82 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal8ffb2951ef6cc6f4f3162130bd0a3e82 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.modal.form','data' => ['id' => 'material-request-modal','size' => 'xxl','title' => 'New Material Request']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.modal.form','data' => ['id' => 'create-do-modal','size' => 'xxl','title' => 'New Delivery Order']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('modal.form'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['id' => 'material-request-modal','size' => 'xxl','title' => 'New Material Request']); ?>
-    <form id="material-request-form" action="<?php echo e(route('warehouse.material-requests.store')); ?>" method="POST" class="space-y-6">
+<?php $component->withAttributes(['id' => 'create-do-modal','size' => 'xxl','title' => 'New Delivery Order']); ?>
+    <form id="delivery-order-form" action="<?php echo e(route('warehouse.delivery-orders.store')); ?>" method="POST" class="space-y-6">
         <?php echo csrf_field(); ?>
 
-        <input type="hidden" name="total_amount" id="material-request-total" value="0">
-        <input type="hidden" name="items" id="material-request-items" value="[]">
+        <input type="hidden" name="total_amount" id="delivery-order-total" value="0">
+        <input type="hidden" name="items" id="delivery-order-items" value="[]">
         <input type="hidden" name="status" value="pending">
 
         <div class="flex flex-col gap-3 rounded-2xl border border-slate-200/70 bg-slate-50/60 p-4 dark:border-darkmode-400 dark:bg-darkmode-600/30">
             <div class="flex flex-wrap items-center gap-3">
                 <div class="h-14 w-14 overflow-hidden rounded-2xl border border-white/60 bg-white shadow-sm flex items-center justify-center">
                     <img
-                        id="material-request-company-logo"
+                        id="delivery-order-company-logo"
                         src="<?php echo e($heroCompanyLogo); ?>"
                         alt="<?php echo e($heroCompanyName); ?> Logo"
                         class="h-full w-full object-cover"
                     >
                 </div>
                 <div class="flex-1 min-w-[200px]">
-                    <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">Material Request</p>
-                    <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100" id="material-request-company-name">
+                    <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">Delivery Order</p>
+                    <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100" id="delivery-order-company-name">
                         <?php echo e($heroCompanyName); ?>
 
                     </h3>
-                    <p class="text-sm text-slate-500" id="material-request-company-address">
+                    <p class="text-sm text-slate-500" id="delivery-order-company-address">
                         <?php echo e($heroCompanyAddress); ?>
 
                     </p>
@@ -75,21 +75,21 @@
 <?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
-                        Request Details
+                        Order Details
                     </h4>
                 </div>
                 <div class="grid grid-cols-12 gap-2 px-5 py-4 text-sm">
                     <div class="col-span-12 sm:col-span-6 lg:col-span-3">
                         <?php if (isset($component)) { $__componentOriginal0b5a207e31917d1ae3d42744188acbdf = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'material-request-code']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'delivery-order-code']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.form-label'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['for' => 'material-request-code']); ?>Request Code <?php echo $__env->renderComponent(); ?>
+<?php $component->withAttributes(['for' => 'delivery-order-code']); ?>Order Code <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal0b5a207e31917d1ae3d42744188acbdf)): ?>
 <?php $attributes = $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf; ?>
@@ -102,14 +102,14 @@
                         <div class="flex gap-2">
                             <?php if (isset($component)) { $__componentOriginal40054831fd8fc1521987609af4b37cc0 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal40054831fd8fc1521987609af4b37cc0 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-input.index','data' => ['id' => 'material-request-code','name' => 'code','type' => 'text','class' => 'w-full text-sm','readonly' => true,'placeholder' => 'AUTO']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-input.index','data' => ['id' => 'delivery-order-code','name' => 'code','type' => 'text','class' => 'w-full text-sm','readonly' => true,'placeholder' => 'AUTO']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.form-input'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['id' => 'material-request-code','name' => 'code','type' => 'text','class' => 'w-full text-sm','readonly' => true,'placeholder' => 'AUTO']); ?>
+<?php $component->withAttributes(['id' => 'delivery-order-code','name' => 'code','type' => 'text','class' => 'w-full text-sm','readonly' => true,'placeholder' => 'AUTO']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal40054831fd8fc1521987609af4b37cc0)): ?>
@@ -122,14 +122,14 @@
 <?php endif; ?>
                             <?php if (isset($component)) { $__componentOriginale00eb601fbe667f0da582732d70c41c5 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginale00eb601fbe667f0da582732d70c41c5 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.button.index','data' => ['type' => 'button','variant' => 'outline-secondary','class' => 'shrink-0','id' => 'material-request-regenerate']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.button.index','data' => ['type' => 'button','variant' => 'outline-secondary','class' => 'shrink-0','id' => 'delivery-order-regenerate']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.button'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['type' => 'button','variant' => 'outline-secondary','class' => 'shrink-0','id' => 'material-request-regenerate']); ?>
+<?php $component->withAttributes(['type' => 'button','variant' => 'outline-secondary','class' => 'shrink-0','id' => 'delivery-order-regenerate']); ?>
                                 <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'RefreshCcw','class' => 'h-4 w-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -165,14 +165,14 @@
                     <div class="col-span-12 sm:col-span-6 lg:col-span-3">
                         <?php if (isset($component)) { $__componentOriginal0b5a207e31917d1ae3d42744188acbdf = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'material-request-company']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'delivery-order-company']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.form-label'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['for' => 'material-request-company']); ?>Company <?php echo $__env->renderComponent(); ?>
+<?php $component->withAttributes(['for' => 'delivery-order-company']); ?>Company <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal0b5a207e31917d1ae3d42744188acbdf)): ?>
 <?php $attributes = $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf; ?>
@@ -184,14 +184,14 @@
 <?php endif; ?>
                         <?php if (isset($component)) { $__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-select.index','data' => ['id' => 'material-request-company','name' => 'company_id','required' => true,'class' => 'text-sm']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-select.index','data' => ['id' => 'delivery-order-company','name' => 'company_id','required' => true,'class' => 'text-sm']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.form-select'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['id' => 'material-request-company','name' => 'company_id','required' => true,'class' => 'text-sm']); ?>
+<?php $component->withAttributes(['id' => 'delivery-order-company','name' => 'company_id','required' => true,'class' => 'text-sm']); ?>
                             <option value="">Select company</option>
                             <?php $__currentLoopData = $companies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $companyOption): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <option value="<?php echo e($companyOption->id); ?>" <?php if(($defaultCompanyId ?? null) === $companyOption->id): echo 'selected'; endif; ?>>
@@ -213,14 +213,14 @@
                     <div class="col-span-12 sm:col-span-6 lg:col-span-3">
                         <?php if (isset($component)) { $__componentOriginal0b5a207e31917d1ae3d42744188acbdf = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'material-request-title']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'delivery-order-title']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.form-label'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['for' => 'material-request-title']); ?>Title <?php echo $__env->renderComponent(); ?>
+<?php $component->withAttributes(['for' => 'delivery-order-title']); ?>Title <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal0b5a207e31917d1ae3d42744188acbdf)): ?>
 <?php $attributes = $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf; ?>
@@ -232,14 +232,14 @@
 <?php endif; ?>
                         <?php if (isset($component)) { $__componentOriginal40054831fd8fc1521987609af4b37cc0 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal40054831fd8fc1521987609af4b37cc0 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-input.index','data' => ['id' => 'material-request-title','name' => 'title','type' => 'text','required' => true,'class' => 'text-sm','placeholder' => 'Ex: Monthly Clinic Supplies']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-input.index','data' => ['id' => 'delivery-order-title','name' => 'title','type' => 'text','required' => true,'class' => 'text-sm','placeholder' => 'Ex: Customer Delivery #1234']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.form-input'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['id' => 'material-request-title','name' => 'title','type' => 'text','required' => true,'class' => 'text-sm','placeholder' => 'Ex: Monthly Clinic Supplies']); ?>
+<?php $component->withAttributes(['id' => 'delivery-order-title','name' => 'title','type' => 'text','required' => true,'class' => 'text-sm','placeholder' => 'Ex: Customer Delivery #1234']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal40054831fd8fc1521987609af4b37cc0)): ?>
@@ -254,14 +254,14 @@
                     <div class="col-span-12 sm:col-span-6 lg:col-span-3">
                         <?php if (isset($component)) { $__componentOriginal0b5a207e31917d1ae3d42744188acbdf = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'material-request-date']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'delivery-order-date']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.form-label'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['for' => 'material-request-date']); ?>Request Date <?php echo $__env->renderComponent(); ?>
+<?php $component->withAttributes(['for' => 'delivery-order-date']); ?>Delivery Date <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal0b5a207e31917d1ae3d42744188acbdf)): ?>
 <?php $attributes = $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf; ?>
@@ -296,14 +296,14 @@
                             </div>
                             <?php if (isset($component)) { $__componentOriginal398ab4cd6da012e7fa913c6582e9e7a1 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal398ab4cd6da012e7fa913c6582e9e7a1 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.litepicker.index','data' => ['id' => 'material-request-date','name' => 'request_date','class' => 'w-full pl-12 text-sm','dataSingleMode' => 'true','dataFormat' => 'YYYY-MM-DD','value' => ''.e(now()->format('Y-m-d')).'','required' => true]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.litepicker.index','data' => ['id' => 'delivery-order-date','name' => 'delivery_date','class' => 'w-full pl-12 text-sm','dataSingleMode' => 'true','dataFormat' => 'YYYY-MM-DD','value' => ''.e(now()->format('Y-m-d')).'','required' => true]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.litepicker'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['id' => 'material-request-date','name' => 'request_date','class' => 'w-full pl-12 text-sm','data-single-mode' => 'true','data-format' => 'YYYY-MM-DD','value' => ''.e(now()->format('Y-m-d')).'','required' => true]); ?>
+<?php $component->withAttributes(['id' => 'delivery-order-date','name' => 'delivery_date','class' => 'w-full pl-12 text-sm','data-single-mode' => 'true','data-format' => 'YYYY-MM-DD','value' => ''.e(now()->format('Y-m-d')).'','required' => true]); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal398ab4cd6da012e7fa913c6582e9e7a1)): ?>
@@ -319,14 +319,14 @@
                     <div class="col-span-12 sm:col-span-6 lg:col-span-3">
                         <?php if (isset($component)) { $__componentOriginal0b5a207e31917d1ae3d42744188acbdf = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'material-request-priority']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'delivery-order-priority']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.form-label'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['for' => 'material-request-priority']); ?>Priority <?php echo $__env->renderComponent(); ?>
+<?php $component->withAttributes(['for' => 'delivery-order-priority']); ?>Priority <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal0b5a207e31917d1ae3d42744188acbdf)): ?>
 <?php $attributes = $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf; ?>
@@ -338,14 +338,14 @@
 <?php endif; ?>
                         <?php if (isset($component)) { $__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-select.index','data' => ['id' => 'material-request-priority','name' => 'priority','class' => 'text-sm']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-select.index','data' => ['id' => 'delivery-order-priority','name' => 'priority','class' => 'text-sm']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.form-select'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['id' => 'material-request-priority','name' => 'priority','class' => 'text-sm']); ?>
+<?php $component->withAttributes(['id' => 'delivery-order-priority','name' => 'priority','class' => 'text-sm']); ?>
                             <option value="normal">Normal</option>
                             <option value="high">High</option>
                             <option value="urgent">Urgent</option>
@@ -363,14 +363,14 @@
                     <div class="col-span-12 sm:col-span-6 lg:col-span-3">
                         <?php if (isset($component)) { $__componentOriginal0b5a207e31917d1ae3d42744188acbdf = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'material-request-approval-template']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'delivery-order-project']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.form-label'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['for' => 'material-request-approval-template']); ?>Approval Template <?php echo $__env->renderComponent(); ?>
+<?php $component->withAttributes(['for' => 'delivery-order-project']); ?>Project <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal0b5a207e31917d1ae3d42744188acbdf)): ?>
 <?php $attributes = $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf; ?>
@@ -382,16 +382,64 @@
 <?php endif; ?>
                         <?php if (isset($component)) { $__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-select.index','data' => ['id' => 'material-request-approval-template','name' => 'approval_template_id','required' => true,'class' => 'text-sm']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-select.index','data' => ['id' => 'delivery-order-project','name' => 'project_id','class' => 'text-sm']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.form-select'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['id' => 'material-request-approval-template','name' => 'approval_template_id','required' => true,'class' => 'text-sm']); ?>
+<?php $component->withAttributes(['id' => 'delivery-order-project','name' => 'project_id','class' => 'text-sm']); ?>
+                            <option value="">Select project</option>
+                            <?php $__currentLoopData = ($projects ?? collect()); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $project): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($project->id); ?>">
+                                    <?php echo e($project->code ? $project->code . ' — ' : ''); ?><?php echo e($project->name); ?>
+
+                                </option>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                         <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a)): ?>
+<?php $attributes = $__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a; ?>
+<?php unset($__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a)): ?>
+<?php $component = $__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a; ?>
+<?php unset($__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a); ?>
+<?php endif; ?>
+                    </div>
+                    <div class="col-span-12 sm:col-span-6 lg:col-span-3">
+                        <?php if (isset($component)) { $__componentOriginal0b5a207e31917d1ae3d42744188acbdf = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'delivery-order-approval-template']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.form-label'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['for' => 'delivery-order-approval-template']); ?>Approval Template <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal0b5a207e31917d1ae3d42744188acbdf)): ?>
+<?php $attributes = $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf; ?>
+<?php unset($__attributesOriginal0b5a207e31917d1ae3d42744188acbdf); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal0b5a207e31917d1ae3d42744188acbdf)): ?>
+<?php $component = $__componentOriginal0b5a207e31917d1ae3d42744188acbdf; ?>
+<?php unset($__componentOriginal0b5a207e31917d1ae3d42744188acbdf); ?>
+<?php endif; ?>
+                        <?php if (isset($component)) { $__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-select.index','data' => ['id' => 'delivery-order-approval-template','name' => 'approval_template_id','class' => 'text-sm']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('base.form-select'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['id' => 'delivery-order-approval-template','name' => 'approval_template_id','class' => 'text-sm']); ?>
                             <option value="">Select approval template</option>
-                            <?php $__currentLoopData = $approvalTemplates; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $template): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <?php $__currentLoopData = $approvalTemplates ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $template): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <option value="<?php echo e($template->id); ?>"><?php echo e($template->name); ?></option>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                          <?php echo $__env->renderComponent(); ?>
@@ -408,14 +456,14 @@
                     <div class="col-span-12 sm:col-span-6 lg:col-span-12">
                         <?php if (isset($component)) { $__componentOriginal0b5a207e31917d1ae3d42744188acbdf = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'material-request-description']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'delivery-order-description']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.form-label'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['for' => 'material-request-description']); ?>Notes <?php echo $__env->renderComponent(); ?>
+<?php $component->withAttributes(['for' => 'delivery-order-description']); ?>Notes <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal0b5a207e31917d1ae3d42744188acbdf)): ?>
 <?php $attributes = $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf; ?>
@@ -427,14 +475,14 @@
 <?php endif; ?>
                         <?php if (isset($component)) { $__componentOriginal29dbcf960a4ade6d0a2b790c04ae12cf = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal29dbcf960a4ade6d0a2b790c04ae12cf = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-textarea.index','data' => ['id' => 'material-request-description','name' => 'description','rows' => '3','class' => 'text-sm','placeholder' => 'Context, instructions, or receiving details...']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-textarea.index','data' => ['id' => 'delivery-order-description','name' => 'description','rows' => '3','class' => 'text-sm','placeholder' => 'Context, instructions, or delivery details...']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.form-textarea'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['id' => 'material-request-description','name' => 'description','rows' => '3','class' => 'text-sm','placeholder' => 'Context, instructions, or receiving details...']); ?> <?php echo $__env->renderComponent(); ?>
+<?php $component->withAttributes(['id' => 'delivery-order-description','name' => 'description','rows' => '3','class' => 'text-sm','placeholder' => 'Context, instructions, or delivery details...']); ?> <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal29dbcf960a4ade6d0a2b790c04ae12cf)): ?>
 <?php $attributes = $__attributesOriginal29dbcf960a4ade6d0a2b790c04ae12cf; ?>
@@ -453,20 +501,19 @@
                     <div class="flex flex-col gap-3">
                         <div class="flex flex-wrap items-start justify-between gap-2 text-sm">
                             <h4 class="text-sm font-semibold text-slate-700 dark:text-slate-100">Select Materials</h4>
-                           
                         </div>
                         <div class="grid grid-cols-12 gap-2 text-sm">
                             <div class="col-span-12 md:col-span-3">
                                 <?php if (isset($component)) { $__componentOriginal0b5a207e31917d1ae3d42744188acbdf = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'material-request-warehouse']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'delivery-order-warehouse']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.form-label'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['for' => 'material-request-warehouse']); ?>Warehouse <?php echo $__env->renderComponent(); ?>
+<?php $component->withAttributes(['for' => 'delivery-order-warehouse']); ?>Warehouse <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal0b5a207e31917d1ae3d42744188acbdf)): ?>
 <?php $attributes = $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf; ?>
@@ -478,14 +525,14 @@
 <?php endif; ?>
                                 <?php if (isset($component)) { $__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-select.index','data' => ['id' => 'material-request-warehouse','name' => 'warehouse_id','required' => true,'class' => 'text-sm']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-select.index','data' => ['id' => 'delivery-order-warehouse','name' => 'warehouse_id','required' => true,'class' => 'text-sm']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.form-select'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['id' => 'material-request-warehouse','name' => 'warehouse_id','required' => true,'class' => 'text-sm']); ?>
+<?php $component->withAttributes(['id' => 'delivery-order-warehouse','name' => 'warehouse_id','required' => true,'class' => 'text-sm']); ?>
                                     <option value="">Select warehouse</option>
                                     <?php $__currentLoopData = $warehouses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $warehouse): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <option value="<?php echo e($warehouse->id); ?>"><?php echo e($warehouse->name); ?> — <?php echo e($warehouse->location); ?></option>
@@ -504,14 +551,14 @@
                             <div class="col-span-12 md:col-span-3" data-catalog-control="catalog">
                                 <?php if (isset($component)) { $__componentOriginal0b5a207e31917d1ae3d42744188acbdf = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'material-request-catalog']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'delivery-order-catalog']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.form-label'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['for' => 'material-request-catalog']); ?>Catalog <?php echo $__env->renderComponent(); ?>
+<?php $component->withAttributes(['for' => 'delivery-order-catalog']); ?>Catalog <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal0b5a207e31917d1ae3d42744188acbdf)): ?>
 <?php $attributes = $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf; ?>
@@ -523,14 +570,14 @@
 <?php endif; ?>
                                 <?php if (isset($component)) { $__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-select.index','data' => ['id' => 'material-request-catalog','class' => 'text-sm']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-select.index','data' => ['id' => 'delivery-order-catalog','class' => 'text-sm']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.form-select'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['id' => 'material-request-catalog','class' => 'text-sm']); ?>
+<?php $component->withAttributes(['id' => 'delivery-order-catalog','class' => 'text-sm']); ?>
                                     <option value="">Select catalog</option>
                                     <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $catalog): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <?php
@@ -561,14 +608,14 @@
                             <div class="col-span-12 md:col-span-3" data-catalog-control="sub">
                                 <?php if (isset($component)) { $__componentOriginal0b5a207e31917d1ae3d42744188acbdf = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'material-request-sub-catalog']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'delivery-order-sub-catalog']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.form-label'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['for' => 'material-request-sub-catalog']); ?>Sub Catalog <?php echo $__env->renderComponent(); ?>
+<?php $component->withAttributes(['for' => 'delivery-order-sub-catalog']); ?>Sub Catalog <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal0b5a207e31917d1ae3d42744188acbdf)): ?>
 <?php $attributes = $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf; ?>
@@ -580,14 +627,14 @@
 <?php endif; ?>
                                 <?php if (isset($component)) { $__componentOriginal1c0beb3cd2271cd34645d22f15db5e3a = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal1c0beb3cd2271cd34645d22f15db5e3a = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-select.index','data' => ['id' => 'material-request-sub-catalog','disabled' => true,'class' => 'text-sm']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-select.index','data' => ['id' => 'delivery-order-sub-catalog','disabled' => true,'class' => 'text-sm']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.form-select'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['id' => 'material-request-sub-catalog','disabled' => true,'class' => 'text-sm']); ?>
+<?php $component->withAttributes(['id' => 'delivery-order-sub-catalog','disabled' => true,'class' => 'text-sm']); ?>
                                     <option value="">Select sub catalog</option>
                                  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
@@ -603,14 +650,14 @@
                             <div class="col-span-12 md:col-span-3" data-catalog-control="material">
                                 <?php if (isset($component)) { $__componentOriginal0b5a207e31917d1ae3d42744188acbdf = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'material-request-material-select']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-label.index','data' => ['for' => 'delivery-order-material-select']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.form-label'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['for' => 'material-request-material-select']); ?>Materials <?php echo $__env->renderComponent(); ?>
+<?php $component->withAttributes(['for' => 'delivery-order-material-select']); ?>Materials <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal0b5a207e31917d1ae3d42744188acbdf)): ?>
 <?php $attributes = $__attributesOriginal0b5a207e31917d1ae3d42744188acbdf; ?>
@@ -622,14 +669,14 @@
 <?php endif; ?>
                                 <?php if (isset($component)) { $__componentOriginalb08e28f9db590bed3446cfb449cfe7fd = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalb08e28f9db590bed3446cfb449cfe7fd = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.tom-select.index','data' => ['id' => 'material-request-material-select','dataPlaceholder' => 'Search materials','class' => 'text-sm','disabled' => true]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.tom-select.index','data' => ['id' => 'delivery-order-material-select','dataPlaceholder' => 'Search materials','class' => 'text-sm','disabled' => true]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.tom-select'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['id' => 'material-request-material-select','data-placeholder' => 'Search materials','class' => 'text-sm','disabled' => true]); ?>
+<?php $component->withAttributes(['id' => 'delivery-order-material-select','data-placeholder' => 'Search materials','class' => 'text-sm','disabled' => true]); ?>
                                     <option value="">Select material</option>
                                  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
@@ -644,14 +691,14 @@
                                 <div class="mt-2">
                                     <?php if (isset($component)) { $__componentOriginal40054831fd8fc1521987609af4b37cc0 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal40054831fd8fc1521987609af4b37cc0 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-input.index','data' => ['id' => 'material-request-material-filter','type' => 'text','placeholder' => 'Type to search...','class' => 'w-full text-sm','disabled' => true]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.form-input.index','data' => ['id' => 'delivery-order-material-filter','type' => 'text','placeholder' => 'Type to search...','class' => 'w-full text-sm','disabled' => true]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('base.form-input'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['id' => 'material-request-material-filter','type' => 'text','placeholder' => 'Type to search...','class' => 'w-full text-sm','disabled' => true]); ?>
+<?php $component->withAttributes(['id' => 'delivery-order-material-filter','type' => 'text','placeholder' => 'Type to search...','class' => 'w-full text-sm','disabled' => true]); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal40054831fd8fc1521987609af4b37cc0)): ?>
@@ -663,7 +710,7 @@
 <?php unset($__componentOriginal40054831fd8fc1521987609af4b37cc0); ?>
 <?php endif; ?>
                                 </div>
-                                <div id="material-request-material-template" class="hidden">
+                                <div id="delivery-order-material-template" class="hidden">
                                     <div class="flex items-center gap-3">
                                         <div class="h-10 w-10 overflow-hidden rounded-lg bg-slate-100">
                                             <img src="" alt="Material" class="h-full w-full object-cover" loading="lazy" />
@@ -679,8 +726,7 @@
                     </div>
                 </div>
                 <div class="px-5 pb-4 text-sm">
-                   
-                    <div id="material-request-material-loader" class="mt-4 flex items-center gap-2 text-xs text-slate-500 hidden">
+                    <div id="delivery-order-material-loader" class="mt-4 flex items-center gap-2 text-xs text-slate-500 hidden">
                         <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal16b2e62e74cde9150905c2d0c2cb6800 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.base.lucide.index','data' => ['icon' => 'Loader','class' => 'h-4 w-4 animate-spin']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -703,7 +749,6 @@
 <?php endif; ?>
                         Fetching materials...
                     </div>
-                    
                 </div>
             </div>
         </div>
@@ -711,7 +756,7 @@
         <div class="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm dark:border-darkmode-400 dark:bg-darkmode-600">
             <div class="flex items-center justify-between border-b border-slate-200/60 pb-4 dark:border-darkmode-400">
                 <h4 class="text-sm font-semibold text-slate-700 dark:text-slate-100">Selected Items</h4>
-                <span class="text-xs text-slate-500" id="material-request-item-count">0 items</span>
+                <span class="text-xs text-slate-500" id="delivery-order-item-count">0 items</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="mt-4 w-full text-left text-sm">
@@ -725,15 +770,15 @@
                             <th class="px-4 py-2 text-center">Remove</th>
                         </tr>
                     </thead>
-                    <tbody id="material-request-selected" class="divide-y divide-slate-100"></tbody>
+                    <tbody id="delivery-order-selected" class="divide-y divide-slate-100"></tbody>
                 </table>
             </div>
             <div class="mt-4 flex flex-wrap items-center justify-between gap-4">
-               
+                <div></div>
                 <div class="text-right">
                     <p class="text-xs uppercase text-slate-500">Grand Total</p>
                     <p class="text-2xl font-semibold text-slate-800">
-                        <span id="material-request-grand-total"><?php echo e($currencySymbol ?? '$'); ?>0.00</span>
+                        <span id="delivery-order-grand-total"><?php echo e($currencySymbol ?? '$'); ?>0.00</span>
                     </p>
                 </div>
             </div>
@@ -771,8 +816,8 @@
             </button>
             <button
                 type="submit"
-                form="material-request-form"
-                id="material-request-submit"
+                form="delivery-order-form"
+                id="delivery-order-submit"
                 class="btn-royal btn-royal--gold group"
             >
                 <?php if (isset($component)) { $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800 = $component; } ?>
@@ -795,25 +840,19 @@
 <?php $component = $__componentOriginal16b2e62e74cde9150905c2d0c2cb6800; ?>
 <?php unset($__componentOriginal16b2e62e74cde9150905c2d0c2cb6800); ?>
 <?php endif; ?>
-                Submit Request
+                Submit Order
             </button>
         </div>
      <?php $__env->endSlot(); ?>
 
     <script>
         (() => {
-            const init = () => {
-                if (window.__materialRequestModalInitialized) {
-                    return;
-                }
-
-                const payload = window.materialRequestPayload;
+            const initModal = () => {
+                const payload = window.deliveryOrderPayload;
                 if (!payload) {
-                    console.warn('materialRequestPayload missing');
+                    console.warn('deliveryOrderPayload missing');
                     return;
                 }
-
-                window.__materialRequestModalInitialized = true;
 
                 const companies = payload.data.companies || [];
                 const defaultCompany = payload.data.defaultCompany || {};
@@ -835,60 +874,46 @@
                     isLoading: false,
                 };
 
-                const codeInput = document.getElementById('material-request-code');
-                const titleInput = document.getElementById('material-request-title');
-                const regenerateBtn = document.getElementById('material-request-regenerate');
-                const warehouseSelect = document.getElementById('material-request-warehouse');
-                const catalogSelect = document.getElementById('material-request-catalog');
-                const subCatalogSelect = document.getElementById('material-request-sub-catalog');
-                const materialSelect = document.getElementById('material-request-material-select');
-                const materialTemplate = document.getElementById('material-request-material-template');
-                const materialFilterInput = document.getElementById('material-request-material-filter');
+                const codeInput = document.getElementById('delivery-order-code');
+                const regenerateBtn = document.getElementById('delivery-order-regenerate');
+                const warehouseSelect = document.getElementById('delivery-order-warehouse');
+                const catalogSelect = document.getElementById('delivery-order-catalog');
+                const subCatalogSelect = document.getElementById('delivery-order-sub-catalog');
+                const materialSelect = document.getElementById('delivery-order-material-select');
+                const materialTemplate = document.getElementById('delivery-order-material-template');
+                const materialFilterInput = document.getElementById('delivery-order-material-filter');
+                const loaderEl = document.getElementById('delivery-order-material-loader');
+                const selectedTable = document.getElementById('delivery-order-selected');
+                const totalField = document.getElementById('delivery-order-total');
+                const itemsField = document.getElementById('delivery-order-items');
+                const grandTotalLabel = document.getElementById('delivery-order-grand-total');
+                const itemCountLabel = document.getElementById('delivery-order-item-count');
+                const form = document.getElementById('delivery-order-form');
+                const submitBtn = document.getElementById('delivery-order-submit');
+                const companySelect = document.getElementById('delivery-order-company');
+                const companyLogoEl = document.getElementById('delivery-order-company-logo');
+                const companyNameEl = document.getElementById('delivery-order-company-name');
+                const companyAddressEl = document.getElementById('delivery-order-company-address');
+
                 const fallbackMaterialImage = payload.meta?.materialPlaceholder || 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" fill="#e2e8f0"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#94a3b8" font-family="Arial" font-size="10">No Image</text></svg>');
-                const loaderEl = document.getElementById('material-request-material-loader');
-                const noticeEl = document.getElementById('material-request-material-notice');
-                const selectedTable = document.getElementById('material-request-selected');
-                const totalField = document.getElementById('material-request-total');
-                const itemsField = document.getElementById('material-request-items');
-                const grandTotalLabel = document.getElementById('material-request-grand-total');
-                const itemCountLabel = document.getElementById('material-request-item-count');
-                const openButton = document.getElementById('create-material-request-button');
-                const form = document.getElementById('material-request-form');
-                const submitBtn = document.getElementById('material-request-submit');
-                const modalEl = document.getElementById('material-request-modal');
-                const companySelect = document.getElementById('material-request-company');
-                const templateSelect = document.getElementById('material-request-approval-template');
-                const companyLogoEl = document.getElementById('material-request-company-logo');
-                const companyNameEl = document.getElementById('material-request-company-name');
-                const companyAddressEl = document.getElementById('material-request-company-address');
 
                 const showError = (message) => {
-                    window.showError(message);
-                };
-
-                const showSuccess = (message) => {
-                    if (typeof window.showSuccess === 'function') {
-                        window.showSuccess(message);
-                    }
+                    window.showError?.(message) ?? console.error(message);
                 };
 
                 const fallbackLogo = (name) => `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'Smart ERP')}&background=1D4ED8&color=fff`;
 
                 const getCompanyData = (id) => {
-                    if (!id) {
-                        return null;
-                    }
+                    if (!id) return null;
                     return state.companyMap.get(String(id)) || null;
                 };
 
                 const updateCompanyHero = (companyData) => {
                     const target = companyData || state.defaultCompany || {};
                     const companyName = target.name || state.defaultCompany?.name || 'Smart ERP';
-                    if (companyNameEl) {
-                        companyNameEl.textContent = companyName;
-                    }
+                    if (companyNameEl) companyNameEl.textContent = companyName;
                     if (companyAddressEl) {
-                        companyAddressEl.textContent = target.address || state.defaultCompany?.address || 'Select the warehouse items needed for fulfillment.';
+                        companyAddressEl.textContent = target.address || state.defaultCompany?.address || 'Prepare and ship the requested items.';
                     }
                     if (companyLogoEl) {
                         companyLogoEl.src = target.logo_url || fallbackLogo(companyName);
@@ -900,18 +925,19 @@
                         updateCompanyHero();
                         return;
                     }
-
                     const selectedId = companySelect.value || state.defaultCompany?.id || null;
                     state.selectedCompanyId = selectedId ? String(selectedId) : null;
                     updateCompanyHero(getCompanyData(state.selectedCompanyId));
                 };
 
                 const fetchCode = () => {
-                    if (!payload.routes.previewCode) return;
+                    if (!payload.routes.previewCode || !codeInput) return;
                     fetch(payload.routes.previewCode)
                         .then((res) => res.json())
                         .then((data) => {
-                            codeInput.value = data.code || codeInput.value;
+                            if (data && data.code) {
+                                codeInput.value = data.code;
+                            }
                         })
                         .catch(() => {});
                 };
@@ -940,21 +966,6 @@
                 const toggleLoader = (show) => {
                     state.isLoading = !!show;
                     loaderEl?.classList.toggle('hidden', !show);
-                };
-
-                const updateNotice = () => {
-                    if (!noticeEl) return;
-                    if (!canQueryMaterials()) {
-                        
-                        noticeEl.hidden = false;
-                    } else if (state.isLoading) {
-                        noticeEl.hidden = true;
-                    } else if (!state.materials.length) {
-                        noticeEl.textContent = 'No materials found for the selected filters.';
-                        noticeEl.hidden = false;
-                    } else {
-                        noticeEl.hidden = true;
-                    }
                 };
 
                 let materialSelectInstance = null;
@@ -993,9 +1004,9 @@
                                     if (img) {
                                         img.src = data.image_url || fallbackMaterialImage;
                                     }
-                                    const title = template.querySelector('p.text-sm');
-                                    if (title) {
-                                        title.textContent = data.name;
+                                    const titleEl = template.querySelector('p.text-sm');
+                                    if (titleEl) {
+                                        titleEl.textContent = data.name;
                                     }
                                     const subtitle = template.querySelector('p.text-xs');
                                     if (subtitle) {
@@ -1063,7 +1074,6 @@
                 const fetchMaterials = (append = false, page = 1) => {
                     if (!payload.routes.materials || !canQueryMaterials()) {
                         resetMaterialResults();
-                        updateNotice();
                         return;
                     }
 
@@ -1104,7 +1114,6 @@
                         })
                         .finally(() => {
                             toggleLoader(false);
-                            updateNotice();
                         });
                 };
 
@@ -1150,281 +1159,212 @@
                     itemCountLabel.textContent = `${state.selected.size} item${state.selected.size === 1 ? '' : 's'}`;
                 };
 
-                const addMaterial = (id) => {
-                    const material = state.materialLookup.get(String(id));
+                const addMaterial = (selectedId) => {
+                    const material = state.materialLookup.get(String(selectedId));
                     if (!material) return;
-                    if (state.selected.has(id)) {
-                        const existing = state.selected.get(id);
+
+                    const key = String(material.id);
+                    const existing = state.selected.get(key);
+
+                    if (existing) {
                         existing.quantity += 1;
-                        state.selected.set(id, existing);
+                        state.selected.set(key, existing);
                     } else {
-                        state.selected.set(id, {
+                        state.selected.set(key, {
                             material_id: material.id,
                             code: material.code,
                             name: material.name,
-                            unit: material.unit,
-                            unit_price: Number(material.price || 0),
+                            unit: material.unit_name,
+                            unit_symbol: material.unit_symbol,
                             quantity: 1,
+                            unit_price: material.price,
                         });
                     }
+
                     renderSelected();
                 };
 
-                const removeMaterial = (id) => {
-                    state.selected.delete(id);
-                    renderSelected();
-                };
-
-                document.addEventListener('click', (event) => {
-                    const removeBtn = event.target.closest('[data-remove]');
-                    if (removeBtn) {
-                        removeMaterial(removeBtn.getAttribute('data-remove'));
-                    }
-                });
-
-                document.addEventListener('input', (event) => {
-                    const qtyInput = event.target.closest('[data-qty]');
-                    if (qtyInput) {
-                        const id = qtyInput.getAttribute('data-qty');
-                        let numericValue = qtyInput.value.replace(/[^0-9]/g, '');
-                        if (!numericValue) {
-                            numericValue = '1';
+                if (warehouseSelect) {
+                    warehouseSelect.addEventListener('change', () => {
+                        state.selectedWarehouseId = warehouseSelect.value || null;
+                        resetMaterialResults();
+                        if (canQueryMaterials()) {
+                            fetchMaterials();
                         }
-                        qtyInput.value = numericValue;
-                        const value = Math.max(1, Number(numericValue) || 1);
-                        if (state.selected.has(id)) {
-                            const item = state.selected.get(id);
-                            item.quantity = value;
-                            state.selected.set(id, item);
-                            const rowTotalCell = qtyInput.closest('tr')?.querySelector(`[data-row-total="${id}"]`);
-                            if (rowTotalCell) {
-                                rowTotalCell.textContent = `${state.currency}${Number(item.unit_price * item.quantity).toFixed(2)}`;
+                    });
+                }
+
+                if (catalogSelect) {
+                    catalogSelect.addEventListener('change', () => {
+                        const catalogId = catalogSelect.value || null;
+                        state.selectedCatalogId = catalogId;
+
+                        const children = state.catalogChildrenMap.get(String(catalogId)) || [];
+                        subCatalogSelect.innerHTML = '<option value="">Select sub catalog</option>';
+                        if (children.length) {
+                            children.forEach((child) => {
+                                const option = document.createElement('option');
+                                option.value = child.id;
+                                option.textContent = child.name;
+                                subCatalogSelect.appendChild(option);
+                            });
+                            subCatalogSelect.disabled = false;
+                        } else {
+                            subCatalogSelect.disabled = true;
+                        }
+
+                        resetMaterialResults();
+                        if (canQueryMaterials()) {
+                            fetchMaterials();
+                        }
+                    });
+                }
+
+                if (subCatalogSelect) {
+                    subCatalogSelect.addEventListener('change', () => {
+                        state.selectedSubCatalogId = subCatalogSelect.value || null;
+                        resetMaterialResults();
+                        if (canQueryMaterials()) {
+                            fetchMaterials();
+                        }
+                    });
+                }
+
+                if (materialSelect) {
+                    materialSelect.addEventListener('change', () => {
+                        const selectedId = materialSelect.value;
+                        if (!selectedId) return;
+                        addMaterial(selectedId);
+                        if (materialSelect.tomselect) {
+                            materialSelect.tomselect.clear(true);
+                        }
+                    });
+                }
+
+                if (selectedTable) {
+                    selectedTable.addEventListener('input', (event) => {
+                        const target = event.target;
+                        if (target && target.hasAttribute('data-qty')) {
+                            const key = target.getAttribute('data-qty');
+                            const value = parseFloat(target.value || '0');
+                            const existing = state.selected.get(String(key));
+                            if (!existing) {
+                                return;
                             }
-                            updateSelectedSummary();
+                            existing.quantity = value > 0 ? value : 1;
+                            state.selected.set(String(key), existing);
+                            renderSelected();
                         }
-                    }
-                });
-
-                const handleWarehouseChange = () => {
-                    state.selectedWarehouseId = warehouseSelect?.value || null;
-                    triggerMaterialFetch();
-                };
-
-                const getChildrenFromOption = (catalogId) => {
-                    if (!catalogSelect || !catalogId) {
-                        return [];
-                    }
-                    const selectedOption = catalogSelect.querySelector(`option[value="${catalogId}"]`);
-                    if (!selectedOption || !selectedOption.dataset.children) {
-                        return [];
-                    }
-                    try {
-                        return JSON.parse(selectedOption.dataset.children) || [];
-                    } catch (error) {
-                        return [];
-                    }
-                };
-
-                const resolveSubCatalogs = (catalogId) => {
-                    if (!catalogId) {
-                        return [];
-                    }
-                    const mapKey = String(catalogId);
-                    let children = state.catalogChildrenMap.get(mapKey);
-
-                    if (!children || !children.length) {
-                        const catalogFromState = (state.catalogs || []).find((catalog) => String(catalog.id) === mapKey);
-                        if (catalogFromState && Array.isArray(catalogFromState.children) && catalogFromState.children.length) {
-                            children = catalogFromState.children;
-                        }
-                    }
-
-                    if (!children || !children.length) {
-                        children = getChildrenFromOption(mapKey);
-                    }
-
-                    if (children && children.length) {
-                        state.catalogChildrenMap.set(mapKey, children);
-                        return children;
-                    }
-
-                    return [];
-                };
-
-                const fetchSubCatalogs = (catalogId) => {
-                    return new Promise((resolve) => {
-                        if (!catalogId || !payload.routes.categoryChildren) {
-                            return resolve([]);
-                        }
-
-                        fetch(`${payload.routes.categoryChildren}?parent_id=${catalogId}`, {
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest',
-                                'Accept': 'application/json',
-                            },
-                        })
-                            .then((res) => {
-                                if (!res.ok) {
-                                    throw new Error('Failed to load sub catalogs');
-                                }
-                                return res.json();
-                            })
-                            .then((data) => {
-                                if (Array.isArray(data) && data.length) {
-                                    state.catalogChildrenMap.set(String(catalogId), data);
-                                    resolve(data);
-                                } else {
-                                    resolve([]);
-                                }
-                            })
-                            .catch(() => resolve([]));
                     });
-                };
 
-                const populateSubCatalogs = async () => {
-                    if (!subCatalogSelect) return;
-                    const catalogId = state.selectedCatalogId;
-                    let children = resolveSubCatalogs(catalogId);
-                    if ((!children || !children.length) && catalogId) {
-                        children = await fetchSubCatalogs(catalogId);
-                    }
-                    subCatalogSelect.innerHTML = '<option value="">Select sub catalog</option>';
-                    children.forEach((child) => {
-                        const option = document.createElement('option');
-                        option.value = child.id;
-                        option.textContent = child.name;
-                        subCatalogSelect.appendChild(option);
+                    selectedTable.addEventListener('click', (event) => {
+                        const target = event.target.closest('[data-remove]');
+                        if (!target) return;
+                        const key = target.getAttribute('data-remove');
+                        state.selected.delete(String(key));
+                        renderSelected();
                     });
-                    if (children.length) {
-                        subCatalogSelect.disabled = false;
-                        subCatalogSelect.removeAttribute('disabled');
-                    } else {
-                        subCatalogSelect.disabled = true;
-                        subCatalogSelect.setAttribute('disabled', 'disabled');
-                    }
-                    if (!children.length) {
-                        state.selectedSubCatalogId = null;
-                        subCatalogSelect.value = '';
-                    } else if (state.selectedSubCatalogId) {
-                        subCatalogSelect.value = state.selectedSubCatalogId;
-                    }
-                };
+                }
 
-                const handleCatalogChange = async () => {
-                    state.selectedCatalogId = catalogSelect?.value || null;
-                    state.selectedSubCatalogId = null;
-                    await populateSubCatalogs();
-                    triggerMaterialFetch();
-                };
-
-                const handleSubCatalogChange = () => {
-                    state.selectedSubCatalogId = subCatalogSelect?.value || null;
-                    triggerMaterialFetch();
-                };
-
-                const triggerMaterialFetch = () => {
-                    const enabled = canQueryMaterials();
-                    resetMaterialResults();
-                    updateNotice();
-                    if (enabled) {
-                        fetchMaterials(false, 1);
-                    }
-                };
-
-                warehouseSelect?.addEventListener('change', handleWarehouseChange);
-                catalogSelect?.addEventListener('change', handleCatalogChange);
-                subCatalogSelect?.addEventListener('change', handleSubCatalogChange);
-
-                regenerateBtn.addEventListener('click', fetchCode);
-
-                if (companySelect) {
-                    if (state.defaultCompany?.id && !companySelect.value) {
-                        companySelect.value = state.defaultCompany.id;
-                    }
-                    companySelect.addEventListener('change', () => {
-                        syncCompanySelection();
+                if (regenerateBtn) {
+                    regenerateBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        fetchCode();
                     });
                 }
 
                 syncCompanySelection();
+
+                if (companySelect) {
+                    companySelect.addEventListener('change', syncCompanySelection);
+                }
+
                 fetchCode();
 
-                openButton?.addEventListener('click', () => {
-                    fetchCode();
-                    syncCompanySelection();
-                    titleInput.focus();
-                });
+                if (form && submitBtn) {
+                    form.addEventListener('submit', function (e) {
+                        e.preventDefault();
 
-                modalEl?.addEventListener('shown.tw.modal', () => {
-                    fetchCode();
-                });
+                        const jq = window.jQuery || window.$;
+                        if (!jq) {
+                            showError('jQuery not available on delivery order page.');
+                            return;
+                        }
 
-                const submitRequest = (event) => {
-                    event.preventDefault();
-
-                    if (!state.selected.size) {
-                        showError('Please add at least one material to the request.');
-                        return;
-                    }
-
-                    if (templateSelect && !templateSelect.value) {
-                        showError('Please select an approval template.');
-                        templateSelect.focus();
-                        return;
-                    }
-
-                    renderSelected();
-
-                    const formData = new FormData(form);
-                    const csrf = payload.meta?.csrf || document.querySelector("meta[name='csrf-token']")?.getAttribute('content');
-
-                    submitBtn.disabled = true;
-                    submitBtn.classList.add('opacity-70');
-
-                    fetch(form.action, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': csrf,
-                            'Accept': 'application/json',
-                        },
-                        body: formData,
-                    })
-                        .then((res) => res.json())
-                        .then((response) => {
-                            if (response.success) {
-                                showSuccess(response.message || 'Request submitted successfully');
-                                if (typeof tailwind !== 'undefined' && tailwind.Modal) {
-                                    tailwind.Modal.getOrCreateInstance(modalEl)?.hide();
-                                }
-                                form.reset();
-                                state.selected.clear();
-                                renderSelected();
-                                window.materialRequestsTable?.ajax.reload();
-                                if (companySelect) {
-                                    if (state.defaultCompany?.id) {
-                                        companySelect.value = state.defaultCompany.id;
-                                    }
-                                    syncCompanySelection();
-                                }
-                            } else {
-                                const errors = response.errors ? Object.values(response.errors).flat().join('\n') : null;
-                                showError(errors || response.message || 'Failed to submit material request.');
+                        const $ = jq;
+                        $.ajaxSetup({
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                             }
-                        })
-                        .catch(() => showError('Unexpected error while submitting the request.'))
-                        .finally(() => {
-                            submitBtn.disabled = false;
-                            submitBtn.classList.remove('opacity-70');
                         });
-                };
 
-                form?.addEventListener('submit', submitRequest);
+                        const formData = new FormData(form);
+                        const originalHtml = submitBtn.innerHTML;
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<i class="w-4 h-4 mr-2 animate-spin" data-lucide="loader"></i> Saving...';
 
-                renderSelected();
-                updateNotice();
-                setTimeout(() => {
-                    window.dispatchEvent(new Event('material-request:modal-ready'));
-                }, 0);
+                        $.ajax({
+                            url: payload.routes.store,
+                            type: 'POST',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                if (response.success) {
+                                    window.showSuccess?.(response.message || 'Delivery order created successfully') ?? console.log(response.message || 'Delivery order created successfully');
+
+                                    const modalElement = document.getElementById('create-do-modal');
+                                    if (modalElement && window.tailwind?.Modal?.getOrCreateInstance) {
+                                        const instance = window.tailwind.Modal.getOrCreateInstance(modalElement);
+                                        instance.hide();
+                                    }
+
+                                    form.reset();
+                                    state.selected.clear();
+                                    renderSelected();
+
+                                    if (window.deliveryOrdersTable) {
+                                        window.deliveryOrdersTable.ajax.reload();
+                                    }
+                                } else {
+                                    const errorMsg = response.message || 'Failed to create delivery order.';
+                                    showError(errorMsg);
+                                }
+                            },
+                            error: function(xhr) {
+                                let message = 'An error occurred while saving the delivery order.';
+                                if (xhr.responseJSON && xhr.responseJSON.message) {
+                                    message = xhr.responseJSON.message;
+                                }
+                                showError(message);
+                            },
+                            complete: function() {
+                                submitBtn.disabled = false;
+                                submitBtn.innerHTML = originalHtml;
+                                if (typeof window.lucide !== 'undefined') {
+                                    window.lucide.createIcons();
+                                }
+                            }
+                        });
+                    });
+                }
+            };
+
+            const init = () => {
+                if (window.deliveryOrderPayload) {
+                    initModal();
+                } else {
+                    window.addEventListener('delivery-order:payload-ready', initModal, { once: true });
+                }
+
+                const openBtn = document.getElementById('open-create-do-modal');
+                if (openBtn) {
+                    openBtn.addEventListener('click', () => {
+                        if (window.deliveryOrderPayload) {
+                            initModal();
+                        }
+                    });
+                }
             };
 
             if (document.readyState === 'loading') {
@@ -1434,7 +1374,6 @@
             }
         })();
     </script>
-
  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal8ffb2951ef6cc6f4f3162130bd0a3e82)): ?>
@@ -1445,4 +1384,4 @@
 <?php $component = $__componentOriginal8ffb2951ef6cc6f4f3162130bd0a3e82; ?>
 <?php unset($__componentOriginal8ffb2951ef6cc6f4f3162130bd0a3e82); ?>
 <?php endif; ?>
-<?php /**PATH D:\laravel\smart-erp\resources\views/warehouse/material-requests/modals/create-request.blade.php ENDPATH**/ ?>
+<?php /**PATH D:\laravel\smart-erp\resources\views/warehouse/delivery-orders/modals/create.blade.php ENDPATH**/ ?>

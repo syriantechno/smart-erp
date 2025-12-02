@@ -9,6 +9,7 @@ use App\Models\Approval\ApprovalTemplate;
 use App\Models\Setting\Company;
 use App\Models\User;
 use App\Models\Warehouse\Category;
+use App\Models\Work\Project;
 use App\Models\Warehouse\Material;
 use App\Models\Warehouse\PurchaseRequest;
 use App\Models\Warehouse\Warehouse;
@@ -83,6 +84,12 @@ class PurchaseRequestController extends Controller
             ->orderBy('name')
             ->get();
 
+        $projects = Project::query()
+            ->active()
+            ->select('id', 'code', 'name')
+            ->orderBy('name')
+            ->get();
+
         // Status statistics for dashboard cards
         $requests = PurchaseRequest::query()
             ->with('approvalRequest')
@@ -112,6 +119,7 @@ class PurchaseRequestController extends Controller
                 'materials',
                 'materialCategories',
                 'approvalTemplates',
+                'projects',
                 'statusStats'
             )
         );

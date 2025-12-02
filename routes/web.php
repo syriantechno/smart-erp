@@ -366,6 +366,8 @@ Route::middleware('auth')->group(function () {
             Route::get('/{category}', [App\Http\Controllers\Warehouse\CategoryController::class, 'show'])->name('show');
             Route::put('/{category}', [App\Http\Controllers\Warehouse\CategoryController::class, 'update'])->name('update');
             Route::delete('/{category}', [App\Http\Controllers\Warehouse\CategoryController::class, 'destroy'])->name('destroy');
+            Route::post('/export-pdf', [App\Http\Controllers\Warehouse\CategoryController::class, 'exportPdf'])->name('export-pdf');
+            Route::get('/export-excel', [App\Http\Controllers\Warehouse\CategoryController::class, 'exportExcel'])->name('export-excel');
         });
 
         // Warehouses
@@ -400,6 +402,8 @@ Route::middleware('auth')->group(function () {
             Route::get('/', [App\Http\Controllers\Warehouse\InventoryController::class, 'index'])->name('index');
             Route::get('/datatable', [App\Http\Controllers\Warehouse\InventoryController::class, 'datatable'])->name('datatable');
             Route::post('/', [App\Http\Controllers\Warehouse\InventoryController::class, 'store'])->name('store');
+            Route::post('/export-pdf', [App\Http\Controllers\Warehouse\InventoryController::class, 'exportPdf'])->name('export-pdf');
+            Route::get('/export-excel', [App\Http\Controllers\Warehouse\InventoryController::class, 'exportExcel'])->name('export-excel');
             Route::get('/{inventory}', [App\Http\Controllers\Warehouse\InventoryController::class, 'show'])->name('show');
             Route::put('/{inventory}', [App\Http\Controllers\Warehouse\InventoryController::class, 'update'])->name('update');
             Route::delete('/{inventory}', [App\Http\Controllers\Warehouse\InventoryController::class, 'destroy'])->name('destroy');

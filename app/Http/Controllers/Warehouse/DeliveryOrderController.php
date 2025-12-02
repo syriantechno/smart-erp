@@ -3,7 +3,13 @@
 namespace App\Http\Controllers\Warehouse;
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
+use App\Models\Approval\ApprovalTemplate;
+use App\Models\Work\Project;
+use App\Models\Warehouse\Category;
 use App\Models\Warehouse\DeliveryOrder;
+use App\Models\Warehouse\Inventory;
+use App\Models\Warehouse\Material;
 use App\Models\Warehouse\Warehouse;
 use App\Services\DocumentCodeGenerator;
 use Illuminate\Http\JsonResponse;
@@ -21,14 +27,100 @@ class DeliveryOrderController extends Controller
 
     public function index()
     {
-        // Get statistics for the royal theme header
+        // Header statistics
         $totalDeliveryOrders = DeliveryOrder::count();
         $pendingDeliveryOrders = DeliveryOrder::where('status', 'pending')->count();
         $shippedDeliveryOrders = DeliveryOrder::where('status', 'shipped')->count();
         $deliveredDeliveryOrders = DeliveryOrder::where('status', 'delivered')->count();
 
-        $warehouses = Warehouse::active()->select('id', 'name')->get();
-        return view('warehouse.delivery-orders.index-unified', compact('warehouses', 'totalDeliveryOrders', 'pendingDeliveryOrders', 'shippedDeliveryOrders', 'deliveredDeliveryOrders'));
+        // Companies for hero + company filter
+        $companies = Company::query()
+            ->select('id', 'name', 'logo', 'address')
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        $company = $companies->first();
+
+        // Warehouses
+        $warehouses = Warehouse::query()
+            ->select('id', 'code', 'name', 'location')
+            ->orderBy('name')
+            ->get();
+
+        // Catalogs (root categories with children)
+        $categories = Category::with(['children.children'])
+            ->whereNull('parent_id')
+            ->orderBy('name')
+            ->get();
+
+        // Materials with category + unit meta (same mapping as material requests / purchase orders)
+        $materials = Material::with(['category:id,name,parent_id', 'unit:id,name,symbol'])
+            ->select('id', 'code', 'name', 'category_id', 'unit_id', 'price')
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get()
+            ->map(function (Material $material) {
+                return [
+                    'id' => $material->id,
+                    'code' => $material->code,
+                    'name' => $material->name,
+                    'category_id' => $material->category_id,
+                    'category_name' => $material->category?->name,
+                    'unit' => $material->unit?->name,
+                    'unit_symbol' => $material->unit?->symbol,
+                    'price' => (float) $material->price,
+                ];
+            });
+
+        $materialCategories = $materials
+            ->pluck('category_name', 'category_id')
+            ->filter()
+            ->map(function ($name, $id) {
+                return [
+                    'id' => $id,
+                    'name' => $name,
+                ];
+            })
+            ->values();
+
+        // Approval templates for delivery orders (reusing same model / scope style)
+        $approvalTemplates = ApprovalTemplate::query()
+            ->active()
+            ->byType('delivery_order')
+            ->select('id', 'name', 'description', 'levels')
+            ->orderBy('name')
+            ->get();
+
+        // Active projects for linking delivery orders to projects
+        $projects = Project::query()
+            ->active()
+            ->select('id', 'code', 'name')
+            ->orderBy('name')
+            ->get();
+
+        $statusStats = [
+            'total' => $totalDeliveryOrders,
+            'pending' => $pendingDeliveryOrders,
+            'shipped' => $shippedDeliveryOrders,
+            'delivered' => $deliveredDeliveryOrders,
+        ];
+
+        return view('warehouse.delivery-orders.index-unified', compact(
+            'company',
+            'companies',
+            'warehouses',
+            'categories',
+            'materials',
+            'materialCategories',
+            'approvalTemplates',
+            'projects',
+            'statusStats',
+            'totalDeliveryOrders',
+            'pendingDeliveryOrders',
+            'shippedDeliveryOrders',
+            'deliveredDeliveryOrders'
+        ));
     }
 
     public function previewCode()
@@ -122,11 +214,51 @@ class DeliveryOrderController extends Controller
             return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
         }
 
+        $oldStatus = $deliveryOrder->status;
+        $lowStockAlerts = [];
+
         try {
             DB::beginTransaction();
+
             $deliveryOrder->update($request->all());
+
+            if ($oldStatus !== 'delivered' && $deliveryOrder->status === 'delivered') {
+                $deliveryOrder->load(['items.material', 'warehouse']);
+
+                foreach ($deliveryOrder->items as $item) {
+                    $inventory = Inventory::firstOrCreate(
+                        [
+                            'material_id' => $item->material_id,
+                            'warehouse_id' => $deliveryOrder->warehouse_id,
+                        ],
+                        [
+                            'quantity' => 0,
+                            'unit_price' => 0,
+                        ]
+                    );
+
+                    $inventory->quantity = max(0, $inventory->quantity - $item->quantity);
+                    $inventory->save();
+
+                    if ($inventory->quantity <= 0) {
+                        $lowStockAlerts[] = [
+                            'material_id' => $item->material_id,
+                            'material_name' => $item->material?->name,
+                            'warehouse_id' => $deliveryOrder->warehouse_id,
+                            'warehouse_name' => $deliveryOrder->warehouse?->name,
+                            'quantity' => (float) $inventory->quantity,
+                        ];
+                    }
+                }
+            }
+
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Delivery order updated successfully']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Delivery order updated successfully',
+                'low_stock' => $lowStockAlerts,
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => 'Failed to update delivery order: ' . $e->getMessage()], 500);

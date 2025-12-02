@@ -5,16 +5,18 @@ namespace App\Http\Controllers\Warehouse;
 use App\Http\Controllers\Controller;
 use App\Models\Warehouse\Category;
 use App\Services\DocumentCodeGenerator;
+use App\Services\PdfExporter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class CategoryController extends Controller
 {
-    public function __construct(private DocumentCodeGenerator $codeGenerator)
+    public function __construct(private DocumentCodeGenerator $codeGenerator, private PdfExporter $pdfExporter)
     {
     }
 
@@ -177,5 +179,52 @@ class CategoryController extends Controller
         }
 
         return response()->json($query->get());
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $categories = Category::with('parent')
+            ->orderBy('code')
+            ->get();
+
+        return $this->pdfExporter->stream(
+            'warehouse.categories.export_pdf',
+            [
+                'categories' => $categories,
+                'exportedAt' => now(),
+            ],
+            'categories.pdf'
+        );
+    }
+
+    public function exportExcel()
+    {
+        $categories = Category::with('parent')
+            ->orderBy('code')
+            ->get();
+
+        $export = new class($categories) implements \Maatwebsite\Excel\Concerns\FromArray, \Maatwebsite\Excel\Concerns\WithHeadings {
+            public function __construct(private $categories) {}
+
+            public function array(): array
+            {
+                return $this->categories->map(function (Category $category) {
+                    return [
+                        'Code' => $category->code,
+                        'Name' => $category->name,
+                        'Parent' => $category->parent?->name ?? 'Root',
+                        'Description' => $category->description,
+                        'Status' => $category->is_active ? 'Active' : 'Inactive',
+                    ];
+                })->toArray();
+            }
+
+            public function headings(): array
+            {
+                return ['Code', 'Name', 'Parent', 'Description', 'Status'];
+            }
+        };
+
+        return Excel::download($export, 'categories.xlsx');
     }
 }

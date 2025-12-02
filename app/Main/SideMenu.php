@@ -179,15 +179,15 @@ class SideMenu
                         'route_name' => 'warehouse.categories.index',
                         'title' => __('menu.categories')
                     ],
-                    'warehouses' => [
-                        'icon' => 'home',
-                        'route_name' => 'warehouse.warehouses.index',
-                        'title' => __('menu.warehouses')
-                    ],
                     'materials' => [
                         'icon' => 'box',
                         'route_name' => 'warehouse.materials.index',
                         'title' => __('menu.materials')
+                    ],
+                    'warehouses' => [
+                        'icon' => 'home',
+                        'route_name' => 'warehouse.warehouses.index',
+                        'title' => __('menu.warehouses')
                     ],
                     'inventory' => [
                         'icon' => 'clipboard-list',

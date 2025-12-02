@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\Notifications\NotificationDispatcher;
 use App\Models\Approval\ApprovalRequest;
 use App\Models\Approval\ApprovalTemplate;
+use App\Models\Work\Project;
 use App\Models\User;
 use App\Models\Warehouse\PurchaseOrder;
 use App\Services\DocumentCodeGenerator;
@@ -25,20 +26,52 @@ class PurchaseOrderController extends Controller
 
     public function index()
     {
-        // Get statistics for the royal theme header
-        $totalPurchaseOrders = PurchaseOrder::count();
-        $pendingPurchaseOrders = PurchaseOrder::where('status', 'pending')->count();
-        $approvedPurchaseOrders = PurchaseOrder::where('status', 'approved')->count();
-        $completedPurchaseOrders = PurchaseOrder::where('status', 'completed')->count();
+        $companies = \App\Models\Setting\Company::query()
+            ->select('id', 'name', 'logo', 'address')
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
 
-        // Get suppliers and materials for the unified invoice form
-        try {
-            $suppliers = collect(); // Empty collection as fallback
-            $materials = \App\Models\Warehouse\Material::select('id', 'name', 'unit', 'price')->get();
-        } catch (\Exception $e) {
-            $suppliers = collect();
-            $materials = collect();
-        }
+        $company = $companies->first();
+
+        $warehouses = \App\Models\Warehouse\Warehouse::query()
+            ->select('id', 'code', 'name', 'location')
+            ->orderBy('name')
+            ->get();
+
+        $categories = \App\Models\Warehouse\Category::with(['children.children'])
+            ->whereNull('parent_id')
+            ->orderBy('name')
+            ->get();
+
+        $materials = \App\Models\Warehouse\Material::with(['category:id,name,parent_id', 'unit:id,name,symbol'])
+            ->select('id', 'code', 'name', 'category_id', 'unit_id', 'price')
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get()
+            ->map(function (\App\Models\Warehouse\Material $material) {
+                return [
+                    'id' => $material->id,
+                    'code' => $material->code,
+                    'name' => $material->name,
+                    'category_id' => $material->category_id,
+                    'category_name' => $material->category?->name,
+                    'unit' => $material->unit?->name,
+                    'unit_symbol' => $material->unit?->symbol,
+                    'price' => (float) $material->price,
+                ];
+            });
+
+        $materialCategories = $materials
+            ->pluck('category_name', 'category_id')
+            ->filter()
+            ->map(function ($name, $id) {
+                return [
+                    'id' => $id,
+                    'name' => $name,
+                ];
+            })
+            ->values();
 
         $approvalTemplates = ApprovalTemplate::query()
             ->active()
@@ -47,7 +80,45 @@ class PurchaseOrderController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('warehouse.purchase-orders.index', compact('suppliers', 'materials', 'approvalTemplates', 'totalPurchaseOrders', 'pendingPurchaseOrders', 'approvedPurchaseOrders', 'completedPurchaseOrders'));
+        $projects = Project::query()
+            ->active()
+            ->select('id', 'code', 'name')
+            ->orderBy('name')
+            ->get();
+
+        $purchaseOrders = PurchaseOrder::query()
+            ->select('id', 'status')
+            ->get();
+
+        $statusStats = [
+            'total' => $purchaseOrders->count(),
+            'pending' => $purchaseOrders->where('status', 'pending')->count(),
+            'approved' => $purchaseOrders->where('status', 'approved')->count(),
+            'shipped' => $purchaseOrders->where('status', 'shipped')->count(),
+            'delivered' => $purchaseOrders->where('status', 'delivered')->count(),
+            'cancelled' => $purchaseOrders->where('status', 'cancelled')->count(),
+        ];
+
+        $suppliers = \App\Models\Supplier\Vendor::query()
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get();
+
+        return view(
+            'warehouse.purchase-orders.index',
+            compact(
+                'company',
+                'companies',
+                'warehouses',
+                'categories',
+                'materials',
+                'materialCategories',
+                'approvalTemplates',
+                'projects',
+                'statusStats',
+                'suppliers'
+            )
+        );
     }
 
     public function previewCode()

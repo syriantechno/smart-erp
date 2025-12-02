@@ -1,7 +1,81 @@
 @extends('../themes/' . $activeTheme . '/' . $activeLayout)
 
+@php
+    $company = $company ?? null;
+    $companies = $companies ?? collect();
+    $warehouses = $warehouses ?? collect();
+    $categories = $categories ?? collect();
+    $materials = $materials ?? collect();
+    $materialCategories = $materialCategories ?? collect();
+    $approvalTemplates = $approvalTemplates ?? collect();
+
+    $warehousesPayload = $warehouses->map(fn ($warehouse) => [
+        'id' => $warehouse->id,
+        'code' => $warehouse->code,
+        'name' => $warehouse->name,
+        'location' => $warehouse->location,
+    ])->values();
+
+    $materialsPayload = $materials->map(fn ($material) => [
+        'id' => $material['id'] ?? null,
+        'code' => $material['code'] ?? null,
+        'name' => $material['name'] ?? null,
+        'category_id' => $material['category_id'] ?? null,
+        'category_name' => $material['category_name'] ?? null,
+        'unit' => $material['unit'] ?? null,
+        'unit_symbol' => $material['unit_symbol'] ?? null,
+        'price' => $material['price'] ?? 0,
+    ])->values();
+
+    $materialCategoriesPayload = $materialCategories->map(fn ($category) => [
+        'id' => $category['id'] ?? null,
+        'name' => $category['name'] ?? null,
+    ])->values();
+
+    $catalogsPayload = $categories->map(fn ($category) => [
+        'id' => $category->id,
+        'name' => $category->name,
+        'children' => $category->children->map(fn ($child) => [
+            'id' => $child->id,
+            'name' => $child->name,
+        ])->values(),
+    ])->values();
+
+    $approvalTemplatesPayload = $approvalTemplates->map(fn ($template) => [
+        'id' => $template->id,
+        'name' => $template->name,
+        'description' => $template->description,
+        'levels' => $template->levels,
+    ])->values();
+
+    $companiesPayload = $companies->map(fn ($company) => [
+        'id' => $company->id,
+        'name' => $company->name,
+        'address' => $company->address,
+        'logo_url' => $company->logo ? \Illuminate\Support\Facades\Storage::url($company->logo) : null,
+    ])->values();
+
+    $currencySymbol = setting('currency.symbol', '$');
+
+    $defaultCompany = $company ?? $companies->first();
+    $defaultCompanyName = $defaultCompany->name ?? 'Smart ERP';
+    $defaultCompanyAddress = $defaultCompany->address ?? 'Select the warehouse items needed for fulfillment.';
+    $defaultCompanyLogo = $defaultCompany?->logo ? \Illuminate\Support\Facades\Storage::url($defaultCompany->logo) : null;
+    $defaultCompanyId = $defaultCompany->id ?? null;
+
+    $defaultCompanyMeta = [
+        'id' => $defaultCompanyId,
+        'name' => $defaultCompanyName,
+        'address' => $defaultCompanyAddress,
+        'logo_url' => $defaultCompanyLogo
+            ?? 'https://ui-avatars.com/api/?name=' . urlencode($defaultCompanyName)
+            . '&background=1D4ED8&color=fff',
+    ];
+@endphp
+
 @section('subhead')
     <title>Purchase Orders - {{ config('app.name') }}</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 @endsection
 
 @include('components.datatable.styles')
@@ -94,71 +168,86 @@
         <div class="intro-y col-span-12">
             <x-base.preview-component class="intro-y box bg-white/80 border border-slate-200/70 shadow-[0_18px_45px_rgba(15,23,42,0.10)]">
                 <div class="p-5">
-                    <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
-                        <form id="purchase-orders-filter-form" class="w-full sm:mr-auto xl:flex">
-                            <div class="items-center sm:mr-4 sm:flex">
-                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
-                                    Status
-                                </label>
-                                <x-base.form-select id="purchase-orders-status-filter" class="mt-2 w-full sm:mt-0 sm:w-auto">
-                                    <option value="">All Status</option>
-                                    <option value="pending">Pending</option>
-                                    <option value="approved">Approved</option>
-                                    <option value="shipped">Shipped</option>
-                                    <option value="delivered">Delivered</option>
-                                    <option value="cancelled">Cancelled</option>
-                                </x-base.form-select>
-                            </div>
-                            <div class="mt-2 items-center sm:mr-4 sm:flex xl:mt-0">
-                                <label class="mr-2 w-16 flex-none xl:w-auto xl:flex-initial">
-                                    Search
-                                </label>
-                                <x-base.form-input
-                                    id="purchase-orders-search-filter"
-                                    type="text"
-                                    placeholder="Search..."
-                                    class="mt-2 w-full sm:mt-0 sm:w-48 2xl:w-full"
-                                />
-                            </div>
-                            <div class="mt-4 flex flex-wrap gap-2 sm:items-center xl:mt-0">
-                                <button id="purchase-orders-filter-go" type="button" class="btn-royal btn-royal--dark btn-royal--sm w-full sm:w-24 group">
-                                    <x-base.lucide icon="search" class="w-4 h-4 icon-hover-rise" />
-                                    Go
-                                </button>
-                                <button id="purchase-orders-filter-reset" type="button" class="btn-royal btn-royal--outline btn-royal--sm w-full sm:w-24 group">
-                                    <x-base.lucide icon="rotate-ccw" class="w-4 h-4 icon-hover-rise" />
-                                    Reset
-                                </button>
-                            </div>
-                        </form>
+                    {{-- Filters & Actions in One Row (copied from Departments) --}}
+                    <div class="flex flex-wrap items-center gap-2 mb-4">
+                        {{-- Search Input --}}
+                        <div class="relative min-w-[180px]">
+                            <x-base.lucide icon="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <x-base.form-input
+                                id="purchase-orders-search-filter"
+                                type="text"
+                                placeholder="Search..."
+                                class="pl-9 w-full text-sm py-1.5"
+                            />
+                        </div>
 
-                        <div class="mt-5 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap">
-                            <x-base.tippy content="Export PDF" placement="bottom">
-                                <button id="purchase-orders-pdf" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
-                                    <x-base.lucide icon="file-text" class="w-5 h-5 icon-hover-rise" />
+                        {{-- Company Filter --}}
+                        <x-base.form-select id="purchase-orders-company-filter" class="w-auto text-sm py-1.5">
+                            <option value="">All Companies</option>
+                            @foreach($companies ?? [] as $companyOption)
+                                <option value="{{ $companyOption->id }}">{{ $companyOption->name }}</option>
+                            @endforeach
+                        </x-base.form-select>
+
+                        {{-- Status Filter --}}
+                        <x-base.form-select id="purchase-orders-status-filter" class="w-auto text-sm py-1.5">
+                            <option value="">Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="cancelled">Cancelled</option>
+                        </x-base.form-select>
+
+                        {{-- Page Length --}}
+                        <x-base.form-select id="purchase-orders-filter-length" class="w-auto text-sm py-1.5">
+                            <option value="10">10</option>
+                            <option value="25" selected>25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </x-base.form-select>
+
+                        {{-- Reset Button --}}
+                        <x-base.tippy as="button" id="purchase-orders-filter-reset" type="button" content="Reset filters" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                            <x-base.lucide icon="x" class="w-4 h-4" />
+                        </x-base.tippy>
+
+                        {{-- Spacer --}}
+                        <div class="flex-1"></div>
+
+                        {{-- Action Buttons --}}
+                        <div class="flex items-center gap-1">
+                            <x-base.tippy content="Print" placement="bottom">
+                                <button type="button" id="purchase-orders-print" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                                    <x-base.lucide icon="printer" class="w-4 h-4" />
                                 </button>
                             </x-base.tippy>
-                            <x-base.tippy content="Export" placement="bottom">
-                                <button id="purchase-orders-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
-                                    <x-base.lucide icon="file-spreadsheet" class="w-5 h-5 icon-hover-rise" />
+                            <x-base.tippy content="Export PDF" placement="bottom">
+                                <button type="button" id="purchase-orders-pdf" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                                    <x-base.lucide icon="file-text" class="w-4 h-4" />
+                                </button>
+                            </x-base.tippy>
+                            <x-base.tippy content="Export Excel" placement="bottom">
+                                <button id="purchase-orders-export" type="button" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                                    <x-base.lucide icon="file-spreadsheet" class="w-4 h-4" />
                                 </button>
                             </x-base.tippy>
                             <x-base.tippy content="Refresh" placement="bottom">
-                                <button id="purchase-orders-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm  group text-royalDark">
-                                    <x-base.lucide icon="refresh-cw" class="w-5 h-5 icon-hover-rise" />
+                                <button id="purchase-orders-refresh" type="button" class="btn-royal btn-royal--outline btn-royal--sm px-2">
+                                    <x-base.lucide icon="refresh-cw" class="w-4 h-4" />
                                 </button>
                             </x-base.tippy>
 
-                            {{-- Add Purchase Order button at the right end of the toolbar --}}
-                            <x-base.tippy content="Create new purchase order" placement="bottom">
+                            {{-- Add Purchase Order Button --}}
+                            <x-base.tippy content="Add purchase order" placement="bottom">
                                 <button
                                     type="button"
                                     id="open-create-po-modal"
-                                    class="btn-royal btn-royal--gold btn-royal--sm sm:btn-royal--lg group"
+                                    class="btn-royal btn-royal--gold btn-royal--sm"
                                     data-tw-toggle="modal"
-                                    data-tw-target="#create-purchase-order-modal"
+                                    data-tw-target="#create-po-modal"
                                 >
-                                    <x-base.lucide icon="plus-circle" class="w-5 h-5 icon-hover-rise" />
+                                    <x-base.lucide icon="plus-circle" class="w-4 h-4 mr-2" />
                                     <span class="hidden sm:inline">Add</span>
                                 </button>
                             </x-base.tippy>
@@ -193,6 +282,30 @@
     @include('components.datatable.scripts')
 
     <script>
+        window.purchaseOrderPayload = {
+            routes: {
+                store: '{{ route('warehouse.purchase-orders.store') }}',
+                previewCode: '{{ route('warehouse.purchase-orders.preview-code') }}',
+                materials: '{{ route('warehouse.material-requests.materials') }}',
+                categoryChildren: '{{ route('warehouse.categories.children') }}'
+            },
+            meta: {
+                csrf: '{{ csrf_token() }}'
+            },
+            data: {
+                companies: @json($companiesPayload),
+                defaultCompany: @json($defaultCompanyMeta),
+                warehouses: @json($warehousesPayload),
+                materials: @json($materialsPayload),
+                categories: @json($materialCategoriesPayload),
+                catalogs: @json($catalogsPayload),
+                approvalTemplates: @json($approvalTemplatesPayload),
+                currencySymbol: @json($currencySymbol)
+            }
+        };
+
+        window.dispatchEvent(new Event('purchase-order:payload-ready'));
+
         let purchaseOrdersTable;
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -221,17 +334,17 @@
                 tableSelector: '#purchase-orders-table',
                 ajaxUrl: '{{ route("warehouse.purchase-orders.datatable") }}',
                 ajaxData: function(d) {
-                    // Advanced filtering like employees
-                    const field = $('#purchase-orders-filter-field').val();
-                    const type = $('#purchase-orders-filter-type').val();
-                    const value = $('#purchase-orders-filter-value').val();
-                    
-                    if (field && field !== 'all' && value) {
-                        d.filter_field = field;
-                        d.filter_type = type;
-                        d.filter_value = value;
+                    const statusEl = document.getElementById('purchase-orders-status-filter');
+                    const searchEl = document.getElementById('purchase-orders-search-filter');
+
+                    if (statusEl && statusEl.value) {
+                        d.status = statusEl.value;
                     }
-                    
+
+                    if (searchEl && searchEl.value) {
+                        d.search_value = searchEl.value;
+                    }
+
                     return d;
                 },
                 columns: [
@@ -244,7 +357,7 @@
                     { data: 'status', name: 'status', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-slate-700 whitespace-nowrap' },
                     { data: 'actions', name: 'actions', className: 'px-5 py-3 border-b dark:border-darkmode-300 text-center', orderable: false, searchable: false }
                 ],
-                pageLength: parseInt($('#purchase-orders-filter-length').val()) || 25,
+                pageLength: 25,
                 drawCallback: function() {
                     // Re-initialize Lucide icons
                     if (typeof lucide !== 'undefined') {
@@ -257,39 +370,37 @@
         }
 
         function setupEventListeners() {
-            // Filter form submission
+            // Filter form submission (status/search only if elements exist)
             $('#purchase-orders-filter-go').on('click', function() {
-                purchaseOrdersTable.page.len(parseInt($('#purchase-orders-filter-length').val())).draw();
-                purchaseOrdersTable.ajax.reload();
-                updateActiveFiltersIndicator();
+                if (purchaseOrdersTable) {
+                    purchaseOrdersTable.ajax.reload();
+                }
             });
 
             // Reset filters
             $('#purchase-orders-filter-reset').on('click', function() {
-                $('#purchase-orders-filter-field').val('all');
-                $('#purchase-orders-filter-type').val('contains');
-                $('#purchase-orders-filter-value').val('');
-                $('#purchase-orders-filter-length').val('25');
-                purchaseOrdersTable.page.len(25).draw();
-                purchaseOrdersTable.ajax.reload();
-                updateActiveFiltersIndicator();
-            });
+                const statusEl = document.getElementById('purchase-orders-status-filter');
+                const searchEl = document.getElementById('purchase-orders-search-filter');
 
-            // Enter key on search
-            $('#purchase-orders-filter-value').on('keypress', function(e) {
-                if (e.which === 13) {
-                    $('#purchase-orders-filter-go').click();
+                if (statusEl) {
+                    statusEl.value = '';
+                }
+
+                if (searchEl) {
+                    searchEl.value = '';
+                }
+
+                if (purchaseOrdersTable) {
+                    purchaseOrdersTable.page.len(25).draw();
+                    purchaseOrdersTable.ajax.reload();
                 }
             });
 
-            $('#purchase-orders-filter-field, #purchase-orders-filter-type').on('change', updateActiveFiltersIndicator);
-            $('#purchase-orders-filter-value').on('input', updateActiveFiltersIndicator);
-
-            updateActiveFiltersIndicator();
-
-            // Page length change
-            $('#purchase-orders-filter-length').on('change', function() {
-                purchaseOrdersTable.page.len(parseInt($(this).val())).draw();
+            // Enter key on search
+            $('#purchase-orders-search-filter').on('keypress', function(e) {
+                if (e.which === 13) {
+                    $('#purchase-orders-filter-go').click();
+                }
             });
 
             // PDF export
@@ -327,11 +438,18 @@
         }
 
         function updateActiveFiltersIndicator() {
-            const field = $('#purchase-orders-filter-field').val();
-            const value = $('#purchase-orders-filter-value').val() || '';
-            const hasValue = value.trim().length > 0;
-            const hasSpecificField = field && field !== 'all' && hasValue;
-            $('#active-filters-indicator').toggleClass('hidden', !(hasValue || hasSpecificField));
+            const statusEl = document.getElementById('purchase-orders-status-filter');
+            const searchEl = document.getElementById('purchase-orders-search-filter');
+            const indicator = document.getElementById('active-filters-indicator');
+
+            if (!indicator) {
+                return;
+            }
+
+            const hasStatus = !!(statusEl && statusEl.value && statusEl.value.trim().length > 0);
+            const hasSearch = !!(searchEl && searchEl.value && searchEl.value.trim().length > 0);
+
+            indicator.classList.toggle('hidden', !(hasStatus || hasSearch));
         }
 
         function deletePurchaseOrder(id, name) {
